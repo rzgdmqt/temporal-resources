@@ -56,7 +56,10 @@ open _→ᵗ_
 [ p ]-≤ = tset-map (λ { (t'' , q , r , a) → t'' , ≤-trans q p , r , a })
 
 ε : ∀ {A} → [ 0 ]ᵒ A →ᵗ A
-ε {tset A Af} = tset-map λ { (t'' , p , q , a) → Af q a }
+ε {tset A Af} = tset-map (λ { (t'' , p , q , a) → Af q a })
+
+ε' : ∀ {A t} → [ t ]ᵒ A →ᵗ A
+ε' {tset A Af} = tset-map λ { (t'' , p , q , a) → Af q a } -- wouldn't want this to be the case!
 
 δ : ∀ {A t₁ t₂} → [ t₁ + t₂ ]ᵒ A →ᵗ [ t₁ ]ᵒ ([ t₂ ]ᵒ A)
 δ {tset A Af} {t₁} {t₂} =
