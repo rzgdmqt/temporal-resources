@@ -1,3 +1,7 @@
+----------------------------------------------
+-- Time-indexed sets and modalities on them --
+----------------------------------------------
+
 open import Function
 
 open import Data.Bool hiding (_≤_)
@@ -8,9 +12,6 @@ open import Data.Product
 import Relation.Binary.PropositionalEquality as Eq
 open Eq
 open Eq.≡-Reasoning
-
--- Time-indexed sets and modalities on them
--------------------------------------------
 
 module TSets where
 
@@ -69,7 +70,7 @@ record _→ᵗ_ (A B : TSet) : Set where
 
 open _→ᵗ_
 
--- Semantics of `[ t ] A` modality as a graded comonad
+-- Semantics of the type modality `[ t ] A` as a graded comonad
 
 [_]ᵒ : Time → TSet → TSet
 [ t ]ᵒ (tset A Af) =
@@ -104,7 +105,7 @@ open _→ᵗ_
 δ⁻¹ {tset A Af} {t₁} {t₂} =
   tset-map (λ {t} a → Af (≤-reflexive (+-assoc t t₁ t₂)) a)
 
--- Semantics of `Γ ⟨ t ⟩` modality as a graded monad
+-- Semantics of the context modality `Γ ⟨ t ⟩` as a graded monad
 
 ⟨_⟩ᵒ : Time → TSet → TSet
 ⟨ t ⟩ᵒ (tset A Af) =
@@ -135,12 +136,15 @@ open _→ᵗ_
 μ : ∀ {A t₁ t₂} → ⟨ t₁ ⟩ᵒ (⟨ t₂ ⟩ᵒ A) →ᵗ ⟨ t₁ + t₂ ⟩ᵒ A
 μ {tset A Af} {t₁} {t₂} =
   tset-map
-    (λ { {t} (p , q , a) → n≤k⇒m≤k∸n⇒n+m≤k t₁ t₂ t p q , Af (≤-reflexive (n∸m∸k≡n∸m+k t t₁ t₂)) a })
+    (λ { {t} (p , q , a) → n≤k⇒m≤k∸n⇒n+m≤k t₁ t₂ t p q ,
+                           Af (≤-reflexive (n∸m∸k≡n∸m+k t t₁ t₂)) a })
 
 μ⁻¹ : ∀ {A t₁ t₂} → ⟨ t₁ + t₂ ⟩ᵒ A →ᵗ ⟨ t₁ ⟩ᵒ (⟨ t₂ ⟩ᵒ A)
 μ⁻¹ {tset A Af} {t₁} {t₂} =
   tset-map
-    (λ { {t} (p , a) → m+n≤o⇒m≤o t₁ p , n+m≤k⇒m≤k∸n t₁ t₂ t p , Af (≤-reflexive (sym (n∸m∸k≡n∸m+k t t₁ t₂))) a })
+    (λ { {t} (p , a) → m+n≤o⇒m≤o t₁ p ,
+                       n+m≤k⇒m≤k∸n t₁ t₂ t p ,
+                       Af (≤-reflexive (sym (n∸m∸k≡n∸m+k t t₁ t₂))) a })
 
 -- Adjunction between the graded monad and comonad
 

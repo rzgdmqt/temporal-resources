@@ -1,11 +1,12 @@
+-------------------------------------------------------------------
+-- Types and terms of the intuitionistic variant of the language --
+-------------------------------------------------------------------
+
 open import Data.Nat
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
-
--- Types and terms of the intuitionistic variant of the language
-----------------------------------------------------------------
 
 module Language where
 
@@ -95,7 +96,7 @@ data _⊢_ (Γ : Ctx) : Type → Set where
   delay  : {A : Type}
          → {t : Time}
          → Γ ⟨ t ⟩ ⊢ A
-         -------------- (make a value available after `t` time steps)
+         -------------- (delay computing the value by `t` time steps)
          → Γ ⊢ [ t ] A
 
   wait   : {Γ' Γ'' : Ctx}
@@ -104,5 +105,5 @@ data _⊢_ (Γ : Ctx) : Type → Set where
          → Γ' ⊢ [ t ] A
          → Γ ≡ Γ' ++ᶜ Γ''
          → t ≤ delayᶜ Γ''
-         ---------------- (wait for a value to become available in at least `t` time steps)
+         ---------------- (wait for a value to become available after at least `t` time steps)
          → Γ ⊢ A
