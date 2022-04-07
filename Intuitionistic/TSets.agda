@@ -21,12 +21,30 @@ Time = ℕ
 
 -- Auxiliary lemmas
 
-∸-+ : (n m k : ℕ) → n ∸ m ∸ k ≡ n ∸ (m + k)
-∸-+ zero    zero    k       = refl
-∸-+ zero    (suc m) zero    = refl
-∸-+ zero    (suc m) (suc k) = refl
-∸-+ (suc n) zero    k       = refl
-∸-+ (suc n) (suc m) k       = ∸-+ n m k
+n∸m∸k≡n∸m+k : (n m k : ℕ) → n ∸ m ∸ k ≡ n ∸ (m + k)
+n∸m∸k≡n∸m+k zero    zero    k       = refl
+n∸m∸k≡n∸m+k zero    (suc m) zero    = refl
+n∸m∸k≡n∸m+k zero    (suc m) (suc k) = refl
+n∸m∸k≡n∸m+k (suc n) zero    k       = refl
+n∸m∸k≡n∸m+k (suc n) (suc m) k       = n∸m∸k≡n∸m+k n m k
+
+n≤k⇒m≤k∸n⇒n+m≤k : (n m k : ℕ) → n ≤ k → m ≤ k ∸ n → n + m ≤ k
+n≤k⇒m≤k∸n⇒n+m≤k zero m k z≤n q = q
+n≤k⇒m≤k∸n⇒n+m≤k (suc n) m (suc k) (s≤s p) q =
+  +-monoʳ-≤ 1 (n≤k⇒m≤k∸n⇒n+m≤k n m k p q)
+
+n≤m⇒m∸n+n≤m : (n m : ℕ) → n ≤ m → m ∸ n + n ≤ m
+n≤m⇒m∸n+n≤m zero m z≤n =
+  ≤-reflexive (+-identityʳ m)
+n≤m⇒m∸n+n≤m (suc n) (suc m) (s≤s p) =
+  ≤-trans
+    (≤-reflexive (+-suc (m ∸ n) n))
+    (+-monoʳ-≤ 1 (n≤m⇒m∸n+n≤m n m p))
+
+n+m≤k⇒m≤k∸n : (n m k : ℕ) → n + m ≤ k → m ≤ k ∸ n
+n+m≤k⇒m≤k∸n zero    m       k       p       = p
+n+m≤k⇒m≤k∸n (suc n) zero    k       p       = z≤n
+n+m≤k⇒m≤k∸n (suc n) (suc m) (suc k) (s≤s p) = n+m≤k⇒m≤k∸n n (suc m) k p
 
 -- Time-indexed sets
 
@@ -45,7 +63,7 @@ record _→ᵗ_ (A B : TSet) : Set where
   constructor
     tset-map
   field
-    carrier : ∀ {t} → carrier A t → carrier B t
+    map-carrier : ∀ {t} → carrier A t → carrier B t
 
     -- TODO: also include naturality law
 
@@ -91,58 +109,49 @@ open _→ᵗ_
 ⟨_⟩ᵒ : Time → TSet → TSet
 ⟨ t ⟩ᵒ (tset A Af) =
   tset
-    (λ t' → A (t' ∸ t))
-    (λ p a → Af (∸-mono p (≤-refl {t})) a)
+    (λ t' → t ≤ t' × A (t' ∸ t))
+    (λ p (q , a) → ≤-trans q p , Af (∸-mono p (≤-refl {t})) a)
 
 ⟨_⟩ᶠ : ∀ {A B} → (t : Time) → A →ᵗ B → ⟨ t ⟩ᵒ A →ᵗ ⟨ t ⟩ᵒ B
-⟨ t ⟩ᶠ (tset-map f) = tset-map f
+⟨ t ⟩ᶠ (tset-map f) =
+  tset-map
+    (λ { (p , a) → p , f a })
 
 ⟨_⟩-≤ : ∀ {A t₁ t₂} → t₁ ≤ t₂ → ⟨ t₂ ⟩ᵒ A →ᵗ ⟨ t₁ ⟩ᵒ A
 ⟨_⟩-≤ {tset A Af} p =
   tset-map
-    (λ {t} a → Af (∸-mono (≤-refl {t}) p) a)
+    (λ { {t} (q , a) → ≤-trans p q , Af (∸-mono (≤-refl {t}) p) a })
 
 η : ∀ {A} → A →ᵗ ⟨ 0 ⟩ᵒ A
-η = tset-map id
+η =
+  tset-map
+    (λ a → z≤n , a)
 
 η⁻¹ : ∀ {A} → ⟨ 0 ⟩ᵒ A →ᵗ A
-η⁻¹ = tset-map id
+η⁻¹ =
+  tset-map
+    (λ { (p , a) → a })
 
 μ : ∀ {A t₁ t₂} → ⟨ t₁ ⟩ᵒ (⟨ t₂ ⟩ᵒ A) →ᵗ ⟨ t₁ + t₂ ⟩ᵒ A
 μ {tset A Af} {t₁} {t₂} =
   tset-map
-    (λ {t} a → Af (≤-reflexive (∸-+ t t₁ t₂)) a)
+    (λ { {t} (p , q , a) → n≤k⇒m≤k∸n⇒n+m≤k t₁ t₂ t p q , Af (≤-reflexive (n∸m∸k≡n∸m+k t t₁ t₂)) a })
 
 μ⁻¹ : ∀ {A t₁ t₂} → ⟨ t₁ + t₂ ⟩ᵒ A →ᵗ ⟨ t₁ ⟩ᵒ (⟨ t₂ ⟩ᵒ A)
 μ⁻¹ {tset A Af} {t₁} {t₂} =
-  tset-map (λ {t} a → Af (≤-reflexive (sym (∸-+ t t₁ t₂))) a)
+  tset-map
+    (λ { {t} (p , a) → m+n≤o⇒m≤o t₁ p , n+m≤k⇒m≤k∸n t₁ t₂ t p , Af (≤-reflexive (sym (n∸m∸k≡n∸m+k t t₁ t₂))) a })
 
--- Adjunction between graded monad and comonad
+-- Adjunction between the graded monad and comonad
 
 η⊣ : ∀ {A t} → A →ᵗ [ t ]ᵒ (⟨ t ⟩ᵒ A)
 η⊣ {tset A Af} {t} =
   tset-map
-    (λ {t'} a → Af (≤-reflexive (sym (m+n∸n≡m t' t))) a)
+    (λ {t'} a → m≤n+m t t' , Af (≤-reflexive (sym (m+n∸n≡m t' t))) a)
 
 ε⊣ : ∀ {A t} → ⟨ t ⟩ᵒ ([ t ]ᵒ A) →ᵗ A
 ε⊣ {tset A Af} {t} =
   tset-map
-    (λ {t'} a → Af {!!} a)
-
-{-
-ε⊣ : ∀ {A t t'} → ⟨ t' ⟩ᵒ ([ t ]ᵒ A) →ᵗ [ t + t' ]ᵒ A
-ε⊣ {tset A Af} {t} {t'} =
-  tset-map
-    (λ {t''} a → Af {!!} a)
--}
+    (λ { {t'} (p , a) → Af (n≤m⇒m∸n+n≤m t t' p) a })
 
 -- ...
-
-
-
-
-{-
-
-    G,x:[t]A,<t'> |- ... : [t - t']A
-
--}
