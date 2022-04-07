@@ -28,18 +28,6 @@ Time = ℕ
 ∸-+ (suc n) zero    k       = refl
 ∸-+ (suc n) (suc m) k       = ∸-+ n m k
 
-+-∸ : (n m : ℕ) → n ≡ (n + m) ∸ m
-+-∸ n m = 
-  begin
-    n
-  ≡⟨ sym (+-identityʳ n) ⟩
-    n + zero
-  ≡⟨ cong (n +_) (sym (n∸n≡0 m)) ⟩
-    n + (m ∸ m)
-  ≡⟨ sym (+-∸-assoc n (≤-refl {m})) ⟩
-    n + m ∸ m
-  ∎
-
 -- Time-indexed sets
 
 record TSet : Set₁ where
@@ -129,16 +117,32 @@ open _→ᵗ_
 μ⁻¹ {tset A Af} {t₁} {t₂} =
   tset-map (λ {t} a → Af (≤-reflexive (sym (∸-+ t t₁ t₂))) a)
 
--- Graded monad and comonad are adjoint
+-- Adjunction between graded monad and comonad
 
 η⊣ : ∀ {A t} → A →ᵗ [ t ]ᵒ (⟨ t ⟩ᵒ A)
 η⊣ {tset A Af} {t} =
   tset-map
-    (λ {t'} a → Af (≤-reflexive (+-∸ t' t)) a)
+    (λ {t'} a → Af (≤-reflexive (sym (m+n∸n≡m t' t))) a)
 
 ε⊣ : ∀ {A t} → ⟨ t ⟩ᵒ ([ t ]ᵒ A) →ᵗ A
 ε⊣ {tset A Af} {t} =
   tset-map
     (λ {t'} a → Af {!!} a)
 
+{-
+ε⊣ : ∀ {A t t'} → ⟨ t' ⟩ᵒ ([ t ]ᵒ A) →ᵗ [ t + t' ]ᵒ A
+ε⊣ {tset A Af} {t} {t'} =
+  tset-map
+    (λ {t''} a → Af {!!} a)
+-}
+
 -- ...
+
+
+
+
+{-
+
+    G,x:[t]A,<t'> |- ... : [t - t']A
+
+-}
