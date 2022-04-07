@@ -50,10 +50,10 @@ infixl 30 _++ᶜ_
 
 -- Total time delay of a context 
 
-delay : Ctx → Time
-delay []        = 0
-delay (Γ ∷ᶜ A)  = delay Γ
-delay (Γ ⟨ t ⟩) = delay Γ + t
+delayᶜ : Ctx → Time
+delayᶜ []        = 0
+delayᶜ (Γ ∷ᶜ A)  = delayᶜ Γ
+delayᶜ (Γ ⟨ t ⟩) = delayᶜ Γ + t
 
 -- Variable in a context (if it is available now)
 
@@ -92,7 +92,7 @@ data _⊢_ (Γ : Ctx) : Type → Set where
 
   -- temporal modality
 
-  give   : {A : Type}
+  delay  : {A : Type}
          → {t : Time}
          → Γ ⟨ t ⟩ ⊢ A
          -------------- (make a value available after `t` time steps)
@@ -103,6 +103,6 @@ data _⊢_ (Γ : Ctx) : Type → Set where
          → {t : Time}
          → Γ' ⊢ [ t ] A
          → Γ ≡ Γ' ++ᶜ Γ''
-         → t ≤ delay Γ''
+         → t ≤ delayᶜ Γ''
          ---------------- (wait for a value to become available in at least `t` time steps)
          → Γ ⊢ A

@@ -19,6 +19,27 @@ module TSets where
 Time : Set
 Time = ℕ
 
+-- Auxiliary lemmas
+
+∸-+ : (n m k : ℕ) → n ∸ m ∸ k ≡ n ∸ (m + k)
+∸-+ zero    zero    k       = refl
+∸-+ zero    (suc m) zero    = refl
+∸-+ zero    (suc m) (suc k) = refl
+∸-+ (suc n) zero    k       = refl
+∸-+ (suc n) (suc m) k       = ∸-+ n m k
+
++-∸ : (n m : ℕ) → n ≡ (n + m) ∸ m
++-∸ n m = 
+  begin
+    n
+  ≡⟨ sym (+-identityʳ n) ⟩
+    n + zero
+  ≡⟨ cong (n +_) (sym (n∸n≡0 m)) ⟩
+    n + (m ∸ m)
+  ≡⟨ sym (+-∸-assoc n (≤-refl {m})) ⟩
+    n + m ∸ m
+  ∎
+
 -- Time-indexed sets
 
 record TSet : Set₁ where
@@ -42,53 +63,82 @@ record _→ᵗ_ (A B : TSet) : Set where
 
 open _→ᵗ_
 
--- semantics of `[ t ] A` modality as a graded comonad
+-- Semantics of `[ t ] A` modality as a graded comonad
 
 [_]ᵒ : Time → TSet → TSet
 [ t ]ᵒ (tset A Af) =
-  tset (λ t' → Σ[ t'' ∈ Time ] (t'' ≤ t × t'' ≤ t' × A t''))
-       (λ r → λ { (t'' , p , q , a) → t'' , p , ≤-trans q r , a })
+  tset
+    (λ t' → A (t' + t))
+    (λ p a → Af (+-mono-≤ p ≤-refl) a)
 
 [_]ᶠ : ∀ {A B} → (t : Time) → A →ᵗ B → [ t ]ᵒ A →ᵗ [ t ]ᵒ B
-[ t ]ᶠ (tset-map f) = tset-map (λ { (t'' , p , q , a) → t'' , p , q , f a })
+[ t ]ᶠ (tset-map f) = tset-map f
 
-[_]-≤ : ∀ {A t t'} → t ≤ t' → [ t ]ᵒ A →ᵗ [ t' ]ᵒ A
-[ p ]-≤ = tset-map (λ { (t'' , q , r , a) → t'' , ≤-trans q p , r , a })
+[_]-≤ : ∀ {A t₁ t₂} → t₁ ≤ t₂ → [ t₁ ]ᵒ A →ᵗ [ t₂ ]ᵒ A
+[_]-≤ {tset A Af} p =
+  tset-map
+    (λ a → Af (+-mono-≤ ≤-refl p) a)
 
 ε : ∀ {A} → [ 0 ]ᵒ A →ᵗ A
-ε {tset A Af} = tset-map (λ { (t'' , p , q , a) → Af q a })
+ε {tset A Af} =
+  tset-map
+    (λ {t} a → Af (≤-reflexive (+-identityʳ t)) a)
 
-ε' : ∀ {A t} → [ t ]ᵒ A →ᵗ A
-ε' {tset A Af} = tset-map λ { (t'' , p , q , a) → Af q a } -- wouldn't want this to be the case!
+ε⁻¹ : ∀ {A} → A →ᵗ [ 0 ]ᵒ A
+ε⁻¹ {tset A Af} =
+  tset-map
+    (λ {t} a → Af (≤-reflexive (sym (+-identityʳ t))) a)
 
 δ : ∀ {A t₁ t₂} → [ t₁ + t₂ ]ᵒ A →ᵗ [ t₁ ]ᵒ ([ t₂ ]ᵒ A)
 δ {tset A Af} {t₁} {t₂} =
-  tset-map δ-aux --(λ {t'} → λ { (t'' , p , q , a) → {!!} , {!!} , {!!} , {!!} , {!!} , {!!} , {!!} })
+  tset-map
+    (λ {t} a → Af (≤-reflexive (sym (+-assoc t t₁ t₂))) a)
 
-  where
-    δ-aux : {t' : Time} → carrier ([ t₁ + t₂ ]ᵒ (tset A Af)) t' → carrier ([ t₁ ]ᵒ ([ t₂ ]ᵒ (tset A Af))) t'
-    δ-aux {t'} (t'' , p , q , a) with t'' <ᵇ t₁ | inspect (λ (t'' , t₁) → t'' <ᵇ t₁) (t'' , t₁)
-    ... | true  | [ eq ]  = {!!} , {!!} , {!!} , {!!} , {!!} , {!!} , {!!}
-    ... | false | [ eq ]  = {!!} , {!!} , {!!} , {!!} , {!!} , {!!} , {!!}
+δ⁻¹ : ∀ {A t₁ t₂} → [ t₁ ]ᵒ ([ t₂ ]ᵒ A) →ᵗ [ t₁ + t₂ ]ᵒ A
+δ⁻¹ {tset A Af} {t₁} {t₂} =
+  tset-map (λ {t} a → Af (≤-reflexive (+-assoc t t₁ t₂)) a)
 
--- ∸
+-- Semantics of `Γ ⟨ t ⟩` modality as a graded monad
 
-{-
-[_]ᶠ : ∀ {A B} → (t : Time) → A →ᵗ B → [ t ]ᵒ A →ᵗ [ t ]ᵒ B
-[ t ]ᶠ f p = f ∘ p
+⟨_⟩ᵒ : Time → TSet → TSet
+⟨ t ⟩ᵒ (tset A Af) =
+  tset
+    (λ t' → A (t' ∸ t))
+    (λ p a → Af (∸-mono p (≤-refl {t})) a)
 
-[_]-≤ : ∀ {A t t'} → t ≤ t' → [ t ]ᵒ A →ᵗ [ t' ]ᵒ A
-[ p ]-≤ q = λ r → q (≤-trans p r)
+⟨_⟩ᶠ : ∀ {A B} → (t : Time) → A →ᵗ B → ⟨ t ⟩ᵒ A →ᵗ ⟨ t ⟩ᵒ B
+⟨ t ⟩ᶠ (tset-map f) = tset-map f
 
-ε : ∀ {A} → [ 0 ]ᵒ A →ᵗ A
-ε p = p z≤n
+⟨_⟩-≤ : ∀ {A t₁ t₂} → t₁ ≤ t₂ → ⟨ t₂ ⟩ᵒ A →ᵗ ⟨ t₁ ⟩ᵒ A
+⟨_⟩-≤ {tset A Af} p =
+  tset-map
+    (λ {t} a → Af (∸-mono (≤-refl {t}) p) a)
 
-δ : ∀ {A t t'} → [ t + t' ]ᵒ A →ᵗ [ t ]ᵒ ([ t' ]ᵒ A)
-δ p = λ q r → p {!!}
--}
+η : ∀ {A} → A →ᵗ ⟨ 0 ⟩ᵒ A
+η = tset-map id
 
--- ...
+η⁻¹ : ∀ {A} → ⟨ 0 ⟩ᵒ A →ᵗ A
+η⁻¹ = tset-map id
 
--- semantics of `Γ ⟨ t ⟩` modality as a graded monad
+μ : ∀ {A t₁ t₂} → ⟨ t₁ ⟩ᵒ (⟨ t₂ ⟩ᵒ A) →ᵗ ⟨ t₁ + t₂ ⟩ᵒ A
+μ {tset A Af} {t₁} {t₂} =
+  tset-map
+    (λ {t} a → Af (≤-reflexive (∸-+ t t₁ t₂)) a)
+
+μ⁻¹ : ∀ {A t₁ t₂} → ⟨ t₁ + t₂ ⟩ᵒ A →ᵗ ⟨ t₁ ⟩ᵒ (⟨ t₂ ⟩ᵒ A)
+μ⁻¹ {tset A Af} {t₁} {t₂} =
+  tset-map (λ {t} a → Af (≤-reflexive (sym (∸-+ t t₁ t₂))) a)
+
+-- Graded monad and comonad are adjoint
+
+η⊣ : ∀ {A t} → A →ᵗ [ t ]ᵒ (⟨ t ⟩ᵒ A)
+η⊣ {tset A Af} {t} =
+  tset-map
+    (λ {t'} a → Af (≤-reflexive (+-∸ t' t)) a)
+
+ε⊣ : ∀ {A t} → ⟨ t ⟩ᵒ ([ t ]ᵒ A) →ᵗ A
+ε⊣ {tset A Af} {t} =
+  tset-map
+    (λ {t'} a → Af {!!} a)
 
 -- ...
