@@ -46,6 +46,13 @@ n+m≤k⇒m≤k∸n zero    m       k       p       = p
 n+m≤k⇒m≤k∸n (suc n) zero    k       p       = z≤n
 n+m≤k⇒m≤k∸n (suc n) (suc m) (suc k) (s≤s p) = n+m≤k⇒m≤k∸n n (suc m) k p
 
+≤-split-+ : ∀ {n n' m k} → n ≡ m + k → n ≤ n' → 0 < m → Σ[ k' ∈ ℕ ] (n' ≡ m + k' × k ≤ k')
+≤-split-+ {n' = n'} {m = m} p z≤n r
+  rewrite m+n≡0⇒m≡0 m (sym p) | m+n≡0⇒n≡0 m (sym p) = n' , refl , z≤n
+≤-split-+ {n = suc n} {n' = n'} {m = suc m} {k = k} p (s≤s q) (s≤s r) = {!!}
+--with ≤-split-+ {!!} q (s≤s r)
+--... | p' , q' , r' = {!!} , {!!} , {!!}
+
 -- Time-indexed sets (covariant presheaves indexed by `(ℕ,≤)`)
 
 record TSet : Set₁ where

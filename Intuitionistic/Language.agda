@@ -31,10 +31,11 @@ data GType : Set where
 -- Signature of (ground-typed) operation symbols
 
 postulate
-  Op      : Set                             -- set of operation symbols
-  param   : Op → GType                      -- parameter type of each operation
-  arity   : Op → GType                      -- arity type of each operation
-  op-time : Op → Time                       -- each operation's (maximal) time-duration
+  Op         : Set                          -- set of operation symbols
+  param      : Op → GType                   -- parameter type of each operation
+  arity      : Op → GType                   -- arity type of each operation
+  op-time    : Op → Time                    -- each operation's (maximal) time-duration
+  no-stutter : (op : Op) → 0 < op-time op   -- operations do not stutter
 
 -- Grammar of value and computation types
 
