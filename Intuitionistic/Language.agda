@@ -19,7 +19,7 @@ Time = ℕ
 
 postulate
   BaseType : Set
-  base-consts : BaseType → Set
+  BaseSet  : BaseType → Set
 
 -- Ground types (for operation signatures)
 
@@ -35,7 +35,6 @@ postulate
   param      : Op → GType                   -- parameter type of each operation
   arity      : Op → GType                   -- arity type of each operation
   op-time    : Op → Time                    -- each operation's (maximal) time-duration
-  no-stutter : (op : Op) → 0 < op-time op   -- operations do not stutter
 
 -- Grammar of value and computation types
 
@@ -61,23 +60,6 @@ type-of-gtype : GType → VType
 type-of-gtype (Base B) = Base B
 type-of-gtype Unit     = Unit
 type-of-gtype Empty    = Empty
-
--- Subtyping relations
-
-mutual
-
-  data _≤V⦂_ : VType → VType → Set where
-    ≤⦂-base  : ∀ {B} → Base B ≤V⦂ Base B
-    ≤⦂-unit  : Unit ≤V⦂ Unit
-    ≤⦂-empty : Empty ≤V⦂ Empty
-    ≤⦂-func  : ∀ {A B C D} → B ≤V⦂ A → C ≤C⦂ D → A ⇒ C ≤V⦂ B ⇒ D
-    ≤⦂-modal : ∀ {A B τ τ'} → τ ≤ τ' → A ≤V⦂ B → [ τ ] A ≤V⦂ [ τ' ] B
-
-  data _≤C⦂_ : CType → CType → Set where
-    <⦂-comp : ∀ {A B τ τ'} → A ≤V⦂ B → τ ≤ τ' → A ‼ τ ≤C⦂ B ‼ τ'
-
-  infix 28 _≤V⦂_
-  infix 28 _≤C⦂_
 
 -- Structured contexts (indexed by the number of ◆s in them)
 
@@ -133,7 +115,7 @@ mutual
     -- base-typed constants
 
     const   : {B : BaseType}
-            → base-consts B
+            → BaseSet B
             ----------------
             → Γ ⊢V⦂ Base B
 
@@ -164,14 +146,15 @@ mutual
     -- returning a value
 
     return  : {A : VType}
+            → {τ : Time}
             → Γ ⊢V⦂ A
             -------------
-            → Γ ⊢C⦂ A ‼ 0        -- TODO: might want this to be arbitrary to compute away coercions
+            → Γ ⊢C⦂ A ‼ τ        -- arbitrary `τ` to push `coerce`s inside (includes 0)
 
     -- sequential composition
 
     _;_     : {A B : VType}      -- note: not just an ordinary ;, instead using \;0
-            → {τ τ' : Time}
+            → {τ τ' τ'' : Time}
             → Γ ⊢C⦂ A ‼ τ
             → Γ ∷ᶜ A ⊢C⦂ B ‼ τ'
             -------------------
@@ -210,18 +193,19 @@ mutual
 
     unbox   : {Γ' Γ'' : Ctx}
             → {A : VType}
-            → {τ : Time}
+            → {τ τ' : Time}
             → Γ' ⊢V⦂ [ τ ] A
             → Γ ≡ Γ' ++ᶜ Γ''
             → τ ≤ ctx-delay Γ''
             -------------------
-            → Γ ⊢C⦂ A ‼ 0          -- TODO: might want this to be arbitrary to compute away coercions
+            → Γ ⊢C⦂ A ‼ τ'          -- arbitrary `τ'` to push `coerce`s inside (includes 0)
 
-    -- (explicit) subtyping coercion for computations
+    -- explicit sub-effecting coercion (no general sub-typing for simplicity)
 
-    coerce  : {C D : CType}
-            → Γ ⊢C⦂ C
-            → C ≤C⦂ D
+    coerce  : {A : VType}
+            → {τ τ' : Time}
+            → τ ≤ τ'
+            → Γ ⊢C⦂ A ‼ τ
             ---------------
-            → Γ ⊢C⦂ D
+            → Γ ⊢C⦂ A ‼ τ'
 

@@ -46,12 +46,15 @@ n+m≤k⇒m≤k∸n zero    m       k       p       = p
 n+m≤k⇒m≤k∸n (suc n) zero    k       p       = z≤n
 n+m≤k⇒m≤k∸n (suc n) (suc m) (suc k) (s≤s p) = n+m≤k⇒m≤k∸n n (suc m) k p
 
-≤-split-+ : ∀ {n n' m k} → n ≡ m + k → n ≤ n' → 0 < m → Σ[ k' ∈ ℕ ] (n' ≡ m + k' × k ≤ k')
-≤-split-+ {n' = n'} {m = m} p z≤n r
-  rewrite m+n≡0⇒m≡0 m (sym p) | m+n≡0⇒n≡0 m (sym p) = n' , refl , z≤n
-≤-split-+ {n = suc n} {n' = n'} {m = suc m} {k = k} p (s≤s q) (s≤s r) = {!!}
---with ≤-split-+ {!!} q (s≤s r)
---... | p' , q' , r' = {!!} , {!!} , {!!}
+≤-split-+ : ∀ {n n' m k} → n ≡ m + k → n ≤ n' → Σ[ m' ∈ ℕ ] (n' ≡ m' + k × m ≤ m')
+≤-split-+ {n' = n'} {m = m} p z≤n
+  rewrite m+n≡0⇒m≡0 m (sym p) | m+n≡0⇒n≡0 m (sym p) =
+    n' , sym (+-identityʳ n') , z≤n
+≤-split-+ {n' = .(suc _)} {m = zero} refl (s≤s {n''} {n'''} q) with ≤-split-+ {k = n''} refl q
+... | p' , q' , r' = p' , trans (cong suc q') (sym (+-suc p' n'')) , r'
+≤-split-+ {n' = .(suc _)} {m = suc m} p (s≤s {n''} {n'''} q) with suc-injective p
+... | s with ≤-split-+ {m = m} s q
+... | p' , q' , r' = suc p' , cong suc q' , +-mono-≤ (≤-refl {1}) r'
 
 -- Time-indexed sets (covariant presheaves indexed by `(ℕ,≤)`)
 
@@ -64,7 +67,9 @@ record TSet : Set₁ where
 
     -- TODO: also include the functor laws for refl-id and trans-∘
 
-open TSet
+open TSet public
+
+-- Maps of time-indexed sets
 
 record _→ᵗ_ (A B : TSet) : Set where
   constructor
@@ -76,21 +81,31 @@ record _→ᵗ_ (A B : TSet) : Set where
 
 infix 20 _→ᵗ_
 
-open _→ᵗ_
+open _→ᵗ_ public
+
+-- Identity and composition of maps of time-indexed sets
+
+idᵗ : ∀ {A} → A →ᵗ A
+idᵗ = tset-map id
+
+_∘ᵗ_ : ∀ {A B C} → B →ᵗ C → A →ᵗ B → A →ᵗ C
+(tset-map g) ∘ᵗ (tset-map f) = tset-map (g ∘ f)
+
+infixr 9 _∘ᵗ_
 
 -- Product, sum, exponent, etc structures of time-indexed sets
 
 𝟙ᵗ : TSet
 𝟙ᵗ = tset (λ _ → ⊤) (λ _ → id)
 
-terminalᵗ : (A : TSet) → A →ᵗ 𝟙ᵗ
-terminalᵗ A = tset-map (λ _ → tt)
+terminalᵗ : ∀ {A} → A →ᵗ 𝟙ᵗ
+terminalᵗ = tset-map (λ _ → tt)
 
 𝟘ᵗ : TSet
 𝟘ᵗ = tset (λ _ → ⊥) (λ _ → id)
 
-initialᵗ : (A : TSet) → 𝟘ᵗ →ᵗ A
-initialᵗ A = tset-map (λ ())
+initialᵗ : ∀ {A} → 𝟘ᵗ →ᵗ A
+initialᵗ = tset-map (λ ())
 
 _×ᵗ_ : TSet → TSet → TSet
 (tset A Af) ×ᵗ (tset B Bf) =
@@ -98,7 +113,7 @@ _×ᵗ_ : TSet → TSet → TSet
     (λ t → A t × B t)
     (λ p → mapˣ (Af p) (Bf p))
 
-infix 23 _×ᵗ_
+infixr 23 _×ᵗ_
 
 fstᵗ : ∀ {A B} → A ×ᵗ B →ᵗ A
 fstᵗ = tset-map proj₁
