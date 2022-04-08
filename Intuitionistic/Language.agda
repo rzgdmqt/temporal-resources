@@ -199,9 +199,11 @@ mutual
             → {t : Time}
             → (op : Op)
             → Γ ⊢V⦂ type-of-gtype (param op)
-            → Γ ∷ᶜ type-of-gtype (arity op) ⊢C⦂ A ‼ t
-            -----------------------------------------
+            → Γ ∷ᶜ type-of-gtype (arity op) ⟨ op-time op ⟩ ⊢C⦂ A ‼ t
+            --------------------------------------------------------
             → Γ ⊢C⦂ A ‼ (op-time op + t)
+
+    -- TODO: add effect handlers as well in the future
 
     -- unboxing a `t`-boxed value after at least `t` time steps
 
@@ -214,7 +216,7 @@ mutual
             -------------------
             → Γ ⊢C⦂ A ‼ 0          -- TODO: might want this to be arbitrary to compute away coercions
 
-    -- explicit subtyping coercion for computations
+    -- (explicit) subtyping coercion for computations
 
     coerce  : {C D : CType}
             → Γ ⊢C⦂ C

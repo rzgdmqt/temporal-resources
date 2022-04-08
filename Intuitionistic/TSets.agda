@@ -4,21 +4,20 @@
 
 open import Function
 
-open import Data.Bool hiding (_≤_)
+open import Data.Empty
 open import Data.Nat
 open import Data.Nat.Properties
-open import Data.Product
+open import Data.Product renaming (map to mapˣ)
+open import Data.Sum renaming (map to map⁺)
+open import Data.Unit hiding (_≤_)
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq
 open Eq.≡-Reasoning
 
+open import Language
+
 module TSets where
-
--- Time steps (using natural numbers)
-
-Time : Set
-Time = ℕ
 
 -- Auxiliary lemmas
 
@@ -47,7 +46,7 @@ n+m≤k⇒m≤k∸n zero    m       k       p       = p
 n+m≤k⇒m≤k∸n (suc n) zero    k       p       = z≤n
 n+m≤k⇒m≤k∸n (suc n) (suc m) (suc k) (s≤s p) = n+m≤k⇒m≤k∸n n (suc m) k p
 
--- Time-indexed sets
+-- Time-indexed sets (covariant presheaves indexed by `(ℕ,≤)`)
 
 record TSet : Set₁ where
   constructor
@@ -68,7 +67,51 @@ record _→ᵗ_ (A B : TSet) : Set where
 
     -- TODO: also include naturality law
 
+infix 20 _→ᵗ_
+
 open _→ᵗ_
+
+-- Product, sum, exponent, etc structures of time-indexed sets
+
+𝟙ᵗ : TSet
+𝟙ᵗ = tset (λ _ → ⊤) (λ _ → id)
+
+terminalᵗ : (A : TSet) → A →ᵗ 𝟙ᵗ
+terminalᵗ A = tset-map (λ _ → tt)
+
+𝟘ᵗ : TSet
+𝟘ᵗ = tset (λ _ → ⊥) (λ _ → id)
+
+initialᵗ : (A : TSet) → 𝟘ᵗ →ᵗ A
+initialᵗ A = tset-map (λ ())
+
+_×ᵗ_ : TSet → TSet → TSet
+(tset A Af) ×ᵗ (tset B Bf) =
+  tset
+    (λ t → A t × B t)
+    (λ p → mapˣ (Af p) (Bf p))
+
+infix 23 _×ᵗ_
+
+fstᵗ : ∀ {A B} → A ×ᵗ B →ᵗ A
+fstᵗ = tset-map proj₁
+
+sndᵗ : ∀ {A B} → A ×ᵗ B →ᵗ B
+sndᵗ = tset-map proj₂
+
+⟨_,_⟩ᵗ : ∀ {A B C} → A →ᵗ B → A →ᵗ C → A →ᵗ B ×ᵗ C
+⟨ tset-map f , tset-map g ⟩ᵗ = tset-map < f , g >
+
+_⇒ᵗ_ : TSet → TSet → TSet
+(tset A Af) ⇒ᵗ (tset B Bf) =
+  tset
+    (λ t → (t' : Time) → t ≤ t' → A t' → B t')
+    (λ p f t' q a → f t' (≤-trans p q) a)
+
+infix 22 _⇒ᵗ_
+
+appᵗ : ∀ {A B} → (A ⇒ᵗ B) ×ᵗ A →ᵗ B
+appᵗ = tset-map λ { {t} (f , a) → f t ≤-refl a }
 
 -- Semantics of the type modality `[ t ] A` as a graded comonad
 
@@ -157,5 +200,3 @@ open _→ᵗ_
 ε⊣ {tset A Af} {t} =
   tset-map
     (λ { {t'} (p , a) → Af (n≤m⇒m∸n+n≤m t t' p) a })
-
--- ...
