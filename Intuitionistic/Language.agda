@@ -70,10 +70,10 @@ mutual
     ≤⦂-unit  : Unit ≤V⦂ Unit
     ≤⦂-empty : Empty ≤V⦂ Empty
     ≤⦂-func  : ∀ {A B C D} → B ≤V⦂ A → C ≤C⦂ D → A ⇒ C ≤V⦂ B ⇒ D
-    ≤⦂-modal : ∀ {A B t t'} → t ≤ t' → A ≤V⦂ B → [ t ] A ≤V⦂ [ t' ] B
+    ≤⦂-modal : ∀ {A B τ τ'} → τ ≤ τ' → A ≤V⦂ B → [ τ ] A ≤V⦂ [ τ' ] B
 
   data _≤C⦂_ : CType → CType → Set where
-    <⦂-comp : ∀ {A B t t'} → A ≤V⦂ B → t ≤ t' → A ‼ t ≤C⦂ B ‼ t'
+    <⦂-comp : ∀ {A B τ τ'} → A ≤V⦂ B → τ ≤ τ' → A ‼ τ ≤C⦂ B ‼ τ'
 
   infix 28 _≤V⦂_
   infix 28 _≤C⦂_
@@ -93,7 +93,7 @@ infix  28 _⟨_⟩
 _++ᶜ_ : Ctx → Ctx → Ctx
 Γ ++ᶜ []         = Γ
 Γ ++ᶜ (Γ' ∷ᶜ X)  = Γ ++ᶜ Γ' ∷ᶜ X
-Γ ++ᶜ (Γ' ⟨ t ⟩) = Γ ++ᶜ Γ' ⟨ t ⟩
+Γ ++ᶜ (Γ' ⟨ τ ⟩) = Γ ++ᶜ Γ' ⟨ τ ⟩
 
 infixl 30 _++ᶜ_
 
@@ -102,7 +102,7 @@ infixl 30 _++ᶜ_
 ctx-delay : Ctx → Time
 ctx-delay []        = 0
 ctx-delay (Γ ∷ᶜ A)  = ctx-delay Γ
-ctx-delay (Γ ⟨ t ⟩) = ctx-delay Γ + t
+ctx-delay (Γ ⟨ τ ⟩) = ctx-delay Γ + τ
 
 -- Variable in a context (if it is available now)
 
@@ -145,18 +145,18 @@ mutual
     -- lambda abstraction
           
     lam     : {A B : VType}
-            → {t : Time}
-            → Γ ∷ᶜ A ⊢C⦂ B ‼ t
+            → {τ : Time}
+            → Γ ∷ᶜ A ⊢C⦂ B ‼ τ
             ------------------
-            → Γ ⊢V⦂ A ⇒ B ‼ t
+            → Γ ⊢V⦂ A ⇒ B ‼ τ
 
     -- boxing up a value for use in at least `t` time steps
 
     box     : {A : VType}
-            → {t : Time}
-            → Γ ⟨ t ⟩ ⊢V⦂ A
+            → {τ : Time}
+            → Γ ⟨ τ ⟩ ⊢V⦂ A
             ---------------
-            → Γ ⊢V⦂ [ t ] A
+            → Γ ⊢V⦂ [ τ ] A
 
   data _⊢C⦂_ (Γ : Ctx) : CType → Set where
 
@@ -170,38 +170,38 @@ mutual
     -- sequential composition
 
     _;_     : {A B : VType}      -- note: not just an ordinary ;, instead using \;0
-            → {t t' : Time}
-            → Γ ⊢C⦂ A ‼ t
-            → Γ ∷ᶜ A ⊢C⦂ B ‼ t'
+            → {τ τ' : Time}
+            → Γ ⊢C⦂ A ‼ τ
+            → Γ ∷ᶜ A ⊢C⦂ B ‼ τ'
             -------------------
-            → Γ ⊢C⦂ B ‼ (t + t') -- TODO: might want this to be arbitrary to compute away coercions
+            → Γ ⊢C⦂ B ‼ (τ + τ') -- TODO: might want this to be arbitrary to compute away coercions
 
     -- function application
     
     _·_     : {A B : VType}
-            → {t : Time}
-            → Γ ⊢V⦂ A ⇒ B ‼ t
+            → {τ : Time}
+            → Γ ⊢V⦂ A ⇒ B ‼ τ
             → Γ ⊢V⦂ A
             -----------------
-            → Γ ⊢C⦂ B ‼ t
+            → Γ ⊢C⦂ B ‼ τ
 
     -- empty type elimination
 
     absurd  : {A : VType}
-            → {t : Time}
+            → {τ : Time}
             → Γ ⊢V⦂ Empty
             -------------
-            → Γ ⊢C⦂ A ‼ t
+            → Γ ⊢C⦂ A ‼ τ
 
     -- performing algebraic operations
 
     perform : {A : VType}
-            → {t : Time}
+            → {τ : Time}
             → (op : Op)
             → Γ ⊢V⦂ type-of-gtype (param op)
-            → Γ ∷ᶜ type-of-gtype (arity op) ⟨ op-time op ⟩ ⊢C⦂ A ‼ t
+            → Γ ∷ᶜ type-of-gtype (arity op) ⟨ op-time op ⟩ ⊢C⦂ A ‼ τ
             --------------------------------------------------------
-            → Γ ⊢C⦂ A ‼ (op-time op + t)
+            → Γ ⊢C⦂ A ‼ (op-time op + τ)
 
     -- TODO: add effect handlers as well in the future
 
@@ -209,10 +209,10 @@ mutual
 
     unbox   : {Γ' Γ'' : Ctx}
             → {A : VType}
-            → {t : Time}
-            → Γ' ⊢V⦂ [ t ] A
+            → {τ : Time}
+            → Γ' ⊢V⦂ [ τ ] A
             → Γ ≡ Γ' ++ᶜ Γ''
-            → t ≤ ctx-delay Γ''
+            → τ ≤ ctx-delay Γ''
             -------------------
             → Γ ⊢C⦂ A ‼ 0          -- TODO: might want this to be arbitrary to compute away coercions
 

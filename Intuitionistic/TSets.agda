@@ -116,15 +116,15 @@ appᵗ = tset-map λ { {t} (f , a) → f t ≤-refl a }
 -- Semantics of the type modality `[ t ] A` as a graded comonad
 
 [_]ᵒ : Time → TSet → TSet
-[ t ]ᵒ (tset A Af) =
+[ τ ]ᵒ (tset A Af) =
   tset
-    (λ t' → A (t' + t))
+    (λ t' → A (t' + τ))
     (λ p a → Af (+-mono-≤ p ≤-refl) a)
 
-[_]ᶠ : ∀ {A B} → (t : Time) → A →ᵗ B → [ t ]ᵒ A →ᵗ [ t ]ᵒ B
-[ t ]ᶠ (tset-map f) = tset-map f
+[_]ᶠ : ∀ {A B} → (τ : Time) → A →ᵗ B → [ τ ]ᵒ A →ᵗ [ τ ]ᵒ B
+[ τ ]ᶠ (tset-map f) = tset-map f
 
-[_]-≤ : ∀ {A t₁ t₂} → t₁ ≤ t₂ → [ t₁ ]ᵒ A →ᵗ [ t₂ ]ᵒ A
+[_]-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → [ τ₁ ]ᵒ A →ᵗ [ τ₂ ]ᵒ A
 [_]-≤ {tset A Af} p =
   tset-map
     (λ a → Af (+-mono-≤ ≤-refl p) a)
@@ -139,29 +139,29 @@ appᵗ = tset-map λ { {t} (f , a) → f t ≤-refl a }
   tset-map
     (λ {t} a → Af (≤-reflexive (sym (+-identityʳ t))) a)
 
-δ : ∀ {A t₁ t₂} → [ t₁ + t₂ ]ᵒ A →ᵗ [ t₁ ]ᵒ ([ t₂ ]ᵒ A)
-δ {tset A Af} {t₁} {t₂} =
+δ : ∀ {A τ₁ τ₂} → [ τ₁ + τ₂ ]ᵒ A →ᵗ [ τ₁ ]ᵒ ([ τ₂ ]ᵒ A)
+δ {tset A Af} {τ₁} {τ₂} =
   tset-map
-    (λ {t} a → Af (≤-reflexive (sym (+-assoc t t₁ t₂))) a)
+    (λ {t} a → Af (≤-reflexive (sym (+-assoc t τ₁ τ₂))) a)
 
-δ⁻¹ : ∀ {A t₁ t₂} → [ t₁ ]ᵒ ([ t₂ ]ᵒ A) →ᵗ [ t₁ + t₂ ]ᵒ A
-δ⁻¹ {tset A Af} {t₁} {t₂} =
-  tset-map (λ {t} a → Af (≤-reflexive (+-assoc t t₁ t₂)) a)
+δ⁻¹ : ∀ {A τ₁ τ₂} → [ τ₁ ]ᵒ ([ τ₂ ]ᵒ A) →ᵗ [ τ₁ + τ₂ ]ᵒ A
+δ⁻¹ {tset A Af} {τ₁} {τ₂} =
+  tset-map (λ {t} a → Af (≤-reflexive (+-assoc t τ₁ τ₂)) a)
 
 -- Semantics of the context modality `Γ ⟨ t ⟩` as a graded monad
 
 ⟨_⟩ᵒ : Time → TSet → TSet
-⟨ t ⟩ᵒ (tset A Af) =
+⟨ τ ⟩ᵒ (tset A Af) =
   tset
-    (λ t' → t ≤ t' × A (t' ∸ t))
-    (λ p (q , a) → ≤-trans q p , Af (∸-mono p (≤-refl {t})) a)
+    (λ t' → τ ≤ t' × A (t' ∸ τ))
+    (λ p (q , a) → ≤-trans q p , Af (∸-mono p (≤-refl {τ})) a)
 
-⟨_⟩ᶠ : ∀ {A B} → (t : Time) → A →ᵗ B → ⟨ t ⟩ᵒ A →ᵗ ⟨ t ⟩ᵒ B
-⟨ t ⟩ᶠ (tset-map f) =
+⟨_⟩ᶠ : ∀ {A B} → (τ : Time) → A →ᵗ B → ⟨ τ ⟩ᵒ A →ᵗ ⟨ τ ⟩ᵒ B
+⟨ τ ⟩ᶠ (tset-map f) =
   tset-map
     (λ { (p , a) → p , f a })
 
-⟨_⟩-≤ : ∀ {A t₁ t₂} → t₁ ≤ t₂ → ⟨ t₂ ⟩ᵒ A →ᵗ ⟨ t₁ ⟩ᵒ A
+⟨_⟩-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → ⟨ τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ A
 ⟨_⟩-≤ {tset A Af} p =
   tset-map
     (λ { {t} (q , a) → ≤-trans p q , Af (∸-mono (≤-refl {t}) p) a })
@@ -176,27 +176,27 @@ appᵗ = tset-map λ { {t} (f , a) → f t ≤-refl a }
   tset-map
     (λ { (p , a) → a })
 
-μ : ∀ {A t₁ t₂} → ⟨ t₁ ⟩ᵒ (⟨ t₂ ⟩ᵒ A) →ᵗ ⟨ t₁ + t₂ ⟩ᵒ A
-μ {tset A Af} {t₁} {t₂} =
+μ : ∀ {A τ₁ τ₂} → ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A) →ᵗ ⟨ τ₁ + τ₂ ⟩ᵒ A
+μ {tset A Af} {τ₁} {τ₂} =
   tset-map
-    (λ { {t} (p , q , a) → n≤k⇒m≤k∸n⇒n+m≤k t₁ t₂ t p q ,
-                           Af (≤-reflexive (n∸m∸k≡n∸m+k t t₁ t₂)) a })
+    (λ { {t} (p , q , a) → n≤k⇒m≤k∸n⇒n+m≤k τ₁ τ₂ t p q ,
+                           Af (≤-reflexive (n∸m∸k≡n∸m+k t τ₁ τ₂)) a })
 
-μ⁻¹ : ∀ {A t₁ t₂} → ⟨ t₁ + t₂ ⟩ᵒ A →ᵗ ⟨ t₁ ⟩ᵒ (⟨ t₂ ⟩ᵒ A)
-μ⁻¹ {tset A Af} {t₁} {t₂} =
+μ⁻¹ : ∀ {A τ₁ τ₂} → ⟨ τ₁ + τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A)
+μ⁻¹ {tset A Af} {τ₁} {τ₂} =
   tset-map
-    (λ { {t} (p , a) → m+n≤o⇒m≤o t₁ p ,
-                       n+m≤k⇒m≤k∸n t₁ t₂ t p ,
-                       Af (≤-reflexive (sym (n∸m∸k≡n∸m+k t t₁ t₂))) a })
+    (λ { {t} (p , a) → m+n≤o⇒m≤o τ₁ p ,
+                       n+m≤k⇒m≤k∸n τ₁ τ₂ t p ,
+                       Af (≤-reflexive (sym (n∸m∸k≡n∸m+k t τ₁ τ₂))) a })
 
 -- Adjunction between the graded monad and comonad
 
-η⊣ : ∀ {A t} → A →ᵗ [ t ]ᵒ (⟨ t ⟩ᵒ A)
-η⊣ {tset A Af} {t} =
+η⊣ : ∀ {A τ} → A →ᵗ [ τ ]ᵒ (⟨ τ ⟩ᵒ A)
+η⊣ {tset A Af} {τ} =
   tset-map
-    (λ {t'} a → m≤n+m t t' , Af (≤-reflexive (sym (m+n∸n≡m t' t))) a)
+    (λ {t'} a → m≤n+m τ t' , Af (≤-reflexive (sym (m+n∸n≡m t' τ))) a)
 
-ε⊣ : ∀ {A t} → ⟨ t ⟩ᵒ ([ t ]ᵒ A) →ᵗ A
-ε⊣ {tset A Af} {t} =
+ε⊣ : ∀ {A τ} → ⟨ τ ⟩ᵒ ([ τ ]ᵒ A) →ᵗ A
+ε⊣ {tset A Af} {τ} =
   tset-map
-    (λ { {t'} (p , a) → Af (n≤m⇒m∸n+n≤m t t' p) a })
+    (λ { {t'} (p , a) → Af (n≤m⇒m∸n+n≤m τ t' p) a })
