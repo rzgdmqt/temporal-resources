@@ -22,6 +22,9 @@ module Interpretation where
 BaseTSet : BaseType → TSet
 BaseTSet B = tset (λ _ → BaseSet B) (λ _ → id)
 
+constᵗ : ∀ {B} → BaseSet B → 𝟙ᵗ →ᵗ BaseTSet B
+constᵗ c = tset-map (λ _ → c)
+
 -- Interpretation of ground types
 
 ⟦_⟧ᵍ : GType → TSet
@@ -95,16 +98,16 @@ T-≤τ p = tset-map (Tˢ-≤τ p)
 ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
 ηᵀ = tset-map (λ v → leaf v)
 
----- Kleisli extension (bind) of the graded monad
+---- multiplication of the graded monad
 
 Tˢ-move-+ : ∀ {A τ τ' t} → Tˢ A τ (τ' + t) → Tˢ A (τ' + τ) t
 Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (leaf v) =
   leaf (Af (≤-reflexive (trans (sym (+-assoc τ τ' t)) (cong (_+ t) (+-comm τ τ')))) v)
 Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (node {τ = τ''} op v k q) =
   node op
-    (⟦⟧ᵍ-constant (param op) (τ' + t) t v)
+    (⟦⟧ᵍ-constant (param op) (τ' + t) t v)  -- can't use monotonicity of the parameter type
     (λ { {t'} r y → Tˢ-move-+ (k (≤-trans (≤-reflexive (+-assoc τ' t (op-time op))) (+-monoʳ-≤ τ' r))
-                                 (⟦⟧ᵍ-constant (arity op) t' (τ' + t') y)) })
+                                 (monotone ⟦ arity op ⟧ᵍ (m≤n+m t' τ') y)) })  -- could also have used ⟦⟧ᵍ-constant
     (trans
       (trans
         (cong (τ' +_) q)
@@ -112,22 +115,38 @@ Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (node {τ = τ''} op v k q) =
       (trans
         (cong (_+ τ'') (+-comm τ' (op-time op)))
         (+-assoc (op-time op) τ' τ'')))
-    
-extendˢ : ∀ {A B τ τ'} → A →ᵗ Tᵒ B τ' → {t : Time} → Tˢ A τ t → Tˢ B (τ + τ') t
-extendˢ (tset-map f) (leaf v) = Tˢ-move-+ (f v)
-extendˢ {τ = τ} {τ' = τ'} (tset-map f) (node op v k q) =
-  node op v
-    (λ r y → extendˢ (tset-map f) (k r y))
-    (trans (cong (_+ _) q) (+-assoc (op-time op) _ _))
 
-extendᵀ : ∀ {A B τ τ'} → A →ᵗ Tᵒ B τ' → Tᵒ A τ →ᵗ Tᵒ B (τ + τ')
-extendᵀ f = tset-map (extendˢ f)
+
+μˢ : ∀ {A τ τ'} → {t : Time} → carrier (Tᵒ (Tᵒ A τ') τ) t → carrier (Tᵒ A (τ + τ')) t
+μˢ {tset A Af} (leaf c) = Tˢ-move-+ c
+μˢ (node op v k p) =
+  node op v (λ q y → μˢ (k q y)) (trans (cong (_+ _) p) (+-assoc (op-time op) _ _))
+
+μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
+μᵀ = tset-map μˢ
+
+---- strength of the graded monad
+
+---- note: had to mark σˢ as terminating because Agda's termination
+---- gets confused trying to see see that subtrees modelled as a
+---- function are smaller that the given tree (I guess reindexing the
+---- non-recursive argument component with Af is at fault for this)
+
+{-# TERMINATING #-}
+σˢ : ∀ {A B τ} → {t : Time} → carrier A t × carrier (Tᵒ B τ) t → carrier (Tᵒ (A ×ᵗ B) τ) t
+σˢ {tset A Af} {τ = τ} {t = t} (v , leaf w) =
+  leaf (Af (m≤n+m t τ) v , w)
+σˢ {tset A Af} {t = t} (v , node op w k p) =
+  node op w (λ q y → σˢ (Af (≤-trans (m≤m+n t (op-time op)) q) v , k q y)) p
+
+σᵀ : ∀ {A B τ} → A ×ᵗ Tᵒ B τ →ᵗ Tᵒ (A ×ᵗ B) τ
+σᵀ = tset-map σˢ
 
 ---- algebraic operations
 
-opᵗ : ∀ {A τ} → (op : Op)
+opᵀ : ∀ {A τ} → (op : Op)
     → ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)) →ᵗ Tᵒ A (op-time op + τ)
-opᵗ op = tset-map (λ { (v , k) → node op v k refl })
+opᵀ op = tset-map (λ { (v , k) → node op v k refl })
 
 -- Interpretation of value and computation types
 
@@ -167,24 +186,30 @@ mutual
 
 infix 25 ⟦_⟧ᵉ
 
+-- Projecting a variable out of an environment
+
+varᵗ : ∀ {Γ A} → A ∈ Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟦ A ⟧ᵛ
+varᵗ Hd     = sndᵗ
+varᵗ (Tl x) = varᵗ x ∘ᵗ fstᵗ
+
 -- Interpretation of well-typed value and computation terms
 
 mutual
 
   ⟦_⟧ᵛᵗ : ∀ {Γ A} → Γ ⊢V⦂ A → ⟦ Γ ⟧ᵉ →ᵗ ⟦ A ⟧ᵛ
-  ⟦ var x ⟧ᵛᵗ         = {!!}
-  ⟦ const c ⟧ᵛᵗ       = tset-map (λ _ → c)
+  ⟦ var x ⟧ᵛᵗ         = varᵗ x
+  ⟦ const c ⟧ᵛᵗ       = constᵗ c ∘ᵗ terminalᵗ
   ⟦ ⟨⟩ ⟧ᵛᵗ            = terminalᵗ
   ⟦ lam M ⟧ᵛᵗ         = curryᵗ ⟦ M ⟧ᶜᵗ
   ⟦ box {τ = τ} V ⟧ᵛᵗ = ([ τ ]ᶠ ⟦ V ⟧ᵛᵗ) ∘ᵗ η⊣ 
 
   ⟦_⟧ᶜᵗ : ∀ {Γ C} → Γ ⊢C⦂ C → ⟦ Γ ⟧ᵉ →ᵗ ⟦ C ⟧ᶜ
   ⟦ return V ⟧ᶜᵗ       = T-≤τ z≤n ∘ᵗ ηᵀ ∘ᵗ ⟦ V ⟧ᵛᵗ
-  ⟦ M ; N ⟧ᶜᵗ          = {!!}
+  ⟦ M ; N ⟧ᶜᵗ          = μᵀ ∘ᵗ Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵗ σᵀ ∘ᵗ ⟨ idᵗ , ⟦ M ⟧ᶜᵗ ⟩ᵗ 
   ⟦ V · W ⟧ᶜᵗ          = appᵗ ∘ᵗ ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵗ
   ⟦ absurd V ⟧ᶜᵗ       = initialᵗ ∘ᵗ ⟦ V ⟧ᵛᵗ
   ⟦ perform op V M ⟧ᶜᵗ =
-     opᵗ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
+     opᵀ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
                  [ op-time op ]ᶠ (curryᵗ (⟦ M ⟧ᶜᵗ ∘ᵗ mapˣᵗ idᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)))) ∘ᵗ η⊣ ⟩ᵗ
   ⟦ unbox V p q ⟧ᶜᵗ    = {!!}
   ⟦ coerce p M ⟧ᶜᵗ     = T-≤τ p ∘ᵗ ⟦ M ⟧ᶜᵗ
