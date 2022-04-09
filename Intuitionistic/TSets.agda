@@ -46,14 +46,14 @@ n+m≤k⇒m≤k∸n zero    m       k       p       = p
 n+m≤k⇒m≤k∸n (suc n) zero    k       p       = z≤n
 n+m≤k⇒m≤k∸n (suc n) (suc m) (suc k) (s≤s p) = n+m≤k⇒m≤k∸n n (suc m) k p
 
-≤-split-+ : ∀ {n n' m k} → n ≡ m + k → n ≤ n' → Σ[ m' ∈ ℕ ] (n' ≡ m' + k × m ≤ m')
-≤-split-+ {n' = n'} {m = m} p z≤n
+n≡m+k≤n' : ∀ {n n' m k} → n ≡ m + k → n ≤ n' → Σ[ m' ∈ ℕ ] (n' ≡ m' + k × m ≤ m')
+n≡m+k≤n' {n' = n'} {m = m} p z≤n
   rewrite m+n≡0⇒m≡0 m (sym p) | m+n≡0⇒n≡0 m (sym p) =
     n' , sym (+-identityʳ n') , z≤n
-≤-split-+ {n' = .(suc _)} {m = zero} refl (s≤s {n''} {n'''} q) with ≤-split-+ {k = n''} refl q
+n≡m+k≤n' {n' = .(suc _)} {m = zero} refl (s≤s {n''} {n'''} q) with n≡m+k≤n' {k = n''} refl q
 ... | p' , q' , r' = p' , trans (cong suc q') (sym (+-suc p' n'')) , r'
-≤-split-+ {n' = .(suc _)} {m = suc m} p (s≤s {n''} {n'''} q) with suc-injective p
-... | s with ≤-split-+ {m = m} s q
+n≡m+k≤n' {n' = .(suc _)} {m = suc m} p (s≤s {n''} {n'''} q) with suc-injective p
+... | s with n≡m+k≤n' {m = m} s q
 ... | p' , q' , r' = suc p' , cong suc q' , +-mono-≤ (≤-refl {1}) r'
 
 -- Time-indexed sets (covariant presheaves indexed by `(ℕ,≤)`)
@@ -95,17 +95,23 @@ infixr 9 _∘ᵗ_
 
 -- Product, sum, exponent, etc structures of time-indexed sets
 
+---- terminal object
+
 𝟙ᵗ : TSet
 𝟙ᵗ = tset (λ _ → ⊤) (λ _ → id)
 
 terminalᵗ : ∀ {A} → A →ᵗ 𝟙ᵗ
 terminalᵗ = tset-map (λ _ → tt)
 
+---- initial object
+
 𝟘ᵗ : TSet
 𝟘ᵗ = tset (λ _ → ⊥) (λ _ → id)
 
 initialᵗ : ∀ {A} → 𝟘ᵗ →ᵗ A
 initialᵗ = tset-map (λ ())
+
+---- products
 
 _×ᵗ_ : TSet → TSet → TSet
 (tset A Af) ×ᵗ (tset B Bf) =
@@ -124,16 +130,27 @@ sndᵗ = tset-map proj₂
 ⟨_,_⟩ᵗ : ∀ {A B C} → A →ᵗ B → A →ᵗ C → A →ᵗ B ×ᵗ C
 ⟨ tset-map f , tset-map g ⟩ᵗ = tset-map < f , g >
 
+mapˣᵗ : ∀ {A B C D} → A →ᵗ C → B →ᵗ D → A ×ᵗ B →ᵗ C ×ᵗ D
+mapˣᵗ (tset-map f) (tset-map g) = tset-map (mapˣ f g)
+
+---- exponentials
+
 _⇒ᵗ_ : TSet → TSet → TSet
 (tset A Af) ⇒ᵗ (tset B Bf) =
   tset
-    (λ t → (t' : Time) → t ≤ t' → A t' → B t')
-    (λ p f t' q a → f t' (≤-trans p q) a)
+    (λ t → {t' : Time} → t ≤ t' → A t' → B t')
+    (λ p f q a → f (≤-trans p q) a)
 
 infix 22 _⇒ᵗ_
 
 appᵗ : ∀ {A B} → (A ⇒ᵗ B) ×ᵗ A →ᵗ B
-appᵗ = tset-map λ { {t} (f , a) → f t ≤-refl a }
+appᵗ = tset-map λ { {t} (f , a) → f ≤-refl a }
+
+curryᵗ : ∀ {A B C} → A ×ᵗ B →ᵗ C → A →ᵗ B ⇒ᵗ C
+curryᵗ {tset A Af} (tset-map f) = tset-map (λ a → λ p b → f (Af p a , b))
+
+uncurryᵗ : ∀ {A B C} → A →ᵗ B ⇒ᵗ C → A ×ᵗ B →ᵗ C
+uncurryᵗ (tset-map f) = tset-map λ { (a , b) → f a ≤-refl b }
 
 -- Semantics of the type modality `[ t ] A` as a graded comonad
 
