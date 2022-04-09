@@ -95,7 +95,7 @@ mutual
   ⊢C⦂-ctx-monotonic p (V · W)          = ⊢V⦂-ctx-monotonic p V · ⊢V⦂-ctx-monotonic p W
   ⊢C⦂-ctx-monotonic p (absurd V)       = absurd (⊢V⦂-ctx-monotonic p V)
   ⊢C⦂-ctx-monotonic p (perform op V M) =
-    perform op (⊢V⦂-ctx-monotonic p V) (⊢C⦂-ctx-monotonic (≤-⟨⟩ (≤-∷ᶜ p) ≤-refl) M)
+    perform op (⊢V⦂-ctx-monotonic p V) (⊢C⦂-ctx-monotonic (≤-∷ᶜ (≤-⟨⟩ p ≤-refl)) M)
   ⊢C⦂-ctx-monotonic p (unbox V q r) with split-≤ᶜ q p
   ... | Γ₁' , Γ₂' , p' , q' , r' rewrite sym (split-≡ p') =
     unbox (⊢V⦂-ctx-monotonic q' V) (split-≡-++ᶜ {Γ₁'} {Γ₂'}) (≤-trans r (≤ᶜ-ctx-delay r'))  

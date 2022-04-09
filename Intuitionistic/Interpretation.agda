@@ -56,7 +56,7 @@ data Tˢ (A : TSet) : (τ : Time) → (t : Time) → Set where  -- 1st time inde
 Tˢ-move-+ : ∀ {A τ τ' t} → Tˢ A τ (τ' + t) → Tˢ A (τ' + τ) t
 Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (leaf v) =
   leaf (Af (≤-reflexive (trans (sym (+-assoc τ τ' t)) (cong (_+ t) (+-comm τ τ')))) v)
-Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (node op v k q) = --rewrite ⟦⟧ᵍ-constant (param op) (τ' + t) t =
+Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (node op v k q) =
   node op
     (⟦⟧ᵍ-constant (param op) (τ' + t) t v)
     (λ { t' r (s , y) → Tˢ-move-+ (k (τ' + t')
@@ -127,7 +127,14 @@ extendˢ {τ = τ} {τ' = τ'} (tset-map f) (node op v k q) =
 extendᵀ : ∀ {A B τ τ'} → A →ᵗ Tᵒ B τ' → Tᵒ A τ →ᵗ Tᵒ B (τ + τ')
 extendᵀ f = tset-map (extendˢ f)
 
--- Interpretation of types
+---- Algebraic operations associated with the graded monad
+
+opᵗ : ∀ {A τ τ'}
+    → (op : Op) → τ' ≡ op-time op + τ
+    → ⟦ param op ⟧ᵍ ×ᵗ (⟨ op-time op ⟩ᵒ ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ) →ᵗ Tᵒ A τ'
+opᵗ op p = tset-map λ { (v , k) → node op v k p }
+
+-- Interpretation of value and computation types
 
 mutual
 
@@ -144,6 +151,13 @@ mutual
   infix 25 ⟦_⟧ᵛ
   infix 25 ⟦_⟧ᶜ
 
+-- Relating the interpretation of ground types and ground type to type conversion
+
+⟦⟧ᵛ-⟦⟧ᵍ : (B : GType) → ⟦ type-of-gtype B ⟧ᵛ →ᵗ ⟦ B ⟧ᵍ
+⟦⟧ᵛ-⟦⟧ᵍ (Base B) = tset-map id
+⟦⟧ᵛ-⟦⟧ᵍ Unit     = tset-map id
+⟦⟧ᵛ-⟦⟧ᵍ Empty    = tset-map id
+
 -- Interpretation of contexts as environments
 
 ⟦_⟧ᵉ : Ctx → TSet
@@ -153,7 +167,7 @@ mutual
 
 infix 25 ⟦_⟧ᵉ
 
--- Interpretation of well-typed values and computations
+-- Interpretation of well-typed value and computation terms
 
 mutual
 
@@ -169,6 +183,6 @@ mutual
   ⟦ M ; N ⟧ᶜᵗ          = {!!}
   ⟦ V · W ⟧ᶜᵗ          = appᵗ ∘ᵗ ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵗ
   ⟦ absurd V ⟧ᶜᵗ       = initialᵗ ∘ᵗ ⟦ V ⟧ᵛᵗ
-  ⟦ perform op V M ⟧ᶜᵗ = {!!}
+  ⟦ perform op V M ⟧ᶜᵗ = opᵗ op refl ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ , {!⟦ M ⟧ᶜᵗ!} ⟩ᵗ
   ⟦ unbox V p q ⟧ᶜᵗ    = {!!}
   ⟦ coerce p M ⟧ᶜᵗ     = T-≤τ p ∘ᵗ ⟦ M ⟧ᶜᵗ

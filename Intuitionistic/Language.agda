@@ -70,8 +70,8 @@ data Ctx : Set where
   _∷ᶜ_ : Ctx → VType → Ctx          -- context extension with a variable
   _⟨_⟩ : Ctx → Time → Ctx          -- context use after a time delay
 
-infixl 29 _∷ᶜ_
-infix  28 _⟨_⟩
+infixl 28 _∷ᶜ_
+infix  29 _⟨_⟩
 
 -- Concatenation of contexts
 
@@ -142,7 +142,7 @@ mutual
             ------------------
             → Γ ⊢V⦂ A ⇒ B ‼ τ
 
-    -- boxing up a value for use in at least `t` time steps
+    -- boxing up a value/resource that is ready for use in at least `t` time steps
 
     box     : {A : VType}
             → {τ : Time}
@@ -158,11 +158,11 @@ mutual
             → {τ : Time}
             → Γ ⊢V⦂ A
             -------------
-            → Γ ⊢C⦂ A ‼ τ        -- arbitrary `τ` to push `coerce`s inside (includes 0)
+            → Γ ⊢C⦂ A ‼ τ        -- arbitrary `τ` to push `coerce`s inside computations
 
     -- sequential composition
 
-    _;_     : {A B : VType}      -- note: not just an ordinary ;, instead using \;0
+    _;_     : {A B : VType}      -- note: use \;0 to get this unicode semicolon
             → {τ τ' : Time}
             → Γ ⊢C⦂ A ‼ τ
             → Γ ∷ᶜ A ⊢C⦂ B ‼ τ'
@@ -192,13 +192,13 @@ mutual
             → {τ : Time}
             → (op : Op)
             → Γ ⊢V⦂ type-of-gtype (param op)
-            → Γ ∷ᶜ type-of-gtype (arity op) ⟨ op-time op ⟩ ⊢C⦂ A ‼ τ
+            → Γ ⟨ op-time op ⟩ ∷ᶜ type-of-gtype (arity op) ⊢C⦂ A ‼ τ
             --------------------------------------------------------
             → Γ ⊢C⦂ A ‼ (op-time op + τ)
 
     -- TODO: in the future, add effect handlers as well
 
-    -- unboxing a `t`-boxed value after at least `t` time steps
+    -- unboxing a boxed value/resource after enough time has passed for it to be ready
 
     unbox   : {Γ' Γ'' : Ctx}
             → {A : VType}
