@@ -186,30 +186,62 @@ mutual
 
 infix 25 ⟦_⟧ᵉ
 
+-- Total delay of an environment as a single ⟨_⟩ modality
+
+env-delay : ∀ {Γ Γ' Γ''} → Γ' , Γ'' split Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟨ ctx-delay Γ'' ⟩ᵒ ⟦ Γ' ⟧ᵉ
+env-delay split-[]     = η
+env-delay (split-∷ᶜ p) = env-delay p ∘ᵗ fstᵗ
+env-delay {Γ' = Γ'} {Γ'' = Γ'' ⟨ τ ⟩} (split-⟨⟩ p) =
+     ⟨_⟩-≤ {A = ⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (ctx-delay Γ'') τ))
+  ∘ᵗ μ {A = ⟦ Γ' ⟧ᵉ}
+  ∘ᵗ ⟨ τ ⟩ᶠ (env-delay p)
+
 -- Projecting a variable out of an environment
 
-varᵗ : ∀ {Γ A} → A ∈ Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟦ A ⟧ᵛ
-varᵗ Hd     = sndᵗ
-varᵗ (Tl x) = varᵗ x ∘ᵗ fstᵗ
+env-var : ∀ {Γ A} → A ∈ Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟦ A ⟧ᵛ
+env-var Hd     = sndᵗ
+env-var (Tl x) = env-var x ∘ᵗ fstᵗ
 
 -- Interpretation of well-typed value and computation terms
 
 mutual
 
   ⟦_⟧ᵛᵗ : ∀ {Γ A} → Γ ⊢V⦂ A → ⟦ Γ ⟧ᵉ →ᵗ ⟦ A ⟧ᵛ
-  ⟦ var x ⟧ᵛᵗ         = varᵗ x
-  ⟦ const c ⟧ᵛᵗ       = constᵗ c ∘ᵗ terminalᵗ
-  ⟦ ⟨⟩ ⟧ᵛᵗ            = terminalᵗ
-  ⟦ lam M ⟧ᵛᵗ         = curryᵗ ⟦ M ⟧ᶜᵗ
+  
+  ⟦ var x ⟧ᵛᵗ = env-var x
+  
+  ⟦ const c ⟧ᵛᵗ = constᵗ c ∘ᵗ terminalᵗ
+  
+  ⟦ ⟨⟩ ⟧ᵛᵗ = terminalᵗ
+  
+  ⟦ lam M ⟧ᵛᵗ = curryᵗ ⟦ M ⟧ᶜᵗ
+  
   ⟦ box {τ = τ} V ⟧ᵛᵗ = ([ τ ]ᶠ ⟦ V ⟧ᵛᵗ) ∘ᵗ η⊣ 
 
+  infix 25 ⟦_⟧ᵛᵗ
+
+
   ⟦_⟧ᶜᵗ : ∀ {Γ C} → Γ ⊢C⦂ C → ⟦ Γ ⟧ᵉ →ᵗ ⟦ C ⟧ᶜ
-  ⟦ return V ⟧ᶜᵗ       = T-≤τ z≤n ∘ᵗ ηᵀ ∘ᵗ ⟦ V ⟧ᵛᵗ
-  ⟦ M ; N ⟧ᶜᵗ          = μᵀ ∘ᵗ Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵗ σᵀ ∘ᵗ ⟨ idᵗ , ⟦ M ⟧ᶜᵗ ⟩ᵗ 
-  ⟦ V · W ⟧ᶜᵗ          = appᵗ ∘ᵗ ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵗ
-  ⟦ absurd V ⟧ᶜᵗ       = initialᵗ ∘ᵗ ⟦ V ⟧ᵛᵗ
+  
+  ⟦ return V ⟧ᶜᵗ = T-≤τ z≤n ∘ᵗ ηᵀ ∘ᵗ ⟦ V ⟧ᵛᵗ
+  
+  ⟦ M ; N ⟧ᶜᵗ = μᵀ ∘ᵗ Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵗ σᵀ ∘ᵗ ⟨ idᵗ , ⟦ M ⟧ᶜᵗ ⟩ᵗ
+  
+  ⟦ V · W ⟧ᶜᵗ = appᵗ ∘ᵗ ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵗ
+  
+  ⟦ absurd V ⟧ᶜᵗ = initialᵗ ∘ᵗ ⟦ V ⟧ᵛᵗ
+  
   ⟦ perform op V M ⟧ᶜᵗ =
      opᵀ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
                  [ op-time op ]ᶠ (curryᵗ (⟦ M ⟧ᶜᵗ ∘ᵗ mapˣᵗ idᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)))) ∘ᵗ η⊣ ⟩ᵗ
-  ⟦ unbox V p q ⟧ᶜᵗ    = {!!}
-  ⟦ coerce p M ⟧ᶜᵗ     = T-≤τ p ∘ᵗ ⟦ M ⟧ᶜᵗ
+                 
+  ⟦ unbox {Γ' = Γ'} {τ = τ} p q V M ⟧ᶜᵗ =
+    ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
+                    ε⊣
+                 ∘ᵗ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ
+                 ∘ᵗ ⟨_⟩-≤ {A = ⟦ Γ' ⟧ᵉ} q
+                 ∘ᵗ env-delay p ⟩ᵗ
+                 
+  ⟦ coerce p M ⟧ᶜᵗ = T-≤τ p ∘ᵗ ⟦ M ⟧ᶜᵗ
+
+  infix 25 ⟦_⟧ᶜᵗ

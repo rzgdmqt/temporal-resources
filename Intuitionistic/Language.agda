@@ -201,13 +201,14 @@ mutual
     -- unboxing a boxed value/resource after enough time has passed for it to be ready
 
     unbox   : {Γ' Γ'' : Ctx}
-            → {A : VType}
+            → {A B : VType}
             → {τ τ' : Time}
-            → Γ' ⊢V⦂ [ τ ] A
             → Γ' , Γ'' split Γ
             → τ ≤ ctx-delay Γ''
+            → Γ' ⊢V⦂ [ τ ] A
+            → Γ ∷ᶜ A  ⊢C⦂ B ‼ τ'
             -------------------
-            → Γ ⊢C⦂ A ‼ τ'          -- arbitrary `τ'` to push `coerce`s inside (includes 0)
+            → Γ ⊢C⦂ B ‼ τ'          -- arbitrary `τ'` to push `coerce`s inside (includes 0)
 
     -- explicit sub-effecting coercion (no general sub-typing for simplicity)
 
