@@ -3,6 +3,8 @@
 -------------------------------------------------------------------
 
 open import Data.Nat
+open import Data.Nat.Properties
+open import Data.Product
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
@@ -87,12 +89,19 @@ ctx-delay []        = 0
 ctx-delay (Γ ∷ᶜ A)  = ctx-delay Γ
 ctx-delay (Γ ⟨ τ ⟩) = ctx-delay Γ + τ
 
--- Variable in a context (if it is available now)
+-- Proof that sub-contexts split a given context
+
+data _,_split_ : (Γ Γ' Γ'' : Ctx) → Set where
+  split-[] : ∀ {Γ} → Γ , [] split Γ
+  split-∷ᶜ : ∀ {Γ Γ' Γ'' A} → Γ , Γ' split Γ'' → Γ , Γ' ∷ᶜ A split Γ'' ∷ᶜ A
+  split-⟨⟩ : ∀ {Γ Γ' Γ'' τ} → Γ , Γ' split Γ'' → Γ , Γ' ⟨ τ ⟩ split Γ'' ⟨ τ ⟩
+
+-- Variable in a context
+-- (if it is available now, i.e., it is under no ⟨_⟩s)
 
 data _∈_ (A : VType) : Ctx → Set where
   Hd    : ∀ {Γ}   → A ∈ Γ ∷ᶜ A
   Tl    : ∀ {Γ B} → A ∈ Γ → A ∈ Γ ∷ᶜ B
-  Tl-⟨⟩ : ∀ {Γ}   → A ∈ Γ → A ∈ Γ ⟨ 0 ⟩
 
 infix 27 _∈_
 
@@ -154,7 +163,7 @@ mutual
     -- sequential composition
 
     _;_     : {A B : VType}      -- note: not just an ordinary ;, instead using \;0
-            → {τ τ' τ'' : Time}
+            → {τ τ' : Time}
             → Γ ⊢C⦂ A ‼ τ
             → Γ ∷ᶜ A ⊢C⦂ B ‼ τ'
             -------------------
@@ -187,7 +196,7 @@ mutual
             --------------------------------------------------------
             → Γ ⊢C⦂ A ‼ (op-time op + τ)
 
-    -- TODO: add effect handlers as well in the future
+    -- TODO: in the future, add effect handlers as well
 
     -- unboxing a `t`-boxed value after at least `t` time steps
 
@@ -195,7 +204,7 @@ mutual
             → {A : VType}
             → {τ τ' : Time}
             → Γ' ⊢V⦂ [ τ ] A
-            → Γ ≡ Γ' ++ᶜ Γ''
+            → Γ' , Γ'' split Γ
             → τ ≤ ctx-delay Γ''
             -------------------
             → Γ ⊢C⦂ A ‼ τ'          -- arbitrary `τ'` to push `coerce`s inside (includes 0)
@@ -208,4 +217,3 @@ mutual
             → Γ ⊢C⦂ A ‼ τ
             ---------------
             → Γ ⊢C⦂ A ‼ τ'
-
