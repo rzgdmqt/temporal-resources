@@ -11,6 +11,7 @@ open Eq hiding ([_])
 open Eq.≡-Reasoning
 
 open import Language
+open import ContextModality
 
 module Renamings where
 
@@ -88,7 +89,9 @@ split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
               Γ₁' , Γ₂' split Γ' ×
               τ ≤ ctx-delay Γ₂')
               
-split-ren ρ p q = {!!}
+split-ren ρ split-[]     z≤n = _ , [] , ρ , ≡-split refl , z≤n
+split-ren ρ (split-∷ᶜ p) q   = {!!}
+split-ren ρ (split-⟨⟩ p) q   = {!!}
 
 -- Action of renamings on well-typed values and computations
 

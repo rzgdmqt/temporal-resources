@@ -116,6 +116,7 @@ mutual
 ⟨⟩-strengthen-var {Γ₂ = Γ₂ ∷ᶜ _} refl refl Hd     = Hd
 ⟨⟩-strengthen-var {Γ₂ = Γ₂ ∷ᶜ _} refl refl (Tl x) = Tl (⟨⟩-strengthen-var refl refl x)
 
+{-
 mutual
 
   ⊢V⦂-⟨⟩-strengthen : ∀ {Γ Γ' Γ₁ Γ₂ A}
@@ -157,7 +158,7 @@ mutual
     unbox {!!} {!!} {!!} (⊢C⦂-⟨⟩-strengthen (split-∷ᶜ p) (split-∷ᶜ q) M)
   ⊢C⦂-⟨⟩-strengthen p q (coerce r M) =
     coerce r (⊢C⦂-⟨⟩-strengthen p q M)
-
+-}
 
 -- Merging two ⟨_⟩s (the graded monadic multiplication of ⟨_⟩)
 --------------------------------------------------------------
