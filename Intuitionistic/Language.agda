@@ -70,15 +70,15 @@ data Ctx : Set where
   _∷ᶜ_ : Ctx → VType → Ctx          -- context extension with a variable
   _⟨_⟩ : Ctx → Time → Ctx          -- context use after a time delay
 
-infixl 28 _∷ᶜ_
-infix  29 _⟨_⟩
+infixl 31 _∷ᶜ_
+infix  32 _⟨_⟩
 
 -- Concatenation of contexts
 
 _++ᶜ_ : Ctx → Ctx → Ctx
 Γ ++ᶜ []         = Γ
-Γ ++ᶜ (Γ' ∷ᶜ X)  = Γ ++ᶜ Γ' ∷ᶜ X
-Γ ++ᶜ (Γ' ⟨ τ ⟩) = Γ ++ᶜ Γ' ⟨ τ ⟩
+Γ ++ᶜ (Γ' ∷ᶜ X)  = (Γ ++ᶜ Γ') ∷ᶜ X
+Γ ++ᶜ (Γ' ⟨ τ ⟩) = (Γ ++ᶜ Γ') ⟨ τ ⟩
 
 infixl 30 _++ᶜ_
 
