@@ -212,7 +212,7 @@ mutual
   
   ⟦ const c ⟧ᵛᵗ = constᵗ c ∘ᵗ terminalᵗ
   
-  ⟦ ⟨⟩ ⟧ᵛᵗ = terminalᵗ
+  ⟦ ⋆ ⟧ᵛᵗ = terminalᵗ
   
   ⟦ lam M ⟧ᵛᵗ = curryᵗ ⟦ M ⟧ᶜᵗ
   

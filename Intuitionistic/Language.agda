@@ -130,7 +130,7 @@ mutual
 
     -- unit type
 
-    ⟨⟩      :
+    ⋆       :
             ------------
               Γ ⊢V⦂ Unit
 

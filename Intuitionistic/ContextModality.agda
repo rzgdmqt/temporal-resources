@@ -1,6 +1,6 @@
-------------------------------------------------------------------------
--- Admissible rules for manipulating the contexts of well-typed terms --
-------------------------------------------------------------------------
+---------------------------------------------------
+-- Admissible rules for the context modality ⟨_⟩ --
+---------------------------------------------------
 
 open import Data.Nat
 open import Data.Nat.Properties
@@ -12,7 +12,7 @@ open Eq.≡-Reasoning
 
 open import Language
 
-module ContextRules where
+module ContextModality where
 
 
 -- Time-ordering of contexts (accumulated monotonicity of ⟨_⟩s)
@@ -85,7 +85,7 @@ mutual
 
   ⊢V⦂-ctx-monotonic p (var x) = var (∈-≤ᶜ-∈ x p)
   ⊢V⦂-ctx-monotonic p (const c) = const c
-  ⊢V⦂-ctx-monotonic p ⟨⟩ = ⟨⟩
+  ⊢V⦂-ctx-monotonic p ⋆ = ⋆
   ⊢V⦂-ctx-monotonic p (lam M) = lam (⊢C⦂-ctx-monotonic (≤-∷ᶜ p) M)
   ⊢V⦂-ctx-monotonic p (box V) = box (⊢V⦂-ctx-monotonic (≤-⟨⟩ p ≤-refl) V)
 
@@ -128,7 +128,7 @@ mutual
   ⊢V⦂-⟨⟩-strengthen p q (var x) =
     var (⟨⟩-strengthen-var (sym (split-≡ p)) (sym (split-≡ q)) x)
   ⊢V⦂-⟨⟩-strengthen p q (const c) = const c
-  ⊢V⦂-⟨⟩-strengthen p q ⟨⟩ = ⟨⟩
+  ⊢V⦂-⟨⟩-strengthen p q ⋆ = ⋆
   ⊢V⦂-⟨⟩-strengthen p q (lam M) =
     lam (⊢C⦂-⟨⟩-strengthen (split-∷ᶜ p) (split-∷ᶜ q) M)
   ⊢V⦂-⟨⟩-strengthen p q (box V) =
@@ -161,23 +161,5 @@ mutual
 
 -- Merging two ⟨_⟩s (the graded monadic multiplication of ⟨_⟩)
 --------------------------------------------------------------
-
--- ...
-
-
--- Variable weakening rule
---------------------------
-
--- ...
-
-
--- Variable exchange rule
--------------------------
-
--- ...
-
-
--- Variable contraction rule
-----------------------------
 
 -- ...
