@@ -14,6 +14,7 @@ open import Language
 
 module ContextRules where
 
+
 -- Time-ordering of contexts (accumulated monotonicity of ⟨_⟩s)
 ---------------------------------------------------------------
 
@@ -58,10 +59,13 @@ split-≡ split-[] = refl
 split-≡ (split-∷ᶜ p) = cong (_∷ᶜ _) (split-≡ p)
 split-≡ (split-⟨⟩ p) = cong (_⟨ _ ⟩) (split-≡ p)
 
+≡-split : ∀ {Γ Γ₁ Γ₂} → Γ₁ ++ᶜ Γ₂ ≡ Γ → Γ₁ , Γ₂ split Γ
+≡-split {Γ₂ = []}       refl = split-[]
+≡-split {Γ₂ = Γ₂ ∷ᶜ A}  refl = split-∷ᶜ (≡-split refl)
+≡-split {Γ₂ = Γ₂ ⟨ τ ⟩} refl = split-⟨⟩ (≡-split refl)
+
 split-≡-++ᶜ : ∀ {Γ₁ Γ₂} → Γ₁ , Γ₂ split (Γ₁ ++ᶜ Γ₂)
-split-≡-++ᶜ {Γ₂ = []}       = split-[]
-split-≡-++ᶜ {Γ₂ = Γ₂ ∷ᶜ A}  = split-∷ᶜ split-≡-++ᶜ
-split-≡-++ᶜ {Γ₂ = Γ₂ ⟨ τ ⟩} = split-⟨⟩ split-≡-++ᶜ
+split-≡-++ᶜ = ≡-split refl
 
 -- ≤ᶜ preserves ∈
 
@@ -102,6 +106,7 @@ mutual
     unbox  (split-≡-++ᶜ {Γ₁'} {Γ₂'}) (≤-trans r (≤ᶜ-ctx-delay r'))
       (⊢V⦂-ctx-monotonic q' V) (⊢C⦂-ctx-monotonic (≤-∷ᶜ p) M)
   ⊢C⦂-ctx-monotonic p (coerce q M) = coerce q (⊢C⦂-ctx-monotonic p M)
+
 
 -- Strengthening context with ⟨ 0 ⟩ (the graded monadic unit of ⟨_⟩)
 --------------------------------------------------------------------
@@ -153,22 +158,26 @@ mutual
   ⊢C⦂-⟨⟩-strengthen p q (coerce r M) =
     coerce r (⊢C⦂-⟨⟩-strengthen p q M)
 
+
 -- Merging two ⟨_⟩s (the graded monadic multiplication of ⟨_⟩)
 --------------------------------------------------------------
 
 -- ...
 
--- Weakening rule
------------------
+
+-- Variable weakening rule
+--------------------------
 
 -- ...
 
--- Exchange rule
-----------------
+
+-- Variable exchange rule
+-------------------------
 
 -- ...
 
--- Contraction rule
--------------------
+
+-- Variable contraction rule
+----------------------------
 
 -- ...
