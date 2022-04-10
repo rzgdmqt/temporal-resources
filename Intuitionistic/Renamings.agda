@@ -80,18 +80,23 @@ cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ = ⟨⟩ (cong-ren ρ)
 
 -- Splitting a renaming
 
-split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
+split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ τ'}
           → Ren Γ Γ'
-          → Γ₁ , Γ₂ split Γ
-          → τ ≤ ctx-delay Γ₂
+          → Γ₁ ⟨ τ' ⟩ , Γ₂ split Γ
+          → τ ≤ τ' + ctx-delay Γ₂
           → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
              (Ren Γ₁ Γ₁' ×
-              Γ₁' , Γ₂' split Γ' ×
-              τ ≤ ctx-delay Γ₂')
+              Γ₁' ⟨ τ' ⟩ , Γ₂' split Γ' ×
+              τ ≤ τ' + ctx-delay Γ₂')
               
-split-ren ρ split-[]     z≤n = _ , [] , ρ , ≡-split refl , z≤n
-split-ren ρ (split-∷ᶜ p) q   = {!!}
-split-ren ρ (split-⟨⟩ p) q   = {!!}
+split-ren (wk ρ) split-[] q with split-ren ρ split-[] q
+... | Γ₁' , Γ₂' , ρ' , p' , q' = Γ₁' , Γ₂' ∷ᶜ _ , ρ' , split-∷ᶜ p' , q'
+split-ren (⟨⟩ ρ) split-[] q =
+  _ , [] , ρ , ≡-split refl , q
+split-ren (wk ρ) (split-∷ᶜ p) q = {!!}
+split-ren (ext ρ x) (split-∷ᶜ p) q = split-ren ρ p q
+split-ren (wk ρ) (split-⟨⟩ p) q = {!!}
+split-ren (⟨⟩ {τ = τ} ρ) (split-⟨⟩ p) q = {!split-ren ρ p!}
 
 -- Action of renamings on well-typed values and computations
 

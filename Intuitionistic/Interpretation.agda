@@ -235,13 +235,14 @@ mutual
      opᵀ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
                  [ op-time op ]ᶠ (curryᵗ (⟦ M ⟧ᶜᵗ ∘ᵗ mapˣᵗ idᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)))) ∘ᵗ η⊣ ⟩ᵗ
                  
-  ⟦ unbox {Γ' = Γ'} {τ = τ} p q V M ⟧ᶜᵗ =
+  ⟦ unbox {Γ'} {Γ''} {τ = τ} {τ' = τ'} p q V M ⟧ᶜᵗ =
     ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
                     ε⊣
                  ∘ᵗ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ
-                 ∘ᵗ ⟨_⟩-≤ {A = ⟦ Γ' ⟧ᵉ} q
+                 ∘ᵗ ⟨_⟩-≤ {A = ⟦ Γ' ⟧ᵉ} (≤-trans q (≤-reflexive (+-comm τ' (ctx-delay Γ''))))
+                 ∘ᵗ μ {A = ⟦ Γ' ⟧ᵉ}
                  ∘ᵗ env-delay p ⟩ᵗ
-                 
+  
   ⟦ coerce p M ⟧ᶜᵗ = T-≤τ p ∘ᵗ ⟦ M ⟧ᶜᵗ
 
   infix 25 ⟦_⟧ᶜᵗ

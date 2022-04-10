@@ -83,11 +83,11 @@ mutual
                     ------------
                     → Γ' ⊢V⦂ A
 
-  ⊢V⦂-ctx-monotonic p (var x) = var (∈-≤ᶜ-∈ x p)
+  ⊢V⦂-ctx-monotonic p (var x)   = var (∈-≤ᶜ-∈ x p)
   ⊢V⦂-ctx-monotonic p (const c) = const c
-  ⊢V⦂-ctx-monotonic p ⋆ = ⋆
-  ⊢V⦂-ctx-monotonic p (lam M) = lam (⊢C⦂-ctx-monotonic (≤-∷ᶜ p) M)
-  ⊢V⦂-ctx-monotonic p (box V) = box (⊢V⦂-ctx-monotonic (≤-⟨⟩ p ≤-refl) V)
+  ⊢V⦂-ctx-monotonic p ⋆         = ⋆
+  ⊢V⦂-ctx-monotonic p (lam M)   = lam (⊢C⦂-ctx-monotonic (≤-∷ᶜ p) M)
+  ⊢V⦂-ctx-monotonic p (box V)   = box (⊢V⦂-ctx-monotonic (≤-⟨⟩ p ≤-refl) V)
 
   ⊢C⦂-ctx-monotonic : ∀ {Γ Γ' C}
                     → Γ ≤ᶜ Γ'
@@ -96,15 +96,17 @@ mutual
                     → Γ' ⊢C⦂ C
 
   ⊢C⦂-ctx-monotonic p (return V) = return (⊢V⦂-ctx-monotonic p V)
-  ⊢C⦂-ctx-monotonic p (M ; N) = ⊢C⦂-ctx-monotonic p M ; ⊢C⦂-ctx-monotonic (≤-∷ᶜ p) N
-  ⊢C⦂-ctx-monotonic p (V · W) = ⊢V⦂-ctx-monotonic p V · ⊢V⦂-ctx-monotonic p W
+  ⊢C⦂-ctx-monotonic p (M ; N)    = ⊢C⦂-ctx-monotonic p M ; ⊢C⦂-ctx-monotonic (≤-∷ᶜ p) N
+  ⊢C⦂-ctx-monotonic p (V · W)    = ⊢V⦂-ctx-monotonic p V · ⊢V⦂-ctx-monotonic p W
   ⊢C⦂-ctx-monotonic p (absurd V) = absurd (⊢V⦂-ctx-monotonic p V)
   ⊢C⦂-ctx-monotonic p (perform op V M) =
     perform op (⊢V⦂-ctx-monotonic p V) (⊢C⦂-ctx-monotonic (≤-∷ᶜ (≤-⟨⟩ p ≤-refl)) M)
   ⊢C⦂-ctx-monotonic p (unbox q r V M) with split-≤ᶜ q p
-  ... | Γ₁' , Γ₂' , p' , q' , r' rewrite sym (split-≡ p') =
-    unbox  (split-≡-++ᶜ {Γ₁'} {Γ₂'}) (≤-trans r (≤ᶜ-ctx-delay r'))
-      (⊢V⦂-ctx-monotonic q' V) (⊢C⦂-ctx-monotonic (≤-∷ᶜ p) M)
+  ... | (Γ₁' ⟨ τ' ⟩) , Γ₂' , p' , ≤-⟨⟩ q' q'' , r' =
+    unbox p'
+      (≤-trans r (+-mono-≤ q'' (≤ᶜ-ctx-delay r')))
+      (⊢V⦂-ctx-monotonic q' V)
+      (⊢C⦂-ctx-monotonic (≤-∷ᶜ p) M)
   ⊢C⦂-ctx-monotonic p (coerce q M) = coerce q (⊢C⦂-ctx-monotonic p M)
 
 
@@ -117,6 +119,8 @@ mutual
 ⟨⟩-strengthen-var {Γ₂ = Γ₂ ∷ᶜ _} refl refl (Tl x) = Tl (⟨⟩-strengthen-var refl refl x)
 
 {-
+-- TODO: commented out to work on renamings file
+
 mutual
 
   ⊢V⦂-⟨⟩-strengthen : ∀ {Γ Γ' Γ₁ Γ₂ A}
