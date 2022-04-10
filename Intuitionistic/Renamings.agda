@@ -93,9 +93,11 @@ split-ren (wk ρ) split-[] q with split-ren ρ split-[] q
 ... | Γ₁' , Γ₂' , ρ' , p' , q' = Γ₁' , Γ₂' ∷ᶜ _ , ρ' , split-∷ᶜ p' , q'
 split-ren (⟨⟩ ρ) split-[] q =
   _ , [] , ρ , ≡-split refl , q
-split-ren (wk ρ) (split-∷ᶜ p) q = {!!}
+split-ren (wk ρ) (split-∷ᶜ p) q with split-ren ρ (split-∷ᶜ p) q
+... | Γ₁' , Γ₂' , ρ' , p' , q' = Γ₁' , Γ₂' ∷ᶜ _ , ρ' , split-∷ᶜ p' , q'
 split-ren (ext ρ x) (split-∷ᶜ p) q = split-ren ρ p q
-split-ren (wk ρ) (split-⟨⟩ p) q = {!!}
+split-ren (wk ρ) (split-⟨⟩ p) q with split-ren ρ (split-⟨⟩ p) q
+... | Γ₁' , Γ₂' , ρ' , p' , q' = Γ₁' , Γ₂' ∷ᶜ _ , ρ' , split-∷ᶜ p' , q'
 split-ren (⟨⟩ {τ = τ} ρ) (split-⟨⟩ p) q = {!split-ren ρ p!}
 
 -- Action of renamings on well-typed values and computations
