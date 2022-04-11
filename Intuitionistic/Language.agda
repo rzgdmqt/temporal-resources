@@ -107,10 +107,10 @@ infix 27 _∈[_]_
 
 -- Monotonicity of variables in context
 
-∈[]-monotonicity : ∀ {Γ A τ τ'} → A ∈[ τ ] Γ → τ' ≤ τ → A ∈[ τ' ] Γ
-∈[]-monotonicity Hd        p = Hd
-∈[]-monotonicity (Tl-∷ᶜ x) p = Tl-∷ᶜ (∈[]-monotonicity x p)
-∈[]-monotonicity (Tl-⟨⟩ x) p = {!!}
+--∈[]-monotonicity : ∀ {Γ A τ τ'} → A ∈[ τ ] Γ → τ' ≤ τ → A ∈[ τ' ] Γ
+--∈[]-monotonicity Hd        p = Hd
+--∈[]-monotonicity (Tl-∷ᶜ x) p = Tl-∷ᶜ (∈[]-monotonicity x p)
+--∈[]-monotonicity (Tl-⟨⟩ q x) p = Tl-⟨⟩ {!!} (∈[]-monotonicity x {!!})
 
 -- Well-typed terms (values and computations)
 
