@@ -2,7 +2,7 @@
 -- Context renamings and their action on well-typed terms --
 ------------------------------------------------------------
 
-open import Function
+open import Function hiding (const)
 
 open import Data.Nat
 open import Data.Nat.Properties
@@ -36,9 +36,66 @@ idʳ {.(_ ⟨ _ ⟩)} (Tl-⟨⟩ x) = _ , ≤-refl , Tl-⟨⟩ x
 _∘ʳ_ : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
 (ρ' ∘ʳ ρ) {A} {τ} Hd with ρ {A} {τ} Hd
 ... | τ , p , x with ρ' x
-... | τ' , p' , x' = τ' , ≤-trans p p' , x'
+... | τ' , p' , y = τ' , ≤-trans p p' , y
 (ρ' ∘ʳ ρ) (Tl-∷ᶜ x) = (ρ' ∘ʳ (ρ ∘ Tl-∷ᶜ)) x
-(ρ' ∘ʳ ρ) (Tl-⟨⟩ x) = {!!}
+(ρ' ∘ʳ ρ) (Tl-⟨⟩ x) with ρ (Tl-⟨⟩ x)
+... | τ , p , y with ρ' y
+... | τ' , p' , z = τ' , ≤-trans p p' , z
+
+-- Weakening renaming
+
+wk-ren : ∀ {Γ A} → Ren Γ (Γ ∷ᶜ A)
+wk-ren x = _ , ≤-refl , Tl-∷ᶜ x
+
+-- Exchange renaming
+
+exch-ren : ∀ {Γ A B} → Ren (Γ ∷ᶜ A ∷ᶜ B) (Γ ∷ᶜ B ∷ᶜ A)
+exch-ren Hd                = _ , ≤-refl , Tl-∷ᶜ Hd
+exch-ren (Tl-∷ᶜ Hd)        = _ , ≤-refl , Hd
+exch-ren (Tl-∷ᶜ (Tl-∷ᶜ x)) = _ , ≤-refl , Tl-∷ᶜ (Tl-∷ᶜ x)
+
+-- Contraction renaming
+
+contract-ren : ∀ {Γ A} → Ren (Γ ∷ᶜ A ∷ᶜ A) (Γ ∷ᶜ A)
+contract-ren Hd        = _ , ≤-refl , Hd
+contract-ren (Tl-∷ᶜ x) = _ , ≤-refl , x
+
+-- Congruence of context renamings
+
+cong-ren : ∀ {Γ Γ' Γ''} → Ren Γ Γ' → Ren (Γ ++ᶜ Γ'') (Γ' ++ᶜ Γ'')
+cong-ren {Γ'' = []}        ρ x = ρ x
+cong-ren {Γ'' = Γ'' ∷ᶜ A}  ρ x = {!!}
+cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ x = {!!}
+
+-- Action of renamings on well-typed values and computations
+
+mutual
+
+  V-rename : ∀ {Γ Γ' A}
+           → Ren Γ Γ'
+           → Γ ⊢V⦂ A
+           ------------
+           → Γ' ⊢V⦂ A
+
+  V-rename ρ (var x)   = var (proj₂ (proj₂ (ρ x)))
+  V-rename ρ (const c) = const c
+  V-rename ρ ⋆         = ⋆
+  V-rename ρ (lam M)   = lam (C-rename (cong-ren ρ) M)
+  V-rename ρ (box V)   = box (V-rename (cong-ren ρ) V)
+
+  C-rename : ∀ {Γ Γ' C}
+           → Ren Γ Γ'
+           → Γ ⊢C⦂ C
+           ------------
+           → Γ' ⊢C⦂ C
+
+  C-rename ρ (return V)       = return (V-rename ρ V)
+  C-rename ρ (M ; N)          = C-rename ρ M ; C-rename (cong-ren ρ) N
+  C-rename ρ (V · W)          = V-rename ρ V · V-rename ρ W
+  C-rename ρ (absurd V)       = absurd (V-rename ρ V)
+  C-rename ρ (perform op V M) = perform op (V-rename ρ V) (C-rename (cong-ren ρ) M)
+  C-rename ρ (unbox q r V M)  = {!!}
+  C-rename ρ (coerce q M)     = coerce q (C-rename ρ M)
 
 
 
