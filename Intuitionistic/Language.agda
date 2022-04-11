@@ -96,12 +96,11 @@ data _,_split_ : (Γ Γ' Γ'' : Ctx) → Set where
   split-∷ᶜ : ∀ {Γ Γ' Γ'' A} → Γ , Γ' split Γ'' → Γ , Γ' ∷ᶜ A split Γ'' ∷ᶜ A
   split-⟨⟩ : ∀ {Γ Γ' Γ'' τ} → Γ , Γ' split Γ'' → Γ , Γ' ⟨ τ ⟩ split Γ'' ⟨ τ ⟩
 
--- Variable in a context
--- (if it is available now, i.e., it is under no ⟨_⟩s)
+-- Variable in a context (available now, i.e., under no ⟨_⟩s)
 
 data _∈_ (A : VType) : Ctx → Set where
-  Hd    : ∀ {Γ}   → A ∈ Γ ∷ᶜ A
-  Tl    : ∀ {Γ B} → A ∈ Γ → A ∈ Γ ∷ᶜ B
+  Hd : ∀ {Γ}   → A ∈ Γ ∷ᶜ A
+  Tl : ∀ {Γ B} → A ∈ Γ → A ∈ Γ ∷ᶜ B
 
 infix 27 _∈_
 
@@ -136,11 +135,11 @@ mutual
 
     -- lambda abstraction
           
-    lam     : {A B : VType}
-            → {τ : Time}
-            → Γ ∷ᶜ A ⊢C⦂ B ‼ τ
-            ------------------
-            → Γ ⊢V⦂ A ⇒ B ‼ τ
+    lam     : {A : VType}
+            → {C : CType}
+            → Γ ∷ᶜ A ⊢C⦂ C
+            -------------
+            → Γ ⊢V⦂ A ⇒ C
 
     -- boxing up a value/resource that is ready for use in at least `t` time steps
 
@@ -171,20 +170,19 @@ mutual
 
     -- function application
     
-    _·_     : {A B : VType}
-            → {τ : Time}
-            → Γ ⊢V⦂ A ⇒ B ‼ τ
+    _·_     : {A : VType}
+            → {C : CType}
+            → Γ ⊢V⦂ A ⇒ C
             → Γ ⊢V⦂ A
-            -----------------
-            → Γ ⊢C⦂ B ‼ τ
+            -------------
+            → Γ ⊢C⦂ C
 
     -- empty type elimination
 
-    absurd  : {A : VType}
-            → {τ : Time}
+    absurd  : {C : CType}
             → Γ ⊢V⦂ Empty
             -------------
-            → Γ ⊢C⦂ A ‼ τ
+            → Γ ⊢C⦂ C
 
     -- performing algebraic operations
 
@@ -201,14 +199,15 @@ mutual
     -- unboxing a boxed value/resource after enough time has passed for it to be ready
 
     unbox   : {Γ' Γ'' : Ctx}
-            → {A B : VType}
-            → {τ τ' τ'' : Time}
+            → {A : VType}
+            → {C : CType}
+            → {τ τ' : Time}
             → Γ' ⟨ τ' ⟩ , Γ'' split Γ
             → τ ≤ τ' + ctx-delay Γ''
             → Γ' ⊢V⦂ [ τ ] A
-            → Γ ∷ᶜ A  ⊢C⦂ B ‼ τ''
-            ---------------------
-            → Γ ⊢C⦂ B ‼ τ''          -- arbitrary `τ'` to push `coerce`s inside (includes 0)
+            → Γ ∷ᶜ A  ⊢C⦂ C
+            -------------------------
+            → Γ ⊢C⦂ C                    -- arbitrary `τ'` to push `coerce`s inside (includes 0)
 
     -- explicit sub-effecting coercion (no general sub-typing for simplicity)
 

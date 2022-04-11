@@ -118,9 +118,25 @@ mutual
 ⟨⟩-strengthen-var {Γ₂ = Γ₂ ∷ᶜ _} refl refl Hd     = Hd
 ⟨⟩-strengthen-var {Γ₂ = Γ₂ ∷ᶜ _} refl refl (Tl x) = Tl (⟨⟩-strengthen-var refl refl x)
 
-{-
--- TODO: commented out to work on renamings file
+-- TODO: wip proof commented out for time being to work on other files
 
+postulate
+
+  ⊢V⦂-⟨⟩-eta : ∀ {Γ Γ' Γ₁ Γ₂ A}
+            → Γ₁ ⟨ 0 ⟩ , Γ₂ split Γ
+            → Γ₁ , Γ₂ split Γ'
+            → Γ ⊢V⦂ A
+            -----------------------
+            → Γ' ⊢V⦂ A
+
+  ⊢C⦂-⟨⟩-eta : ∀ {Γ Γ' Γ₁ Γ₂ C}
+            → Γ₁ ⟨ 0 ⟩ , Γ₂ split Γ
+            → Γ₁ , Γ₂ split Γ'
+            → Γ ⊢C⦂ C
+            -----------------------
+            → Γ' ⊢C⦂ C
+
+{-
 mutual
 
   ⊢V⦂-⟨⟩-strengthen : ∀ {Γ Γ' Γ₁ Γ₂ A}
@@ -167,4 +183,20 @@ mutual
 -- Merging two ⟨_⟩s (the graded monadic multiplication of ⟨_⟩)
 --------------------------------------------------------------
 
--- ...
+-- TODO: write up the proofs of this
+
+postulate
+
+  ⊢V⦂-⟨⟩-mu : ∀ {Γ Γ' Γ₁ Γ₂ τ τ' A}
+           → Γ₁ ⟨ τ + τ' ⟩ , Γ₂ split Γ
+           → Γ₁ ⟨ τ ⟩ ⟨ τ' ⟩ , Γ₂ split Γ'
+           → Γ ⊢V⦂ A
+           -------------------------------
+           → Γ' ⊢V⦂ A
+
+  ⊢C⦂-⟨⟩-mu : ∀ {Γ Γ' Γ₁ Γ₂ τ τ' C}
+           → Γ₁ ⟨ τ + τ' ⟩ , Γ₂ split Γ
+           → Γ₁ ⟨ τ ⟩ ⟨ τ' ⟩ , Γ₂ split Γ'
+           → Γ ⊢C⦂ C
+           -------------------------------
+           → Γ' ⊢C⦂ C
