@@ -16,7 +16,7 @@ open import Renamings
 
 module Substitutions where
 
--- Context split by a variable
+-- Splitting a context according to a variable in it
 
 var-split : ∀ {Γ A τ}
           → A ∈[ τ ] Γ
@@ -29,7 +29,7 @@ var-split {Γ ⟨ τ ⟩} (Tl-⟨⟩ x) with var-split x
 ... | Γ₁ , Γ₂ , p , q =
   Γ₁ , Γ₂ ⟨ τ ⟩ , split-⟨⟩ p , trans (cong (_+ τ) q) (+-comm _ τ)
 
--- Variable in a context is in one of the two contexts splitting it
+-- Variable in context is in one of the two contexts splitting it
 
 var-in-split : ∀ {Γ Γ₁ Γ₂ A τ}
              → Γ₁ , Γ₂ split Γ
@@ -39,10 +39,15 @@ var-in-split : ∀ {Γ Γ₁ Γ₂ A τ}
 
 var-in-split {Γ₂ = .[]} {A = A} split-[] x with var-split x
 ... | Γ₁ , Γ₂ , p , q = inj₁ (Γ₂ , p)
-var-in-split {Γ₂ = .(_ ∷ᶜ _)} (split-∷ᶜ p) x = {!!}
-var-in-split {Γ₂ = .(_ ⟨ _ ⟩)} (split-⟨⟩ p) x = {!!}
+var-in-split {Γ₂ = .(_ ∷ᶜ _)} (split-∷ᶜ p) Hd = inj₂ (_ , [] , split-[] , split-≡ p)
+var-in-split {Γ₂ = .(_ ∷ᶜ _)} (split-∷ᶜ p) (Tl-∷ᶜ x) with var-in-split p x
+... | inj₁ (Γ' , q) = inj₁ (Γ' , q)
+... | inj₂ (Γ' , Γ'' , q , r) = inj₂ (Γ' , Γ'' ∷ᶜ _ , split-∷ᶜ q , r)
+var-in-split {Γ₂ = .(_ ⟨ _ ⟩)} (split-⟨⟩ p) (Tl-⟨⟩ x) with var-in-split p x
+... | inj₁ (Γ' , q) = inj₁ (Γ' , q)
+... | inj₂ (Γ' , Γ'' , q , r) = inj₂ (Γ' , Γ'' ⟨ _ ⟩ , split-⟨⟩ q , r)
 
--- Substituting a value for a variable
+-- Substituting a value for a variable in context
 
 _[_↦_]var : ∀ {Γ A B τ τ'}
           → B ∈[ τ' ] Γ
