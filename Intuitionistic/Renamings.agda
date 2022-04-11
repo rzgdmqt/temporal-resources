@@ -117,8 +117,7 @@ split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
 
 split-ren ρ split-[] q = _ , [] , ρ , split-[] , z≤n
 split-ren ρ (split-∷ᶜ p) q = split-ren (ρ ∘ Tl-∷ᶜ) p q
-split-ren {τ = τ} ρ (split-⟨⟩ {τ = τ'} p) q = {!!}
-{-
+split-ren {τ = τ} ρ (split-⟨⟩ {τ = τ'} p) q 
   with split-ren
          {τ = τ ∸ τ'}
          (λ x → let (τ'' , r , y) = ρ (Tl-⟨⟩ x) in
@@ -126,8 +125,7 @@ split-ren {τ = τ} ρ (split-⟨⟩ {τ = τ'} p) q = {!!}
          p
          {!!}
 ... | Γ₁' , Γ₂' , ρ' , p' , q' = 
-  Γ₁' , Γ₂' ⟨ τ' ⟩ , ρ' , {!!} , {!!}
--}
+  Γ₁' , {!!} , ρ' , {!!} , {!!}
 
 -- Action of renamings on well-typed values and computations
 
