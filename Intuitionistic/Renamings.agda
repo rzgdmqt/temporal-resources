@@ -2,6 +2,8 @@
 -- Context renamings and their action on well-typed terms --
 ------------------------------------------------------------
 
+open import Function
+
 open import Data.Nat
 open import Data.Nat.Properties
 open import Data.Product
@@ -33,8 +35,9 @@ idʳ {.(_ ⟨ _ ⟩)} (Tl-⟨⟩ x) = _ , ≤-refl , Tl-⟨⟩ x
 
 _∘ʳ_ : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
 (ρ' ∘ʳ ρ) {A} {τ} Hd with ρ {A} {τ} Hd
-... | τ , p , x = {!ρ' x!}
-(ρ' ∘ʳ ρ) (Tl-∷ᶜ x) = {!!}
+... | τ , p , x with ρ' x
+... | τ' , p' , x' = τ' , ≤-trans p p' , x'
+(ρ' ∘ʳ ρ) (Tl-∷ᶜ x) = (ρ' ∘ʳ (ρ ∘ Tl-∷ᶜ)) x
 (ρ' ∘ʳ ρ) (Tl-⟨⟩ x) = {!!}
 
 
