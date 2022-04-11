@@ -96,13 +96,21 @@ data _,_split_ : (Γ Γ' Γ'' : Ctx) → Set where
   split-∷ᶜ : ∀ {Γ Γ' Γ'' A} → Γ , Γ' split Γ'' → Γ , Γ' ∷ᶜ A split Γ'' ∷ᶜ A
   split-⟨⟩ : ∀ {Γ Γ' Γ'' τ} → Γ , Γ' split Γ'' → Γ , Γ' ⟨ τ ⟩ split Γ'' ⟨ τ ⟩
 
--- Variable in a context (available now, i.e., under no ⟨_⟩s)
+-- Variable in a context (looking under τ-many time delay)
 
-data _∈_ (A : VType) : Ctx → Set where
-  Hd : ∀ {Γ}   → A ∈ Γ ∷ᶜ A
-  Tl : ∀ {Γ B} → A ∈ Γ → A ∈ Γ ∷ᶜ B
+data _∈[_]_ (A : VType) : Time → Ctx → Set where
+  Hd    : ∀ {Γ τ}    → A ∈[ τ ] Γ ∷ᶜ A
+  Tl-∷ᶜ : ∀ {Γ B τ}  → A ∈[ τ ] Γ → A ∈[ τ ] Γ ∷ᶜ B
+  Tl-⟨⟩ : ∀ {Γ τ τ'} → A ∈[ τ' ] Γ → A ∈[ τ + τ' ] Γ ⟨ τ ⟩
 
-infix 27 _∈_
+infix 27 _∈[_]_
+
+-- Monotonicity of variables in context
+
+∈[]-monotonicity : ∀ {Γ A τ τ'} → A ∈[ τ ] Γ → τ' ≤ τ → A ∈[ τ' ] Γ
+∈[]-monotonicity Hd        p = Hd
+∈[]-monotonicity (Tl-∷ᶜ x) p = Tl-∷ᶜ (∈[]-monotonicity x p)
+∈[]-monotonicity (Tl-⟨⟩ x) p = {!!}
 
 -- Well-typed terms (values and computations)
 
@@ -115,9 +123,10 @@ mutual
 
     -- variables
 
-    var     : {A : VType} 
-            → A ∈ Γ
-            -----------
+    var     : {A : VType}
+            → {τ : Time}
+            → A ∈[ τ ] Γ
+            ------------
             → Γ ⊢V⦂ A
 
     -- base-typed constants

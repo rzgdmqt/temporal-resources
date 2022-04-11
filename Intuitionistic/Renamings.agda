@@ -11,10 +11,35 @@ open Eq hiding ([_])
 open Eq.≡-Reasoning
 
 open import Language
-open import ContextModality
+--open import ContextModality
 
 module Renamings where
 
+-- Variable renamings
+
+-- Note: This allows one to move a variable under more ⟨_⟩s but not vice versa.
+
+Ren : Ctx → Ctx → Set
+Ren Γ Γ' = ∀ {A τ} → A ∈[ τ ] Γ → Σ[ τ' ∈ Time ] (τ ≤ τ' × A ∈[ τ' ] Γ')
+
+-- Identity renaming
+
+idʳ : ∀ {Γ} → Ren Γ Γ
+idʳ {.(_ ∷ᶜ _)}  Hd        = _ , ≤-refl , Hd
+idʳ {.(_ ∷ᶜ _)}  (Tl-∷ᶜ x) = _ , ≤-refl , Tl-∷ᶜ x
+idʳ {.(_ ⟨ _ ⟩)} (Tl-⟨⟩ x) = _ , ≤-refl , Tl-⟨⟩ x
+
+-- Composition of renamings
+
+_∘ʳ_ : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
+(ρ' ∘ʳ ρ) {A} {τ} Hd with ρ {A} {τ} Hd
+... | τ , p , x = ρ' {!x!}
+(ρ' ∘ʳ ρ) (Tl-∷ᶜ x) = {!!}
+(ρ' ∘ʳ ρ) (Tl-⟨⟩ x) = {!!}
+
+
+
+{-
 -- Variable renamings
 
 -- Note: do not include the unit, multiplication, and monotonicity
@@ -157,3 +182,4 @@ mutual
                                   (C-rename (cong-ren ρ) M)
   C-rename ρ (coerce q M)     = coerce q (C-rename ρ M)
   
+-}
