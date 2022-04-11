@@ -2,6 +2,9 @@
 -- Admissible rules for the context modality ⟨_⟩ --
 ---------------------------------------------------
 
+-- NOTE: This file is likely going to be obsolete with the
+-- new definition of variable renamings in Renamings.agda
+
 open import Data.Nat
 open import Data.Nat.Properties
 open import Data.Product

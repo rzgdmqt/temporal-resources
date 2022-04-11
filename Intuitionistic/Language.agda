@@ -210,12 +210,12 @@ mutual
     unbox   : {Γ' Γ'' : Ctx}
             → {A : VType}
             → {C : CType}
-            → {τ τ' : Time}
-            → Γ' ⟨ τ' ⟩ , Γ'' split Γ
-            → τ ≤ τ' + ctx-delay Γ''
+            → {τ : Time}
+            → Γ' , Γ'' split Γ
+            → τ ≤ ctx-delay Γ''
             → Γ' ⊢V⦂ [ τ ] A
             → Γ ∷ᶜ A  ⊢C⦂ C
-            -------------------------
+            -------------------
             → Γ ⊢C⦂ C                    -- arbitrary `τ'` to push `coerce`s inside (includes 0)
 
     -- explicit sub-effecting coercion (no general sub-typing for simplicity)
