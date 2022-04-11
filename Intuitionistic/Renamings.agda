@@ -24,7 +24,7 @@ data Ren : Ctx → Ctx → Set where
   ∅   : ∀ {Γ} → Ren [] Γ
   wk  : ∀ {Γ Γ' A} → Ren Γ Γ' → Ren Γ (Γ' ∷ᶜ A)
   ext : ∀ {Γ Γ' A} → Ren Γ Γ' → A ∈ Γ' → Ren (Γ ∷ᶜ A) Γ'
-  ⟨⟩ : ∀ {Γ Γ' τ } → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
+  ⟨⟩  : ∀ {Γ Γ' τ } → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
 
 -- Renaming a variable
 
@@ -80,6 +80,14 @@ cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ = ⟨⟩ (cong-ren ρ)
 
 -- Splitting a renaming
 
+n≤n∸m+m : (n m : ℕ) → n ≤ n ∸ m + m
+n≤n∸m+m n       zero    = ≤-stepsʳ 0 ≤-refl
+n≤n∸m+m zero    (suc m) = z≤n
+n≤n∸m+m (suc n) (suc m) =
+  ≤-trans
+    (+-monoʳ-≤ 1 (n≤n∸m+m n m))
+    (≤-reflexive (sym (+-suc (n ∸ m) (m))))
+
 split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ τ'}
           → Ren Γ Γ'
           → Γ₁ ⟨ τ' ⟩ , Γ₂ split Γ
@@ -98,7 +106,22 @@ split-ren (wk ρ) (split-∷ᶜ p) q with split-ren ρ (split-∷ᶜ p) q
 split-ren (ext ρ x) (split-∷ᶜ p) q = split-ren ρ p q
 split-ren (wk ρ) (split-⟨⟩ p) q with split-ren ρ (split-⟨⟩ p) q
 ... | Γ₁' , Γ₂' , ρ' , p' , q' = Γ₁' , Γ₂' ∷ᶜ _ , ρ' , split-∷ᶜ p' , q'
-split-ren (⟨⟩ {τ = τ} ρ) (split-⟨⟩ p) q = {!split-ren ρ p!}
+split-ren {τ = τ} {τ' = τ'} (⟨⟩ ρ) (split-⟨⟩ {Γ' = Γ'} {τ = τ''} p) q
+  with split-ren {τ = τ ∸ τ'' } ρ p 
+         (≤-trans     -- τ ≤ τ' + (ctx-delay Γ' + τ'') implies τ ∸ τ'' ≤ τ' + ctx-delay Γ'
+           (≤-trans
+             (≤-trans
+               (≤-trans
+                 (∸-monoˡ-≤ τ'' q)
+                 (≤-reflexive (+-∸-assoc τ' {ctx-delay Γ' + τ''} {τ''} (≤-stepsˡ (ctx-delay Γ') ≤-refl))))
+               (+-monoʳ-≤ τ' (≤-reflexive (+-∸-assoc (ctx-delay Γ') (≤-refl {τ''})))))
+             (≤-reflexive (sym (+-assoc τ' (ctx-delay Γ') (τ'' ∸ τ'')))))
+           (≤-reflexive (trans (cong (τ' + ctx-delay Γ' +_) (n∸n≡0 τ'')) (+-identityʳ (τ' + ctx-delay Γ')))))
+... | Γ₁' , Γ₂' , ρ' , p' , q' =
+  Γ₁' , Γ₂' ⟨ τ'' ⟩ , ρ' , split-⟨⟩ p' ,
+    ≤-trans
+      (≤-trans (n≤n∸m+m τ τ'') (+-monoˡ-≤ τ'' q'))
+      (≤-reflexive (+-assoc τ' (ctx-delay Γ₂') τ''))
 
 -- Action of renamings on well-typed values and computations
 
@@ -133,3 +156,4 @@ mutual
                                   (V-rename (proj₁ (proj₂ (proj₂ (split-ren ρ q r)))) V)
                                   (C-rename (cong-ren ρ) M)
   C-rename ρ (coerce q M)     = coerce q (C-rename ρ M)
+  
