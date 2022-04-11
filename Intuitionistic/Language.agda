@@ -99,7 +99,7 @@ data _,_split_ : (Γ Γ' Γ'' : Ctx) → Set where
 -- Variable in a context (looking under τ-many time delay)
 
 data _∈[_]_ (A : VType) : Time → Ctx → Set where
-  Hd    : ∀ {Γ τ}    → A ∈[ τ ] Γ ∷ᶜ A
+  Hd    : ∀ {Γ}      → A ∈[ 0 ] Γ ∷ᶜ A
   Tl-∷ᶜ : ∀ {Γ B τ}  → A ∈[ τ ] Γ → A ∈[ τ ] Γ ∷ᶜ B
   Tl-⟨⟩ : ∀ {Γ τ τ'} → A ∈[ τ' ] Γ → A ∈[ τ + τ' ] Γ ⟨ τ ⟩
 

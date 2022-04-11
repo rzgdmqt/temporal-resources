@@ -42,7 +42,7 @@ _∘ʳ_ : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
 ... | τ , p , y with ρ' y
 ... | τ' , p' , z = τ' , ≤-trans p p' , z
 
--- Weakening renaming
+-- Variable weakening renaming
 
 wk-ren : ∀ {Γ A} → Ren Γ (Γ ∷ᶜ A)
 wk-ren x = _ , ≤-refl , Tl-∷ᶜ x
@@ -106,15 +106,19 @@ n≤n∸m+m (suc n) (suc m) =
     (+-monoʳ-≤ 1 (n≤n∸m+m n m))
     (≤-reflexive (sym (+-suc (n ∸ m) (m))))
 
-split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
-          → Ren Γ Γ'
-          → Γ₁ , Γ₂ split Γ
-          → τ ≤ ctx-delay Γ₂
-          → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
-             (Ren Γ₁ Γ₁' ×
-              Γ₁' , Γ₂' split Γ' ×
-              ctx-delay Γ₂ ≤ ctx-delay Γ₂')
+postulate
+  -- TODO: work this out formally; need to calculate the
+  -- smallest prefix of Γ' that includes the image of Γ₁
 
+  split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
+            → Ren Γ Γ'
+            → Γ₁ , Γ₂ split Γ
+            → τ ≤ ctx-delay Γ₂
+            → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
+               (Ren Γ₁ Γ₁' ×
+                Γ₁' , Γ₂' split Γ' ×
+                ctx-delay Γ₂ ≤ ctx-delay Γ₂')
+{-
 split-ren ρ split-[] q = _ , [] , ρ , split-[] , z≤n
 split-ren ρ (split-∷ᶜ p) q = split-ren (ρ ∘ Tl-∷ᶜ) p q
 split-ren {τ = τ} ρ (split-⟨⟩ {τ = τ'} p) q 
@@ -126,6 +130,7 @@ split-ren {τ = τ} ρ (split-⟨⟩ {τ = τ'} p) q
          {!!}
 ... | Γ₁' , Γ₂' , ρ' , p' , q' = 
   Γ₁' , {!!} , ρ' , {!!} , {!!}
+-}
 
 -- Action of renamings on well-typed values and computations
 
@@ -158,6 +163,11 @@ mutual
   ... | Γ₁' , Γ₂' , ρ' , p' , q' =
     unbox p' (≤-trans r q') (V-rename ρ' V) (C-rename (cong-ren ρ) M)
   C-rename ρ (coerce q M)     = coerce q (C-rename ρ M)
+
+
+
+
+
 
 {-
 -- Splitting a renaming

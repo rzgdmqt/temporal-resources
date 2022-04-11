@@ -17,6 +17,7 @@ open import Language
 
 module ContextModality where
 
+{-
 
 -- Time-ordering of contexts (accumulated monotonicity of ⟨_⟩s)
 ---------------------------------------------------------------
@@ -203,3 +204,5 @@ postulate
            → Γ ⊢C⦂ C
            -------------------------------
            → Γ' ⊢C⦂ C
+
+-}
