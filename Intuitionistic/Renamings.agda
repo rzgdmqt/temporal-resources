@@ -64,7 +64,7 @@ contract-ren (Tl-∷ᶜ x) = _ , ≤-refl , x
 
 cong-ren : ∀ {Γ Γ' Γ''} → Ren Γ Γ' → Ren (Γ ++ᶜ Γ'') (Γ' ++ᶜ Γ'')
 cong-ren {Γ'' = []}        ρ x = ρ x
-cong-ren {Γ'' = Γ'' ∷ᶜ A}  ρ x = {!!}
+cong-ren {Γ'' = Γ'' ∷ᶜ A}  ρ x = {!cong-ren (ρ ∘⃗ Tl-∷ᶜ)!}
 cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ x = {!!}
 
 -- Action of renamings on well-typed values and computations
@@ -94,9 +94,16 @@ mutual
   C-rename ρ (V · W)          = V-rename ρ V · V-rename ρ W
   C-rename ρ (absurd V)       = absurd (V-rename ρ V)
   C-rename ρ (perform op V M) = perform op (V-rename ρ V) (C-rename (cong-ren ρ) M)
-  C-rename ρ (unbox q r V M)  = {!!}
+  C-rename ρ (unbox q r V M)  = {!unbox!}
   C-rename ρ (coerce q M)     = coerce q (C-rename ρ M)
 
+{-
+  C-rename ρ (unbox q r V M)  = unbox
+                                  (proj₁ (proj₂ (proj₂ (proj₂ (split-ren ρ q r)))))
+                                  (proj₂ (proj₂ (proj₂ (proj₂ (split-ren ρ q r)))))
+                                  (V-rename (proj₁ (proj₂ (proj₂ (split-ren ρ q r)))) V)
+                                  (C-rename (cong-ren ρ) M)
+-}
 
 
 {-
