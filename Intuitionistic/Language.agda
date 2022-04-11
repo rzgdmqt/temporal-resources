@@ -73,6 +73,12 @@ data Ctx : Set where
 infixl 31 _∷ᶜ_
 infix  32 _⟨_⟩
 
+∷ᶜ-injective : ∀ {Γ Γ' A} → Γ ∷ᶜ A ≡ Γ' ∷ᶜ A → Γ ≡ Γ'
+∷ᶜ-injective refl = refl
+
+⟨⟩-injective : ∀ {Γ Γ' τ} → Γ ⟨ τ ⟩ ≡ Γ' ⟨ τ ⟩ → Γ ≡ Γ'
+⟨⟩-injective refl = refl
+
 -- Concatenation of contexts
 
 _++ᶜ_ : Ctx → Ctx → Ctx
@@ -81,6 +87,37 @@ _++ᶜ_ : Ctx → Ctx → Ctx
 Γ ++ᶜ (Γ' ⟨ τ ⟩) = (Γ ++ᶜ Γ') ⟨ τ ⟩
 
 infixl 30 _++ᶜ_
+
+-- Identity, associativity, and injectivity of ++ᶜ
+
+++ᶜ-identityˡ : ∀ {Γ} → [] ++ᶜ Γ ≡ Γ
+++ᶜ-identityˡ {[]}      = refl
+++ᶜ-identityˡ {Γ ∷ᶜ A}  = cong (_∷ᶜ A) ++ᶜ-identityˡ
+++ᶜ-identityˡ {Γ ⟨ τ ⟩} = cong (_⟨ τ ⟩) ++ᶜ-identityˡ
+
+++ᶜ-identityʳ : ∀ {Γ} → Γ ++ᶜ [] ≡ Γ
+++ᶜ-identityʳ = refl
+
+++ᶜ-assoc : ∀ {Γ Γ' Γ''} → (Γ ++ᶜ Γ') ++ᶜ Γ'' ≡ Γ ++ᶜ (Γ' ++ᶜ Γ'')
+++ᶜ-assoc {Γ'' = []}        = refl
+++ᶜ-assoc {Γ'' = Γ'' ∷ᶜ A}  = cong (_∷ᶜ A) (++ᶜ-assoc {Γ'' = Γ''})
+++ᶜ-assoc {Γ'' = Γ'' ⟨ τ ⟩} = cong (_⟨ τ ⟩) (++ᶜ-assoc {Γ'' = Γ''})
+
+++ᶜ-injectiveˡ : ∀ {Γ Γ' Γ''} → Γ' ++ᶜ Γ ≡ Γ'' ++ᶜ Γ → Γ' ≡ Γ''
+++ᶜ-injectiveˡ {[]} p = p
+++ᶜ-injectiveˡ {Γ ∷ᶜ A} p = ++ᶜ-injectiveˡ {Γ} (∷ᶜ-injective p)
+++ᶜ-injectiveˡ {Γ ⟨ τ ⟩} p = ++ᶜ-injectiveˡ {Γ} (⟨⟩-injective p)
+
+postulate 
+  -- TODO: finish this proof
+  ++ᶜ-injectiveʳ : ∀ {Γ Γ' Γ''} → Γ ++ᶜ Γ' ≡ Γ ++ᶜ Γ'' → Γ' ≡ Γ''
+{-
+++ᶜ-injectiveʳ {Γ' = []} {Γ'' = []} p = {!!}
+++ᶜ-injectiveʳ {Γ' = []} {Γ'' = Γ'' ∷ᶜ x} p = {!!}
+++ᶜ-injectiveʳ {Γ' = []} {Γ'' = Γ'' ⟨ x ⟩} p = {!!}
+++ᶜ-injectiveʳ {Γ' = Γ' ∷ᶜ x} {Γ'' = Γ''} p = {!!}
+++ᶜ-injectiveʳ {Γ' = Γ' ⟨ x ⟩} {Γ'' = Γ''} p = {!!}
+-}
 
 -- Total time delay of a context 
 
@@ -96,7 +133,22 @@ data _,_split_ : (Γ Γ' Γ'' : Ctx) → Set where
   split-∷ᶜ : ∀ {Γ Γ' Γ'' A} → Γ , Γ' split Γ'' → Γ , Γ' ∷ᶜ A split Γ'' ∷ᶜ A
   split-⟨⟩ : ∀ {Γ Γ' Γ'' τ} → Γ , Γ' split Γ'' → Γ , Γ' ⟨ τ ⟩ split Γ'' ⟨ τ ⟩
 
--- Variable in a context (looking under τ-many time delay)
+-- Interaction between context splitting and ++ᶜ 
+
+split-≡ : ∀ {Γ Γ₁ Γ₂} → Γ₁ , Γ₂ split Γ → Γ₁ ++ᶜ Γ₂ ≡ Γ
+split-≡ split-[] = refl
+split-≡ (split-∷ᶜ p) = cong (_∷ᶜ _) (split-≡ p)
+split-≡ (split-⟨⟩ p) = cong (_⟨ _ ⟩) (split-≡ p)
+
+≡-split : ∀ {Γ Γ₁ Γ₂} → Γ₁ ++ᶜ Γ₂ ≡ Γ → Γ₁ , Γ₂ split Γ
+≡-split {Γ₂ = []}       refl = split-[]
+≡-split {Γ₂ = Γ₂ ∷ᶜ A}  refl = split-∷ᶜ (≡-split refl)
+≡-split {Γ₂ = Γ₂ ⟨ τ ⟩} refl = split-⟨⟩ (≡-split refl)
+
+split-≡-++ᶜ : ∀ {Γ₁ Γ₂} → Γ₁ , Γ₂ split (Γ₁ ++ᶜ Γ₂)
+split-≡-++ᶜ = ≡-split refl
+
+-- Variable in a context (looking under τ-amount of time delay)
 
 data _∈[_]_ (A : VType) : Time → Ctx → Set where
   Hd    : ∀ {Γ}      → A ∈[ 0 ] Γ ∷ᶜ A
@@ -104,13 +156,6 @@ data _∈[_]_ (A : VType) : Time → Ctx → Set where
   Tl-⟨⟩ : ∀ {Γ τ τ'} → A ∈[ τ' ] Γ → A ∈[ τ + τ' ] Γ ⟨ τ ⟩
 
 infix 27 _∈[_]_
-
--- Monotonicity of variables in context
-
---∈[]-monotonicity : ∀ {Γ A τ τ'} → A ∈[ τ ] Γ → τ' ≤ τ → A ∈[ τ' ] Γ
---∈[]-monotonicity Hd        p = Hd
---∈[]-monotonicity (Tl-∷ᶜ x) p = Tl-∷ᶜ (∈[]-monotonicity x p)
---∈[]-monotonicity (Tl-⟨⟩ q x) p = Tl-⟨⟩ {!!} (∈[]-monotonicity x {!!})
 
 -- Well-typed terms (values and computations)
 

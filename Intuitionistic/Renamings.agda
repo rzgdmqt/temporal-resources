@@ -47,6 +47,13 @@ _∘ʳ_ : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
 wk-ren : ∀ {Γ A} → Ren Γ (Γ ∷ᶜ A)
 wk-ren x = _ , ≤-refl , Tl-∷ᶜ x
 
+wk-ctx-ren : ∀ {Γ Γ'} → Ren Γ (Γ ++ᶜ Γ')
+wk-ctx-ren {Γ' = []}       x = _ , ≤-refl , x
+wk-ctx-ren {Γ' = Γ' ∷ᶜ A}  x with wk-ctx-ren {Γ' = Γ'} x
+... | τ' , p , y = τ' , p , Tl-∷ᶜ y
+wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} x with wk-ctx-ren {Γ' = Γ'} x
+... | τ' , p , y = τ + τ' , ≤-stepsˡ τ p , Tl-⟨⟩ y
+
 -- Exchange renaming
 
 exch-ren : ∀ {Γ A B} → Ren (Γ ∷ᶜ A ∷ᶜ B) (Γ ∷ᶜ B ∷ᶜ A)
@@ -95,6 +102,11 @@ cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ (Tl-⟨⟩ x) with cong-ren ρ x
                 (sym (+-assoc τ' τ τ''))
                 (cong (_+ τ'') (+-comm τ' τ))) ,
   Tl-⟨⟩ x
+
+-- Monotonicity of ⟨_⟩
+
+⟨⟩-mon-ren : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
+⟨⟩-mon-ren p (Tl-⟨⟩ {τ' = τ'} x) = _ , +-monoˡ-≤ τ' p , Tl-⟨⟩ x
 
 -- Splitting a renaming
 
