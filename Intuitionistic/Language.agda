@@ -103,11 +103,6 @@ infixl 30 _++ᶜ_
 ++ᶜ-assoc Γ Γ' (Γ'' ∷ᶜ A)  = cong (_∷ᶜ A) (++ᶜ-assoc Γ Γ' Γ'')
 ++ᶜ-assoc Γ Γ' (Γ'' ⟨ τ ⟩) = cong (_⟨ τ ⟩) (++ᶜ-assoc Γ Γ' Γ'')
 
-++ᶜ-injectiveˡ : ∀ {Γ Γ' Γ''} → Γ' ++ᶜ Γ ≡ Γ'' ++ᶜ Γ → Γ' ≡ Γ''
-++ᶜ-injectiveˡ {[]} p = p
-++ᶜ-injectiveˡ {Γ ∷ᶜ A} p = ++ᶜ-injectiveˡ {Γ} (∷ᶜ-injective p)
-++ᶜ-injectiveˡ {Γ ⟨ τ ⟩} p = ++ᶜ-injectiveˡ {Γ} (⟨⟩-injective p)
-
 -- Total time delay of a context 
 
 ctx-delay : Ctx → Time
