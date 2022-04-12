@@ -4,9 +4,11 @@
 
 open import Function hiding (const)
 
+open import Data.Bool hiding (_≤_)
 open import Data.Nat
 open import Data.Nat.Properties
 open import Data.Product
+open import Data.Sum
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
@@ -42,6 +44,8 @@ _∘ʳ_ : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
 ... | τ , p , y with ρ' y
 ... | τ' , p' , z = τ' , ≤-trans p p' , z
 
+infixr 20 _∘ʳ_
+
 -- Variable weakening renaming
 
 wk-ren : ∀ {Γ A} → Ren Γ (Γ ∷ A)
@@ -66,6 +70,12 @@ exch-ren (Tl-∷ (Tl-∷ x)) = _ , ≤-refl , Tl-∷ (Tl-∷ x)
 contract-ren : ∀ {Γ A} → Ren (Γ ∷ A ∷ A) (Γ ∷ A)
 contract-ren Hd        = _ , ≤-refl , Hd
 contract-ren (Tl-∷ x) = _ , ≤-refl , x
+
+-- Extending a renaming
+
+extend-ren : ∀ {Γ Γ' A τ} → Ren Γ Γ' → A ∈[ τ ] Γ' → Ren (Γ ∷ A) Γ'
+extend-ren ρ x Hd = _ , z≤n , x
+extend-ren ρ x (Tl-∷ y) = ρ y
 
 -- Congruence of context renamings
 
@@ -113,17 +123,97 @@ cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ (Tl-⟨⟩ x) with cong-ren ρ x
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren refl = idʳ
 
--- Image of a renaming
+-- Splitting a context according to a variable in it
 
+var-split : ∀ {Γ A τ}
+          → A ∈[ τ ] Γ
+          → Σ[ Γ₁ ∈ Ctx ] Σ[ Γ₂ ∈ Ctx ] Γ₁ ∷ A , Γ₂ split Γ × ctx-delay Γ₂ ≡ τ
+
+var-split {Γ ∷ A} Hd = Γ , [] , split-[] , refl
+var-split {Γ ∷ B} (Tl-∷ x) with var-split x
+... | Γ₁ , Γ₂ , p , q = Γ₁ , Γ₂ ∷ B , split-∷ p , q
+var-split {Γ ⟨ τ ⟩} (Tl-⟨⟩ x) with var-split x
+... | Γ₁ , Γ₂ , p , q =
+  Γ₁ , Γ₂ ⟨ τ ⟩ , split-⟨⟩ p , trans (cong (_+ τ) q) (+-comm _ τ)
+
+var-in-split-proj₁-subst : ∀ {Γ A τ τ'}
+                         → (x : A ∈[ τ ] Γ)
+                         → (p : τ ≡ τ')
+                         → proj₁ (var-split x)
+                         ≡ proj₁ (var-split (subst (A ∈[_] Γ) p x))
+
+var-in-split-proj₁-subst x refl = refl
+
+var-in-split-proj₂-subst : ∀ {Γ A τ τ'}
+                         → (x : A ∈[ τ ] Γ)
+                         → (p : τ ≡ τ')
+                         → proj₁ (proj₂ (var-split x))
+                         ≡ proj₁ (proj₂ (var-split (subst (A ∈[_] Γ) p x)))
+
+var-in-split-proj₂-subst x refl = refl
+
+-- Variable in context is in one of the two contexts splitting it
+
+var-in-split : ∀ {Γ Γ₁ Γ₂ A τ}
+             → Γ₁ , Γ₂ split Γ
+             → (x : A ∈[ τ ] Γ)
+             → (Σ[ y ∈ A ∈[ τ ∸ ctx-delay Γ₂ ] Γ₁ ]
+                   proj₁ (var-split x) ≡ proj₁ (var-split y)
+                 × proj₁ (proj₂ (var-split x)) ≡ proj₁ (proj₂ (var-split y)) ++ᶜ Γ₂)
+             ⊎ (Σ[ Γ' ∈ Ctx ] Σ[ Γ'' ∈ Ctx ]
+                   (Γ' ∷ A , Γ'' split Γ₂)
+                 × Γ₁ ++ᶜ Γ' ≡ proj₁ (var-split x)
+                 × Γ'' ≡ proj₁ (proj₂ (var-split x)))
+
+var-in-split split-[] x = inj₁ (x , refl , refl)
+var-in-split (split-∷ p) Hd = inj₂ (_ , [] , split-[] , split-≡ p , refl)
+var-in-split (split-∷ p) (Tl-∷ {B = B} x) with var-in-split p x
+... | inj₁ (y , q , r) = inj₁ (y , q , cong (_∷ B) r)
+... | inj₂ (Γ' , Γ'' , q , r , s) =
+  inj₂ (Γ' , Γ'' ∷ _ , split-∷ q , r , cong (_∷ B) s)
+var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A}
+  (split-⟨⟩ p) (Tl-⟨⟩ {τ' = τ'} x) with var-in-split p x
+... | inj₁ (y , q , r) =
+  inj₁ (
+    subst (A ∈[_] Γ₁)
+      (trans
+        (trans
+          (trans
+            (cong (_∸ ctx-delay Γ₂)
+              (trans
+                (trans
+                  (sym (+-identityʳ τ'))
+                  (cong (τ' +_) (sym (n∸n≡0 τ))))
+                (sym (+-∸-assoc τ' (≤-refl {τ})))))
+            (∸-+-assoc (τ' + τ) τ (ctx-delay Γ₂)))
+          (cong (τ' + τ ∸_) (+-comm τ (ctx-delay Γ₂))))
+        (cong (_∸ (ctx-delay Γ₂ + τ)) (+-comm τ' τ))) y ,
+    trans q (var-in-split-proj₁-subst y _) ,
+    cong (_⟨ τ ⟩) (trans r (cong (_++ᶜ Γ₂) (var-in-split-proj₂-subst y _))))
+... | inj₂ (Γ' , Γ'' , q , r , s) =
+  inj₂ (Γ' , Γ'' ⟨ τ ⟩ , split-⟨⟩ q , r , cong (_⟨ τ ⟩) s)
+
+
+-- Calculating the image of a renaming
+
+-- TODO: in an attempt to construct splittings of renamings below
 {-
-data Ctxⁱ : Set where
-  []   : Ctxⁱ
-  _∷ᶜ_ : Ctxⁱ → VType → Ctxⁱ
-  _⟨_⟩ : Ctxⁱ → Time → Ctxⁱ
+ctx-length : Ctx → ℕ
+ctx-length [] = 0
+ctx-length (Γ ∷ A) = ctx-length Γ + 1
+ctx-length (Γ ⟨ τ ⟩) = ctx-length Γ + 1
 
-infixl 31 _∷ᶜ_
-infix  32 _⟨_⟩
+ren-image : ∀ {Γ Γ'}
+          → Ren Γ Γ'
+          → Σ[ Γ₁ ∈ Ctx ] Σ[ Γ₂ ∈ Ctx ] (Ren Γ Γ₁ × Γ₁ , Γ₂ split Γ')
 
+ren-image {[]} {Γ'} ρ = [] , Γ' , idʳ , ≡-split ++ᶜ-identityˡ
+ren-image {Γ ∷ A} ρ with ren-image {Γ} (ρ ∘ʳ wk-ren) | var-split (proj₂ (proj₂ (ρ Hd)))
+... | Γ₁ , Γ₂ , ρ' , p | Γ₁' , Γ₂' , q , r with ctx-length Γ₁ <ᵇ ctx-length Γ₁'
+... | false = Γ₁ , Γ₂ , extend-ren ρ' {!!} , p
+... | true  = Γ₁' ∷ A , Γ₂' , extend-ren {!!} {!!} , q
+ren-image {Γ ⟨ τ ⟩} ρ with ren-image {Γ} (ρ ∘ʳ ⟨⟩-mon-ren z≤n ∘ʳ ⟨⟩-eta⁻¹-ren)
+... | Γ₁ , Γ₂ , ρ' , p = {!!}
 -}
 
 
@@ -196,47 +286,3 @@ mutual
   ... | Γ₁' , Γ₂' , ρ' , p' , q' =
     unbox p' (≤-trans r q') (V-rename ρ' V) (C-rename (cong-ren ρ) M)
   C-rename ρ (coerce q M)     = coerce q (C-rename ρ M)
-
-
-
-
-
-
-{-
--- Splitting a renaming
-
-split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ τ'}
-          → Ren Γ Γ'
-          → Γ₁ ⟨ τ' ⟩ , Γ₂ split Γ
-          → τ ≤ τ' + ctx-delay Γ₂
-          → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
-             (Ren Γ₁ Γ₁' ×
-              Γ₁' ⟨ τ' ⟩ , Γ₂' split Γ' ×
-              τ ≤ τ' + ctx-delay Γ₂')
-              
-split-ren (wk ρ) split-[] q with split-ren ρ split-[] q
-... | Γ₁' , Γ₂' , ρ' , p' , q' = Γ₁' , Γ₂' ∷ᶜ _ , ρ' , split-∷ᶜ p' , q'
-split-ren (⟨⟩ ρ) split-[] q =
-  _ , [] , ρ , ≡-split refl , q
-split-ren (wk ρ) (split-∷ᶜ p) q with split-ren ρ (split-∷ᶜ p) q
-... | Γ₁' , Γ₂' , ρ' , p' , q' = Γ₁' , Γ₂' ∷ᶜ _ , ρ' , split-∷ᶜ p' , q'
-split-ren (ext ρ x) (split-∷ᶜ p) q = split-ren ρ p q
-split-ren (wk ρ) (split-⟨⟩ p) q with split-ren ρ (split-⟨⟩ p) q
-... | Γ₁' , Γ₂' , ρ' , p' , q' = Γ₁' , Γ₂' ∷ᶜ _ , ρ' , split-∷ᶜ p' , q'
-split-ren {τ = τ} {τ' = τ'} (⟨⟩ ρ) (split-⟨⟩ {Γ' = Γ'} {τ = τ''} p) q
-  with split-ren {τ = τ ∸ τ'' } ρ p 
-         (≤-trans     -- τ ≤ τ' + (ctx-delay Γ' + τ'') implies τ ∸ τ'' ≤ τ' + ctx-delay Γ'
-           (≤-trans
-             (≤-trans
-               (≤-trans
-                 (∸-monoˡ-≤ τ'' q)
-                 (≤-reflexive (+-∸-assoc τ' {ctx-delay Γ' + τ''} {τ''} (≤-stepsˡ (ctx-delay Γ') ≤-refl))))
-               (+-monoʳ-≤ τ' (≤-reflexive (+-∸-assoc (ctx-delay Γ') (≤-refl {τ''})))))
-             (≤-reflexive (sym (+-assoc τ' (ctx-delay Γ') (τ'' ∸ τ'')))))
-           (≤-reflexive (trans (cong (τ' + ctx-delay Γ' +_) (n∸n≡0 τ'')) (+-identityʳ (τ' + ctx-delay Γ')))))
-... | Γ₁' , Γ₂' , ρ' , p' , q' =
-  Γ₁' , Γ₂' ⟨ τ'' ⟩ , ρ' , split-⟨⟩ p' ,
-    ≤-trans
-      (≤-trans (n≤n∸m+m τ τ'') (+-monoˡ-≤ τ'' q'))
-      (≤-reflexive (+-assoc τ' (ctx-delay Γ₂') τ''))
--}
