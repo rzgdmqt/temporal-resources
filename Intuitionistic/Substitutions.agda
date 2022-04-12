@@ -36,36 +36,48 @@ var-in-split-proj₁-subst : ∀ {Γ A τ τ'}
 
 var-in-split-proj₁-subst x refl = refl
 
+var-in-split-proj₂-subst : ∀ {Γ A τ τ'}
+                         → (x : A ∈[ τ ] Γ)
+                         → (p : τ ≡ τ')
+                         → proj₁ (proj₂ (var-split x)) ≡ proj₁ (proj₂ (var-split (subst (A ∈[_] Γ) p x)))
+
+var-in-split-proj₂-subst x refl = refl
+
 -- Variable in context is in one of the two contexts splitting it
 
 var-in-split : ∀ {Γ Γ₁ Γ₂ A τ}
              → Γ₁ , Γ₂ split Γ
              → (x : A ∈[ τ ] Γ)
-             → (Σ[ Γ' ∈ Ctx ] proj₁ (var-split x) ∷ᶜ A , Γ' split Γ₁ × Σ[ y ∈ A ∈[ τ ∸ ctx-delay Γ₂ ] Γ₁ ] proj₁ (var-split x) ≡ proj₁ (var-split y))
-             ⊎ Σ[ Γ' ∈ Ctx ] Σ[ Γ'' ∈ Ctx ] (Γ' ∷ᶜ A , Γ'' split Γ₂) × Γ₁ ++ᶜ Γ' ≡ proj₁ (var-split x)
+             → (Σ[ y ∈ A ∈[ τ ∸ ctx-delay Γ₂ ] Γ₁ ]
+                  proj₁ (var-split x) ≡ proj₁ (var-split y) ×
+                  proj₁ (proj₂ (var-split x)) ≡ proj₁ (proj₂ (var-split y)) ++ᶜ Γ₂)
+             ⊎ (Σ[ Γ' ∈ Ctx ] Σ[ Γ'' ∈ Ctx ]
+                  (Γ' ∷ᶜ A , Γ'' split Γ₂) ×
+                  Γ₁ ++ᶜ Γ' ≡ proj₁ (var-split x))
 
-var-in-split split-[] x with var-split x | inspect var-split x
-... | Γ₁ , Γ₂ , p , q | [| eq |] = inj₁ (Γ₂ , p , x , cong proj₁ (sym eq))
+var-in-split split-[] x = inj₁ (x , refl , refl)
 var-in-split (split-∷ᶜ p) Hd = inj₂ (_ , [] , split-[] , split-≡ p)
-var-in-split (split-∷ᶜ p) (Tl-∷ᶜ x) with var-in-split p x
-... | inj₁ (Γ' , q , y , r)       = inj₁ (Γ' , q , y , r)
+var-in-split (split-∷ᶜ p) (Tl-∷ᶜ {B = B} x) with var-in-split p x
+... | inj₁ (y , q , r)        = inj₁ (y , q , cong (_∷ᶜ B) r)
 ... | inj₂ (Γ' , Γ'' , q , r) = inj₂ (Γ' , Γ'' ∷ᶜ _ , split-∷ᶜ q , r)
 var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A} (split-⟨⟩ p) (Tl-⟨⟩ {τ' = τ'} x) with var-in-split p x
-... | inj₁ (Γ' , q , y , r)       =
-  inj₁ (Γ' , q , subst (A ∈[_] Γ₁)
-    (trans
+... | inj₁ (y , q , r) =
+  inj₁ (
+    subst (A ∈[_] Γ₁)
       (trans
         (trans
-          (cong (_∸ ctx-delay Γ₂)
-            (trans
+          (trans
+            (cong (_∸ ctx-delay Γ₂)
               (trans
-                (sym (+-identityʳ τ'))
-                (cong (τ' +_) (sym (n∸n≡0 τ))))
-              (sym (+-∸-assoc τ' (≤-refl {τ})))))
-          (∸-+-assoc (τ' + τ) τ (ctx-delay Γ₂)))
-        (cong (τ' + τ ∸_) (+-comm τ (ctx-delay Γ₂))))
-      (cong (_∸ (ctx-delay Γ₂ + τ)) (+-comm τ' τ)))
-    y , trans r (var-in-split-proj₁-subst y _))
+                (trans
+                  (sym (+-identityʳ τ'))
+                  (cong (τ' +_) (sym (n∸n≡0 τ))))
+                (sym (+-∸-assoc τ' (≤-refl {τ})))))
+            (∸-+-assoc (τ' + τ) τ (ctx-delay Γ₂)))
+          (cong (τ' + τ ∸_) (+-comm τ (ctx-delay Γ₂))))
+        (cong (_∸ (ctx-delay Γ₂ + τ)) (+-comm τ' τ))) y ,
+    trans q (var-in-split-proj₁-subst y _) ,
+    cong (_⟨ τ ⟩) (trans r (cong (_++ᶜ Γ₂) (var-in-split-proj₂-subst y _))))
 ... | inj₂ (Γ' , Γ'' , q , r) = inj₂ (Γ' , Γ'' ⟨ _ ⟩ , split-⟨⟩ q , r)
 
 -- Substituting a value for a variable in context
@@ -119,8 +131,25 @@ mutual
   perform op V M [ x ↦ W ]c = perform op (V [ x ↦ W ]v) (M [ Tl-∷ᶜ (Tl-⟨⟩ x) ↦ W ]c)
   
   _[_↦_]c {A = A} (unbox {Γ'' = Γ''} p q V M) x W with var-in-split p x
-  
+
+  ... | inj₁ (y , r , s) =
+    unbox
+      {Γ'' = Γ'' }
+      (≡-split (trans
+                 (++ᶜ-assoc (proj₁ (var-split y)) (proj₁ (proj₂ (var-split y))) Γ'')
+                 (cong₂ _++ᶜ_ (sym r) (sym s))))
+      q
+      ((V [ y ↦ V-rename (eq-ren r) W ]v))
+      (M [ Tl-∷ᶜ x ↦ W ]c)
+
+  ... | inj₂ (Γ''' , Γ'' , r , s) = {!!}
+
+  coerce p M     [ x ↦ W ]c = coerce p (M [ x ↦ W ]c)
+
+
+  {-
   ... | inj₁ (Γ''' , r , y , s) =
+  
     unbox
       {Γ'' = Γ''' ++ᶜ Γ'' }
       {!!}
@@ -131,7 +160,7 @@ mutual
       (M [ Tl-∷ᶜ x ↦ W ]c)
   
   ... | inj₂ (Γ''' , Γ'' , r , s) = {!!}
-
+  -}
 --rewrite (sym s) | sym (split-≡ p) | sym (split-≡ r) =
 
 {-
@@ -159,4 +188,3 @@ trans
   --unbox {Γ = {!Γ''' ++ᶜ Γ'!}} {Γ' = {!!}} {!!} {!q!} V (M [ Tl-∷ᶜ x ↦ W ]c)
   --unbox {!!} {!!} {!!} (M [ Tl-∷ᶜ x ↦ W ]c)
   
-  coerce p M     [ x ↦ W ]c = coerce p (M [ x ↦ W ]c)
