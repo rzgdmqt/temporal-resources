@@ -46,9 +46,9 @@ mutual
     -- congruences
 
     lam-cong : ∀ {A B τ}
-             → {M N : Γ ∷ᶜ A ⊢C⦂ B ‼ τ}
-             → Γ ∷ᶜ A ⊢C⦂ M == N
-             --------------------------
+             → {M N : Γ ∷ A ⊢C⦂ B ‼ τ}
+             → Γ ∷ A ⊢C⦂ M == N
+             -------------------------
              → Γ ⊢V⦂ lam M == lam N
 
     box-cong : ∀ {A τ}
@@ -100,29 +100,30 @@ mutual
 
     let-return : ∀ {A B τ τ'}
                → (V : Γ ⊢V⦂ A)
-               → (M : Γ ∷ᶜ A ⊢C⦂ B ‼ τ')
+               → (M : Γ ∷ A ⊢C⦂ B ‼ τ')
                -------------------------------------------------
                → Γ ⊢C⦂ return {τ = τ} V ; M
                    == coerce (≤-stepsˡ τ ≤-refl) (M [ Hd ↦ V ]c)
 
     let-assoc : ∀ {A B C τ τ' τ''}
               → (M : Γ ⊢C⦂ A ‼ τ)
-              → (N : Γ ∷ᶜ A ⊢C⦂ B ‼ τ')
-              → (P : Γ ∷ᶜ B ⊢C⦂ C ‼ τ'')
+              → (N : Γ ∷ A ⊢C⦂ B ‼ τ')
+              → (P : Γ ∷ B ⊢C⦂ C ‼ τ'')
               --------------------------------------------------
               → Γ ⊢C⦂ (M ; N) ; P
                   == coerce (≤-reflexive (sym (+-assoc τ τ' τ'')))
-                       (M ; (N ; C-rename (cong-ren {Γ'' = [] ∷ᶜ B} (wk idʳ)) P))
+                       (M ; (N ; C-rename (cong-ren {Γ'' = [] ∷ B} wk-ren) P))
 
     let-perform : ∀ {A B τ τ'}
                 → (op : Op)
                 → (V : Γ ⊢V⦂ type-of-gtype (param op))
-                → (M : Γ ⟨ op-time op ⟩ ∷ᶜ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
-                → (N : Γ ∷ᶜ A ⊢C⦂ B ‼ τ')
+                → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
+                → (N : Γ ∷ A ⊢C⦂ B ‼ τ')
                 --------------------------------------------------------------
                 → Γ ⊢C⦂ perform op V M ; N
                     == coerce (≤-reflexive (sym (+-assoc (op-time op) τ τ')))
-                         (perform op V (M ; {!!}))
+                         (perform op V
+                            (M ; C-rename (cong-ren {Γ = Γ} wk-ctx-ren) N))
 
     -- ...
 
