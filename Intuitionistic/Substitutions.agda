@@ -20,11 +20,11 @@ module Substitutions where
 
 var-split : ∀ {Γ A τ}
           → A ∈[ τ ] Γ
-          → Σ[ Γ₁ ∈ Ctx ] Σ[ Γ₂ ∈ Ctx ] Γ₁ ∷ᶜ A , Γ₂ split Γ × ctx-delay Γ₂ ≡ τ
+          → Σ[ Γ₁ ∈ Ctx ] Σ[ Γ₂ ∈ Ctx ] Γ₁ ∷ A , Γ₂ split Γ × ctx-delay Γ₂ ≡ τ
 
-var-split {Γ ∷ᶜ A} Hd = Γ , [] , split-[] , refl
-var-split {Γ ∷ᶜ B} (Tl-∷ᶜ x) with var-split x
-... | Γ₁ , Γ₂ , p , q = Γ₁ , Γ₂ ∷ᶜ B , split-∷ᶜ p , q
+var-split {Γ ∷ A} Hd = Γ , [] , split-[] , refl
+var-split {Γ ∷ B} (Tl-∷ x) with var-split x
+... | Γ₁ , Γ₂ , p , q = Γ₁ , Γ₂ ∷ B , split-∷ p , q
 var-split {Γ ⟨ τ ⟩} (Tl-⟨⟩ x) with var-split x
 ... | Γ₁ , Γ₂ , p , q =
   Γ₁ , Γ₂ ⟨ τ ⟩ , split-⟨⟩ p , trans (cong (_+ τ) q) (+-comm _ τ)
@@ -54,16 +54,16 @@ var-in-split : ∀ {Γ Γ₁ Γ₂ A τ}
                    proj₁ (var-split x) ≡ proj₁ (var-split y)
                  × proj₁ (proj₂ (var-split x)) ≡ proj₁ (proj₂ (var-split y)) ++ᶜ Γ₂)
              ⊎ (Σ[ Γ' ∈ Ctx ] Σ[ Γ'' ∈ Ctx ]
-                   (Γ' ∷ᶜ A , Γ'' split Γ₂)
+                   (Γ' ∷ A , Γ'' split Γ₂)
                  × Γ₁ ++ᶜ Γ' ≡ proj₁ (var-split x)
                  × Γ'' ≡ proj₁ (proj₂ (var-split x)))
 
 var-in-split split-[] x = inj₁ (x , refl , refl)
-var-in-split (split-∷ᶜ p) Hd = inj₂ (_ , [] , split-[] , split-≡ p , refl)
-var-in-split (split-∷ᶜ p) (Tl-∷ᶜ {B = B} x) with var-in-split p x
-... | inj₁ (y , q , r) = inj₁ (y , q , cong (_∷ᶜ B) r)
+var-in-split (split-∷ p) Hd = inj₂ (_ , [] , split-[] , split-≡ p , refl)
+var-in-split (split-∷ p) (Tl-∷ {B = B} x) with var-in-split p x
+... | inj₁ (y , q , r) = inj₁ (y , q , cong (_∷ B) r)
 ... | inj₂ (Γ' , Γ'' , q , r , s) =
-  inj₂ (Γ' , Γ'' ∷ᶜ _ , split-∷ᶜ q , r , cong (_∷ᶜ B) s)
+  inj₂ (Γ' , Γ'' ∷ _ , split-∷ q , r , cong (_∷ B) s)
 var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A}
   (split-⟨⟩ p) (Tl-⟨⟩ {τ' = τ'} x) with var-in-split p x
 ... | inj₁ (y , q , r) =
@@ -96,10 +96,10 @@ _[_↦_]var : ∀ {Γ A B τ τ'}
           → proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) ⊢V⦂ B
  
 Hd [ Hd ↦ W ]var = W
-Hd [ Tl-∷ᶜ x ↦ W ]var with var-split x
+Hd [ Tl-∷ x ↦ W ]var with var-split x
 ... | Γ₁ , Γ₂ , p , q = var Hd
-Tl-∷ᶜ y [ Hd ↦ W ]var = var y
-Tl-∷ᶜ y [ Tl-∷ᶜ x ↦ W ]var with var-split x | inspect var-split x
+Tl-∷ y [ Hd ↦ W ]var = var y
+Tl-∷ y [ Tl-∷ x ↦ W ]var with var-split x | inspect var-split x
 ... | ._ , ._ , ._ , ._ | [| refl |] =
   V-rename wk-ren (y [ x ↦ W ]var)
 Tl-⟨⟩ y [ Tl-⟨⟩ x ↦ W ]var with var-split x | inspect var-split x
@@ -120,7 +120,7 @@ mutual
   var y   [ x ↦ W ]v = y [ x ↦ W ]var
   const c [ x ↦ W ]v = const c
   ⋆       [ x ↦ W ]v = ⋆
-  lam M   [ x ↦ W ]v = lam (M [ Tl-∷ᶜ x ↦ W ]c)
+  lam M   [ x ↦ W ]v = lam (M [ Tl-∷ x ↦ W ]c)
   box V   [ x ↦ W ]v = box (V [ Tl-⟨⟩ x ↦ W ]v)
 
   _[_↦_]c : ∀ {Γ A C τ}
@@ -131,10 +131,10 @@ mutual
           → proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) ⊢C⦂ C
 
   return V       [ x ↦ W ]c = return (V [ x ↦ W ]v)
-  (M ; N)        [ x ↦ W ]c = (M [ x ↦ W ]c) ; (N [ Tl-∷ᶜ x ↦ W ]c)
+  (M ; N)        [ x ↦ W ]c = (M [ x ↦ W ]c) ; (N [ Tl-∷ x ↦ W ]c)
   (V₁ · V₂)      [ x ↦ W ]c = (V₁ [ x ↦ W ]v) · (V₂ [ x ↦ W ]v)
   absurd V       [ x ↦ W ]c = absurd (V [ x ↦ W ]v)
-  perform op V M [ x ↦ W ]c = perform op (V [ x ↦ W ]v) (M [ Tl-∷ᶜ (Tl-⟨⟩ x) ↦ W ]c)
+  perform op V M [ x ↦ W ]c = perform op (V [ x ↦ W ]v) (M [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c)
   _[_↦_]c {A = A} (unbox {Γ' = Γ'} {Γ'' = Γ''} p q V M) x W with var-in-split p x
   ... | inj₁ (y , r , s) =
     unbox
@@ -143,8 +143,8 @@ mutual
                  (++ᶜ-assoc (proj₁ (var-split y)) (proj₁ (proj₂ (var-split y))) Γ'')
                  (cong₂ _++ᶜ_ (sym r) (sym s))))
       q
-      ((V [ y ↦ V-rename (eq-ren r) W ]v))
-      (M [ Tl-∷ᶜ x ↦ W ]c)
+      (V [ y ↦ V-rename (eq-ren r) W ]v)
+      (M [ Tl-∷ x ↦ W ]c)
   ... | inj₂ (Γ''' , Γ'' , r , s , u) =
     unbox
       {Γ'' = Γ''' ++ᶜ Γ''}
@@ -156,8 +156,8 @@ mutual
         (≤-trans
           (≤-trans
             (≤-reflexive (cong ctx-delay (sym (split-≡ r))))
-            (≤-reflexive (ctx-delay-++ᶜ (Γ''' ∷ᶜ A) Γ'')))
+            (≤-reflexive (ctx-delay-++ᶜ (Γ''' ∷ A) Γ'')))
           (≤-reflexive (sym (ctx-delay-++ᶜ Γ''' Γ'' )))))
       V
-      (M [ Tl-∷ᶜ x ↦ W ]c)
+      (M [ Tl-∷ x ↦ W ]c)
   coerce p M     [ x ↦ W ]c = coerce p (M [ x ↦ W ]c)  

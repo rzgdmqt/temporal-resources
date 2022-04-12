@@ -27,8 +27,8 @@ Ren Γ Γ' = ∀ {A τ} → A ∈[ τ ] Γ → Σ[ τ' ∈ Time ] (τ ≤ τ' ×
 -- Identity renaming
 
 idʳ : ∀ {Γ} → Ren Γ Γ
-idʳ {.(_ ∷ᶜ _)}  Hd        = _ , ≤-refl , Hd
-idʳ {.(_ ∷ᶜ _)}  (Tl-∷ᶜ x) = _ , ≤-refl , Tl-∷ᶜ x
+idʳ {.(_ ∷ _)}  Hd         = _ , ≤-refl , Hd
+idʳ {.(_ ∷ _)}  (Tl-∷ x)   = _ , ≤-refl , Tl-∷ x
 idʳ {.(_ ⟨ _ ⟩)} (Tl-⟨⟩ x) = _ , ≤-refl , Tl-⟨⟩ x
 
 -- Composition of renamings
@@ -37,43 +37,43 @@ _∘ʳ_ : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
 (ρ' ∘ʳ ρ) {A} {τ} Hd with ρ {A} {τ} Hd
 ... | τ , p , x with ρ' x
 ... | τ' , p' , y = τ' , ≤-trans p p' , y
-(ρ' ∘ʳ ρ) (Tl-∷ᶜ x) = (ρ' ∘ʳ (ρ ∘ Tl-∷ᶜ)) x
+(ρ' ∘ʳ ρ) (Tl-∷ x) = (ρ' ∘ʳ (ρ ∘ Tl-∷)) x
 (ρ' ∘ʳ ρ) (Tl-⟨⟩ x) with ρ (Tl-⟨⟩ x)
 ... | τ , p , y with ρ' y
 ... | τ' , p' , z = τ' , ≤-trans p p' , z
 
 -- Variable weakening renaming
 
-wk-ren : ∀ {Γ A} → Ren Γ (Γ ∷ᶜ A)
-wk-ren x = _ , ≤-refl , Tl-∷ᶜ x
+wk-ren : ∀ {Γ A} → Ren Γ (Γ ∷ A)
+wk-ren x = _ , ≤-refl , Tl-∷ x
 
 wk-ctx-ren : ∀ {Γ Γ'} → Ren Γ (Γ ++ᶜ Γ')
 wk-ctx-ren {Γ' = []}       x = _ , ≤-refl , x
-wk-ctx-ren {Γ' = Γ' ∷ᶜ A}  x with wk-ctx-ren {Γ' = Γ'} x
-... | τ' , p , y = τ' , p , Tl-∷ᶜ y
+wk-ctx-ren {Γ' = Γ' ∷ A}   x with wk-ctx-ren {Γ' = Γ'} x
+... | τ' , p , y = τ' , p , Tl-∷ y
 wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} x with wk-ctx-ren {Γ' = Γ'} x
 ... | τ' , p , y = τ + τ' , ≤-stepsˡ τ p , Tl-⟨⟩ y
 
 -- Exchange renaming
 
-exch-ren : ∀ {Γ A B} → Ren (Γ ∷ᶜ A ∷ᶜ B) (Γ ∷ᶜ B ∷ᶜ A)
-exch-ren Hd                = _ , ≤-refl , Tl-∷ᶜ Hd
-exch-ren (Tl-∷ᶜ Hd)        = _ , ≤-refl , Hd
-exch-ren (Tl-∷ᶜ (Tl-∷ᶜ x)) = _ , ≤-refl , Tl-∷ᶜ (Tl-∷ᶜ x)
+exch-ren : ∀ {Γ A B} → Ren (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
+exch-ren Hd              = _ , ≤-refl , Tl-∷ Hd
+exch-ren (Tl-∷ Hd)       = _ , ≤-refl , Hd
+exch-ren (Tl-∷ (Tl-∷ x)) = _ , ≤-refl , Tl-∷ (Tl-∷ x)
 
 -- Contraction renaming
 
-contract-ren : ∀ {Γ A} → Ren (Γ ∷ᶜ A ∷ᶜ A) (Γ ∷ᶜ A)
+contract-ren : ∀ {Γ A} → Ren (Γ ∷ A ∷ A) (Γ ∷ A)
 contract-ren Hd        = _ , ≤-refl , Hd
-contract-ren (Tl-∷ᶜ x) = _ , ≤-refl , x
+contract-ren (Tl-∷ x) = _ , ≤-refl , x
 
 -- Congruence of context renamings
 
 cong-ren : ∀ {Γ Γ' Γ''} → Ren Γ Γ' → Ren (Γ ++ᶜ Γ'') (Γ' ++ᶜ Γ'')
 cong-ren {Γ'' = []} ρ x = ρ x
-cong-ren {Γ'' = Γ'' ∷ᶜ A} ρ Hd = _ , ≤-refl , Hd
-cong-ren {Γ'' = Γ'' ∷ᶜ A} ρ (Tl-∷ᶜ x) with cong-ren ρ x
-... | τ' , p , y = τ' , p , Tl-∷ᶜ y
+cong-ren {Γ'' = Γ'' ∷ A} ρ Hd = _ , ≤-refl , Hd
+cong-ren {Γ'' = Γ'' ∷ A} ρ (Tl-∷ x) with cong-ren ρ x
+... | τ' , p , y = τ' , p , Tl-∷ y
 cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ (Tl-⟨⟩ x) with cong-ren ρ x
 ... | τ' , p , y = τ + τ' , +-monoʳ-≤ τ p , Tl-⟨⟩ y
 
@@ -108,10 +108,24 @@ cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ (Tl-⟨⟩ x) with cong-ren ρ x
 ⟨⟩-mon-ren : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
 ⟨⟩-mon-ren p (Tl-⟨⟩ {τ' = τ'} x) = _ , +-monoˡ-≤ τ' p , Tl-⟨⟩ x
 
--- Renaming from an equality
+-- Renaming from an equality of contexts
 
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren refl = idʳ
+
+-- Image of a renaming
+
+{-
+data Ctxⁱ : Set where
+  []   : Ctxⁱ
+  _∷ᶜ_ : Ctxⁱ → VType → Ctxⁱ
+  _⟨_⟩ : Ctxⁱ → Time → Ctxⁱ
+
+infixl 31 _∷ᶜ_
+infix  32 _⟨_⟩
+
+-}
+
 
 -- Splitting a renaming
 
@@ -132,9 +146,11 @@ postulate
             → Γ₁ , Γ₂ split Γ
             → τ ≤ ctx-delay Γ₂
             → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
-               (Ren Γ₁ Γ₁' ×
-                Γ₁' , Γ₂' split Γ' ×
-                ctx-delay Γ₂ ≤ ctx-delay Γ₂')
+                 Ren Γ₁ Γ₁'
+               × Γ₁' , Γ₂' split Γ'
+               × ctx-delay Γ₂ ≤ ctx-delay Γ₂'
+
+
 {-
 split-ren ρ split-[] q = _ , [] , ρ , split-[] , z≤n
 split-ren ρ (split-∷ᶜ p) q = split-ren (ρ ∘ Tl-∷ᶜ) p q
