@@ -20,7 +20,7 @@ module Substitutions where
 
 var-split : ∀ {Γ A τ}
           → A ∈[ τ ] Γ
-          → Σ[ Γ₁ ∈ Ctx ] Σ[ Γ₂ ∈ Ctx ] (Γ₁ ∷ᶜ A , Γ₂ split Γ × ctx-delay Γ₂ ≡ τ)
+          → Σ[ Γ₁ ∈ Ctx ] Σ[ Γ₂ ∈ Ctx ] Γ₁ ∷ᶜ A , Γ₂ split Γ × ctx-delay Γ₂ ≡ τ
 
 var-split {Γ ∷ᶜ A} Hd = Γ , [] , split-[] , refl
 var-split {Γ ∷ᶜ B} (Tl-∷ᶜ x) with var-split x
@@ -29,22 +29,43 @@ var-split {Γ ⟨ τ ⟩} (Tl-⟨⟩ x) with var-split x
 ... | Γ₁ , Γ₂ , p , q =
   Γ₁ , Γ₂ ⟨ τ ⟩ , split-⟨⟩ p , trans (cong (_+ τ) q) (+-comm _ τ)
 
+var-in-split-proj₁-subst : ∀ {Γ A τ τ'}
+                         → (x : A ∈[ τ ] Γ)
+                         → (p : τ ≡ τ')
+                         → proj₁ (var-split x) ≡ proj₁ (var-split (subst (A ∈[_] Γ) p x))
+
+var-in-split-proj₁-subst x refl = refl
+
 -- Variable in context is in one of the two contexts splitting it
 
 var-in-split : ∀ {Γ Γ₁ Γ₂ A τ}
              → Γ₁ , Γ₂ split Γ
              → (x : A ∈[ τ ] Γ)
-             → (Σ[ Γ' ∈ Ctx ] proj₁ (var-split x) ∷ᶜ A , Γ' split Γ₁)
+             → (Σ[ Γ' ∈ Ctx ] proj₁ (var-split x) ∷ᶜ A , Γ' split Γ₁ × Σ[ y ∈ A ∈[ τ ∸ ctx-delay Γ₂ ] Γ₁ ] proj₁ (var-split x) ≡ proj₁ (var-split y))
              ⊎ Σ[ Γ' ∈ Ctx ] Σ[ Γ'' ∈ Ctx ] (Γ' ∷ᶜ A , Γ'' split Γ₂) × Γ₁ ++ᶜ Γ' ≡ proj₁ (var-split x)
 
-var-in-split {Γ₂ = .[]} {A = A} split-[] x with var-split x
-... | Γ₁ , Γ₂ , p , q = inj₁ (Γ₂ , p)
-var-in-split {Γ₂ = .(_ ∷ᶜ _)} (split-∷ᶜ p) Hd = inj₂ (_ , [] , split-[] , split-≡ p)
-var-in-split {Γ₂ = .(_ ∷ᶜ _)} (split-∷ᶜ p) (Tl-∷ᶜ x) with var-in-split p x
-... | inj₁ (Γ' , q) = inj₁ (Γ' , q)
+var-in-split split-[] x with var-split x | inspect var-split x
+... | Γ₁ , Γ₂ , p , q | [| eq |] = inj₁ (Γ₂ , p , x , cong proj₁ (sym eq))
+var-in-split (split-∷ᶜ p) Hd = inj₂ (_ , [] , split-[] , split-≡ p)
+var-in-split (split-∷ᶜ p) (Tl-∷ᶜ x) with var-in-split p x
+... | inj₁ (Γ' , q , y , r)       = inj₁ (Γ' , q , y , r)
 ... | inj₂ (Γ' , Γ'' , q , r) = inj₂ (Γ' , Γ'' ∷ᶜ _ , split-∷ᶜ q , r)
-var-in-split {Γ₂ = .(_ ⟨ _ ⟩)} (split-⟨⟩ p) (Tl-⟨⟩ x) with var-in-split p x
-... | inj₁ (Γ' , q) = inj₁ (Γ' , q)
+var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A} (split-⟨⟩ p) (Tl-⟨⟩ {τ' = τ'} x) with var-in-split p x
+... | inj₁ (Γ' , q , y , r)       =
+  inj₁ (Γ' , q , subst (A ∈[_] Γ₁)
+    (trans
+      (trans
+        (trans
+          (cong (_∸ ctx-delay Γ₂)
+            (trans
+              (trans
+                (sym (+-identityʳ τ'))
+                (cong (τ' +_) (sym (n∸n≡0 τ))))
+              (sym (+-∸-assoc τ' (≤-refl {τ})))))
+          (∸-+-assoc (τ' + τ) τ (ctx-delay Γ₂)))
+        (cong (τ' + τ ∸_) (+-comm τ (ctx-delay Γ₂))))
+      (cong (_∸ (ctx-delay Γ₂ + τ)) (+-comm τ' τ)))
+    y , trans r (var-in-split-proj₁-subst y _))
 ... | inj₂ (Γ' , Γ'' , q , r) = inj₂ (Γ' , Γ'' ⟨ _ ⟩ , split-⟨⟩ q , r)
 
 -- Substituting a value for a variable in context
@@ -96,11 +117,20 @@ mutual
   (V₁ · V₂)      [ x ↦ W ]c = (V₁ [ x ↦ W ]v) · (V₂ [ x ↦ W ]v)
   absurd V       [ x ↦ W ]c = absurd (V [ x ↦ W ]v)
   perform op V M [ x ↦ W ]c = perform op (V [ x ↦ W ]v) (M [ Tl-∷ᶜ (Tl-⟨⟩ x) ↦ W ]c)
-  _[_↦_]c {A = A} (unbox p q V M) x W with var-in-split p x
   
-  ... | inj₁ (Γ' , r) rewrite sym (split-≡ r) = {!!} --unbox {!!} {!!} {!V [ {!!} ↦ {!!} ]v!} (M [ Tl-∷ᶜ x ↦ W ]c)
+  _[_↦_]c {A = A} (unbox {Γ'' = Γ''} p q V M) x W with var-in-split p x
   
-  ... | inj₂ (Γ' , Γ'' , r , s) = {!!}
+  ... | inj₁ (Γ''' , r , y , s) =
+    unbox
+      {Γ'' = Γ''' ++ᶜ Γ'' }
+      {!!}
+      (≤-trans
+        (≤-stepsˡ (ctx-delay Γ''') q)
+        (≤-reflexive (sym (ctx-delay-++ᶜ Γ''' Γ''))))
+      (V [ y ↦ V-rename (eq-ren s) W ]v)
+      (M [ Tl-∷ᶜ x ↦ W ]c)
+  
+  ... | inj₂ (Γ''' , Γ'' , r , s) = {!!}
 
 --rewrite (sym s) | sym (split-≡ p) | sym (split-≡ r) =
 

@@ -108,23 +108,22 @@ infixl 30 _++ᶜ_
 ++ᶜ-injectiveˡ {Γ ∷ᶜ A} p = ++ᶜ-injectiveˡ {Γ} (∷ᶜ-injective p)
 ++ᶜ-injectiveˡ {Γ ⟨ τ ⟩} p = ++ᶜ-injectiveˡ {Γ} (⟨⟩-injective p)
 
-postulate 
-  -- TODO: finish this proof
-  ++ᶜ-injectiveʳ : ∀ {Γ Γ' Γ''} → Γ ++ᶜ Γ' ≡ Γ ++ᶜ Γ'' → Γ' ≡ Γ''
-{-
-++ᶜ-injectiveʳ {Γ' = []} {Γ'' = []} p = {!!}
-++ᶜ-injectiveʳ {Γ' = []} {Γ'' = Γ'' ∷ᶜ x} p = {!!}
-++ᶜ-injectiveʳ {Γ' = []} {Γ'' = Γ'' ⟨ x ⟩} p = {!!}
-++ᶜ-injectiveʳ {Γ' = Γ' ∷ᶜ x} {Γ'' = Γ''} p = {!!}
-++ᶜ-injectiveʳ {Γ' = Γ' ⟨ x ⟩} {Γ'' = Γ''} p = {!!}
--}
-
 -- Total time delay of a context 
 
 ctx-delay : Ctx → Time
 ctx-delay []        = 0
 ctx-delay (Γ ∷ᶜ A)  = ctx-delay Γ
 ctx-delay (Γ ⟨ τ ⟩) = ctx-delay Γ + τ
+
+-- Interaction of context delay and ++ᶜ
+
+ctx-delay-++ᶜ : (Γ Γ' : Ctx)
+              → ctx-delay (Γ ++ᶜ Γ') ≡ ctx-delay Γ + ctx-delay Γ'
+ctx-delay-++ᶜ Γ []         = sym (+-identityʳ (ctx-delay Γ))
+ctx-delay-++ᶜ Γ (Γ' ∷ᶜ A)  = ctx-delay-++ᶜ Γ Γ'
+ctx-delay-++ᶜ Γ (Γ' ⟨ τ ⟩) = trans
+                               (cong (_+ τ) (ctx-delay-++ᶜ Γ Γ'))
+                               (+-assoc (ctx-delay Γ) (ctx-delay Γ') τ)
 
 -- Proof that sub-contexts split a given context
 

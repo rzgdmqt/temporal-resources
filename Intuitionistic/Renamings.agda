@@ -108,6 +108,11 @@ cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ (Tl-⟨⟩ x) with cong-ren ρ x
 ⟨⟩-mon-ren : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
 ⟨⟩-mon-ren p (Tl-⟨⟩ {τ' = τ'} x) = _ , +-monoˡ-≤ τ' p , Tl-⟨⟩ x
 
+-- Renaming from an equality
+
+eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
+eq-ren refl = idʳ
+
 -- Splitting a renaming
 
 n≤n∸m+m : (n m : ℕ) → n ≤ n ∸ m + m
