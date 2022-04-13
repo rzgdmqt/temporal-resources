@@ -98,7 +98,19 @@ mutual
 
     -- congruence equations
 
-    -- ...
+    -- return-cong
+
+    -- ;-cong
+
+    -- app-cong
+
+    -- absurd-cong
+
+    -- perform-cong
+
+    -- unbox-cong
+
+    -- coerce-cong
 
     -- computational/beta equations for sequential composition
 
