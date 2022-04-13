@@ -264,7 +264,8 @@ mutual
             -------------------
             → Γ ⊢C⦂ B ‼ 0
 
-    -- explicit sub-effecting coercion (no general sub-typing for simplicity)
+    -- explicit sub-effecting coercion (notice the temporal awareness)
+    -- (can also be thought of as a primitive delay operation/computation)
 
     coerce  : {A : VType}
             → {τ τ' : Time}

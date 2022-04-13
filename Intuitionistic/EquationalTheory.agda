@@ -96,7 +96,7 @@ mutual
 
     -- ...
 
-    -- beta/computational equations
+    -- (computational) equations for let
 
     let-return : ∀ {A B τ}
                → (V : Γ ⊢V⦂ A)
@@ -109,14 +109,14 @@ mutual
               → (M : Γ ⊢C⦂ A ‼ τ)
               → (N : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
               → (P : Γ ⟨ τ + τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
-              ---------------------------------------------------------------
+              -----------------------------------------------------------------------------------
               → Γ ⊢C⦂ (M ; N) ; P
                   == coerce (≤-reflexive (sym (+-assoc τ τ' τ'')))                -- M ; (N ; P)
                        (C-rename
                          (⟨⟩-mon-ren (≤-reflexive (trans
                                                    (sym (n∸n≡0 (τ + τ' + τ'')))
-                                                   (cong (τ + τ' + τ'' ∸_) (+-assoc τ τ' τ'')))) ∘ʳ 
-                          ⟨⟩-eta⁻¹-ren)
+                                                   (cong (τ + τ' + τ'' ∸_) (+-assoc τ τ' τ''))))
+                          ∘ʳ ⟨⟩-eta⁻¹-ren)
                          (M ;
                            (N ;
                              C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
@@ -127,25 +127,45 @@ mutual
                 → (V : Γ ⊢V⦂ type-of-gtype (param op))
                 → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
                 → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
-                ---------------------------------------------------------------
+                -----------------------------------------------------------------------------------------------------
                 → Γ ⊢C⦂ (perform op V M) ; N
                     == coerce (≤-reflexive (sym (+-assoc (op-time op) τ τ')))     -- perform op V (M ; N)
-                         {!(perform op V
-                           (M ;
-                             C-rename ((cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
-                               cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren )) N))!}
+                         (C-rename
+                           (⟨⟩-mon-ren (≤-reflexive (trans
+                                                      (sym (n∸n≡0 (op-time op + τ + τ')))
+                                                      (cong (op-time op + τ + τ' ∸_) (+-assoc (op-time op) τ τ'))))
+                            ∘ʳ ⟨⟩-eta⁻¹-ren)
+                           (perform op V
+                             (M ;
+                               C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
+                                 cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren ) N)))
 
     let-coerce : ∀ {A B τ τ' τ''}
                → (p : τ ≤ τ')
                → (M : Γ ⟨ τ' ∸ τ ⟩ ⊢C⦂ A ‼ τ)
                → (N : Γ ⟨ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ'')
-               --------------------------------
+               -------------------------------------------------------------------------------------
                → Γ ⊢C⦂ coerce p M ; N
-                   == coerce (+-monoˡ-≤ τ'' p) {!!}
-{-
-               → Γ ⊢C⦂ coerce p M ; C-rename (cong-ren {Γ'' = [] ∷ A} (⟨⟩-mon-ren p)) N
-                   == coerce {!!} (M ; N)
--}
+                   == coerce                         -- coerce (p + id) (M ; N)
+                        (+-monoˡ-≤ τ'' p)
+                        (C-rename
+                           (⟨⟩-mon-ren (≤-reflexive (trans
+                                                      (sym ([m+n]∸[m+o]≡n∸o τ'' τ' τ))
+                                                      (cong₂ _∸_ (+-comm τ'' τ') (+-comm τ'' τ)))))
+                           M ;
+                          C-rename
+                            (cong-ren {Γ'' = [] ∷ A}
+                              (⟨⟩-mu-ren
+                               ∘ʳ ⟨⟩-mon-ren (≤-reflexive
+                                               (trans
+                                                 (trans
+                                                   (sym (m∸n+n≡m p))
+                                                   (cong (_+ τ) (sym ([m+n]∸[m+o]≡n∸o τ'' τ' τ))))
+                                                 (cong₂ (λ t t' → t ∸ (t') + τ) (+-comm τ'' τ') (+-comm τ'' τ))))))
+                            N)
+
+    -- (computational) equation for function application
+
     -- ...
 
     -- eta equations
