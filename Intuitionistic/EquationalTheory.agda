@@ -112,10 +112,15 @@ mutual
               ---------------------------------------------------------------
               → Γ ⊢C⦂ (M ; N) ; P
                   == coerce (≤-reflexive (sym (+-assoc τ τ' τ'')))                -- M ; (N ; P)
-                       (M ;
-                         (N ;
-                           C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
-                             cong-ren {Γ'' = [] ∷ B} ⟨⟩-mu-ren ) P))
+                       (C-rename
+                         (⟨⟩-mon-ren (≤-reflexive (trans
+                                                   (sym (n∸n≡0 (τ + τ' + τ'')))
+                                                   (cong (τ + τ' + τ'' ∸_) (+-assoc τ τ' τ'')))) ∘ʳ 
+                          ⟨⟩-eta⁻¹-ren)
+                         (M ;
+                           (N ;
+                             C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
+                               cong-ren {Γ'' = [] ∷ B} ⟨⟩-mu-ren ) P)))
                   
     let-perform : ∀ {A B τ τ'}
                 → (op : Op)
@@ -125,19 +130,22 @@ mutual
                 ---------------------------------------------------------------
                 → Γ ⊢C⦂ (perform op V M) ; N
                     == coerce (≤-reflexive (sym (+-assoc (op-time op) τ τ')))     -- perform op V (M ; N)
-                         (perform op V
+                         {!(perform op V
                            (M ;
                              C-rename ((cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
-                               cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren )) N))
+                               cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren )) N))!}
 
     let-coerce : ∀ {A B τ τ' τ''}
                → (p : τ ≤ τ')
-               → (M : Γ ⊢C⦂ A ‼ τ)
-               → (N : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'')
+               → (M : Γ ⟨ τ' ∸ τ ⟩ ⊢C⦂ A ‼ τ)
+               → (N : Γ ⟨ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ'')
                --------------------------------
+               → Γ ⊢C⦂ coerce p M ; N
+                   == coerce (+-monoˡ-≤ τ'' p) {!!}
+{-
                → Γ ⊢C⦂ coerce p M ; C-rename (cong-ren {Γ'' = [] ∷ A} (⟨⟩-mon-ren p)) N
                    == coerce {!!} (M ; N)
-
+-}
     -- ...
 
     -- eta equations
