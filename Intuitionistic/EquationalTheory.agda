@@ -98,32 +98,37 @@ mutual
 
     -- beta/computational equations
 
-    let-return : ∀ {A B τ τ'}
+    let-return : ∀ {A B τ}
                → (V : Γ ⊢V⦂ A)
-               → (M : Γ ∷ A ⊢C⦂ B ‼ τ')
-               -------------------------------------------------
-               → Γ ⊢C⦂ return {τ = τ} V ; M
-                   == coerce (≤-stepsˡ τ ≤-refl) (M [ Hd ↦ V ]c)
+               → (M : Γ ⟨ 0 ⟩ ∷ A ⊢C⦂ B ‼ τ)
+               ----------------------------------------------------------------
+               → Γ ⊢C⦂ return V ; M
+                   == C-rename ⟨⟩-eta-ren (M [ Hd ↦ V-rename ⟨⟩-eta⁻¹-ren V ]c)   -- M[V/x]
 
     let-assoc : ∀ {A B C τ τ' τ''}
               → (M : Γ ⊢C⦂ A ‼ τ)
-              → (N : Γ ∷ A ⊢C⦂ B ‼ τ')
-              → (P : Γ ∷ B ⊢C⦂ C ‼ τ'')
-              --------------------------------------------------
+              → (N : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
+              → (P : Γ ⟨ τ + τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
+              ---------------------------------------------------------------
               → Γ ⊢C⦂ (M ; N) ; P
-                  == coerce (≤-reflexive (sym (+-assoc τ τ' τ'')))
-                       (M ; (N ; C-rename (cong-ren {Γ'' = [] ∷ B} wk-ren) P))
-
+                  == coerce (≤-reflexive (sym (+-assoc τ τ' τ'')))                -- M ; (N ; P)
+                       (M ;
+                         (N ;
+                           C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
+                             cong-ren {Γ'' = [] ∷ B} ⟨⟩-mu-ren ) P))
+                  
     let-perform : ∀ {A B τ τ'}
                 → (op : Op)
                 → (V : Γ ⊢V⦂ type-of-gtype (param op))
                 → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
-                → (N : Γ ∷ A ⊢C⦂ B ‼ τ')
-                --------------------------------------------------------------
-                → Γ ⊢C⦂ perform op V M ; N
-                    == coerce (≤-reflexive (sym (+-assoc (op-time op) τ τ')))
+                → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
+                ---------------------------------------------------------------
+                → Γ ⊢C⦂ (perform op V M) ; N
+                    == coerce (≤-reflexive (sym (+-assoc (op-time op) τ τ')))     -- perform op V (M ; N)
                          (perform op V
-                            (M ; C-rename (cong-ren {Γ = Γ} wk-ctx-ren) N))
+                           (M ;
+                             C-rename ((cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
+                               cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren )) N))
 
     -- ...
 
@@ -131,7 +136,7 @@ mutual
 
     -- ...
 
-    -- coercion elimination equations
+    -- coercion equations
 
     -- ...
 

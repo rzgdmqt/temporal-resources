@@ -202,19 +202,18 @@ mutual
     -- returning a value
 
     return  : {A : VType}
-            → {τ : Time}
             → Γ ⊢V⦂ A
             -------------
-            → Γ ⊢C⦂ A ‼ τ        -- arbitrary `τ` to push `coerce`s inside computations
+            → Γ ⊢C⦂ A ‼ 0
 
     -- sequential composition
 
     _;_     : {A B : VType}      -- note: use \;0 to get this unicode semicolon
             → {τ τ' : Time}
             → Γ ⊢C⦂ A ‼ τ
-            → Γ ∷ A ⊢C⦂ B ‼ τ'
-            -------------------
-            → Γ ⊢C⦂ B ‼ (τ + τ') -- TODO: might want this to be arbitrary to compute away coercions
+            → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
+            ------------------------
+            → Γ ⊢C⦂ B ‼ (τ + τ')
 
     -- function application
     
@@ -247,15 +246,14 @@ mutual
     -- unboxing a boxed value/resource after enough time has passed for it to be ready
 
     unbox   : {Γ' Γ'' : Ctx}
-            → {A : VType}
-            → {C : CType}
+            → {A B : VType}
             → {τ : Time}
             → Γ' , Γ'' split Γ
             → τ ≤ ctx-delay Γ''
             → Γ' ⊢V⦂ [ τ ] A
-            → Γ ∷ A  ⊢C⦂ C
+            → Γ ∷ A  ⊢C⦂ B ‼ 0
             -------------------
-            → Γ ⊢C⦂ C                    -- arbitrary `τ'` to push `coerce`s inside (includes 0)
+            → Γ ⊢C⦂ B ‼ 0
 
     -- explicit sub-effecting coercion (no general sub-typing for simplicity)
 
