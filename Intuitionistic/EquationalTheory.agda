@@ -124,8 +124,7 @@ mutual
                 ------------------------------------
                 → Γ ⊢C⦂ absurd {C = C} V == absurd W
 
-    perform-cong : ∀ {A τ}
-                 → {op : Op}
+    perform-cong : ∀ {A τ op}
                  → {V W : Γ ⊢V⦂ type-of-gtype (param op)}
                  → {M N : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ}
                  → Γ ⊢V⦂ V == W
@@ -176,31 +175,6 @@ mutual
                            (M ;
                              C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
                                cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren ) N)))
-
-    coerce-; : ∀ {A B τ τ' τ''}
-             → (p : τ ≤ τ')
-             → (M : Γ ⟨ τ' ∸ τ ⟩ ⊢C⦂ A ‼ τ)
-             → (N : Γ ⟨ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ'')
-             -------------------------------------------------------------------------------------
-             → Γ ⊢C⦂ coerce p M ; N
-                 == coerce                         -- coerce (p + id) (M ; N)
-                      (+-monoˡ-≤ τ'' p)
-                      (C-rename
-                         (⟨⟩-mon-ren (≤-reflexive (trans
-                                                    (sym ([m+n]∸[m+o]≡n∸o τ'' τ' τ))
-                                                    (cong₂ _∸_ (+-comm τ'' τ') (+-comm τ'' τ)))))
-                         M ;
-                       C-rename
-                         (cong-ren {Γ'' = [] ∷ A}
-                           (⟨⟩-mu-ren
-                            ∘ʳ ⟨⟩-mon-ren (≤-reflexive
-                                            (trans
-                                              (trans
-                                                (sym (m∸n+n≡m p))
-                                                (cong (_+ τ) (sym ([m+n]∸[m+o]≡n∸o τ'' τ' τ))))
-                                              (cong₂ (λ t t' → t ∸ (t') + τ)
-                                                (+-comm τ'' τ') (+-comm τ'' τ))))))
-                         N)
 
     -- associativity equation for sequential composition
 
@@ -275,8 +249,7 @@ mutual
                       == unbox p ≤-refl                                               -- unbox V to x in M[box x/y]                             
                            V
                            (C-rename (eq-ren (split-≡ (split-∷ p)))
-                             ((C-rename
-                                (exch-ren ∘ʳ wk-ren) M)
+                             ((C-rename (exch-ren ∘ʳ wk-ren) M)
                                 [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c))
 
     -- coercion equations
@@ -304,9 +277,68 @@ mutual
                              ∘ʳ ⟨⟩-mu⁻¹-ren)
                             M)
 
-  infix 18 _⊢C⦂_==_
+    coerce₁-; : ∀ {A B τ τ' τ''}
+              → (p : τ ≤ τ')
+              → (M : Γ ⟨ τ' ∸ τ ⟩ ⊢C⦂ A ‼ τ)
+              → (N : Γ ⟨ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ'')
+              -------------------------------------------------------------------------------------
+              → Γ ⊢C⦂ coerce p M ; N
+                  == coerce                         -- coerce (p + id) (M ; N)
+                       (+-monoˡ-≤ τ'' p)
+                       (C-rename
+                          (⟨⟩-mon-ren (≤-reflexive (trans
+                                                     (sym ([m+n]∸[m+o]≡n∸o τ'' τ' τ))
+                                                     (cong₂ _∸_ (+-comm τ'' τ') (+-comm τ'' τ)))))
+                          M ;
+                        C-rename
+                          (cong-ren {Γ'' = [] ∷ A}
+                            (⟨⟩-mu-ren
+                             ∘ʳ ⟨⟩-mon-ren (≤-reflexive
+                                             (trans
+                                               (trans
+                                                 (sym (m∸n+n≡m p))
+                                                 (cong (_+ τ) (sym ([m+n]∸[m+o]≡n∸o τ'' τ' τ))))
+                                               (cong₂ (λ t t' → t ∸ (t') + τ)
+                                                 (+-comm τ'' τ') (+-comm τ'' τ))))))
+                          N)
 
-  -- TODO: consider also adding some additional equations, such as 
-  --       coerce in 2nd component of seq. comp. and coerce in perform;
-  --       the currently selected equations are based on how the small
-  --       step operational semantics would look like for coerce
+    coerce₂-; : ∀ {A B τ τ' τ''}
+              → (p : τ' ≤ τ'')
+              → (M : Γ ⊢C⦂ A ‼ τ)
+              → (N : Γ ⟨ τ ⟩ ⟨ τ'' ∸ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ')                             -- unfortunately cannot assume A between the ⟨_⟩s
+              ----------------------------------------------------------------        -- in which case the LHS wouldn't have a renaming in it
+              → Γ ⊢C⦂ M ; coerce p (C-rename exch-⟨⟩-ren N)
+                  == coerce (+-monoʳ-≤ τ p)
+                       (C-rename (⟨⟩-mon-ren z≤n ∘ʳ ⟨⟩-eta⁻¹-ren) M ;
+                        C-rename
+                          (cong-ren {Γ'' = [] ∷ A}
+                           (   ⟨⟩-mu-ren
+                            ∘ʳ ⟨⟩-mon-ren
+                                 (≤-reflexive
+                                   (trans
+                                     (+-comm τ (τ'' ∸ τ'))
+                                     (cong (_+ τ) (sym (n+m∸n+k≡m∸k τ p)))))
+                            ∘ʳ ⟨⟩-mu⁻¹-ren))
+                          N)
+
+    coerce-perform : ∀ {A τ τ' op}
+                   → (p : τ ≤ τ')
+                   → (V : Γ ⊢V⦂ type-of-gtype (param op))
+                   → (M : Γ ⟨ op-time op ⟩ ⟨ τ' ∸ τ ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
+                   ------------------------------------------------------------------------------------
+                   → Γ ⊢C⦂ perform op V (coerce p (C-rename exch-⟨⟩-ren M))
+                       == coerce (+-monoʳ-≤ (op-time op) p)
+                            (perform op
+                              (V-rename (⟨⟩-mon-ren z≤n ∘ʳ ⟨⟩-eta⁻¹-ren) V)
+                              (C-rename
+                                (cong-ren {Γ'' = [] ∷ type-of-gtype (arity op)}
+                                  (   ⟨⟩-mu-ren
+                                   ∘ʳ ⟨⟩-mon-ren
+                                        (≤-reflexive
+                                          (trans
+                                            (+-comm (op-time op) (τ' ∸ τ))
+                                            (cong (_+ op-time op) (sym (n+m∸n+k≡m∸k (op-time op) p)))))
+                                   ∘ʳ ⟨⟩-mu⁻¹-ren))
+                                M))
+
+  infix 18 _⊢C⦂_==_

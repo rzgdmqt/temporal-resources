@@ -19,6 +19,36 @@ open import Language
 
 module Renamings where
 
+-- Auxiliary lemmas
+
+n≤n∸m+m : (n m : ℕ) → n ≤ n ∸ m + m
+n≤n∸m+m n       zero    = ≤-stepsʳ 0 ≤-refl
+n≤n∸m+m zero    (suc m) = z≤n
+n≤n∸m+m (suc n) (suc m) =
+  ≤-trans
+    (+-monoʳ-≤ 1 (n≤n∸m+m n m))
+    (≤-reflexive (sym (+-suc (n ∸ m) (m))))
+
+n+m∸n+k≡m∸k : (n : ℕ) → {m k : ℕ} → k ≤ m → n + m ∸ (n + k) ≡ m ∸ k
+n+m∸n+k≡m∸k zero {zero} {k} p = refl
+n+m∸n+k≡m∸k zero {suc m} {zero} p = refl
+n+m∸n+k≡m∸k zero {suc m} {suc k} p = refl
+n+m∸n+k≡m∸k (suc n) {zero} {zero} p = n∸n≡0 (n + zero)
+n+m∸n+k≡m∸k (suc n) {suc m} {zero} p =
+  trans
+    (trans
+      (cong (n + suc m ∸_) (+-identityʳ n))
+      (trans
+        (trans
+          (m+n∸m≡n n (suc m))
+          (sym (cong suc (m+n∸m≡n n m))))
+        (cong (λ l → suc (n + m ∸ l)) (sym (+-identityʳ n)))))
+    (cong suc (n+m∸n+k≡m∸k n z≤n))
+n+m∸n+k≡m∸k (suc n) {suc m} {suc k} (s≤s p) =
+  trans
+    (cong₂ _∸_ (+-suc n m) (+-suc n k))
+    (n+m∸n+k≡m∸k n p)
+
 -- Variable renamings
 
 -- Note: This allows one to move a variable under more ⟨_⟩s but not vice versa.
@@ -58,23 +88,27 @@ wk-ctx-ren {Γ' = Γ' ∷ A}   x with wk-ctx-ren {Γ' = Γ'} x
 wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} x with wk-ctx-ren {Γ' = Γ'} x
 ... | τ' , p , y = τ + τ' , ≤-stepsˡ τ p , Tl-⟨⟩ y
 
--- Exchange renaming
+-- Exchange renamings
 
 exch-ren : ∀ {Γ A B} → Ren (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
 exch-ren Hd              = _ , ≤-refl , Tl-∷ Hd
 exch-ren (Tl-∷ Hd)       = _ , ≤-refl , Hd
 exch-ren (Tl-∷ (Tl-∷ x)) = _ , ≤-refl , Tl-∷ (Tl-∷ x)
 
+exch-⟨⟩-ren : ∀ {Γ A τ} → Ren (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
+exch-⟨⟩-ren Hd               = _ , z≤n , Tl-⟨⟩ Hd
+exch-⟨⟩-ren (Tl-∷ (Tl-⟨⟩ x)) = _ , ≤-refl , Tl-⟨⟩ (Tl-∷ x)
+
 -- Contraction renaming
 
 contract-ren : ∀ {Γ A} → Ren (Γ ∷ A ∷ A) (Γ ∷ A)
-contract-ren Hd        = _ , ≤-refl , Hd
+contract-ren Hd       = _ , ≤-refl , Hd
 contract-ren (Tl-∷ x) = _ , ≤-refl , x
 
 -- Extending a renaming
 
 extend-ren : ∀ {Γ Γ' A τ} → Ren Γ Γ' → A ∈[ τ ] Γ' → Ren (Γ ∷ A) Γ'
-extend-ren ρ x Hd = _ , z≤n , x
+extend-ren ρ x Hd       = _ , z≤n , x
 extend-ren ρ x (Tl-∷ y) = ρ y
 
 -- Congruence of context renamings
@@ -124,14 +158,6 @@ eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren refl = idʳ
 
 -- Weakening a ⟨ τ ⟩ modality into a context with at least τ delay
-
-n≤n∸m+m : (n m : ℕ) → n ≤ n ∸ m + m
-n≤n∸m+m n       zero    = ≤-stepsʳ 0 ≤-refl
-n≤n∸m+m zero    (suc m) = z≤n
-n≤n∸m+m (suc n) (suc m) =
-  ≤-trans
-    (+-monoʳ-≤ 1 (n≤n∸m+m n m))
-    (≤-reflexive (sym (+-suc (n ∸ m) (m))))
 
 wk-⟨⟩-ren : ∀ {Γ Γ' Γ'' τ}
           → Γ' , Γ'' split Γ
