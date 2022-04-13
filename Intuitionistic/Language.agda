@@ -207,14 +207,23 @@ mutual
             → Γ ⊢C⦂ A ‼ 0
 
     -- sequential composition
-
+    {-
     _;_     : {A B : VType}      -- note: use \;0 to get this unicode semicolon
             → {τ τ' : Time}
             → Γ ⊢C⦂ A ‼ τ
-            → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
-            ------------------------
-            → Γ ⊢C⦂ B ‼ (τ + τ')
-
+            → Γ ∷ A ⊢C⦂ B ‼ τ'    -- naively would like to have Γ ⟨ τ ⟩ ∷ A context, but
+            --------------------  -- then coercion equation is not type-safe, nor can one
+            → Γ ⊢C⦂ B ‼ (τ + τ')   -- define the corresponding strength in the presheaf model
+    -}
+    
+    _;_     : {A B : VType}      -- note: use \;0 to get this unicode semicolon
+            → {τ τ' : Time}
+            → Γ ⊢C⦂ A ‼ τ
+            → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'   -- naively would like to have Γ ⟨ τ ⟩ ∷ A context, but
+            ------------------------   -- then coercion equation is not type-safe, nor can one
+            → Γ ⊢C⦂ B ‼ (τ + τ')        -- define the corresponding strength in the presheaf model
+    
+    
     -- function application
     
     _·_     : {A : VType}

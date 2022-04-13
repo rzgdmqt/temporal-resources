@@ -133,14 +133,31 @@ Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (node {τ = τ''} op v k q) =
 ---- non-recursive argument component with Af is at fault for this)
 
 {-# TERMINATING #-}
-σˢ : ∀ {A B τ} → {t : Time} → carrier A t × carrier (Tᵒ B τ) t → carrier (Tᵒ (A ×ᵗ B) τ) t
+σˢ : ∀ {A B τ} → {t : Time} → carrier A t × carrier (Tᵒ B τ) t → carrier (Tᵒ (⟨ τ ⟩ᵒ A ×ᵗ B) τ) t
+σˢ {A} {τ = τ} {t = t} (v , leaf w) =
+  leaf (monotone
+         (⟨ τ ⟩ᵒ A)
+         (≤-reflexive (+-comm t τ))
+         (map-carrier (η⊣ {A}) v) , w)
+σˢ {A} {B} {τ = τ} {t = t} (v , node {τ = τ'} op w k q) =
+  node op w (λ r y → {!σˢ {A} {B} {τ'} ({!!} , ?)!}) q
+
+-- map-carrier (Tᶠ {!!}) (σˢ {A} {B} {τ'} ({!!} , k q y))
+
+-- σˢ {A} {B} {?} : {t = t₁ : Time} → carrier A t₁ × carrier (Tᵒ B ?5) t₁ → carrier (Tᵒ (⟨ ?5 ⟩ᵒ A ×ᵗ B) ?5) t₁
+
+-- v : carrier A t
+-- k q y : Tˢ B τ' t'
+
+{-
 σˢ {tset A Af} {τ = τ} {t = t} (v , leaf w) =
   leaf (Af (m≤n+m t τ) v , w)
 σˢ {tset A Af} {t = t} (v , node op w k p) =
   node op w (λ q y → σˢ (Af (≤-trans (m≤m+n t (op-time op)) q) v , k q y)) p
+-}
 
-σᵀ : ∀ {A B τ} → A ×ᵗ Tᵒ B τ →ᵗ Tᵒ (A ×ᵗ B) τ
-σᵀ = tset-map σˢ
+σᵀ : ∀ {A B τ} → A ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ ⟩ᵒ A ×ᵗ B) τ
+σᵀ = {!!} --tset-map σˢ
 
 ---- algebraic operations
 

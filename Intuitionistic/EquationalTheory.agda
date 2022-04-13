@@ -130,6 +130,14 @@ mutual
                              C-rename ((cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
                                cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren )) N))
 
+    let-coerce : ∀ {A B τ τ' τ''}
+               → (p : τ ≤ τ')
+               → (M : Γ ⊢C⦂ A ‼ τ)
+               → (N : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'')
+               --------------------------------
+               → Γ ⊢C⦂ coerce p M ; C-rename (cong-ren {Γ'' = [] ∷ A} (⟨⟩-mon-ren p)) N
+                   == coerce {!!} (M ; N)
+
     -- ...
 
     -- eta equations
