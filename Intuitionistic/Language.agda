@@ -207,22 +207,13 @@ mutual
             → Γ ⊢C⦂ A ‼ 0
 
     -- sequential composition
-    {-
-    _;_     : {A B : VType}      -- note: use \;0 to get this unicode semicolon
-            → {τ τ' : Time}
-            → Γ ⊢C⦂ A ‼ τ
-            → Γ ∷ A ⊢C⦂ B ‼ τ'    -- naively would like to have Γ ⟨ τ ⟩ ∷ A context, but
-            --------------------  -- then coercion equation is not type-safe, nor can one
-            → Γ ⊢C⦂ B ‼ (τ + τ')   -- define the corresponding strength in the presheaf model
-    -}
     
     _;_     : {A B : VType}      -- note: use \;0 to get this unicode semicolon
             → {τ τ' : Time}
             → Γ ⊢C⦂ A ‼ τ
-            → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'   -- naively would like to have Γ ⟨ τ ⟩ ∷ A context, but
-            ------------------------   -- then coercion equation is not type-safe, nor can one
-            → Γ ⊢C⦂ B ‼ (τ + τ')        -- define the corresponding strength in the presheaf model
-    
+            → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
+            ------------------------
+            → Γ ⊢C⦂ B ‼ (τ + τ')
     
     -- function application
     
@@ -255,17 +246,18 @@ mutual
     -- unboxing a boxed value/resource after enough time has passed for it to be ready
 
     unbox   : {Γ' Γ'' : Ctx}
-            → {A B : VType}
+            → {A : VType}
+            → {C : CType}
             → {τ : Time}
             → Γ' , Γ'' split Γ
             → τ ≤ ctx-delay Γ''
             → Γ' ⊢V⦂ [ τ ] A
-            → Γ ∷ A  ⊢C⦂ B ‼ 0
+            → Γ ∷ A  ⊢C⦂ C
             -------------------
-            → Γ ⊢C⦂ B ‼ 0
+            → Γ ⊢C⦂ C
 
-    -- explicit sub-effecting coercion (notice the temporal awareness)
-    -- (can also be thought of as a primitive delay operation/computation)
+    -- explicit sub-effecting coercion (notice the temporal awareness in the premise)
+    -- (this can also be thought of as a primitive delay operation/computation)
 
     coerce  : {A : VType}
             → {τ τ' : Time}

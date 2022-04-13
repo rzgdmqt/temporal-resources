@@ -21,6 +21,8 @@ module EquationalTheory where
 
 mutual
 
+  -- value equations
+
   data _⊢V⦂_==_ (Γ : Ctx) : {A : VType} → Γ ⊢V⦂ A → Γ ⊢V⦂ A → Set where
 
     -- reflexivity, symmetry, transitivity
@@ -43,7 +45,7 @@ mutual
              -------------------
              → Γ ⊢V⦂ V == U
 
-    -- congruences
+    -- congruence equations
 
     lam-cong : ∀ {A B τ}
              → {M N : Γ ∷ A ⊢C⦂ B ‼ τ}
@@ -70,6 +72,8 @@ mutual
 
   infix 18 _⊢V⦂_==_
 
+  -- computation equations
+
   data _⊢C⦂_==_ (Γ : Ctx) : {C : CType} → Γ ⊢C⦂ C → Γ ⊢C⦂ C → Set where
 
     -- reflexivity, symmetry, transitivity
@@ -92,88 +96,167 @@ mutual
              -------------------
              → Γ ⊢C⦂ M == P
 
-    -- congruences
+    -- congruence equations
 
     -- ...
 
-    -- (computational) equations for let
+    -- computational/beta equations for sequential composition
 
-    let-return : ∀ {A B τ}
-               → (V : Γ ⊢V⦂ A)
-               → (M : Γ ⟨ 0 ⟩ ∷ A ⊢C⦂ B ‼ τ)
-               ----------------------------------------------------------------
-               → Γ ⊢C⦂ return V ; M
-                   == C-rename ⟨⟩-eta-ren (M [ Hd ↦ V-rename ⟨⟩-eta⁻¹-ren V ]c)   -- M[V/x]
-
-    let-assoc : ∀ {A B C τ τ' τ''}
-              → (M : Γ ⊢C⦂ A ‼ τ)
-              → (N : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
-              → (P : Γ ⟨ τ + τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
-              -----------------------------------------------------------------------------------
-              → Γ ⊢C⦂ (M ; N) ; P
-                  == coerce (≤-reflexive (sym (+-assoc τ τ' τ'')))                -- M ; (N ; P)
+    return-; : ∀ {A B τ}
+             → (V : Γ ⊢V⦂ A)
+             → (M : Γ ⟨ 0 ⟩ ∷ A ⊢C⦂ B ‼ τ)
+             ----------------------------------------------------------------
+             → Γ ⊢C⦂ return V ; M
+                 == C-rename ⟨⟩-eta-ren (M [ Hd ↦ V-rename ⟨⟩-eta⁻¹-ren V ]c)   -- M[V/x]
+                  
+    perform-; : ∀ {A B τ τ'}
+              → (op : Op)
+              → (V : Γ ⊢V⦂ type-of-gtype (param op))
+              → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
+              → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
+              -----------------------------------------------------------------------------------------------------
+              → Γ ⊢C⦂ (perform op V M) ; N
+                  == coerce (≤-reflexive (sym (+-assoc (op-time op) τ τ')))     -- perform op V (M ; N)
                        (C-rename
                          (⟨⟩-mon-ren (≤-reflexive (trans
-                                                   (sym (n∸n≡0 (τ + τ' + τ'')))
-                                                   (cong (τ + τ' + τ'' ∸_) (+-assoc τ τ' τ''))))
+                                                    (sym (n∸n≡0 (op-time op + τ + τ')))
+                                                    (cong (op-time op + τ + τ' ∸_) (+-assoc (op-time op) τ τ'))))
                           ∘ʳ ⟨⟩-eta⁻¹-ren)
-                         (M ;
-                           (N ;
-                             C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
-                               cong-ren {Γ'' = [] ∷ B} ⟨⟩-mu-ren ) P)))
-                  
-    let-perform : ∀ {A B τ τ'}
-                → (op : Op)
-                → (V : Γ ⊢V⦂ type-of-gtype (param op))
-                → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
-                → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
-                -----------------------------------------------------------------------------------------------------
-                → Γ ⊢C⦂ (perform op V M) ; N
-                    == coerce (≤-reflexive (sym (+-assoc (op-time op) τ τ')))     -- perform op V (M ; N)
-                         (C-rename
-                           (⟨⟩-mon-ren (≤-reflexive (trans
-                                                      (sym (n∸n≡0 (op-time op + τ + τ')))
-                                                      (cong (op-time op + τ + τ' ∸_) (+-assoc (op-time op) τ τ'))))
-                            ∘ʳ ⟨⟩-eta⁻¹-ren)
-                           (perform op V
-                             (M ;
-                               C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
-                                 cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren ) N)))
+                         (perform op V
+                           (M ;
+                             C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
+                               cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren ) N)))
 
-    let-coerce : ∀ {A B τ τ' τ''}
-               → (p : τ ≤ τ')
-               → (M : Γ ⟨ τ' ∸ τ ⟩ ⊢C⦂ A ‼ τ)
-               → (N : Γ ⟨ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ'')
-               -------------------------------------------------------------------------------------
-               → Γ ⊢C⦂ coerce p M ; N
-                   == coerce                         -- coerce (p + id) (M ; N)
-                        (+-monoˡ-≤ τ'' p)
-                        (C-rename
-                           (⟨⟩-mon-ren (≤-reflexive (trans
-                                                      (sym ([m+n]∸[m+o]≡n∸o τ'' τ' τ))
-                                                      (cong₂ _∸_ (+-comm τ'' τ') (+-comm τ'' τ)))))
-                           M ;
-                          C-rename
-                            (cong-ren {Γ'' = [] ∷ A}
-                              (⟨⟩-mu-ren
-                               ∘ʳ ⟨⟩-mon-ren (≤-reflexive
-                                               (trans
-                                                 (trans
-                                                   (sym (m∸n+n≡m p))
-                                                   (cong (_+ τ) (sym ([m+n]∸[m+o]≡n∸o τ'' τ' τ))))
-                                                 (cong₂ (λ t t' → t ∸ (t') + τ) (+-comm τ'' τ') (+-comm τ'' τ))))))
-                            N)
+    coerce-; : ∀ {A B τ τ' τ''}
+             → (p : τ ≤ τ')
+             → (M : Γ ⟨ τ' ∸ τ ⟩ ⊢C⦂ A ‼ τ)
+             → (N : Γ ⟨ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ'')
+             -------------------------------------------------------------------------------------
+             → Γ ⊢C⦂ coerce p M ; N
+                 == coerce                         -- coerce (p + id) (M ; N)
+                      (+-monoˡ-≤ τ'' p)
+                      (C-rename
+                         (⟨⟩-mon-ren (≤-reflexive (trans
+                                                    (sym ([m+n]∸[m+o]≡n∸o τ'' τ' τ))
+                                                    (cong₂ _∸_ (+-comm τ'' τ') (+-comm τ'' τ)))))
+                         M ;
+                       C-rename
+                         (cong-ren {Γ'' = [] ∷ A}
+                           (⟨⟩-mu-ren
+                            ∘ʳ ⟨⟩-mon-ren (≤-reflexive
+                                            (trans
+                                              (trans
+                                                (sym (m∸n+n≡m p))
+                                                (cong (_+ τ) (sym ([m+n]∸[m+o]≡n∸o τ'' τ' τ))))
+                                              (cong₂ (λ t t' → t ∸ (t') + τ)
+                                                (+-comm τ'' τ') (+-comm τ'' τ))))))
+                         N)
 
-    -- (computational) equation for function application
+    -- associativity equation for sequential composition
 
-    -- ...
+    ;-assoc : ∀ {A B C τ τ' τ''}
+            → (M : Γ ⊢C⦂ A ‼ τ)
+            → (N : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
+            → (P : Γ ⟨ τ + τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
+            -----------------------------------------------------------------------------------
+            → Γ ⊢C⦂ (M ; N) ; P
+                == coerce (≤-reflexive (sym (+-assoc τ τ' τ'')))            -- M ; (N ; P)
+                     (C-rename
+                       (⟨⟩-mon-ren (≤-reflexive (trans
+                                                 (sym (n∸n≡0 (τ + τ' + τ'')))
+                                                 (cong (τ + τ' + τ'' ∸_) (+-assoc τ τ' τ''))))
+                        ∘ʳ ⟨⟩-eta⁻¹-ren)
+                       (M ;
+                         (N ;
+                           C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
+                             cong-ren {Γ'' = [] ∷ B} ⟨⟩-mu-ren ) P)))
+
+
+    -- computational/beta equation for function application
+
+    app-lam : ∀ {A C}
+            → (M : Γ ∷ A ⊢C⦂ C)
+            → (W : Γ ⊢V⦂ A)
+            ------------------------
+            → Γ ⊢C⦂ lam M · W == (M [ Hd ↦ W ]c)
+
+    -- computational/beta equation for unboxing
+
+    unbox-box : ∀ {Γ' Γ'' A B τ τ'}
+              → (p : Γ' , Γ'' split Γ)
+              → (q : τ ≤ ctx-delay Γ'')
+              → (V : Γ' ⟨ τ ⟩ ⊢V⦂ A)
+              → (N : Γ ∷ A ⊢C⦂ B ‼ τ')
+              -----------------------------------------------
+              → Γ ⊢C⦂ unbox p q (box V) N
+                  == (N [ Hd ↦ V-rename (wk-⟨⟩-ren p q) V ]c)
 
     -- eta equations
 
-    -- ...
+    ;-return-eta : ∀ {A τ}
+                 → (M : Γ ⊢C⦂ A ‼ τ)
+                 ----------------------------------------------------------------------------
+                 → Γ ⊢C⦂ M
+                     == coerce (≤-reflexive (+-identityʳ τ))            -- M ; return x
+                          (C-rename
+                             (⟨⟩-mon-ren (≤-reflexive (trans
+                                                        (sym (n∸n≡0 τ))
+                                                        (cong (τ ∸_) (sym (+-identityʳ τ)))))
+                             ∘ʳ ⟨⟩-eta⁻¹-ren)
+                             M ;
+                          return (var Hd))
+
+    absurd-eta : ∀ {C}
+               → (V : Γ ⊢V⦂ Empty)
+               → (M : Γ ⊢C⦂ C)
+               ---------------------
+               → Γ ⊢C⦂ absurd V == M
+
+    box-unbox-eta : ∀ {Γ' A C τ}
+                  → (p : Γ' , [] ⟨ τ ⟩ split Γ )
+                  → (V : Γ' ⊢V⦂ [ τ ] A)
+                  → (M : Γ' ⟨ τ ⟩ ∷ [ τ ] A ⊢C⦂ C)
+                  ------------------------------------------------------
+                  → Γ ⊢C⦂ C-rename                                                     -- M[V/y]
+                            (eq-ren (split-≡ p))                                       
+                            (M [ Hd ↦ V-rename                                         
+                                        (⟨⟩-mon-ren z≤n ∘ʳ ⟨⟩-eta⁻¹-ren)               
+                                        V ]c)                                          
+                      == unbox p ≤-refl                                               -- unbox V to x in M[box x/y]                             
+                           V
+                           (C-rename (eq-ren (split-≡ (split-∷ p)))
+                             ((C-rename
+                                (exch-ren ∘ʳ wk-ren) M)
+                                [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c))
 
     -- coercion equations
+    
+    coerce-refl : ∀ {A τ}
+                → (M : Γ ⟨ τ ∸ τ ⟩ ⊢C⦂ A ‼ τ)
+                -----------------------------------------------------------
+                → Γ ⊢C⦂ coerce ≤-refl M
+                    == C-rename
+                         (⟨⟩-eta-ren ∘ʳ ⟨⟩-mon-ren (≤-reflexive (n∸n≡0 τ)))
+                         M
 
-    -- ...
+    coerce-trans : ∀ {A τ τ' τ''}
+                 → (p : τ ≤ τ')
+                 → (q : τ' ≤ τ'')
+                 → (M : Γ ⟨ τ'' ∸ τ' ⟩ ⟨ τ' ∸ τ ⟩ ⊢C⦂ A ‼ τ)
+                 -----------------------------------------------------------
+                 → Γ ⊢C⦂ coerce q (coerce p M)
+                     == coerce (≤-trans p q)
+                          (C-rename
+                            (⟨⟩-mon-ren
+                              (≤-trans
+                                (≤-reflexive (sym (+-∸-assoc (τ'' ∸ τ') p)))
+                                (∸-monoˡ-≤ τ (≤-reflexive (m∸n+n≡m q))))
+                             ∘ʳ ⟨⟩-mu⁻¹-ren)
+                            M)
 
   infix 18 _⊢C⦂_==_
+
+  -- TODO: consider also adding some additional equations, such as 
+  --       coerce in 2nd component of seq. comp. and coerce in perform;
+  --       the currently selected equations are based on how the small
+  --       step operational semantics would look like for coerce

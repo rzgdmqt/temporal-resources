@@ -123,6 +123,32 @@ cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ (Tl-⟨⟩ x) with cong-ren ρ x
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren refl = idʳ
 
+-- Weakening a ⟨ τ ⟩ modality into a context with at least τ delay
+
+n≤n∸m+m : (n m : ℕ) → n ≤ n ∸ m + m
+n≤n∸m+m n       zero    = ≤-stepsʳ 0 ≤-refl
+n≤n∸m+m zero    (suc m) = z≤n
+n≤n∸m+m (suc n) (suc m) =
+  ≤-trans
+    (+-monoʳ-≤ 1 (n≤n∸m+m n m))
+    (≤-reflexive (sym (+-suc (n ∸ m) (m))))
+
+wk-⟨⟩-ren : ∀ {Γ Γ' Γ'' τ}
+          → Γ' , Γ'' split Γ
+          → τ ≤ ctx-delay Γ''
+          → Ren (Γ' ⟨ τ ⟩) Γ
+
+wk-⟨⟩-ren split-[] z≤n = ⟨⟩-eta-ren
+wk-⟨⟩-ren (split-∷ p) q = wk-ren ∘ʳ (wk-⟨⟩-ren p q)
+wk-⟨⟩-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
+     cong-ren {Γ'' = [] ⟨ τ' ⟩}
+       (wk-⟨⟩-ren {τ = τ ∸ τ'} p
+         (≤-trans
+           (∸-monoˡ-≤ τ' q)
+           (≤-reflexive (m+n∸n≡m (ctx-delay Γ') τ'))))
+  ∘ʳ ⟨⟩-mu-ren
+  ∘ʳ ⟨⟩-mon-ren (n≤n∸m+m τ τ')
+
 -- Splitting a context according to a variable in it
 
 var-split : ∀ {Γ A τ}
@@ -218,14 +244,6 @@ ren-image {Γ ⟨ τ ⟩} ρ with ren-image {Γ} (ρ ∘ʳ ⟨⟩-mon-ren z≤n 
 
 
 -- Splitting a renaming
-
-n≤n∸m+m : (n m : ℕ) → n ≤ n ∸ m + m
-n≤n∸m+m n       zero    = ≤-stepsʳ 0 ≤-refl
-n≤n∸m+m zero    (suc m) = z≤n
-n≤n∸m+m (suc n) (suc m) =
-  ≤-trans
-    (+-monoʳ-≤ 1 (n≤n∸m+m n m))
-    (≤-reflexive (sym (+-suc (n ∸ m) (m))))
 
 postulate
   -- TODO: work this out formally; need to calculate the
