@@ -95,9 +95,20 @@ exch-ren Hd              = _ , ≤-refl , Tl-∷ Hd
 exch-ren (Tl-∷ Hd)       = _ , ≤-refl , Hd
 exch-ren (Tl-∷ (Tl-∷ x)) = _ , ≤-refl , Tl-∷ (Tl-∷ x)
 
-exch-⟨⟩-ren : ∀ {Γ A τ} → Ren (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
-exch-⟨⟩-ren Hd               = _ , z≤n , Tl-⟨⟩ Hd
-exch-⟨⟩-ren (Tl-∷ (Tl-⟨⟩ x)) = _ , ≤-refl , Tl-⟨⟩ (Tl-∷ x)
+exch-⟨⟩-var-ren : ∀ {Γ A τ} → Ren (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
+exch-⟨⟩-var-ren Hd               = _ , z≤n , Tl-⟨⟩ Hd
+exch-⟨⟩-var-ren (Tl-∷ (Tl-⟨⟩ x)) = _ , ≤-refl , Tl-⟨⟩ (Tl-∷ x)
+
+exch-⟨⟩-⟨⟩-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ' ⟩ ⟨ τ ⟩)
+exch-⟨⟩-⟨⟩-ren {τ = τ} {τ' = τ'} (Tl-⟨⟩ (Tl-⟨⟩ {τ' = τ''} x)) =
+  τ + (τ' + τ'') ,
+  ≤-reflexive
+    (trans
+      (sym (+-assoc τ' τ τ''))
+      (trans
+        (cong (_+ τ'') (+-comm τ' τ))
+        (+-assoc τ τ' τ''))) ,
+  Tl-⟨⟩ (Tl-⟨⟩ x)
 
 -- Contraction renaming
 
@@ -156,6 +167,11 @@ cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ (Tl-⟨⟩ x) with cong-ren ρ x
 
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren refl = idʳ
+
+-- Strengthening a context with a ⟨ τ ⟩ renaming
+
+str-⟨⟩-ren : ∀ {Γ τ} → Ren Γ (Γ ⟨ τ ⟩)
+str-⟨⟩-ren = ⟨⟩-mon-ren z≤n ∘ʳ ⟨⟩-eta⁻¹-ren
 
 -- Weakening a ⟨ τ ⟩ modality into a context with at least τ delay
 
@@ -329,4 +345,4 @@ mutual
   C-rename ρ (unbox q r V M)  with split-ren ρ q r
   ... | Γ₁' , Γ₂' , ρ' , p' , q' =
     unbox p' (≤-trans r q') (V-rename ρ' V) (C-rename (cong-ren ρ) M)
-  C-rename ρ (delay q M)      = delay q (C-rename (cong-ren ρ) M)
+  C-rename ρ (delay τ q M)      = delay τ q (C-rename (cong-ren ρ) M)
