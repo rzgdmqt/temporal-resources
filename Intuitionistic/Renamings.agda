@@ -329,4 +329,4 @@ mutual
   C-rename ρ (unbox q r V M)  with split-ren ρ q r
   ... | Γ₁' , Γ₂' , ρ' , p' , q' =
     unbox p' (≤-trans r q') (V-rename ρ' V) (C-rename (cong-ren ρ) M)
-  C-rename ρ (coerce q M)     = coerce q (C-rename (cong-ren ρ) M)
+  C-rename ρ (delay q M)      = delay q (C-rename (cong-ren ρ) M)

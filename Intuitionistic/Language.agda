@@ -256,10 +256,10 @@ mutual
             -------------------
             → Γ ⊢C⦂ C
 
-    -- explicit sub-effecting coercion (notice the temporal awareness in the premise)
-    -- (this can also be thought of as a primitive delay operation/computation)
+    -- explicit delaying of a computation (a special case of this
+    -- construct is the explicit sub-effecting subsumption rule)
 
-    coerce  : {A : VType}
+    delay   : {A : VType}
             → {τ τ' : Time}
             → τ ≤ τ'
             → Γ ⟨ τ' ∸ τ ⟩ ⊢C⦂ A ‼ τ

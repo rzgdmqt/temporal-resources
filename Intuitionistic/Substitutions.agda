@@ -90,4 +90,4 @@ mutual
           (≤-reflexive (sym (ctx-delay-++ᶜ Γ''' Γ'' )))))
       V
       (M [ Tl-∷ x ↦ W ]c)
-  coerce p M     [ x ↦ W ]c = coerce p (M [ Tl-⟨⟩ x ↦ W ]c)
+  delay p M      [ x ↦ W ]c = delay p (M [ Tl-⟨⟩ x ↦ W ]c)
