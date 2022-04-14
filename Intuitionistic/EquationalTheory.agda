@@ -182,17 +182,6 @@ mutual
                                cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren)
                            N))
 
-                  {- == delay (≤-reflexive (sym (+-assoc (op-time op) τ τ')))     -- perform op V (M ; N)
-                       (C-rename
-                         (⟨⟩-mon-ren (≤-reflexive (trans
-                                                    (sym (n∸n≡0 (op-time op + τ + τ')))
-                                                    (cong (op-time op + τ + τ' ∸_) (+-assoc (op-time op) τ τ'))))
-                          ∘ʳ ⟨⟩-eta⁻¹-ren)
-                         (perform op V
-                           (M ;
-                             C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
-                               cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren ) N))) -}
-
     -- associativity equation for sequential composition
 
     ;-assoc : ∀ {A B C τ τ' τ''}
@@ -204,19 +193,6 @@ mutual
                 == coerce (≤-reflexive (sym (+-assoc τ τ' τ'')))
                      (M ; (N ; C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
                                  cong-ren {Γ'' = [] ∷ B} ⟨⟩-mu-ren ) P))
-
-
-              {-  == delay (≤-reflexive (sym (+-assoc τ τ' τ'')))            -- M ; (N ; P)
-                     (C-rename
-                       (⟨⟩-mon-ren (≤-reflexive (trans
-                                                 (sym (n∸n≡0 (τ + τ' + τ'')))
-                                                 (cong (τ + τ' + τ'' ∸_) (+-assoc τ τ' τ''))))
-                        ∘ʳ ⟨⟩-eta⁻¹-ren)
-                       (M ;
-                         (N ;
-                           C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
-                             cong-ren {Γ'' = [] ∷ B} ⟨⟩-mu-ren ) P))) -}
-
 
     -- computational/beta equation for function application
 
@@ -320,7 +296,7 @@ mutual
     delay₂-; : ∀ {A B τ τ' τ''}
              → (p : τ' ≤ τ'')
              → (M : Γ ⊢C⦂ A ‼ τ)
-             → (N : Γ ⟨ τ ⟩ ⟨ τ'' ∸ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ')                             -- unfortunately cannot assume A between the ⟨_⟩s
+             → (N : Γ ⟨ τ ⟩ ⟨ τ'' ∸ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ')                             -- unfortunately cannot assume x:A between the ⟨_⟩s
              ----------------------------------------------------------------        -- in which case the LHS wouldn't have a renaming in it
              → Γ ⊢C⦂ M ; delay p (C-rename exch-⟨⟩-ren N)
                  == delay (+-monoʳ-≤ τ p)

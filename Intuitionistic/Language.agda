@@ -259,6 +259,9 @@ mutual
     -- explicit delaying of a computation (a special case of this
     -- construct is the explicit sub-effecting subsumption rule)
 
+    -- note: the delay in the context is needed to type equations
+    -- such as (delay p M) ; N == delay (p + id) (M ; N)
+
     delay   : {A : VType}
             → {τ τ' : Time}
             → τ ≤ τ'
