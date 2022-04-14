@@ -1,6 +1,11 @@
-------------------------------------------------------------------
--- Semantics of the type modality `[ t ] A` as a graded comonad --
-------------------------------------------------------------------
+-------------------------------------------------------------------
+-- Semantics of the type modality `[ t ] A` as a graded comonad  --
+--                                                               --
+-- While `[ t ] A` is in fact a strong monoidal functor, then we --
+-- prefer to speak abour it in terms of the graded comonad view  --
+-- of it due to the analogy with the comonad on types in Fitch   --
+-- style modal lambda calculi (that this language is based on).  --
+-------------------------------------------------------------------
 
 open import Function
 
@@ -18,7 +23,9 @@ open Eq.≡-Reasoning
 open import Language
 open import TSets
 
-module ComonadModality where
+module TypeModality where
+
+-- STRUCTURE
 
 -- Functor
 
@@ -68,6 +75,9 @@ module ComonadModality where
 δ⁻¹ : ∀ {A τ₁ τ₂} → [ τ₁ ]ᵒ ([ τ₂ ]ᵒ A) →ᵗ [ τ₁ + τ₂ ]ᵒ A
 δ⁻¹ {A} {τ₁} {τ₂} =
   tset-map (λ {t} a → monotone A (≤-reflexive (+-assoc t τ₁ τ₂)) a)
+
+
+-- PROPERTIES
 
 -- [_]ᵒ is functorial in the gradings
 

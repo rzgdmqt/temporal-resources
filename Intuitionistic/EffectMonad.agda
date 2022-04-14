@@ -15,8 +15,8 @@ open Eq.≡-Reasoning
 open import Language
 
 open import TSets
-open import ComonadModality
-open import MonadModality
+open import ContextModality
+open import TypeModality
 open import ModalityAdjunction
 
 module EffectMonad where

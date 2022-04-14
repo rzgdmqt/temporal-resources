@@ -1,6 +1,7 @@
--------------------------------------------
--- Time-indexed sets and their morphisms --
--------------------------------------------
+--------------------------------------------------------
+-- Time-varying sets (covariant presheaves on (ℕ,≤)), --
+-- their morphisms, and basic categorical structures  --
+--------------------------------------------------------
 
 open import Function
 
@@ -22,7 +23,7 @@ open import Language
 module TSets where
 
 postulate
-  fun-ext : ∀ {a b} → Extensionality a b            -- assuming function extensionality
+  fun-ext  : ∀ {a b} → Extensionality a b            -- assuming function extensionality
   ifun-ext : ∀ {a b} → ExtensionalityImplicit a b   -- and the same for functions with implicit arguments
 
 -- Some auxiliary lemmas concerning minus on natural numbers
@@ -62,7 +63,7 @@ n≡m+k≤n' {n' = .(suc _)} {m = suc m} p (s≤s {n''} {n'''} q) with suc-injec
 ... | s with n≡m+k≤n' {m = m} s q
 ... | p' , q' , r' = suc p' , cong suc q' , +-mono-≤ (≤-refl {1}) r'
 
--- Time-indexed sets (covariant presheaves indexed by `(ℕ,≤)`)
+-- Time-varying sets
 
 record TSet : Set₁ where
   constructor
@@ -78,7 +79,7 @@ record TSet : Set₁ where
 
 open TSet public
 
--- Maps of time-indexed sets
+-- Maps of time-varying sets
 
 record _→ᵗ_ (A B : TSet) : Set where
   constructor
@@ -99,7 +100,7 @@ _≡ᵗ_ {A} f g = ∀ {t} → (x : carrier A t) → map-carrier f x ≡ map-car
 
 infix 5 _≡ᵗ_
 
--- Identity and composition of maps of time-indexed sets
+-- Identity and composition of maps
 
 idᵗ : ∀ {A} → A →ᵗ A
 idᵗ = tset-map id
@@ -109,7 +110,7 @@ g ∘ᵗ f = tset-map (map-carrier g ∘ map-carrier f)
 
 infixr 9 _∘ᵗ_
 
--- Product, sum, exponent, etc structures of time-indexed sets
+-- Product, sum, exponent, etc structures
 
 ---- terminal object
 

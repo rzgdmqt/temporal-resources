@@ -18,10 +18,12 @@ open Eq.≡-Reasoning
 open import Language
 
 open import TSets
-open import ComonadModality
-open import MonadModality
+open import ContextModality
+open import TypeModality
 
 module ModalityAdjunction where
+
+-- STRUCTURE
 
 -- Unit of the adjunction
 
@@ -36,3 +38,8 @@ module ModalityAdjunction where
 ε⊣ {A} {τ} =
   tset-map
     (λ { {t'} (p , a) → monotone A (n≤m⇒m∸n+n≤m τ t' p) a })
+
+
+-- PROPERTIES
+
+-- ...

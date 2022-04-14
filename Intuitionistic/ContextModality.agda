@@ -1,5 +1,10 @@
 -------------------------------------------------------------------
 -- Semantics of the context modality `Γ ⟨ t ⟩` as a graded monad --
+--                                                               --
+-- While `Γ ⟨ t ⟩` is in fact a strong monoidal functor, then we --
+-- prefer to speak abour it in terms of the graded monad view of --
+-- it due to the analogy with the monad on contexts in Fitch     --
+-- style modal lambda calculi (that this language is based on).  --
 -------------------------------------------------------------------
 
 open import Function
@@ -18,7 +23,9 @@ open Eq.≡-Reasoning
 open import Language
 open import TSets
 
-module MonadModality where
+module ContextModality where
+
+-- STRUCTURE
 
 -- Functor
 
@@ -76,3 +83,8 @@ module MonadModality where
     (λ { {t} (p , a) → m+n≤o⇒m≤o τ₁ p ,
                        n+m≤k⇒m≤k∸n τ₁ τ₂ t p ,
                        monotone A (≤-reflexive (sym (n∸m∸k≡n∸m+k t τ₁ τ₂))) a })
+
+
+-- PROPERTIES
+
+-- ...

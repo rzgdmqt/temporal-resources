@@ -1,5 +1,5 @@
 -------------------------------------------------------------
--- Interpretation of well-typed terms in time-indexed sets --
+-- Interpretation of well-typed terms in time-varying sets --
 -------------------------------------------------------------
 
 open import Function
@@ -15,8 +15,8 @@ open Eq.≡-Reasoning
 open import Language
 
 open import TSets
-open import ComonadModality
-open import MonadModality
+open import ContextModality
+open import TypeModality
 open import ModalityAdjunction
 open import EffectMonad
 
