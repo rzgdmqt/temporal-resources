@@ -13,7 +13,11 @@ open Eq hiding ([_])
 open Eq.≡-Reasoning
 
 open import Language
+
 open import TSets
+open import ComonadModality
+open import MonadModality
+open import ModalityAdjunction
 
 module Interpretation where
 
