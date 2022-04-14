@@ -20,21 +20,37 @@ open import TSets
 
 module MonadModality where
 
+-- Functor
+
 ⟨_⟩ᵒ : Time → TSet → TSet
-⟨ τ ⟩ᵒ (tset A Af) =
+⟨ τ ⟩ᵒ (A) =
   tset
-    (λ t' → τ ≤ t' × A (t' ∸ τ))
-    (λ p (q , a) → ≤-trans q p , Af (∸-mono p (≤-refl {τ})) a)
+    (λ t' → τ ≤ t' × carrier A (t' ∸ τ))
+    (λ p (q , a) → ≤-trans q p , monotone A (∸-mono p (≤-refl {τ})) a)
+    (λ x → cong₂ _,_
+             (≤-irrelevant _ _)
+             (trans
+               (cong (λ p → monotone A p (proj₂ x)) (≤-irrelevant _ _))
+               (monotone-refl A (proj₂ x))))
+    (λ p q x → cong₂ _,_
+                 (≤-irrelevant _ _)
+                 (trans
+                   (monotone-trans A _ _ (proj₂ x))
+                   (cong (λ r → monotone A r (proj₂ x)) (≤-irrelevant _ _))))
 
 ⟨_⟩ᶠ : ∀ {A B} → (τ : Time) → A →ᵗ B → ⟨ τ ⟩ᵒ A →ᵗ ⟨ τ ⟩ᵒ B
-⟨ τ ⟩ᶠ (tset-map f) =
+⟨ τ ⟩ᶠ f =
   tset-map
-    (λ { (p , a) → p , f a })
+    (λ { (p , a) → p , map-carrier f a })
+
+-- (Contravariant) monotonicity for gradings
 
 ⟨_⟩-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → ⟨ τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ A
-⟨_⟩-≤ {tset A Af} p =
+⟨_⟩-≤ {A} p =
   tset-map
-    (λ { {t} (q , a) → ≤-trans p q , Af (∸-mono (≤-refl {t}) p) a })
+    (λ { {t} (q , a) → ≤-trans p q , monotone A (∸-mono (≤-refl {t}) p) a })
+
+-- Unit
 
 η : ∀ {A} → A →ᵗ ⟨ 0 ⟩ᵒ A
 η =
@@ -46,15 +62,17 @@ module MonadModality where
   tset-map
     (λ { (p , a) → a })
 
+-- Multiplication
+
 μ : ∀ {A τ₁ τ₂} → ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A) →ᵗ ⟨ τ₁ + τ₂ ⟩ᵒ A
-μ {tset A Af} {τ₁} {τ₂} =
+μ {A} {τ₁} {τ₂} =
   tset-map
     (λ { {t} (p , q , a) → n≤k⇒m≤k∸n⇒n+m≤k τ₁ τ₂ t p q ,
-                           Af (≤-reflexive (n∸m∸k≡n∸m+k t τ₁ τ₂)) a })
+                           monotone A (≤-reflexive (n∸m∸k≡n∸m+k t τ₁ τ₂)) a })
 
 μ⁻¹ : ∀ {A τ₁ τ₂} → ⟨ τ₁ + τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A)
-μ⁻¹ {tset A Af} {τ₁} {τ₂} =
+μ⁻¹ {A} {τ₁} {τ₂} =
   tset-map
     (λ { {t} (p , a) → m+n≤o⇒m≤o τ₁ p ,
                        n+m≤k⇒m≤k∸n τ₁ τ₂ t p ,
-                       Af (≤-reflexive (sym (n∸m∸k≡n∸m+k t τ₁ τ₂))) a })
+                       monotone A (≤-reflexive (sym (n∸m∸k≡n∸m+k t τ₁ τ₂))) a })

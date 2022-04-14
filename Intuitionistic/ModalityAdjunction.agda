@@ -23,12 +23,16 @@ open import MonadModality
 
 module ModalityAdjunction where
 
+-- Unit of the adjunction
+
 η⊣ : ∀ {A τ} → A →ᵗ [ τ ]ᵒ (⟨ τ ⟩ᵒ A)
-η⊣ {tset A Af} {τ} =
+η⊣ {A} {τ} =
   tset-map
-    (λ {t'} a → m≤n+m τ t' , Af (≤-reflexive (sym (m+n∸n≡m t' τ))) a)
+    (λ {t'} a → m≤n+m τ t' , monotone A (≤-reflexive (sym (m+n∸n≡m t' τ))) a)
+
+-- Counit of the adjunction
 
 ε⊣ : ∀ {A τ} → ⟨ τ ⟩ᵒ ([ τ ]ᵒ A) →ᵗ A
-ε⊣ {tset A Af} {τ} =
+ε⊣ {A} {τ} =
   tset-map
-    (λ { {t'} (p , a) → Af (n≤m⇒m∸n+n≤m τ t' p) a })
+    (λ { {t'} (p , a) → monotone A (n≤m⇒m∸n+n≤m τ t' p) a })

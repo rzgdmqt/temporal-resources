@@ -1,6 +1,6 @@
-----------------------------------------------
--- Time-indexed sets and modalities on them --
-----------------------------------------------
+-------------------------------------------
+-- Time-indexed sets and their morphisms --
+-------------------------------------------
 
 open import Function
 
@@ -12,14 +12,20 @@ open import Data.Sum renaming (map to map⁺)
 open import Data.Unit hiding (_≤_)
 
 import Relation.Binary.PropositionalEquality as Eq
-open Eq
+open Eq hiding (Extensionality)
 open Eq.≡-Reasoning
+
+open import Axiom.Extensionality.Propositional using (Extensionality; ExtensionalityImplicit)
 
 open import Language
 
 module TSets where
 
--- Auxiliary lemmas
+postulate
+  fun-ext : ∀ {a b} → Extensionality a b            -- assuming function extensionality
+  ifun-ext : ∀ {a b} → ExtensionalityImplicit a b   -- and the same for functions with implicit arguments
+
+-- Some auxiliary lemmas concerning minus on natural numbers
 
 n∸m∸k≡n∸m+k : (n m k : ℕ) → n ∸ m ∸ k ≡ n ∸ (m + k)
 n∸m∸k≡n∸m+k zero    zero    k       = refl
@@ -65,7 +71,10 @@ record TSet : Set₁ where
     carrier  : Time → Set
     monotone : ∀ {t t'} → t ≤ t' → carrier t → carrier t'
 
-    -- TODO: also include the functor laws for refl-id and trans-∘
+    monotone-refl  : ∀ {t}
+                   → (x : carrier t) → monotone (≤-refl {t}) x ≡ x
+    monotone-trans : ∀ {t t' t''} → (p : t ≤ t') → (q : t' ≤ t'')
+                   → (x : carrier t) → monotone q (monotone p x) ≡ monotone (≤-trans p q) x
 
 open TSet public
 
@@ -83,13 +92,20 @@ infix 20 _→ᵗ_
 
 open _→ᵗ_ public
 
+-- Equality of TSet-morphisms
+
+_≡ᵗ_ : ∀ {A B} → A →ᵗ B → A →ᵗ B → Set
+_≡ᵗ_ {A} f g = ∀ {t} → (x : carrier A t) → map-carrier f x ≡ map-carrier g x
+
+infix 5 _≡ᵗ_
+
 -- Identity and composition of maps of time-indexed sets
 
 idᵗ : ∀ {A} → A →ᵗ A
 idᵗ = tset-map id
 
 _∘ᵗ_ : ∀ {A B C} → B →ᵗ C → A →ᵗ B → A →ᵗ C
-(tset-map g) ∘ᵗ (tset-map f) = tset-map (g ∘ f)
+g ∘ᵗ f = tset-map (map-carrier g ∘ map-carrier f)
 
 infixr 9 _∘ᵗ_
 
@@ -98,7 +114,7 @@ infixr 9 _∘ᵗ_
 ---- terminal object
 
 𝟙ᵗ : TSet
-𝟙ᵗ = tset (λ _ → ⊤) (λ _ → id)
+𝟙ᵗ = tset (λ _ → ⊤) (λ _ → id) (λ _ → refl) (λ _ _ _ → refl)
 
 terminalᵗ : ∀ {A} → A →ᵗ 𝟙ᵗ
 terminalᵗ = tset-map (λ _ → tt)
@@ -106,7 +122,7 @@ terminalᵗ = tset-map (λ _ → tt)
 ---- initial object
 
 𝟘ᵗ : TSet
-𝟘ᵗ = tset (λ _ → ⊥) (λ _ → id)
+𝟘ᵗ = tset (λ _ → ⊥) (λ _ → id) (λ _ → refl) (λ _ _ _ → refl)
 
 initialᵗ : ∀ {A} → 𝟘ᵗ →ᵗ A
 initialᵗ = tset-map (λ ())
@@ -114,10 +130,12 @@ initialᵗ = tset-map (λ ())
 ---- products
 
 _×ᵗ_ : TSet → TSet → TSet
-(tset A Af) ×ᵗ (tset B Bf) =
+A ×ᵗ B =
   tset
-    (λ t → A t × B t)
-    (λ p → mapˣ (Af p) (Bf p))
+    (λ t → carrier A t × carrier B t)
+    (λ p → mapˣ (monotone A p) (monotone B p))
+    (λ x → cong₂ _,_ (monotone-refl A (proj₁ x)) (monotone-refl B (proj₂ x)))
+    (λ p q x → cong₂ _,_ (monotone-trans A p q (proj₁ x)) (monotone-trans B p q (proj₂ x)))
 
 infixr 23 _×ᵗ_
 
@@ -128,18 +146,22 @@ sndᵗ : ∀ {A B} → A ×ᵗ B →ᵗ B
 sndᵗ = tset-map proj₂
 
 ⟨_,_⟩ᵗ : ∀ {A B C} → A →ᵗ B → A →ᵗ C → A →ᵗ B ×ᵗ C
-⟨ tset-map f , tset-map g ⟩ᵗ = tset-map < f , g >
+⟨ f , g ⟩ᵗ = tset-map < map-carrier f , map-carrier g >
 
 mapˣᵗ : ∀ {A B C D} → A →ᵗ C → B →ᵗ D → A ×ᵗ B →ᵗ C ×ᵗ D
-mapˣᵗ (tset-map f) (tset-map g) = tset-map (mapˣ f g)
+mapˣᵗ f g = tset-map (mapˣ (map-carrier f) (map-carrier g))
 
 ---- exponentials
 
 _⇒ᵗ_ : TSet → TSet → TSet
-(tset A Af) ⇒ᵗ (tset B Bf) =
+A ⇒ᵗ B =
   tset
-    (λ t → {t' : Time} → t ≤ t' → A t' → B t')
+    (λ t → {t' : Time} → t ≤ t' → carrier A t' → carrier B t')
     (λ p f q a → f (≤-trans p q) a)
+    (λ f → ifun-ext (fun-ext (λ p → fun-ext λ x →
+             cong (λ p → f p x) (≤-irrelevant _ _))))
+    (λ p q f → ifun-ext (fun-ext (λ r → fun-ext (λ x →
+                 cong (λ p → f p x) (≤-irrelevant _ _)))))
 
 infix 22 _⇒ᵗ_
 
@@ -147,8 +169,8 @@ appᵗ : ∀ {A B} → (A ⇒ᵗ B) ×ᵗ A →ᵗ B
 appᵗ = tset-map λ { {t} (f , a) → f ≤-refl a }
 
 curryᵗ : ∀ {A B C} → A ×ᵗ B →ᵗ C → A →ᵗ B ⇒ᵗ C
-curryᵗ {tset A Af} (tset-map f) = tset-map (λ a → λ p b → f (Af p a , b))
+curryᵗ {A} f = tset-map (λ a → λ p b → map-carrier f (monotone A p a , b))
 
 uncurryᵗ : ∀ {A B C} → A →ᵗ B ⇒ᵗ C → A ×ᵗ B →ᵗ C
-uncurryᵗ (tset-map f) = tset-map λ { (a , b) → f a ≤-refl b }
+uncurryᵗ f = tset-map λ { (a , b) → map-carrier f a ≤-refl b }
 
