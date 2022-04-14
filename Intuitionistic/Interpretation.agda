@@ -114,7 +114,7 @@ Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (node {τ = τ''} op v k q) =
         (sym (+-assoc τ' (op-time op) τ'')))
       (trans
         (cong (_+ τ'') (+-comm τ' (op-time op)))
-        (+-assoc (op-time op) τ' τ'')))
+          (+-assoc (op-time op) τ' τ'')))
 
 kl-extˢ : ∀ {A B τ τ'} → {t : Time}
         → carrier (Tᵒ A τ) t
@@ -197,11 +197,13 @@ env-delay {Γ' = Γ'} {Γ'' = Γ'' ⟨ τ ⟩} (split-⟨⟩ p) =
 
 -- Projecting a variable out of an environment
 
-env-var : ∀ {Γ A τ} → A ∈[ τ ] Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟦ A ⟧ᵛ
-env-var = {!!}
+env-var-⟨⟩ : ∀ {Γ A τ} → A ∈[ τ ] Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟨ τ ⟩ᵒ ⟦ A ⟧ᵛ
+env-var-⟨⟩ {A = A} Hd                = η ∘ᵗ sndᵗ
+env-var-⟨⟩ {A = A} (Tl-∷ x)          = env-var-⟨⟩ x ∘ᵗ fstᵗ
+env-var-⟨⟩ {A = A} (Tl-⟨⟩ {τ = τ} x) = μ {A = ⟦ A ⟧ᵛ} ∘ᵗ ⟨ τ ⟩ᶠ (env-var-⟨⟩ x)
 
---env-var Hd     = sndᵗ
---env-var (Tl x) = env-var x ∘ᵗ fstᵗ
+env-var : ∀ {Γ A τ} → A ∈[ τ ] Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟦ A ⟧ᵛ
+env-var {A = A} x = η⁻¹ ∘ᵗ ⟨_⟩-≤ {A = ⟦ A ⟧ᵛ} z≤n ∘ᵗ env-var-⟨⟩ x
 
 -- Interpretation of well-typed value and computation terms
 
