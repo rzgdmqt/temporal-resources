@@ -41,8 +41,8 @@ module ComonadModality where
 
 -- Monotonicity for gradings
 
-[_]-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → [ τ₁ ]ᵒ A →ᵗ [ τ₂ ]ᵒ A
-[_]-≤ {A} p =
+[]-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → [ τ₁ ]ᵒ A →ᵗ [ τ₂ ]ᵒ A
+[]-≤ {A} p =
   tset-map
     (λ a → monotone A (+-mono-≤ ≤-refl p) a)
 
@@ -69,9 +69,55 @@ module ComonadModality where
 δ⁻¹ {A} {τ₁} {τ₂} =
   tset-map (λ {t} a → monotone A (≤-reflexive (+-assoc t τ₁ τ₂)) a)
 
--- Properties
+-- [_]ᵒ is functorial in the gradings
+
+[]-≤-refl : ∀ {A τ} → []-≤ {A} (≤-refl {τ}) ≡ᵗ idᵗ
+[]-≤-refl {A} x = 
+  trans
+    (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+    (monotone-refl A x)
+
+[]-≤-trans : ∀ {A τ τ' τ''} → (p : τ ≤ τ') → (q : τ' ≤ τ'')
+           → []-≤ {A} q ∘ᵗ []-≤ {A} p ≡ᵗ []-≤ {A} (≤-trans p q)
+[]-≤-trans {A} p q x =
+  trans
+    (monotone-trans A _ _ x)
+    (cong (λ r → monotone A r x) (≤-irrelevant _ _))
+
+-- [_]ᵒ is strong monoidal
 
 ---- counit is an isomorphism
 
---ε-∘ᵗ-ε' : ∀ {A} → ε {A = A} ∘ᵗ ε⁻¹ ≡ᵗ idᵗ
---ε-∘ᵗ-ε' = λ x → {!!}
+ε∘ε⁻¹≡id : ∀ {A} → ε {A} ∘ᵗ ε⁻¹ ≡ᵗ idᵗ
+ε∘ε⁻¹≡id {A} x =
+  trans
+    (monotone-trans A _ _ x)
+    (trans
+      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+      (monotone-refl A x))
+
+ε⁻¹∘ε≡id : ∀ {A} → ε⁻¹ {A} ∘ᵗ ε ≡ᵗ idᵗ
+ε⁻¹∘ε≡id {A} x =
+  trans
+    (monotone-trans A _ _ x)
+    (trans
+      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+      (monotone-refl A x))
+
+---- comultiplication is an isomorphism
+
+δ∘δ⁻¹≡id : ∀ {A τ₁ τ₂} → δ {A} {τ₁} {τ₂} ∘ᵗ δ⁻¹ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+δ∘δ⁻¹≡id {A} {τ₁} {τ₂} x =
+  trans
+    (monotone-trans A _ _ x)
+    (trans
+      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+      (monotone-refl A x))
+
+δ⁻¹∘δ≡id : ∀ {A τ₁ τ₂} → δ⁻¹ {A} {τ₁} {τ₂} ∘ᵗ δ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+δ⁻¹∘δ≡id {A} {τ₁} {τ₂} x =
+  trans
+    (monotone-trans A _ _ x)
+    (trans
+      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+      (monotone-refl A x))
