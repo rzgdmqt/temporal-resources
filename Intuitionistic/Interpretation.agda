@@ -98,31 +98,51 @@ T-≤τ p = tset-map (Tˢ-≤τ p)
 ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
 ηᵀ = tset-map (λ v → leaf v)
 
----- Kleisli extension of the graded monad
+---- T is a [_]-module
 
-Tˢ-move-+ : ∀ {A τ τ' t} → Tˢ A τ (τ' + t) → Tˢ A (τ' + τ) t
-Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (leaf v) =
-  leaf (Af (≤-reflexive (trans (sym (+-assoc τ τ' t)) (cong (_+ t) (+-comm τ τ')))) v)
-Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (node {τ = τ''} op v k q) =
+T-[]-moduleˢ : ∀ {A τ τ' t} → Tˢ A τ' (t + τ) → Tˢ A (τ + τ') t
+T-[]-moduleˢ {tset A Af} {τ} {τ'} {t} (leaf v) =
+  leaf (Af (≤-reflexive (trans
+                          (trans
+                            (cong (τ' +_) (+-comm t τ))
+                            (sym (+-assoc τ' τ t)))
+                          (cong (_+ t) (+-comm τ' τ)))) v)
+T-[]-moduleˢ {tset A Af} {τ} {τ'} {t} (node {τ = τ''} op v k p) =
   node op
-    (⟦⟧ᵍ-constant (param op) (τ' + t) t v)  -- can't use monotonicity of the parameter type
-    (λ { {t'} r y → Tˢ-move-+ (k (≤-trans (≤-reflexive (+-assoc τ' t (op-time op))) (+-monoʳ-≤ τ' r))
-                                 (monotone ⟦ arity op ⟧ᵍ (m≤n+m t' τ') y)) })  -- could also have used ⟦⟧ᵍ-constant
+    (⟦⟧ᵍ-constant (param op) (t + τ) t v)    -- can't use monotonicity of the parameter type
+    (λ {t'} q y → T-[]-moduleˢ (k (≤-trans
+                                    (≤-reflexive
+                                      (trans
+                                        (+-assoc t τ (op-time op))
+                                        (trans
+                                          (cong (t +_) (+-comm τ (op-time op)))
+                                          (sym (+-assoc t (op-time op) τ)))))
+                                    (+-monoˡ-≤ τ q))
+                                  (monotone ⟦ arity op ⟧ᵍ (m≤m+n t' τ) y)))  -- could also have used ⟦⟧ᵍ-constant
     (trans
+      (cong (τ +_) p)
       (trans
-        (cong (τ' +_) q)
-        (sym (+-assoc τ' (op-time op) τ'')))
-      (trans
-        (cong (_+ τ'') (+-comm τ' (op-time op)))
-          (+-assoc (op-time op) τ' τ'')))
+        (sym (+-assoc τ (op-time op) τ''))
+        (trans
+          (cong (_+ τ'') (+-comm τ (op-time op)))
+          (+-assoc (op-time op) τ _))))
+
+T-[]-module : ∀ {A τ τ'} → [ τ ]ᵒ (Tᵒ A τ') →ᵗ Tᵒ A (τ + τ')
+T-[]-module = tset-map T-[]-moduleˢ
+
+---- Kleisli extension of the graded monad
 
 kl-extˢ : ∀ {A B τ τ'} → {t : Time}
         → carrier (Tᵒ A τ) t
         → carrier ([ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')) t
         → carrier (Tᵒ B (τ + τ')) t
         
-kl-extˢ (leaf {τ} {t} v) f =
-  Tˢ-move-+ (f (≤-reflexive (+-comm t τ)) v)
+kl-extˢ {A} {B} {τ' = τ'} (leaf {τ} {t} v) f =
+  T-[]-moduleˢ
+    (monotone
+      (Tᵒ B τ')
+      (≤-reflexive (+-comm τ t))
+      (f (≤-reflexive (+-comm t τ)) v))
 kl-extˢ {A = A} {B = B} {τ' = τ'} {t} (node {τ = τ} op v k p) f =
   node op v
     (λ {t'} q y →
@@ -238,18 +258,19 @@ mutual
   
   ⟦ perform op V M ⟧ᶜᵗ =
      opᵀ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
-                 [ op-time op ]ᶠ (curryᵗ (⟦ M ⟧ᶜᵗ ∘ᵗ mapˣᵗ idᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)))) ∘ᵗ η⊣ ⟩ᵗ
+                    [ op-time op ]ᶠ (curryᵗ (⟦ M ⟧ᶜᵗ ∘ᵗ mapˣᵗ idᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op))))
+                 ∘ᵗ η⊣ ⟩ᵗ
                  
-  ⟦ unbox {Γ'} {Γ''} {τ = τ} p q V M ⟧ᶜᵗ = {!!}
-
-{-
+  ⟦ unbox {Γ'} {τ = τ} p q V M ⟧ᶜᵗ =
     ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
                     ε⊣
-                 ∘ᵗ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ
-                 ∘ᵗ ⟨_⟩-≤ {A = ⟦ Γ' ⟧ᵉ} (≤-trans q (≤-reflexive (+-comm τ' (ctx-delay Γ''))))
-                 ∘ᵗ μ {A = ⟦ Γ' ⟧ᵉ}
+                 ∘ᵗ (⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ)
+                 ∘ᵗ ⟨_⟩-≤ {A = ⟦ Γ' ⟧ᵉ}  q
                  ∘ᵗ env-delay p ⟩ᵗ
--}  
-  ⟦ delay τ p M ⟧ᶜᵗ = {!!} --T-≤τ p ∘ᵗ ⟦ M ⟧ᶜᵗ
+
+  ⟦ delay τ refl M ⟧ᶜᵗ =
+       T-≤τ (≤-reflexive (+-comm τ _))
+    ∘ᵗ T-[]-module ∘ᵗ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
+    ∘ᵗ η⊣ 
 
   infix 25 ⟦_⟧ᶜᵗ
