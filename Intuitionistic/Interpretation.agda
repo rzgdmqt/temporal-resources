@@ -98,7 +98,7 @@ T-≤τ p = tset-map (Tˢ-≤τ p)
 ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
 ηᵀ = tset-map (λ v → leaf v)
 
----- multiplication of the graded monad
+---- Kleisli extension of the graded monad
 
 Tˢ-move-+ : ∀ {A τ τ' t} → Tˢ A τ (τ' + t) → Tˢ A (τ' + τ) t
 Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (leaf v) =
@@ -116,48 +116,30 @@ Tˢ-move-+ {(tset A Af)} {τ} {τ'} {t} (node {τ = τ''} op v k q) =
         (cong (_+ τ'') (+-comm τ' (op-time op)))
         (+-assoc (op-time op) τ' τ'')))
 
+kl-extˢ : ∀ {A B τ τ'} → {t : Time}
+        → carrier (Tᵒ A τ) t
+        → carrier ([ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')) t
+        → carrier (Tᵒ B (τ + τ')) t
+        
+kl-extˢ (leaf {τ} {t} v) f =
+  Tˢ-move-+ (f (≤-reflexive (+-comm t τ)) v)
+kl-extˢ {A = A} {B = B} {τ' = τ'} {t} (node {τ = τ} op v k p) f =
+  node op v
+    (λ {t'} q y →
+      kl-extˢ
+        (k q y)
+        (λ {t''} r x →
+          f (≤-trans
+              (≤-trans
+                (≤-reflexive (cong (t +_) p))
+                (≤-trans
+                  (≤-reflexive (sym (+-assoc t (op-time op) τ)))
+                  (+-monoˡ-≤ τ q))) r)
+            x))
+    (trans (cong (_+ τ') p) (+-assoc (op-time op) τ τ'))
 
-μˢ : ∀ {A τ τ'} → {t : Time} → carrier (Tᵒ (Tᵒ A τ') τ) t → carrier (Tᵒ A (τ + τ')) t
-μˢ {tset A Af} (leaf c) = Tˢ-move-+ c
-μˢ (node op v k p) =
-  node op v (λ q y → μˢ (k q y)) (trans (cong (_+ _) p) (+-assoc (op-time op) _ _))
-
-μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
-μᵀ = tset-map μˢ
-
----- strength of the graded monad
-
----- note: had to mark σˢ as terminating because Agda's termination
----- gets confused trying to see see that subtrees modelled as a
----- function are smaller that the given tree (I guess reindexing the
----- non-recursive argument component with Af is at fault for this)
-
-{-# TERMINATING #-}
-σˢ : ∀ {A B τ} → {t : Time} → carrier A t × carrier (Tᵒ B τ) t → carrier (Tᵒ (⟨ τ ⟩ᵒ A ×ᵗ B) τ) t
-σˢ {A} {τ = τ} {t = t} (v , leaf w) =
-  leaf (monotone
-         (⟨ τ ⟩ᵒ A)
-         (≤-reflexive (+-comm t τ))
-         (map-carrier (η⊣ {A}) v) , w)
-σˢ {A} {B} {τ = τ} {t = t} (v , node {τ = τ'} op w k q) =
-  node op w (λ r y → {!σˢ {A} {B} {τ'} ({!!} , ?)!}) q
-
--- map-carrier (Tᶠ {!!}) (σˢ {A} {B} {τ'} ({!!} , k q y))
-
--- σˢ {A} {B} {?} : {t = t₁ : Time} → carrier A t₁ × carrier (Tᵒ B ?5) t₁ → carrier (Tᵒ (⟨ ?5 ⟩ᵒ A ×ᵗ B) ?5) t₁
-
--- v : carrier A t
--- k q y : Tˢ B τ' t'
-
-{-
-σˢ {tset A Af} {τ = τ} {t = t} (v , leaf w) =
-  leaf (Af (m≤n+m t τ) v , w)
-σˢ {tset A Af} {t = t} (v , node op w k p) =
-  node op w (λ q y → σˢ (Af (≤-trans (m≤m+n t (op-time op)) q) v , k q y)) p
--}
-
-σᵀ : ∀ {A B τ} → A ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ ⟩ᵒ A ×ᵗ B) τ
-σᵀ = {!!} --tset-map σˢ
+kl-extᵀ : ∀ {A B τ τ'} → Tᵒ A τ ×ᵗ [ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ') →ᵗ Tᵒ B (τ + τ')
+kl-extᵀ = tset-map (λ (c , f) → kl-extˢ c f)
 
 ---- algebraic operations
 
@@ -244,7 +226,9 @@ mutual
   
   ⟦ return V ⟧ᶜᵗ = ηᵀ ∘ᵗ ⟦ V ⟧ᵛᵗ
   
-  ⟦ M ; N ⟧ᶜᵗ = {!!} --μᵀ ∘ᵗ Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵗ σᵀ ∘ᵗ ⟨ idᵗ , ⟦ M ⟧ᶜᵗ ⟩ᵗ
+  ⟦ _;_ {τ = τ} M N ⟧ᶜᵗ = kl-extᵀ ∘ᵗ ⟨ ⟦ M ⟧ᶜᵗ ,
+                                          ([ τ ]ᶠ (curryᵗ ⟦ N ⟧ᶜᵗ))
+                                       ∘ᵗ η⊣  ⟩ᵗ
   
   ⟦ V · W ⟧ᶜᵗ = appᵗ ∘ᵗ ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵗ
   
@@ -264,6 +248,6 @@ mutual
                  ∘ᵗ μ {A = ⟦ Γ' ⟧ᵉ}
                  ∘ᵗ env-delay p ⟩ᵗ
 -}  
-  ⟦ coerce p M ⟧ᶜᵗ = T-≤τ p ∘ᵗ ⟦ M ⟧ᶜᵗ
+  ⟦ delay τ p M ⟧ᶜᵗ = {!!} --T-≤τ p ∘ᵗ ⟦ M ⟧ᶜᵗ
 
   infix 25 ⟦_⟧ᶜᵗ
