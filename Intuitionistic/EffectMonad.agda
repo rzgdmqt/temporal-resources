@@ -187,12 +187,6 @@ T-[]-module = tset-map T-[]-moduleˢ
 μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
 μᵀ = tset-map μˢ
 
--- Algebraic operations
-
-opᵀ : ∀ {A τ} → (op : Op)
-    → ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)) →ᵗ Tᵒ A (op-time op + τ)
-opᵀ op = tset-map (λ { (v , k) → node op v k refl })
-
 -- Strength
 
 strˢ : ∀ {A B τ τ' t} → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t → carrier (Tᵒ B τ) t → carrier (Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ) t
@@ -224,3 +218,9 @@ strˢ {A} {B} {τ' = τ''} {t} (vp , vx) (node {τ = τ} {τ' = τ'} op w k p) =
 
 strᵀ : ∀ {A B τ τ'} → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
 strᵀ {A} {B} {τ} {τ'} = tset-map λ { (v , c) → strˢ {A} {B} {τ} {τ'} v c }
+
+-- Algebraic operations
+
+opᵀ : ∀ {A τ} → (op : Op)
+    → ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)) →ᵗ Tᵒ A (op-time op + τ)
+opᵀ op = tset-map (λ { (v , k) → node op v k refl })
