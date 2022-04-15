@@ -79,6 +79,11 @@ record TSet : Set₁ where
 
 open TSet public
 
+-- Constant time-varying sets
+
+ConstTSet : Set → TSet
+ConstTSet A = tset (λ _ → A) (λ _ → id) (λ _ → refl) (λ _ _ _ → refl)
+
 -- Maps of time-varying sets
 
 record _→ᵗ_ (A B : TSet) : Set where
