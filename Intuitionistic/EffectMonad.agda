@@ -46,8 +46,10 @@ data Tˢ (A : TSet) : (τ : Time) → (t : Time) → Set where  -- 1st time inde
   node : ∀ {τ τ' t}
        → (op : Op)
        → carrier (ConstTSet ⟦ param op ⟧ᵍ) t
-       → ({t' : Time} → t ≤ t' → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t' → Tˢ A τ (t' + op-time op))  -- intuitively, `⟦ arity op ⟧ᵍ ⇒ᵗ [ op-time op ] (Tᵒ A τ)`
-       → τ' ≡ op-time op + τ                                                             -- abstracting into a variable for easier recursive defs.
+       → ({t' : Time} → t + op-time op ≤ t'                     -- `[ op-time op ] (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)`; more convenient
+                      → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'    -- than `⟦ arity op ⟧ᵍ ⇒ᵗ [ op-time op ] (Tᵒ A τ)` for Agda
+                      → Tˢ A τ t')                              -- to see that the function `T-[]-moduleˢ` below terminates
+       → τ' ≡ op-time op + τ                                    -- abstracting into a variable for easier recursive defs.
        → Tˢ A τ' t
 
 -- Monotonicity wrt TSets' time-indices
@@ -56,7 +58,7 @@ Tˢ-≤t : ∀ {A τ t t'} → t ≤ t' → Tˢ A τ t → Tˢ A τ t'
 Tˢ-≤t {A} p (leaf a) =
   leaf (monotone A (+-monoʳ-≤ _ p) a)
 Tˢ-≤t {A} p (node op v k q) =
-  node op v (λ r y → k (≤-trans p r) y) q
+  node op v (λ q y → k (≤-trans (+-monoˡ-≤ (op-time op) p) q) y) q
 
 Tˢ-≤t-refl : ∀ {A τ t} → (c : Tˢ A τ t) → Tˢ-≤t ≤-refl c ≡ c
 Tˢ-≤t-refl {A} (leaf v) =
@@ -67,9 +69,8 @@ Tˢ-≤t-refl {A} (leaf v) =
       (monotone-refl A v))
 Tˢ-≤t-refl {A} (node {τ} {τ'} {t} op v k p) =
   cong
-    (λ (k : ({t' : Time} → t ≤ t'
-                         → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t' → Tˢ A τ (t' + op-time op)))
-                         → node op v k p)
+    (λ (k : ({t' : Time} → t + op-time op ≤ t'
+                         → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t' → Tˢ A τ t')) → node op v k p)
     (ifun-ext (fun-ext (λ q → fun-ext (λ y →
       cong (λ q → k q y) (≤-irrelevant _ _)))))
 
@@ -83,8 +84,8 @@ Tˢ-≤t-trans {A} p q (leaf v) =
       (monotone-trans A _ _ v)
       (cong (λ p → monotone A p v) (≤-irrelevant _ _)))
 Tˢ-≤t-trans {A} p q (node op v k r) =
-  cong (λ (k : ({t' : Time} → _ ≤ t'
-                            → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t' → Tˢ A _ (t' + op-time op)))
+  cong (λ (k : ({t' : Time} → _ + op-time op ≤ t'
+                            → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t' → Tˢ A _ t'))
                             → node op (monotone (ConstTSet ⟦ param op ⟧ᵍ) (≤-trans p q) v) k r)
     (ifun-ext (fun-ext (λ s → fun-ext (λ y →
       cong (λ r → k r y) (≤-irrelevant _ _)))))
@@ -92,7 +93,8 @@ Tˢ-≤t-trans {A} p q (node op v k r) =
 -- Monotonicity wrt time-gradings
 
 Tˢ-≤τ : ∀ {A τ τ' t} → τ ≤ τ' → Tˢ A τ t → Tˢ A τ' t
-Tˢ-≤τ {A} p (leaf v) = leaf (monotone A (+-monoˡ-≤ _ p) v)
+Tˢ-≤τ {A} p (leaf v) =
+  leaf (monotone A (+-monoˡ-≤ _ p) v)
 Tˢ-≤τ p (node op v k q) =
   node op v
     (λ r y → Tˢ-≤τ (proj₂ (proj₂ (n≡m+k≤n' (trans q (+-comm (op-time op) _)) p))) (k r y))
@@ -127,16 +129,26 @@ T-[]-moduleˢ {A} {τ} {τ'} {t} (leaf v) =
                             (sym (+-assoc τ' τ t)))
                           (cong (_+ t) (+-comm τ' τ)))) v)
 T-[]-moduleˢ {A} {τ} {τ'} {t} (node {τ = τ''} op v k p) =
-  node {τ = τ + τ''} op v    -- can't use monotonicity of the parameter type
+  node op v
     (λ {t'} q y →
-      Tˢ-≤t {τ = {!!}} {!!} (
-        T-[]-moduleˢ
-          {τ = {!!}}
-          {τ' = {!!}}
-          (k {{!!}} {!!} y)))
-    (trans (cong (τ +_) p) {!!})
+      T-[]-moduleˢ
+        (k (≤-trans
+             (≤-reflexive
+               (trans
+                 (+-assoc t τ (op-time op))
+                   (trans
+                     (cong (t +_) (+-comm τ (op-time op)))
+                       (sym (+-assoc t (op-time op) τ)))))
+             (+-monoˡ-≤ τ q))
+           y))
+    (trans
+      (cong (τ +_) p)
+      (trans
+        (sym (+-assoc τ (op-time op) τ''))
+        (trans
+          (cong (_+ τ'') (+-comm τ (op-time op)))
+          (+-assoc (op-time op) τ _))))
 
-{-
 T-[]-module : ∀ {A τ τ'} → [ τ ]ᵒ (Tᵒ A τ') →ᵗ Tᵒ A (τ + τ')
 T-[]-module = tset-map T-[]-moduleˢ
 
@@ -190,8 +202,11 @@ strᵀ {A} {B} {τ} {τ'} = tset-map λ { (v , c) → strˢ {A} {B} {τ} {τ'} v
 
 -- Algebraic operations
 
-opᵀ : ∀ {A τ} → (op : Op)
-    → ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)) →ᵗ Tᵒ A (op-time op + τ)
-opᵀ op = tset-map (λ { (v , k) → node op v k refl })
+-- More standard `⟦ arity op ⟧ᵍ ⇒ᵗ [ op-time op ] (Tᵒ A τ)`
+-- presentation compared tot he one used in the def. of `Tᵒ`
 
--}
+opᵀ : ∀ {A τ} → (op : Op)
+    → ConstTSet ⟦ param op ⟧ᵍ ×ᵗ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ [ op-time op ]ᵒ (Tᵒ A τ)) →ᵗ Tᵒ A (op-time op + τ)
+opᵀ {A} {τ} op =
+     tset-map (λ { (v , k) → node op v (λ {t'} → k {t'}) refl })
+  ∘ᵗ mapˣᵗ idᵗ (⇒ᵗ-[] {B = Tᵒ A τ} {τ = op-time op})

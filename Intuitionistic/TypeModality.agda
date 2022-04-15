@@ -79,6 +79,15 @@ module TypeModality where
 
 -- PROPERTIES
 
+-- [_]ᵒ commutes with ⇒ᵗ on constant domain
+
+[]-⇒ᵗ : ∀ {A B τ} → [ τ ]ᵒ (ConstTSet A ⇒ᵗ B) →ᵗ ConstTSet A ⇒ᵗ [ τ ]ᵒ B
+[]-⇒ᵗ {τ = τ} = tset-map (λ f p x → f  (+-monoˡ-≤ τ p) x)
+
+⇒ᵗ-[] : ∀ {A B τ} → ConstTSet A ⇒ᵗ [ τ ]ᵒ B →ᵗ [ τ ]ᵒ (ConstTSet A ⇒ᵗ B)
+⇒ᵗ-[] {B = B} {τ = τ} =
+  tset-map (λ {t} f p x → monotone B p (f {t} ≤-refl x))
+
 -- [_]ᵒ is functorial in the gradings
 
 []-≤-refl : ∀ {A τ} → []-≤ {A} (≤-refl {τ}) ≡ᵗ idᵗ

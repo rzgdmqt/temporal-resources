@@ -84,6 +84,16 @@ module ContextModality where
                        n+m≤k⇒m≤k∸n τ₁ τ₂ t p ,
                        monotone A (≤-reflexive (sym (n∸m∸k≡n∸m+k t τ₁ τ₂))) a })
 
+-- Costrength
+
+⟨⟩-costr : ∀ {A B τ} → ⟨ τ ⟩ᵒ (A ×ᵗ B) →ᵗ ⟨ τ ⟩ᵒ A ×ᵗ B
+⟨⟩-costr {B = B} {τ = τ} =
+  tset-map (λ { {t} (p , x , y) → (p , x) , monotone B (m∸n≤m t τ) y })
+
+-- Strength (for constant time-varying sets)
+
+⟨⟩-str : ∀ {A B τ} → ⟨ τ ⟩ᵒ A ×ᵗ ConstTSet B →ᵗ ⟨ τ ⟩ᵒ (A ×ᵗ ConstTSet B)
+⟨⟩-str = tset-map (λ { ((p , x) , y) → p , x , y })
 
 -- PROPERTIES
 
