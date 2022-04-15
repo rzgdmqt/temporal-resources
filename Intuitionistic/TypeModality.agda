@@ -107,16 +107,16 @@ module TypeModality where
 
 ---- counit is an isomorphism
 
-ε∘ε⁻¹≡id : ∀ {A} → ε {A} ∘ᵗ ε⁻¹ ≡ᵗ idᵗ
-ε∘ε⁻¹≡id {A} x =
+[]-ε∘ε⁻¹≡id : ∀ {A} → ε {A} ∘ᵗ ε⁻¹ ≡ᵗ idᵗ
+[]-ε∘ε⁻¹≡id {A} x =
   trans
     (monotone-trans A _ _ x)
     (trans
       (cong (λ p → monotone A p x) (≤-irrelevant _ _))
       (monotone-refl A x))
 
-ε⁻¹∘ε≡id : ∀ {A} → ε⁻¹ {A} ∘ᵗ ε ≡ᵗ idᵗ
-ε⁻¹∘ε≡id {A} x =
+[]-ε⁻¹∘ε≡id : ∀ {A} → ε⁻¹ {A} ∘ᵗ ε ≡ᵗ idᵗ
+[]-ε⁻¹∘ε≡id {A} x =
   trans
     (monotone-trans A _ _ x)
     (trans
@@ -125,16 +125,16 @@ module TypeModality where
 
 ---- comultiplication is an isomorphism
 
-δ∘δ⁻¹≡id : ∀ {A τ₁ τ₂} → δ {A} {τ₁} {τ₂} ∘ᵗ δ⁻¹ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
-δ∘δ⁻¹≡id {A} {τ₁} {τ₂} x =
+[]-δ∘δ⁻¹≡id : ∀ {A τ₁ τ₂} → δ {A} {τ₁} {τ₂} ∘ᵗ δ⁻¹ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+[]-δ∘δ⁻¹≡id {A} {τ₁} {τ₂} x =
   trans
     (monotone-trans A _ _ x)
     (trans
       (cong (λ p → monotone A p x) (≤-irrelevant _ _))
       (monotone-refl A x))
 
-δ⁻¹∘δ≡id : ∀ {A τ₁ τ₂} → δ⁻¹ {A} {τ₁} {τ₂} ∘ᵗ δ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
-δ⁻¹∘δ≡id {A} {τ₁} {τ₂} x =
+[]-δ⁻¹∘δ≡id : ∀ {A τ₁ τ₂} → δ⁻¹ {A} {τ₁} {τ₂} ∘ᵗ δ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+[]-δ⁻¹∘δ≡id {A} {τ₁} {τ₂} x =
   trans
     (monotone-trans A _ _ x)
     (trans
