@@ -212,3 +212,32 @@ kl-extᵀ = tset-map (λ (c , f) → kl-extˢ c f)
 opᵀ : ∀ {A τ} → (op : Op)
     → ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)) →ᵗ Tᵒ A (op-time op + τ)
 opᵀ op = tset-map (λ { (v , k) → node op v k refl })
+
+-- Strength
+
+strˢ : ∀ {A B τ τ' t} → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t → carrier (Tᵒ B τ) t → carrier (Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ) t
+strˢ {A} {B} {τ} {τ'} {t} (vp , vx) (leaf w) =
+  leaf (
+    (≤-trans vp (≤-reflexive (+-comm t τ)) ,
+     monotone A (≤-reflexive (cong (_∸ τ') (+-comm t τ))) vx) ,
+    w)
+strˢ {A} {B} {τ' = τ''} {t} (vp , vx) (node {τ = τ} {τ' = τ'} op w k p) =
+  node op w
+    (λ q y →
+      strˢ {A = A} {B = B} {τ = τ} {τ' = τ''}
+        (≤-trans
+           (≤-trans
+             vp
+             (≤-trans
+               (≤-reflexive (cong (t +_) p))
+               (≤-reflexive (sym (+-assoc t (op-time op) τ)))))
+           (+-monoˡ-≤ τ q) ,
+         monotone A
+           (≤-trans
+             (≤-reflexive (cong (λ τ' → t + τ' ∸ τ'') p))
+             (≤-trans
+               (≤-reflexive (cong (_∸ τ'') (sym (+-assoc t (op-time op) τ))))
+               (∸-monoˡ-≤ τ'' (+-monoˡ-≤ τ q))))
+           vx)
+        (k q y))
+    p
