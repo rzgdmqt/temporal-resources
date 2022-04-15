@@ -139,11 +139,6 @@ Tᶠ f = tset-map (Tˢᶠ f)
 T-≤τ : ∀ {A τ τ'} → τ ≤ τ' → Tᵒ A τ →ᵗ Tᵒ A τ'
 T-≤τ p = tset-map (Tˢ-≤τ p)
 
--- Unit
-
-ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
-ηᵀ = tset-map (λ v → leaf v)
-
 -- T is a [_]-module
 
 T-[]-moduleˢ : ∀ {A τ τ' t} → Tˢ A τ' (t + τ) → Tˢ A (τ + τ') t
@@ -176,36 +171,21 @@ T-[]-moduleˢ {A} {τ} {τ'} {t} (node {τ = τ''} op v k p) =
 T-[]-module : ∀ {A τ τ'} → [ τ ]ᵒ (Tᵒ A τ') →ᵗ Tᵒ A (τ + τ')
 T-[]-module = tset-map T-[]-moduleˢ
 
--- Kleisli extension
+-- Unit
 
-kl-extˢ : ∀ {A B τ τ'} → {t : Time}
-        → carrier (Tᵒ A τ) t
-        → carrier ([ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')) t
-        → carrier (Tᵒ B (τ + τ')) t
-        
-kl-extˢ {A} {B} {τ' = τ'} (leaf {τ} {t} v) f =
-  T-[]-moduleˢ
-    (monotone
-      (Tᵒ B τ')
-      (≤-reflexive (+-comm τ t))
-      (f (≤-reflexive (+-comm t τ)) v))
-kl-extˢ {A = A} {B = B} {τ' = τ'} {t} (node {τ = τ} op v k p) f =
-  node op v
-    (λ {t'} q y →
-      kl-extˢ
-        (k q y)
-        (λ {t''} r x →
-          f (≤-trans
-              (≤-trans
-                (≤-reflexive (cong (t +_) p))
-                (≤-trans
-                  (≤-reflexive (sym (+-assoc t (op-time op) τ)))
-                  (+-monoˡ-≤ τ q))) r)
-            x))
-    (trans (cong (_+ τ') p) (+-assoc (op-time op) τ τ'))
+ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
+ηᵀ = tset-map (λ v → leaf v)
 
-kl-extᵀ : ∀ {A B τ τ'} → Tᵒ A τ ×ᵗ [ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ') →ᵗ Tᵒ B (τ + τ')
-kl-extᵀ = tset-map (λ (c , f) → kl-extˢ c f)
+-- Multiplication
+
+μˢ : ∀ {A τ τ'} → {t : Time} → carrier (Tᵒ (Tᵒ A τ') τ) t → carrier (Tᵒ A (τ + τ')) t
+μˢ {A} {τ} {τ'} {t} (leaf c) =
+  T-[]-moduleˢ (monotone (Tᵒ A τ') (≤-reflexive (+-comm τ t)) c)
+μˢ (node op v k p) =
+  node op v (λ q y → μˢ (k q y)) (trans (cong (_+ _) p) (+-assoc (op-time op) _ _))
+
+μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
+μᵀ = tset-map μˢ
 
 -- Algebraic operations
 
@@ -241,3 +221,6 @@ strˢ {A} {B} {τ' = τ''} {t} (vp , vx) (node {τ = τ} {τ' = τ'} op w k p) =
            vx)
         (k q y))
     p
+
+strᵀ : ∀ {A B τ τ'} → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
+strᵀ {A} {B} {τ} {τ'} = tset-map λ { (v , c) → strˢ {A} {B} {τ} {τ'} v c }
