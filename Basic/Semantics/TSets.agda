@@ -20,7 +20,7 @@ open import Axiom.Extensionality.Propositional using (Extensionality; Extensiona
 
 open import Language
 
-module TSets where
+module Semantics.TSets where
 
 postulate
   fun-ext  : ∀ {a b} → Extensionality a b            -- assuming function extensionality

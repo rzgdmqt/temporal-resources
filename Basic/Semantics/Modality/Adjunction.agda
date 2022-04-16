@@ -17,11 +17,12 @@ open Eq.≡-Reasoning
 
 open import Language
 
-open import TSets
-open import ContextModality
-open import TypeModality
+open import Semantics.TSets
 
-module ModalityAdjunction where
+open import Semantics.Modality.Future
+open import Semantics.Modality.Past
+
+module Semantics.Modality.Adjunction where
 
 -- STRUCTURE
 

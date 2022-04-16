@@ -16,12 +16,11 @@ open Eq.≡-Reasoning
 
 open import Language
 
-open import TSets
-open import ContextModality
-open import TypeModality
-open import ModalityAdjunction
+open import Semantics.TSets
+open import Semantics.Modality.Future
+open import Semantics.Modality.Past
 
-module EffectMonad where
+module Semantics.Monad where
 
 -- Interpretation of ground types as sets
 

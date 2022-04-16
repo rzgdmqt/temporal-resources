@@ -21,9 +21,10 @@ open Eq
 open Eq.≡-Reasoning
 
 open import Language
-open import TSets
 
-module ContextModality where
+open import Semantics.TSets
+
+module Semantics.Modality.Past where
 
 -- STRUCTURE
 
