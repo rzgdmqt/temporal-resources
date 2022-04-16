@@ -12,12 +12,11 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
 
-open import Syntax.Operations
-
 open import Semantics.TSets
 open import Semantics.Modality.Future
 open import Semantics.Modality.Past
 
+open import Util.Operations
 open import Util.Time
 
 module Semantics.Monad where

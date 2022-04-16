@@ -6,12 +6,19 @@
 module Everything where
 
 -- UTILS
+--------
 
----- (Time-related) utils
+---- Time
 
 open import Util.Time
 
+---- Algebraic operations
+
+open import Util.Operations
+
+
 -- LANGUAGE
+-----------
 
 ---- Syntax of the language
 
@@ -26,7 +33,9 @@ open import Syntax.Substitutions
 
 open import Syntax.EquationalTheory
 
+
 -- SEMANTICS
+------------
 
 ---- Time-varying sets
 

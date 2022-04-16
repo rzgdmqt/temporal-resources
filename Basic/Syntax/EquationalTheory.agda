@@ -8,11 +8,11 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
 
-open import Syntax.Operations
 open import Syntax.Language
 open import Syntax.Renamings
 open import Syntax.Substitutions
 
+open import Util.Operations
 open import Util.Time
 
 module Syntax.EquationalTheory where

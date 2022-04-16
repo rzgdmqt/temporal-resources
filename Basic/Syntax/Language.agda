@@ -8,8 +8,7 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
 
-open import Syntax.Operations
-
+open import Util.Operations
 open import Util.Time
 
 module Syntax.Language where

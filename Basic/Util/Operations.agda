@@ -4,12 +4,16 @@
 
 open import Util.Time
 
-module Syntax.Operations where
+module Util.Operations where
 
 -- Base types
 
 postulate
   BaseType : Set
+
+-- Sets corresponding to base types
+
+postulate
   BaseSet  : BaseType → Set
 
 -- Ground types (for operation signatures)
