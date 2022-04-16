@@ -10,12 +10,11 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
 
-open import Language
-open import ContextModality
-open import Renamings
-open import Substitutions
+open import Syntax.Language
+open import Syntax.Renamings
+open import Syntax.Substitutions
 
-module EquationalTheory where
+module Syntax.EquationalTheory where
 
 -- Explicit sub-effecting, derived from delaying
 

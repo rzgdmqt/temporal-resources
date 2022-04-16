@@ -10,8 +10,6 @@
 open import Function
 
 open import Data.Empty
-open import Data.Nat
-open import Data.Nat.Properties
 open import Data.Product renaming (map to mapˣ)
 open import Data.Sum renaming (map to map⁺)
 open import Data.Unit hiding (_≤_)
@@ -20,9 +18,11 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq
 open Eq.≡-Reasoning
 
-open import Language
+open import Syntax.Language
 
 open import Semantics.TSets
+
+open import Util.Time
 
 module Semantics.Modality.Future where
 

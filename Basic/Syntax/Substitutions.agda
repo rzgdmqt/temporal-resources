@@ -11,10 +11,10 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq renaming ([_] to [|_|])
 open Eq.≡-Reasoning
 
-open import Language
-open import Renamings
+open import Syntax.Language
+open import Syntax.Renamings
 
-module Substitutions where
+module Syntax.Substitutions where
 
 -- Substituting a value for a variable in context
 

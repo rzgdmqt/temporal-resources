@@ -14,10 +14,9 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
 
-open import Language
---open import ContextModality
+open import Syntax.Language
 
-module Renamings where
+module Syntax.Renamings where
 
 -- Auxiliary lemmas
 

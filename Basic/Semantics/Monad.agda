@@ -5,8 +5,6 @@
 open import Function
 
 open import Data.Empty
-open import Data.Nat
-open import Data.Nat.Properties
 open import Data.Product
 open import Data.Unit hiding (_≤_)
 
@@ -14,11 +12,13 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
 
-open import Language
+open import Syntax.Language
 
 open import Semantics.TSets
 open import Semantics.Modality.Future
 open import Semantics.Modality.Past
+
+open import Util.Time
 
 module Semantics.Monad where
 

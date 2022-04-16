@@ -6,8 +6,6 @@
 open import Function
 
 open import Data.Empty
-open import Data.Nat
-open import Data.Nat.Properties
 open import Data.Product renaming (map to mapˣ)
 open import Data.Sum renaming (map to map⁺)
 open import Data.Unit hiding (_≤_)
@@ -18,7 +16,7 @@ open Eq.≡-Reasoning
 
 open import Axiom.Extensionality.Propositional using (Extensionality; ExtensionalityImplicit)
 
-open import Language
+open import Util.Time
 
 module Semantics.TSets where
 

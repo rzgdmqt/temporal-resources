@@ -2,20 +2,15 @@
 -- Types and terms of the intuitionistic variant of the language --
 -------------------------------------------------------------------
 
-open import Data.Nat
-open import Data.Nat.Properties
 open import Data.Product
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
 
-module Language where
+open import Util.Time
 
--- Time steps and annotations
-
-Time : Set
-Time = ℕ
+module Syntax.Language where
 
 -- Base types
 
