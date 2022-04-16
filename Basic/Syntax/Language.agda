@@ -51,19 +51,19 @@ mutual
   infixr 30 _⇒_
   infix  31 _‼_
 
--- Conversion of ground types to types
+-- Embedding ground types into types
 
 type-of-gtype : GType → VType
 type-of-gtype (Base B) = Base B
 type-of-gtype Unit     = Unit
 type-of-gtype Empty    = Empty
 
--- Structured contexts (indexed by the number of ◆s in them)
+-- Structured contexts
 
 data Ctx : Set where
   []   : Ctx                       -- empty context
   _∷_  : Ctx → VType → Ctx         -- context extension with a variable
-  _⟨_⟩ : Ctx → Time → Ctx          -- context use after a time delay
+  _⟨_⟩ : Ctx → Time → Ctx          -- using context after time-passage
 
 infixl 31 _∷_
 infix  32 _⟨_⟩
@@ -98,22 +98,22 @@ infixl 30 _++ᶜ_
 ++ᶜ-assoc Γ Γ' (Γ'' ∷ A)   = cong (_∷ A) (++ᶜ-assoc Γ Γ' Γ'')
 ++ᶜ-assoc Γ Γ' (Γ'' ⟨ τ ⟩) = cong (_⟨ τ ⟩) (++ᶜ-assoc Γ Γ' Γ'')
 
--- Total time delay of a context 
+-- Amount of time-passage modelled by a context 
 
-ctx-delay : Ctx → Time
-ctx-delay []        = 0
-ctx-delay (Γ ∷ A)   = ctx-delay Γ
-ctx-delay (Γ ⟨ τ ⟩) = ctx-delay Γ + τ
+ctx-time : Ctx → Time
+ctx-time []        = 0
+ctx-time (Γ ∷ A)   = ctx-time Γ
+ctx-time (Γ ⟨ τ ⟩) = ctx-time Γ + τ
 
--- Interaction of context delay and ++ᶜ
+-- Interaction of time-passage and ++ᶜ
 
-ctx-delay-++ᶜ : (Γ Γ' : Ctx)
-              → ctx-delay (Γ ++ᶜ Γ') ≡ ctx-delay Γ + ctx-delay Γ'
-ctx-delay-++ᶜ Γ []         = sym (+-identityʳ (ctx-delay Γ))
-ctx-delay-++ᶜ Γ (Γ' ∷ A)   = ctx-delay-++ᶜ Γ Γ'
-ctx-delay-++ᶜ Γ (Γ' ⟨ τ ⟩) = trans
-                               (cong (_+ τ) (ctx-delay-++ᶜ Γ Γ'))
-                               (+-assoc (ctx-delay Γ) (ctx-delay Γ') τ)
+ctx-time-++ᶜ : (Γ Γ' : Ctx)
+              → ctx-time (Γ ++ᶜ Γ') ≡ ctx-time Γ + ctx-time Γ'
+ctx-time-++ᶜ Γ []         = sym (+-identityʳ (ctx-time Γ))
+ctx-time-++ᶜ Γ (Γ' ∷ A)   = ctx-time-++ᶜ Γ Γ'
+ctx-time-++ᶜ Γ (Γ' ⟨ τ ⟩) = trans
+                               (cong (_+ τ) (ctx-time-++ᶜ Γ Γ'))
+                               (+-assoc (ctx-time Γ) (ctx-time Γ') τ)
 
 -- Proof that sub-contexts split a given context
 
@@ -137,7 +137,7 @@ split-≡ (split-⟨⟩ p) = cong (_⟨ _ ⟩) (split-≡ p)
 split-≡-++ᶜ : ∀ {Γ₁ Γ₂} → Γ₁ , Γ₂ split (Γ₁ ++ᶜ Γ₂)
 split-≡-++ᶜ = ≡-split refl
 
--- Variable in a context (looking under τ-amount of time delay)
+-- Variable in a context (under τ-amount of time-passage)
 
 data _∈[_]_ (A : VType) : Time → Ctx → Set where
   Hd    : ∀ {Γ}      → A ∈[ 0 ] Γ ∷ A
@@ -245,10 +245,10 @@ mutual
             → {C : CType}
             → {τ : Time}
             → Γ' , Γ'' split Γ
-            → τ ≤ ctx-delay Γ''
+            → τ ≤ ctx-time Γ''
             → Γ' ⊢V⦂ [ τ ] A
             → Γ ∷ A  ⊢C⦂ C
-            -------------------
+            ------------------
             → Γ ⊢C⦂ C
 
     -- explicit delaying of a computation (a special case of this
@@ -264,12 +264,3 @@ mutual
             → Γ ⟨ τ' ⟩ ⊢C⦂ A ‼ τ
             --------------------
             → Γ ⊢C⦂ A ‼ τ''
-
-{-
-    delay   : {A : VType}
-            → {τ τ' : Time}
-            → τ ≤ τ'
-            → Γ ⟨ τ' ∸ τ ⟩ ⊢C⦂ A ‼ τ
-            ------------------------
-            → Γ ⊢C⦂ A ‼ τ'
--}

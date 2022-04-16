@@ -2,8 +2,6 @@
 -- Substitution of well-typed values for variables --
 -----------------------------------------------------
 
-open import Data.Nat
-open import Data.Nat.Properties
 open import Data.Product
 open import Data.Sum
 
@@ -13,6 +11,8 @@ open Eq.≡-Reasoning
 
 open import Syntax.Language
 open import Syntax.Renamings
+
+open import Util.Time
 
 module Syntax.Substitutions where
 
@@ -85,9 +85,9 @@ mutual
         q
         (≤-trans
           (≤-trans
-            (≤-reflexive (cong ctx-delay (sym (split-≡ r))))
-            (≤-reflexive (ctx-delay-++ᶜ (Γ''' ∷ A) Γ'')))
-          (≤-reflexive (sym (ctx-delay-++ᶜ Γ''' Γ'' )))))
+            (≤-reflexive (cong ctx-time (sym (split-≡ r))))
+            (≤-reflexive (ctx-time-++ᶜ (Γ''' ∷ A) Γ'')))
+          (≤-reflexive (sym (ctx-time-++ᶜ Γ''' Γ'' )))))
       V
       (M [ Tl-∷ x ↦ W ]c)
   delay τ p M    [ x ↦ W ]c = delay τ p (M [ Tl-⟨⟩ x ↦ W ]c)

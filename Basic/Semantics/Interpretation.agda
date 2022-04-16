@@ -61,15 +61,15 @@ mutual
 
 infix 25 ⟦_⟧ᵉ
 
--- Total delay of an environment as a single ⟨_⟩ modality
+-- Total time-passage of an environment as a single ⟨_⟩ modality
 
-env-delay : ∀ {Γ Γ' Γ''} → Γ' , Γ'' split Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟨ ctx-delay Γ'' ⟩ᵒ ⟦ Γ' ⟧ᵉ
-env-delay split-[]     = η
-env-delay (split-∷ p) = env-delay p ∘ᵗ fstᵗ
-env-delay {Γ' = Γ'} {Γ'' = Γ'' ⟨ τ ⟩} (split-⟨⟩ p) =
-     ⟨_⟩-≤ {A = ⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (ctx-delay Γ'') τ))
+env-time : ∀ {Γ Γ' Γ''} → Γ' , Γ'' split Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟨ ctx-time Γ'' ⟩ᵒ ⟦ Γ' ⟧ᵉ
+env-time split-[]     = η
+env-time (split-∷ p) = env-time p ∘ᵗ fstᵗ
+env-time {Γ' = Γ'} {Γ'' = Γ'' ⟨ τ ⟩} (split-⟨⟩ p) =
+     ⟨_⟩-≤ {A = ⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (ctx-time Γ'') τ))
   ∘ᵗ μ {A = ⟦ Γ' ⟧ᵉ}
-  ∘ᵗ ⟨ τ ⟩ᶠ (env-delay p)
+  ∘ᵗ ⟨ τ ⟩ᶠ (env-time p)
 
 -- Projecting a variable out of an environment
 
@@ -127,7 +127,7 @@ mutual
                     ε⊣
                  ∘ᵗ (⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ)
                  ∘ᵗ ⟨_⟩-≤ {A = ⟦ Γ' ⟧ᵉ} q
-                 ∘ᵗ env-delay p ⟩ᵗ
+                 ∘ᵗ env-time p ⟩ᵗ
 
   ⟦ delay τ refl M ⟧ᶜᵗ =
        T-≤τ (≤-reflexive (+-comm τ _))

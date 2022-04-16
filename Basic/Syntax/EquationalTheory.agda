@@ -2,8 +2,6 @@
 -- Equational theory of the language --
 ---------------------------------------
 
-open import Data.Nat
-open import Data.Nat.Properties
 open import Data.Product
 
 import Relation.Binary.PropositionalEquality as Eq
@@ -13,6 +11,8 @@ open Eq.≡-Reasoning
 open import Syntax.Language
 open import Syntax.Renamings
 open import Syntax.Substitutions
+
+open import Util.Time
 
 module Syntax.EquationalTheory where
 
@@ -152,7 +152,7 @@ mutual
 
     unbox-cong : ∀ {Γ' Γ'' A C τ}
                → {p : Γ' , Γ'' split Γ}
-               → {q : τ ≤ ctx-delay Γ''}
+               → {q : τ ≤ ctx-time Γ''}
                → {V W : Γ' ⊢V⦂ [ τ ] A}
                → {M N : Γ ∷ A  ⊢C⦂ C}
                → Γ' ⊢V⦂ V == W
@@ -214,7 +214,7 @@ mutual
 
     box-unbox : ∀ {Γ' Γ'' A B τ τ'}
               → (p : Γ' , Γ'' split Γ)
-              → (q : τ ≤ ctx-delay Γ'')
+              → (q : τ ≤ ctx-time Γ'')
               → (V : Γ' ⟨ τ ⟩ ⊢V⦂ A)
               → (N : Γ ∷ A ⊢C⦂ B ‼ τ')
               -----------------------------------------------

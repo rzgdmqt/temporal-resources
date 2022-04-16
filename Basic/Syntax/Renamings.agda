@@ -5,8 +5,6 @@
 open import Function hiding (const)
 
 open import Data.Bool hiding (_≤_)
-open import Data.Nat
-open import Data.Nat.Properties
 open import Data.Product
 open import Data.Sum
 
@@ -15,6 +13,8 @@ open Eq hiding ([_])
 open Eq.≡-Reasoning
 
 open import Syntax.Language
+
+open import Util.Time
 
 module Syntax.Renamings where
 
@@ -172,11 +172,11 @@ eq-ren refl = idʳ
 str-⟨⟩-ren : ∀ {Γ τ} → Ren Γ (Γ ⟨ τ ⟩)
 str-⟨⟩-ren = ⟨⟩-mon-ren z≤n ∘ʳ ⟨⟩-eta⁻¹-ren
 
--- Weakening a ⟨ τ ⟩ modality into a context with at least τ delay
+-- Weakening a ⟨ τ ⟩ modality into a context with at least τ time-passage
 
 wk-⟨⟩-ren : ∀ {Γ Γ' Γ'' τ}
           → Γ' , Γ'' split Γ
-          → τ ≤ ctx-delay Γ''
+          → τ ≤ ctx-time Γ''
           → Ren (Γ' ⟨ τ ⟩) Γ
 
 wk-⟨⟩-ren split-[] z≤n = ⟨⟩-eta-ren
@@ -186,7 +186,7 @@ wk-⟨⟩-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
        (wk-⟨⟩-ren {τ = τ ∸ τ'} p
          (≤-trans
            (∸-monoˡ-≤ τ' q)
-           (≤-reflexive (m+n∸n≡m (ctx-delay Γ') τ'))))
+           (≤-reflexive (m+n∸n≡m (ctx-time Γ') τ'))))
   ∘ʳ ⟨⟩-mu-ren
   ∘ʳ ⟨⟩-mon-ren (n≤n∸m+m τ τ')
 
@@ -194,7 +194,7 @@ wk-⟨⟩-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
 
 var-split : ∀ {Γ A τ}
           → A ∈[ τ ] Γ
-          → Σ[ Γ₁ ∈ Ctx ] Σ[ Γ₂ ∈ Ctx ] Γ₁ ∷ A , Γ₂ split Γ × ctx-delay Γ₂ ≡ τ
+          → Σ[ Γ₁ ∈ Ctx ] Σ[ Γ₂ ∈ Ctx ] Γ₁ ∷ A , Γ₂ split Γ × ctx-time Γ₂ ≡ τ
 
 var-split {Γ ∷ A} Hd = Γ , [] , split-[] , refl
 var-split {Γ ∷ B} (Tl-∷ x) with var-split x
@@ -224,7 +224,7 @@ var-in-split-proj₂-subst x refl = refl
 var-in-split : ∀ {Γ Γ₁ Γ₂ A τ}
              → Γ₁ , Γ₂ split Γ
              → (x : A ∈[ τ ] Γ)
-             → (Σ[ y ∈ A ∈[ τ ∸ ctx-delay Γ₂ ] Γ₁ ]
+             → (Σ[ y ∈ A ∈[ τ ∸ ctx-time Γ₂ ] Γ₁ ]
                    proj₁ (var-split x) ≡ proj₁ (var-split y)
                  × proj₁ (proj₂ (var-split x)) ≡ proj₁ (proj₂ (var-split y)) ++ᶜ Γ₂)
              ⊎ (Σ[ Γ' ∈ Ctx ] Σ[ Γ'' ∈ Ctx ]
@@ -246,15 +246,15 @@ var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A}
       (trans
         (trans
           (trans
-            (cong (_∸ ctx-delay Γ₂)
+            (cong (_∸ ctx-time Γ₂)
               (trans
                 (trans
                   (sym (+-identityʳ τ'))
                   (cong (τ' +_) (sym (n∸n≡0 τ))))
                 (sym (+-∸-assoc τ' (≤-refl {τ})))))
-            (∸-+-assoc (τ' + τ) τ (ctx-delay Γ₂)))
-          (cong (τ' + τ ∸_) (+-comm τ (ctx-delay Γ₂))))
-        (cong (_∸ (ctx-delay Γ₂ + τ)) (+-comm τ' τ))) y ,
+            (∸-+-assoc (τ' + τ) τ (ctx-time Γ₂)))
+          (cong (τ' + τ ∸_) (+-comm τ (ctx-time Γ₂))))
+        (cong (_∸ (ctx-time Γ₂ + τ)) (+-comm τ' τ))) y ,
     trans q (var-in-split-proj₁-subst y _) ,
     cong (_⟨ τ ⟩) (trans r (cong (_++ᶜ Γ₂) (var-in-split-proj₂-subst y _))))
 ... | inj₂ (Γ' , Γ'' , q , r , s) =
@@ -293,11 +293,11 @@ postulate
   split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
             → Ren Γ Γ'
             → Γ₁ , Γ₂ split Γ
-            → τ ≤ ctx-delay Γ₂
+            → τ ≤ ctx-time Γ₂
             → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
                  Ren Γ₁ Γ₁'
                × Γ₁' , Γ₂' split Γ'
-               × ctx-delay Γ₂ ≤ ctx-delay Γ₂'
+               × ctx-time Γ₂ ≤ ctx-time Γ₂'
 
 
 {-

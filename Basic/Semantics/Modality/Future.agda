@@ -1,11 +1,11 @@
--------------------------------------------------------------------
--- Semantics of the type modality `[ t ] A` as a graded comonad  --
---                                                               --
--- While `[ t ] A` is in fact a strong monoidal functor, then we --
--- prefer to speak abour it in terms of the graded comonad view  --
--- of it due to the analogy with the comonad on types in Fitch   --
--- style modal lambda calculi (that this language is based on).  --
--------------------------------------------------------------------
+--------------------------------------------------------------------
+-- Semantics of the future modality `[ t ] A` as a graded comonad --
+--                                                                --
+-- While `[ t ] A` is in fact a strong monoidal functor, then we  --
+-- prefer to speak abour it in terms of the graded comonad view   --
+-- of it due to the analogy with the comonad on types in Fitch    --
+-- style modal lambda calculi (that this language is based on).   --
+--------------------------------------------------------------------
 
 open import Function
 

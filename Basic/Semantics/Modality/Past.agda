@@ -1,5 +1,5 @@
 -------------------------------------------------------------------
--- Semantics of the context modality `Γ ⟨ t ⟩` as a graded monad --
+-- Semantics of the past modality `Γ ⟨ t ⟩` as a graded monad    --
 --                                                               --
 -- While `Γ ⟨ t ⟩` is in fact a strong monoidal functor, then we --
 -- prefer to speak abour it in terms of the graded monad view of --
