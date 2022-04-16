@@ -8,6 +8,7 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
 
+open import Syntax.Operations
 open import Syntax.Language
 open import Syntax.Renamings
 open import Syntax.Substitutions

@@ -1,30 +1,50 @@
+--------------------------------------------------------------
+-- Agda formalisation of the syntax and semantics of a core --
+-- language for programming with modal temporal resources   --
+--------------------------------------------------------------
+
 module Everything where
 
--- Utils
+-- UTILS
+
+---- (Time-related) utils
 
 open import Util.Time
 
--- Language
+-- LANGUAGE
+
+---- Syntax of the language
 
 open import Syntax.Language
+
+---- Renamings and substitutions
+
 open import Syntax.Renamings
 open import Syntax.Substitutions
+
+---- Equational theory
+
 open import Syntax.EquationalTheory
 
--- Time-varying sets
+-- SEMANTICS
+
+---- Time-varying sets
 
 open import Semantics.TSets
 
--- Modalities and adjunction between them
+---- Temporal modalities
 
 open import Semantics.Modality.Future
 open import Semantics.Modality.Past
+
+---- Adjunction between modalities
+
 open import Semantics.Modality.Adjunction
 
--- Free monad on algebraic operations
+---- Free monad on algebraic operations
 
 open import Semantics.Monad
 
--- Interpretation
+---- Interpretation
 
 open import Semantics.Interpretation

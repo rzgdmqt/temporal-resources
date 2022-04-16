@@ -1,6 +1,6 @@
--------------------------------------------------------------------
--- Types and terms of the intuitionistic variant of the language --
--------------------------------------------------------------------
+-------------------------------------------------
+-- Types and well-typed syntax of the language --
+-------------------------------------------------
 
 open import Data.Product
 
@@ -8,32 +8,13 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
 
+open import Syntax.Operations
+
 open import Util.Time
 
 module Syntax.Language where
 
--- Base types
-
-postulate
-  BaseType : Set
-  BaseSet  : BaseType → Set
-
--- Ground types (for operation signatures)
-
-data GType : Set where
-  Base  : BaseType → GType                -- base types
-  Unit  : GType                           -- unit type
-  Empty : GType                           -- empty type
-
--- Signature of (ground-typed) operation symbols
-
-postulate
-  Op         : Set                          -- set of operation symbols
-  param      : Op → GType                   -- parameter type of each operation
-  arity      : Op → GType                   -- arity type of each operation
-  op-time    : Op → Time                    -- each operation's (maximal) time-duration
-
--- Grammar of value and computation types
+-- Value and computation types
 
 mutual
 

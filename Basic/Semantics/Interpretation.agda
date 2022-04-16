@@ -10,6 +10,7 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
 
+open import Syntax.Operations
 open import Syntax.Language
 
 open import Semantics.TSets
@@ -64,7 +65,7 @@ infix 25 ⟦_⟧ᵉ
 -- Total time-passage of an environment as a single ⟨_⟩ modality
 
 env-time : ∀ {Γ Γ' Γ''} → Γ' , Γ'' split Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟨ ctx-time Γ'' ⟩ᵒ ⟦ Γ' ⟧ᵉ
-env-time split-[]     = η
+env-time split-[]    = η
 env-time (split-∷ p) = env-time p ∘ᵗ fstᵗ
 env-time {Γ' = Γ'} {Γ'' = Γ'' ⟨ τ ⟩} (split-⟨⟩ p) =
      ⟨_⟩-≤ {A = ⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (ctx-time Γ'') τ))
