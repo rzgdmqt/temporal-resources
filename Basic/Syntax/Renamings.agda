@@ -23,8 +23,9 @@ module Syntax.Renamings where
 -- Variable renamings
 
 data Ren : Ctx → Ctx → Set where
-  -- identity and composition
-  idʳ         : ∀ {Γ} → Ren Γ Γ
+  -- identity renaming on empty contexts
+  []-ren      : Ren [] []
+  -- composition
   _∘ʳ_        : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
   -- weakening renaming
   wk-ren      : ∀ {Γ A} → Ren Γ (Γ ∷ A)
@@ -41,6 +42,13 @@ data Ren : Ctx → Ctx → Set where
   cong-⟨⟩-ren : ∀ {Γ Γ' τ} → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
 
 infixr 20 _∘ʳ_
+
+-- Identity renaming
+
+id-ren : ∀ {Γ} → Ren Γ Γ
+id-ren {Γ = []}      = []-ren
+id-ren {Γ = Γ ∷ A}   = cong-∷-ren id-ren
+id-ren {Γ = Γ ⟨ τ ⟩} = cong-⟨⟩-ren id-ren
 
 -- Extending a renaming with a variable
 
@@ -62,7 +70,7 @@ wk-⟨⟩-ren = ⟨⟩-≤-ren z≤n ∘ʳ ⟨⟩-η⁻¹-ren
 -- Weakening by a context renaming
 
 wk-ctx-ren : ∀ {Γ Γ'} → Ren Γ (Γ ++ᶜ Γ')
-wk-ctx-ren {Γ' = []} = idʳ
+wk-ctx-ren {Γ' = []} = id-ren
 wk-ctx-ren {Γ' = Γ' ∷ A} = wk-ren ∘ʳ wk-ctx-ren
 wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} = wk-⟨⟩-ren ∘ʳ wk-ctx-ren
 
@@ -105,7 +113,7 @@ contract-ren = var-ren Hd
 -- Renaming from an equality of contexts
 
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
-eq-ren refl = idʳ
+eq-ren refl = id-ren
 
 -- Splitting a renaming
 
@@ -128,9 +136,7 @@ postulate
 var-rename : ∀ {Γ Γ'}
            → Ren Γ Γ'
            →  ∀ {A τ} → A ∈[ τ ] Γ → Σ[ τ' ∈ Time ] (τ ≤ τ' × A ∈[ τ' ] Γ')
-           
-var-rename idʳ x =
-  _ , ≤-refl , x
+
 var-rename (ρ' ∘ʳ ρ) x with (var-rename ρ) x
 ... | τ , p , y with (var-rename ρ') y
 ... | τ' , p' , y' =
