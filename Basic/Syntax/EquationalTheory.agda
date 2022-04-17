@@ -34,7 +34,7 @@ coerce p M =
   delay
     (proj₁ (n≤m⇒m≡n+n' p))
     (proj₂ (n≤m⇒m≡n+n' p))
-    (C-rename str-⟨⟩-ren M)
+    (C-rename wk-⟨⟩-ren M)
 
 -- Equations between well-typed values and computations
 
@@ -175,7 +175,7 @@ mutual
              → (M : Γ ⟨ 0 ⟩ ∷ A ⊢C⦂ B ‼ τ)
              ----------------------------------------------------------------
              → Γ ⊢C⦂ return V ; M
-                 == C-rename ⟨⟩-eta-ren (M [ Hd ↦ V-rename ⟨⟩-eta⁻¹-ren V ]c)   -- M[V/x]
+                 == C-rename ⟨⟩-η-ren (M [ Hd ↦ V-rename ⟨⟩-η⁻¹-ren V ]c)   -- M[V/x]
                   
     perform-; : ∀ {A B τ τ'}
               → (op : Op)
@@ -188,7 +188,7 @@ mutual
                        (perform op V
                           (M ;
                            C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
-                               cong-ren {Γ'' = [] ∷ A} ⟨⟩-mu-ren)
+                               cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren)
                            N))
 
     -- associativity equation for sequential composition
@@ -201,7 +201,7 @@ mutual
             → Γ ⊢C⦂ (M ; N) ; P
                 == coerce (≤-reflexive (sym (+-assoc τ τ' τ'')))
                      (M ; (N ; C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
-                                 cong-ren {Γ'' = [] ∷ B} ⟨⟩-mu-ren ) P))
+                                 cong-ren {Γ'' = [] ∷ B} ⟨⟩-μ-ren ) P))
 
     -- computational/beta equation for function application
 
@@ -220,7 +220,7 @@ mutual
               → (N : Γ ∷ A ⊢C⦂ B ‼ τ')
               -----------------------------------------------
               → Γ ⊢C⦂ unbox p q (box V) N
-                  == (N [ Hd ↦ V-rename (wk-⟨⟩-ren p q) V ]c)
+                  == (N [ Hd ↦ V-rename (wk-⟨⟩-ctx-ren p q) V ]c)
 
     -- eta equations
 
@@ -243,7 +243,7 @@ mutual
                   ------------------------------------------------------
                   → Γ ⊢C⦂ C-rename                                                     -- M[V/y]
                             (eq-ren (split-≡ p))                                       
-                            (M [ Hd ↦ V-rename str-⟨⟩-ren V ]c)                                          
+                            (M [ Hd ↦ V-rename wk-⟨⟩-ren V ]c)                                          
                       == unbox p ≤-refl                                               -- unbox V to x in M[box x/y]                             
                            V
                            (C-rename (eq-ren (split-≡ (split-∷ p)))
@@ -255,7 +255,7 @@ mutual
     delay-zero : ∀ {A τ}
                → (M : Γ ⟨ 0 ⟩ ⊢C⦂ A ‼ τ)
                ----------------------------------------------------------------
-               → Γ ⊢C⦂ delay 0 (sym (+-identityʳ τ)) M == C-rename ⟨⟩-eta-ren M
+               → Γ ⊢C⦂ delay 0 (sym (+-identityʳ τ)) M == C-rename ⟨⟩-η-ren M
 
     delay-trans : ∀ {A τ τ₁ τ₂ τ' τ''}
                 → (p : τ' ≡ τ + τ₁)
@@ -266,7 +266,7 @@ mutual
                     == delay
                          (τ₁ + τ₂)
                          (trans q (+-assoc τ τ₁ τ₂))
-                         (C-rename (⟨⟩-mon-ren (≤-reflexive (+-comm τ₂ τ₁)) ∘ʳ ⟨⟩-mu⁻¹-ren) M)
+                         (C-rename (⟨⟩-≤-ren (≤-reflexive (+-comm τ₂ τ₁)) ∘ʳ ⟨⟩-μ⁻¹-ren) M)
 
     delay₁-; : ∀ {A B τ τ' τ'' τ'''}
              → (p : τ'' ≡ τ + τ')
@@ -285,8 +285,8 @@ mutual
                       (M ;
                        C-rename
                          (cong-ren {Γ'' = [] ∷ A}
-                           (   ⟨⟩-mu-ren
-                            ∘ʳ ⟨⟩-mon-ren (≤-reflexive (trans p (+-comm τ τ')))))
+                           (   ⟨⟩-μ-ren
+                            ∘ʳ ⟨⟩-≤-ren (≤-reflexive (trans p (+-comm τ τ')))))
                          N)
 
     delay₂-; : ∀ {A B τ τ' τ'' τ'''}
@@ -297,7 +297,7 @@ mutual
              → Γ ⊢C⦂ M ; delay τ'' p (C-rename exch-⟨⟩-var-ren N)                   -- though then the LHS wouldn't have a renaming in it
                  == delay τ''
                       (trans (cong (τ +_) p) (sym (+-assoc τ τ' τ'')))
-                      (C-rename str-⟨⟩-ren M ;
+                      (C-rename wk-⟨⟩-ren M ;
                        C-rename (cong-ren {Γ'' = [] ∷ A} exch-⟨⟩-⟨⟩-ren) N)
 
     delay-perform : ∀ {A τ τ' τ''}
@@ -312,7 +312,7 @@ mutual
                              (cong (op-time op +_) p)
                              (sym (+-assoc (op-time op) τ τ')))
                            (perform op
-                             (V-rename str-⟨⟩-ren V)
+                             (V-rename wk-⟨⟩-ren V)
                              (C-rename
                                (cong-ren {Γ'' = [] ∷ type-of-gtype (arity op)}
                                  exch-⟨⟩-⟨⟩-ren)

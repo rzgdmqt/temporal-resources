@@ -34,7 +34,7 @@ Tl-∷ y [ Tl-∷ x ↦ W ]var with var-split x | inspect var-split x
   V-rename wk-ren (y [ x ↦ W ]var)
 Tl-⟨⟩ y [ Tl-⟨⟩ x ↦ W ]var with var-split x | inspect var-split x
 ... | ._ , ._ , ._ , ._ | [| refl |] =
-  V-rename str-⟨⟩-ren (y [ x ↦ W ]var)
+  V-rename wk-⟨⟩-ren (y [ x ↦ W ]var)
 
 -- Substituting a value for a variable in a well-typed term
 

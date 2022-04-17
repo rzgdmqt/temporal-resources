@@ -53,8 +53,8 @@ module Semantics.Modality.Past where
 
 -- (Contravariant) monotonicity for gradings
 
-⟨_⟩-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → ⟨ τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ A
-⟨_⟩-≤ {A} p =
+⟨⟩-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → ⟨ τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ A
+⟨⟩-≤ {A} p =
   tset-map
     (λ { {t} (q , a) → ≤-trans p q , monotone A (∸-mono (≤-refl {t}) p) a })
 
@@ -95,6 +95,13 @@ module Semantics.Modality.Past where
 
 ⟨⟩-str : ∀ {A B τ} → ⟨ τ ⟩ᵒ A ×ᵗ ConstTSet B →ᵗ ⟨ τ ⟩ᵒ (A ×ᵗ ConstTSet B)
 ⟨⟩-str = tset-map (λ { ((p , x) , y) → p , x , y })
+
+-- Derived counit map (a value that was available
+-- τ time steps in the past is also available now)
+
+⟨⟩-ε : ∀ {A τ} → ⟨ τ ⟩ᵒ A →ᵗ A
+⟨⟩-ε {A} {τ} = η⁻¹ ∘ᵗ ⟨⟩-≤ {A = A} z≤n
+
 
 -- PROPERTIES
 

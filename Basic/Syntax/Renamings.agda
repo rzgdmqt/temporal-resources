@@ -18,36 +18,6 @@ open import Util.Time
 
 module Syntax.Renamings where
 
--- Auxiliary lemmas
-
-n≤n∸m+m : (n m : ℕ) → n ≤ n ∸ m + m
-n≤n∸m+m n       zero    = ≤-stepsʳ 0 ≤-refl
-n≤n∸m+m zero    (suc m) = z≤n
-n≤n∸m+m (suc n) (suc m) =
-  ≤-trans
-    (+-monoʳ-≤ 1 (n≤n∸m+m n m))
-    (≤-reflexive (sym (+-suc (n ∸ m) (m))))
-
-n+m∸n+k≡m∸k : (n : ℕ) → {m k : ℕ} → k ≤ m → n + m ∸ (n + k) ≡ m ∸ k
-n+m∸n+k≡m∸k zero {zero} {k} p = refl
-n+m∸n+k≡m∸k zero {suc m} {zero} p = refl
-n+m∸n+k≡m∸k zero {suc m} {suc k} p = refl
-n+m∸n+k≡m∸k (suc n) {zero} {zero} p = n∸n≡0 (n + zero)
-n+m∸n+k≡m∸k (suc n) {suc m} {zero} p =
-  trans
-    (trans
-      (cong (n + suc m ∸_) (+-identityʳ n))
-      (trans
-        (trans
-          (m+n∸m≡n n (suc m))
-          (sym (cong suc (m+n∸m≡n n m))))
-        (cong (λ l → suc (n + m ∸ l)) (sym (+-identityʳ n)))))
-    (cong suc (n+m∸n+k≡m∸k n z≤n))
-n+m∸n+k≡m∸k (suc n) {suc m} {suc k} (s≤s p) =
-  trans
-    (cong₂ _∸_ (+-suc n m) (+-suc n k))
-    (n+m∸n+k≡m∸k n p)
-
 -- Variable renamings
 
 -- Note: This allows one to move a variable under more ⟨_⟩s but not vice versa.
@@ -133,24 +103,24 @@ cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ (Tl-⟨⟩ x) with cong-ren ρ x
 
 -- Unit (and its inverse) of ⟨_⟩
 
-⟨⟩-eta-ren : ∀ {Γ} → Ren (Γ ⟨ 0 ⟩) Γ
-⟨⟩-eta-ren (Tl-⟨⟩ x) = _ , ≤-refl , x
+⟨⟩-η-ren : ∀ {Γ} → Ren (Γ ⟨ 0 ⟩) Γ
+⟨⟩-η-ren (Tl-⟨⟩ x) = _ , ≤-refl , x
 
-⟨⟩-eta⁻¹-ren : ∀ {Γ} → Ren Γ (Γ ⟨ 0 ⟩)
-⟨⟩-eta⁻¹-ren x = _ , ≤-refl , Tl-⟨⟩ x
+⟨⟩-η⁻¹-ren : ∀ {Γ} → Ren Γ (Γ ⟨ 0 ⟩)
+⟨⟩-η⁻¹-ren x = _ , ≤-refl , Tl-⟨⟩ x
 
 -- Multiplication (and its inverse) of ⟨_⟩
 
-⟨⟩-mu-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ + τ' ⟩) (Γ ⟨ τ ⟩ ⟨ τ' ⟩)
-⟨⟩-mu-ren {τ = τ} {τ' = τ'} (Tl-⟨⟩ {τ' = τ''} x) =
+⟨⟩-μ-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ + τ' ⟩) (Γ ⟨ τ ⟩ ⟨ τ' ⟩)
+⟨⟩-μ-ren {τ = τ} {τ' = τ'} (Tl-⟨⟩ {τ' = τ''} x) =
   _ ,
   ≤-reflexive (trans
                 (cong (_+ τ'') (+-comm τ τ'))
                 (+-assoc τ' τ τ'')) ,
   Tl-⟨⟩ (Tl-⟨⟩ x)
 
-⟨⟩-mu⁻¹-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ + τ' ⟩)
-⟨⟩-mu⁻¹-ren {τ = τ} {τ' = τ'} (Tl-⟨⟩ (Tl-⟨⟩ {τ' = τ''} x)) =
+⟨⟩-μ⁻¹-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ + τ' ⟩)
+⟨⟩-μ⁻¹-ren {τ = τ} {τ' = τ'} (Tl-⟨⟩ (Tl-⟨⟩ {τ' = τ''} x)) =
   _ ,
   ≤-reflexive (trans
                 (sym (+-assoc τ' τ τ''))
@@ -159,36 +129,36 @@ cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ (Tl-⟨⟩ x) with cong-ren ρ x
 
 -- Monotonicity of ⟨_⟩
 
-⟨⟩-mon-ren : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
-⟨⟩-mon-ren p (Tl-⟨⟩ {τ' = τ'} x) = _ , +-monoˡ-≤ τ' p , Tl-⟨⟩ x
+⟨⟩-≤-ren : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
+⟨⟩-≤-ren p (Tl-⟨⟩ {τ' = τ'} x) = _ , +-monoˡ-≤ τ' p , Tl-⟨⟩ x
 
 -- Renaming from an equality of contexts
 
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren refl = idʳ
 
--- Strengthening a context with a ⟨ τ ⟩ renaming
+-- Weakening a context with a ⟨ τ ⟩ renaming
 
-str-⟨⟩-ren : ∀ {Γ τ} → Ren Γ (Γ ⟨ τ ⟩)
-str-⟨⟩-ren = ⟨⟩-mon-ren z≤n ∘ʳ ⟨⟩-eta⁻¹-ren
+wk-⟨⟩-ren : ∀ {Γ τ} → Ren Γ (Γ ⟨ τ ⟩)
+wk-⟨⟩-ren = ⟨⟩-≤-ren z≤n ∘ʳ ⟨⟩-η⁻¹-ren
 
 -- Weakening a ⟨ τ ⟩ modality into a context with at least τ time-passage
 
-wk-⟨⟩-ren : ∀ {Γ Γ' Γ'' τ}
-          → Γ' , Γ'' split Γ
-          → τ ≤ ctx-time Γ''
-          → Ren (Γ' ⟨ τ ⟩) Γ
+wk-⟨⟩-ctx-ren : ∀ {Γ Γ' Γ'' τ}
+              → Γ' , Γ'' split Γ
+              → τ ≤ ctx-time Γ''
+              → Ren (Γ' ⟨ τ ⟩) Γ
 
-wk-⟨⟩-ren split-[] z≤n = ⟨⟩-eta-ren
-wk-⟨⟩-ren (split-∷ p) q = wk-ren ∘ʳ (wk-⟨⟩-ren p q)
-wk-⟨⟩-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
+wk-⟨⟩-ctx-ren split-[] z≤n = ⟨⟩-η-ren
+wk-⟨⟩-ctx-ren (split-∷ p) q = wk-ren ∘ʳ (wk-⟨⟩-ctx-ren p q)
+wk-⟨⟩-ctx-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
      cong-ren {Γ'' = [] ⟨ τ' ⟩}
-       (wk-⟨⟩-ren {τ = τ ∸ τ'} p
+       (wk-⟨⟩-ctx-ren {τ = τ ∸ τ'} p
          (≤-trans
            (∸-monoˡ-≤ τ' q)
            (≤-reflexive (m+n∸n≡m (ctx-time Γ') τ'))))
-  ∘ʳ ⟨⟩-mu-ren
-  ∘ʳ ⟨⟩-mon-ren (n≤n∸m+m τ τ')
+  ∘ʳ ⟨⟩-μ-ren
+  ∘ʳ ⟨⟩-≤-ren (n≤n∸m+m τ τ')
 
 -- Splitting a context according to a variable in it
 
