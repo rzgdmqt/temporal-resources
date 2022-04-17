@@ -10,6 +10,8 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
 
+open import Syntax.Types
+open import Syntax.Contexts
 open import Syntax.Language
 
 open import Semantics.TSets

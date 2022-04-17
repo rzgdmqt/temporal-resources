@@ -41,6 +41,8 @@ open import Util.Operations
 
 ---- Syntax of the language
 
+open import Syntax.Types
+open import Syntax.Contexts
 open import Syntax.Language
 
 ---- Renamings and substitutions
