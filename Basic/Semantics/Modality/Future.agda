@@ -80,8 +80,8 @@ module Semantics.Modality.Future where
 -- Derived general unit map (a value now is
 -- also available in at most τ time steps)
 
-[]-η : ∀ {A τ} → A →ᵗ [ τ ]ᵒ A
-[]-η {A} {τ} = []-≤ {A = A} z≤n ∘ᵗ ε⁻¹
+η-[] : ∀ {A τ} → A →ᵗ [ τ ]ᵒ A
+η-[] {A} {τ} = []-≤ {A = A} z≤n ∘ᵗ ε⁻¹
 
 
 -- PROPERTIES

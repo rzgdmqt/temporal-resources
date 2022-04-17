@@ -75,6 +75,10 @@ open import Semantics.Modality.Adjunction
 
 open import Semantics.Monad
 
----- Interpretation
+---- Interpretation of types and terms
 
 open import Semantics.Interpretation
+
+---- Semantics of renamings
+
+open import Semantics.Renamings

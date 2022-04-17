@@ -66,23 +66,20 @@ infix 25 ⟦_⟧ᵉ
 
 -- Total time-passage of an environment as a single ⟨_⟩ modality
 
-env-time : ∀ {Γ Γ' Γ''} → Γ' , Γ'' split Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟨ ctx-time Γ'' ⟩ᵒ ⟦ Γ' ⟧ᵉ
-env-time split-[]    = η
-env-time (split-∷ p) = env-time p ∘ᵗ fstᵗ
-env-time {Γ' = Γ'} {Γ'' = Γ'' ⟨ τ ⟩} (split-⟨⟩ p) =
+split-env-⟨⟩ : ∀ {Γ Γ' Γ''} → Γ' , Γ'' split Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟨ ctx-time Γ'' ⟩ᵒ ⟦ Γ' ⟧ᵉ
+split-env-⟨⟩ split-[]    = η
+split-env-⟨⟩ (split-∷ p) = split-env-⟨⟩ p ∘ᵗ fstᵗ
+split-env-⟨⟩ {Γ' = Γ'} {Γ'' = Γ'' ⟨ τ ⟩} (split-⟨⟩ p) =
      ⟨⟩-≤ {A = ⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (ctx-time Γ'') τ))
   ∘ᵗ μ {A = ⟦ Γ' ⟧ᵉ}
-  ∘ᵗ ⟨ τ ⟩ᶠ (env-time p)
+  ∘ᵗ ⟨ τ ⟩ᶠ (split-env-⟨⟩ p)
 
 -- Projecting a variable out of an environment
 
-env-var-⟨⟩ : ∀ {Γ A τ} → A ∈[ τ ] Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟨ τ ⟩ᵒ ⟦ A ⟧ᵛ
-env-var-⟨⟩ {A = A} Hd                = η ∘ᵗ sndᵗ
-env-var-⟨⟩ {A = A} (Tl-∷ x)          = env-var-⟨⟩ x ∘ᵗ fstᵗ
-env-var-⟨⟩ {A = A} (Tl-⟨⟩ {τ = τ} x) = μ {A = ⟦ A ⟧ᵛ} ∘ᵗ ⟨ τ ⟩ᶠ (env-var-⟨⟩ x)
-
-env-var : ∀ {Γ A τ} → A ∈[ τ ] Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟦ A ⟧ᵛ
-env-var {A = A} x = η⁻¹ ∘ᵗ ⟨⟩-≤ {A = ⟦ A ⟧ᵛ} z≤n ∘ᵗ env-var-⟨⟩ x
+var-in-env : ∀ {Γ A τ} → A ∈[ τ ] Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟨ τ ⟩ᵒ ⟦ A ⟧ᵛ
+var-in-env {A = A} Hd                = η ∘ᵗ sndᵗ
+var-in-env {A = A} (Tl-∷ x)          = var-in-env x ∘ᵗ fstᵗ
+var-in-env {A = A} (Tl-⟨⟩ {τ = τ} x) = μ {A = ⟦ A ⟧ᵛ} ∘ᵗ ⟨ τ ⟩ᶠ (var-in-env x)
 
 -- Interpretation of well-typed value and computation terms
 
@@ -90,7 +87,7 @@ mutual
 
   ⟦_⟧ᵛᵗ : ∀ {Γ A} → Γ ⊢V⦂ A → ⟦ Γ ⟧ᵉ →ᵗ ⟦ A ⟧ᵛ
   
-  ⟦ var x ⟧ᵛᵗ = env-var x
+  ⟦ var x ⟧ᵛᵗ = ε-⟨⟩ ∘ᵗ var-in-env x
   
   ⟦ const c ⟧ᵛᵗ = constᵗ c ∘ᵗ terminalᵗ
   
@@ -119,7 +116,7 @@ mutual
   
   ⟦_⟧ᶜᵗ {Γ} (perform {A} {τ} op V M) =
     let f : ⟨ op-time op ⟩ᵒ (⟦ Γ ⟧ᵉ ×ᵗ ConstTSet ⟦ arity op ⟧ᵍ) →ᵗ Tᵒ ⟦ A ⟧ᵛ τ
-        f = ⟦ M ⟧ᶜᵗ ∘ᵗ mapˣᵗ idᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) ∘ᵗ ⟨⟩-costr {A = ⟦ Γ ⟧ᵉ} in
+        f = ⟦ M ⟧ᶜᵗ ∘ᵗ mapˣᵗ idᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) ∘ᵗ costr-⟨⟩ {A = ⟦ Γ ⟧ᵉ} in
     let g : ⟦ Γ ⟧ᵉ ×ᵗ ConstTSet ⟦ arity op ⟧ᵍ →ᵗ [ op-time op ]ᵒ (Tᵒ ⟦ A ⟧ᵛ τ)
         g = [ op-time op ]ᶠ f ∘ᵗ η⊣ in
     opᵀ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
@@ -130,7 +127,7 @@ mutual
                     ε⊣
                  ∘ᵗ (⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ)
                  ∘ᵗ ⟨⟩-≤ {A = ⟦ Γ' ⟧ᵉ} q
-                 ∘ᵗ env-time p ⟩ᵗ
+                 ∘ᵗ split-env-⟨⟩ p ⟩ᵗ
 
   ⟦ delay τ refl M ⟧ᶜᵗ =
        T-≤τ (≤-reflexive (+-comm τ _))

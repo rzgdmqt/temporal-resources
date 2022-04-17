@@ -87,20 +87,20 @@ module Semantics.Modality.Past where
 
 -- Costrength
 
-⟨⟩-costr : ∀ {A B τ} → ⟨ τ ⟩ᵒ (A ×ᵗ B) →ᵗ ⟨ τ ⟩ᵒ A ×ᵗ B
-⟨⟩-costr {B = B} {τ = τ} =
+costr-⟨⟩ : ∀ {A B τ} → ⟨ τ ⟩ᵒ (A ×ᵗ B) →ᵗ ⟨ τ ⟩ᵒ A ×ᵗ B
+costr-⟨⟩ {B = B} {τ = τ} =
   tset-map (λ { {t} (p , x , y) → (p , x) , monotone B (m∸n≤m t τ) y })
 
 -- Strength (for constant time-varying sets)
 
-⟨⟩-str : ∀ {A B τ} → ⟨ τ ⟩ᵒ A ×ᵗ ConstTSet B →ᵗ ⟨ τ ⟩ᵒ (A ×ᵗ ConstTSet B)
-⟨⟩-str = tset-map (λ { ((p , x) , y) → p , x , y })
+str-⟨⟩ : ∀ {A B τ} → ⟨ τ ⟩ᵒ A ×ᵗ ConstTSet B →ᵗ ⟨ τ ⟩ᵒ (A ×ᵗ ConstTSet B)
+str-⟨⟩ = tset-map (λ { ((p , x) , y) → p , x , y })
 
 -- Derived counit map (a value that was available
 -- τ time steps in the past is also available now)
 
-⟨⟩-ε : ∀ {A τ} → ⟨ τ ⟩ᵒ A →ᵗ A
-⟨⟩-ε {A} {τ} = η⁻¹ ∘ᵗ ⟨⟩-≤ {A = A} z≤n
+ε-⟨⟩ : ∀ {A τ} → ⟨ τ ⟩ᵒ A →ᵗ A
+ε-⟨⟩ {A} {τ} = η⁻¹ ∘ᵗ ⟨⟩-≤ {A = A} z≤n
 
 
 -- PROPERTIES
