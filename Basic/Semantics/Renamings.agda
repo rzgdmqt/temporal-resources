@@ -20,7 +20,7 @@ open import Util.Time
 
 module Semantics.Renamings where
 
--- Semantics of renamings as a map between environments
+-- Semantics of renamings as maps between environments
 
 ⟦_⟧ʳ : ∀ {Γ Γ' : Ctx} → Ren Γ Γ' → ⟦ Γ' ⟧ᵉ →ᵗ ⟦ Γ ⟧ᵉ
 ⟦_⟧ʳ {[]} ρ =
