@@ -20,6 +20,198 @@ module Syntax.Renamings where
 
 -- Variable renamings
 
+data Ren : Ctx → Ctx → Set where
+  -- identity and composition
+  idʳ         : ∀ {Γ} → Ren Γ Γ
+  _∘ʳ_        : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
+  -- weakening renaming
+  wk-ren      : ∀ {Γ A} → Ren Γ (Γ ∷ A)
+  -- variable renaming
+  var-ren     : ∀ {Γ A τ} → A ∈[ τ ] Γ → Ren (Γ ∷ A) Γ
+  -- ⟨⟩ modality
+  ⟨⟩-η-ren    : ∀ {Γ} → Ren (Γ ⟨ 0 ⟩) Γ
+  ⟨⟩-η⁻¹-ren  : ∀ {Γ} → Ren Γ (Γ ⟨ 0 ⟩)
+  ⟨⟩-μ-ren    : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ + τ' ⟩) (Γ ⟨ τ ⟩ ⟨ τ' ⟩)
+  ⟨⟩-μ⁻¹-ren  : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ + τ' ⟩)
+  ⟨⟩-≤-ren    : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
+  -- congruences
+  cong-∷-ren  : ∀ {Γ Γ' A} → Ren Γ Γ' → Ren (Γ ∷ A) (Γ' ∷ A)
+  cong-⟨⟩-ren : ∀ {Γ Γ' τ} → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
+
+infixr 20 _∘ʳ_
+
+-- Extending a renaming with a variable
+
+extend-ren : ∀ {Γ Γ' A τ} → Ren Γ Γ' → A ∈[ τ ] Γ' → Ren (Γ ∷ A) Γ'
+extend-ren ρ x = var-ren x ∘ʳ cong-∷-ren ρ
+
+-- Congruence of renamings
+
+cong-ren : ∀ {Γ Γ' Γ''} → Ren Γ Γ' → Ren (Γ ++ᶜ Γ'') (Γ' ++ᶜ Γ'')
+cong-ren {Γ'' = []} ρ = ρ
+cong-ren {Γ'' = Γ'' ∷ A} ρ = cong-∷-ren (cong-ren ρ)
+cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ = cong-⟨⟩-ren (cong-ren ρ)
+
+-- Weakening by a modality renaming
+
+wk-⟨⟩-ren : ∀ {Γ τ} → Ren Γ (Γ ⟨ τ ⟩)
+wk-⟨⟩-ren = ⟨⟩-≤-ren z≤n ∘ʳ ⟨⟩-η⁻¹-ren
+
+-- Weakening by a context renaming
+
+wk-ctx-ren : ∀ {Γ Γ'} → Ren Γ (Γ ++ᶜ Γ')
+wk-ctx-ren {Γ' = []} = idʳ
+wk-ctx-ren {Γ' = Γ' ∷ A} = wk-ren ∘ʳ wk-ctx-ren
+wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} = wk-⟨⟩-ren ∘ʳ wk-ctx-ren
+
+-- Weakening a ⟨ τ ⟩ modality into a context with at least τ time-passage
+
+wk-⟨⟩-ctx-ren : ∀ {Γ Γ' Γ'' τ}
+              → Γ' , Γ'' split Γ
+              → τ ≤ ctx-time Γ''
+              → Ren (Γ' ⟨ τ ⟩) Γ
+
+wk-⟨⟩-ctx-ren split-[] z≤n = ⟨⟩-η-ren
+wk-⟨⟩-ctx-ren (split-∷ p) q = wk-ren ∘ʳ (wk-⟨⟩-ctx-ren p q)
+wk-⟨⟩-ctx-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
+     cong-ren {Γ'' = [] ⟨ τ' ⟩}
+       (wk-⟨⟩-ctx-ren {τ = τ ∸ τ'} p
+         (≤-trans
+           (∸-monoˡ-≤ τ' q)
+           (≤-reflexive (m+n∸n≡m (ctx-time Γ') τ'))))
+  ∘ʳ ⟨⟩-μ-ren
+  ∘ʳ ⟨⟩-≤-ren (n≤n∸m+m τ τ')
+
+-- Exchange renamings
+
+exch-ren : ∀ {Γ A B} → Ren (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
+exch-ren = extend-ren (extend-ren wk-ctx-ren Hd) (Tl-∷ Hd)
+
+exch-⟨⟩-var-ren : ∀ {Γ A τ} → Ren (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
+exch-⟨⟩-var-ren {A = A} {τ = τ} =
+  var-ren (Tl-⟨⟩ Hd) ∘ʳ cong-ren {Γ'' = [] ⟨ _ ⟩ ∷ _} wk-ren
+
+exch-⟨⟩-⟨⟩-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ' ⟩ ⟨ τ ⟩)
+exch-⟨⟩-⟨⟩-ren {τ = τ} {τ' = τ'} =
+  ⟨⟩-μ-ren ∘ʳ ⟨⟩-≤-ren (≤-reflexive (+-comm τ τ')) ∘ʳ ⟨⟩-μ⁻¹-ren
+
+-- Contraction renaming
+
+contract-ren : ∀ {Γ A} → Ren (Γ ∷ A ∷ A) (Γ ∷ A)
+contract-ren = var-ren Hd
+
+-- Renaming from an equality of contexts
+
+eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
+eq-ren refl = idʳ
+
+-- Splitting a renaming
+
+postulate
+  -- TODO: work this out formally; need to calculate the
+  -- smallest prefix of Γ' that includes the image of Γ₁
+
+  split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
+            → Ren Γ Γ'
+            → Γ₁ , Γ₂ split Γ
+            → τ ≤ ctx-time Γ₂
+            → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
+                 Ren Γ₁ Γ₁'
+               × Γ₁' , Γ₂' split Γ'
+               × ctx-time Γ₂ ≤ ctx-time Γ₂'
+
+-- Action of renamings on variables (showing that reamings
+-- allow us to move any variable under more ⟨_⟩ modalities)
+
+var-rename : ∀ {Γ Γ'}
+           → Ren Γ Γ'
+           →  ∀ {A τ} → A ∈[ τ ] Γ → Σ[ τ' ∈ Time ] (τ ≤ τ' × A ∈[ τ' ] Γ')
+           
+var-rename idʳ x =
+  _ , ≤-refl , x
+var-rename (ρ' ∘ʳ ρ) x with (var-rename ρ) x
+... | τ , p , y with (var-rename ρ') y
+... | τ' , p' , y' =
+  _ , ≤-trans p p' , y'
+var-rename wk-ren x =
+  _ , ≤-refl , Tl-∷ x
+var-rename (var-ren y) Hd =
+  _ , z≤n , y
+var-rename (var-ren y) (Tl-∷ x) =
+  _ , ≤-refl , x
+var-rename ⟨⟩-η-ren (Tl-⟨⟩ x) =
+  _ , ≤-refl , x
+var-rename ⟨⟩-η⁻¹-ren x =
+  _ , ≤-refl , Tl-⟨⟩ x
+var-rename (⟨⟩-μ-ren {τ = τ} {τ' = τ'}) (Tl-⟨⟩ {τ' = τ''} x) =
+  _ ,
+  ≤-reflexive (trans
+                (cong (_+ τ'') (+-comm τ τ'))
+                (+-assoc τ' τ τ'')) ,
+  Tl-⟨⟩ (Tl-⟨⟩ x)
+var-rename (⟨⟩-μ⁻¹-ren {τ = τ} {τ' = τ'}) (Tl-⟨⟩ (Tl-⟨⟩ {τ' = τ''} x)) =
+  _ ,
+  ≤-reflexive (trans
+                (sym (+-assoc τ' τ τ''))
+                (cong (_+ τ'') (+-comm τ' τ))) ,
+  Tl-⟨⟩ x
+var-rename (⟨⟩-≤-ren p) (Tl-⟨⟩ x) =
+  _ , +-monoˡ-≤ _ p , Tl-⟨⟩ x
+var-rename (cong-∷-ren ρ) Hd =
+  _ , z≤n , Hd
+var-rename (cong-∷-ren ρ) (Tl-∷ x) with var-rename ρ x
+... | τ , p , y =
+  _ , p , Tl-∷ y
+var-rename (cong-⟨⟩-ren ρ) (Tl-⟨⟩ x) with var-rename ρ x
+... | τ , p , y =
+  _ , +-monoʳ-≤ _ p , Tl-⟨⟩ y
+
+-- Action of renamings on well-typed values and computations
+
+mutual
+
+  V-rename : ∀ {Γ Γ' A}
+           → Ren Γ Γ'
+           → Γ ⊢V⦂ A
+           ------------
+           → Γ' ⊢V⦂ A
+
+  V-rename ρ (var x)   = var (proj₂ (proj₂ (var-rename ρ x)))
+  V-rename ρ (const c) = const c
+  V-rename ρ ⋆         = ⋆
+  V-rename ρ (lam M)   = lam (C-rename (cong-ren ρ) M)
+  V-rename ρ (box V)   = box (V-rename (cong-ren ρ) V)
+
+  C-rename : ∀ {Γ Γ' C}
+           → Ren Γ Γ'
+           → Γ ⊢C⦂ C
+           ------------
+           → Γ' ⊢C⦂ C
+
+  C-rename ρ (return V)       = return (V-rename ρ V)
+  C-rename ρ (M ; N)          = C-rename ρ M ; C-rename (cong-ren ρ) N
+  C-rename ρ (V · W)          = V-rename ρ V · V-rename ρ W
+  C-rename ρ (absurd V)       = absurd (V-rename ρ V)
+  C-rename ρ (perform op V M) = perform op (V-rename ρ V) (C-rename (cong-ren ρ) M)
+  C-rename ρ (unbox q r V M)  with split-ren ρ q r
+  ... | Γ₁' , Γ₂' , ρ' , p' , q' =
+    unbox p' (≤-trans r q') (V-rename ρ' V) (C-rename (cong-ren ρ) M)
+  C-rename ρ (delay τ q M)      = delay τ q (C-rename (cong-ren ρ) M)
+
+
+
+
+
+
+
+
+
+
+
+{-
+
+-- Variable renamings
+
 -- Note: This allows one to move a variable under more ⟨_⟩s but not vice versa.
 
 Ren : Ctx → Ctx → Set
@@ -27,10 +219,10 @@ Ren Γ Γ' = ∀ {A τ} → A ∈[ τ ] Γ → Σ[ τ' ∈ Time ] (τ ≤ τ' ×
 
 -- Identity renaming
 
-idʳ : ∀ {Γ} → Ren Γ Γ
-idʳ {.(_ ∷ _)}  Hd         = _ , ≤-refl , Hd
-idʳ {.(_ ∷ _)}  (Tl-∷ x)   = _ , ≤-refl , Tl-∷ x
-idʳ {.(_ ⟨ _ ⟩)} (Tl-⟨⟩ x) = _ , ≤-refl , Tl-⟨⟩ x
+id-ren : ∀ {Γ} → Ren Γ Γ
+id-ren {.(_ ∷ _)}  Hd         = _ , ≤-refl , Hd
+id-ren {.(_ ∷ _)}  (Tl-∷ x)   = _ , ≤-refl , Tl-∷ x
+id-ren {.(_ ⟨ _ ⟩)} (Tl-⟨⟩ x) = _ , ≤-refl , Tl-⟨⟩ x
 
 -- Composition of renamings
 
@@ -135,7 +327,7 @@ cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ (Tl-⟨⟩ x) with cong-ren ρ x
 -- Renaming from an equality of contexts
 
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
-eq-ren refl = idʳ
+eq-ren refl = id-ren
 
 -- Weakening a context with a ⟨ τ ⟩ renaming
 
@@ -315,3 +507,5 @@ mutual
   ... | Γ₁' , Γ₂' , ρ' , p' , q' =
     unbox p' (≤-trans r q') (V-rename ρ' V) (C-rename (cong-ren ρ) M)
   C-rename ρ (delay τ q M)      = delay τ q (C-rename (cong-ren ρ) M)
+
+-}
