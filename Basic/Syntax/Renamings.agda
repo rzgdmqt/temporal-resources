@@ -117,21 +117,71 @@ eq-ren refl = id-ren
 
 -- Splitting a renaming
 
-postulate
+--postulate
   -- TODO: work this out formally; need to calculate the
   -- smallest prefix of Γ' that includes the image of Γ₁
 
-  split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
-            → Ren Γ Γ'
-            → Γ₁ , Γ₂ split Γ
-            → τ ≤ ctx-time Γ₂
-            → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
-                 Ren Γ₁ Γ₁'
-               × Γ₁' , Γ₂' split Γ'
-               × ctx-time Γ₂ ≤ ctx-time Γ₂'
+split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
+          → Ren Γ Γ'
+          → Γ₁ , Γ₂ split Γ
+          → τ ≤ ctx-time Γ₂
+          → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
+               Ren Γ₁ Γ₁'
+             × Γ₁' , Γ₂' split Γ'
+             × τ ≤ ctx-time Γ₂'
+
+split-ren []-ren split-[] q =
+  [] , [] , []-ren , split-[] , q
+
+split-ren (ρ' ∘ʳ ρ) p q = {!!}
+
+split-ren wk-ren p q =
+  _ , _ , id-ren , split-∷ p , q
+
+split-ren (var-ren x) split-[] q =
+  _ , _ , var-ren x , split-[] , {!!}
+split-ren (var-ren x) (split-∷ p) q =
+  _ , _ , id-ren , p , q
+
+split-ren ⟨⟩-η-ren split-[] q =
+  _ , _ , ⟨⟩-η-ren , split-[] , {!!}
+split-ren ⟨⟩-η-ren (split-⟨⟩ p) q =
+  _ , _ , id-ren , p , {!!}
+
+split-ren ⟨⟩-η⁻¹-ren p q =
+  _ , _ , id-ren , split-⟨⟩ p , {!!}
+
+split-ren ⟨⟩-μ-ren split-[] q =
+  _ , _ , ⟨⟩-μ-ren , split-[] , {!!}
+split-ren (⟨⟩-μ-ren {τ = τ} {τ' = τ'}) (split-⟨⟩ {Γ' = Γ'} p) q =
+  _ , _ , id-ren , split-⟨⟩ (split-⟨⟩ p) ,
+  {!!}
+
+split-ren ⟨⟩-μ⁻¹-ren split-[] q = _ , _ , ⟨⟩-μ⁻¹-ren , split-[] , q
+split-ren ⟨⟩-μ⁻¹-ren (split-⟨⟩ split-[]) q = {!!} , {!!} , {!!} , {!!} , {!!} -- TODO: this case is problematic
+split-ren ⟨⟩-μ⁻¹-ren (split-⟨⟩ (split-⟨⟩ p)) q =
+  _ , _ , id-ren , split-⟨⟩ p ,
+  ≤-reflexive (+-assoc {!!} {!!} {!!})
+
+split-ren (⟨⟩-≤-ren r) split-[] q =
+  _ , _ , ⟨⟩-≤-ren r , split-[] , q
+split-ren (⟨⟩-≤-ren r) (split-⟨⟩ p) q =
+  _ , _ , id-ren , split-⟨⟩ p , ≤-trans q (+-monoʳ-≤ _ r)
+
+split-ren (cong-∷-ren ρ) split-[] q =
+  _ , _ , cong-∷-ren ρ , split-[] , q
+split-ren (cong-∷-ren ρ) (split-∷ p) q with split-ren ρ p q
+... | Γ₁ , Γ₂ , ρ' , p' , q' =
+  _ , _ , ρ' , split-∷ p' , q'
+
+split-ren (cong-⟨⟩-ren ρ) split-[] q =
+  _ , _ , cong-⟨⟩-ren ρ , split-[] , q
+split-ren {τ = τ} (cong-⟨⟩-ren {τ = τ'} ρ) (split-⟨⟩ p) q with split-ren {τ = τ ∸ τ'} ρ p {!!}
+... | Γ₁ , Γ₂ , ρ' , p' , q' =
+  _ , _ , ρ' , split-⟨⟩ p' , {!!}
 
 -- Action of renamings on variables (showing that reamings
--- allow us to move any variable under more ⟨_⟩ modalities)
+-- allow one to move any variable under more ⟨_⟩ modalities)
 
 var-rename : ∀ {Γ Γ'}
            → Ren Γ Γ'
@@ -203,7 +253,7 @@ mutual
   C-rename ρ (perform op V M) = perform op (V-rename ρ V) (C-rename (cong-ren ρ) M)
   C-rename ρ (unbox q r V M)  with split-ren ρ q r
   ... | Γ₁' , Γ₂' , ρ' , p' , q' =
-    unbox p' (≤-trans r q') (V-rename ρ' V) (C-rename (cong-ren ρ) M)
+    unbox p' q' (V-rename ρ' V) (C-rename (cong-ren ρ) M)
   C-rename ρ (delay τ q M)      = delay τ q (C-rename (cong-ren ρ) M)
 
 
