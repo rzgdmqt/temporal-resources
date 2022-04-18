@@ -28,11 +28,6 @@ module Semantics.Monad where
 ⟦ Unit ⟧ᵍ   = ⊤
 ⟦ Empty ⟧ᵍ  = ⊥
 
--- Semantic constants for base types
-
-constᵗ : ∀ {B} → BaseSet B → 𝟙ᵗ →ᵗ ConstTSet (BaseSet B)
-constᵗ c = tset-map (λ _ → c)
-
 -- Object-mapping of the underlying functor
 
 data Tˢ (A : TSet) : (τ : Time) → (t : Time) → Set where  -- 1st time index (τ) is the duration of the computation (its time-grading)
@@ -44,9 +39,9 @@ data Tˢ (A : TSet) : (τ : Time) → (t : Time) → Set where  -- 1st time inde
   node : ∀ {τ τ' t}
        → (op : Op)
        → carrier (ConstTSet ⟦ param op ⟧ᵍ) t
-       → ({t' : Time} → t + op-time op ≤ t'                     -- `[ op-time op ] (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)`; more convenient
-                      → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'    -- than `⟦ arity op ⟧ᵍ ⇒ᵗ [ op-time op ] (Tᵒ A τ)` for Agda
-                      → Tˢ A τ t')                              -- to see that the function `T-[]-moduleˢ` below terminates
+       → ({t' : Time} → t + op-time op ≤ t'
+                      → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'
+                      → Tˢ A τ t')
        → τ' ≡ op-time op + τ                                    -- abstracting into a variable for easier recursive defs.
        → Tˢ A τ' t
 
@@ -205,14 +200,14 @@ strᵀ {A} {B} {τ} {τ'} = tset-map λ { (v , c) → strˢ {A} {B} {τ} {τ'} v
 
 -- Algebraic operations
 
--- More standard `⟦ arity op ⟧ᵍ ⇒ᵗ [ op-time op ] (Tᵒ A τ)`
--- presentation compared tot he one used in the def. of `Tᵒ`
+-- note: op's continuation executes after `op-time op` time steps
 
 opᵀ : ∀ {A τ} → (op : Op)
-    → ConstTSet ⟦ param op ⟧ᵍ ×ᵗ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ [ op-time op ]ᵒ (Tᵒ A τ)) →ᵗ Tᵒ A (op-time op + τ)
+    → ConstTSet ⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)
+   →ᵗ Tᵒ A (op-time op + τ)
+   
 opᵀ {A} {τ} op =
-     tset-map (λ { (v , k) → node op v (λ {t'} → k {t'}) refl })
-  ∘ᵗ mapˣᵗ idᵗ (⇒ᵗ-[] {B = Tᵒ A τ} {τ = op-time op})
+  tset-map (λ { (v , k) → node op v k refl })
 
 -- Semantics of effect handling (the mediating
 -- homomorphism induced by a given algebra)
