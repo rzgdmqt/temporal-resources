@@ -121,7 +121,9 @@ mutual
         g = [ op-time op ]ᶠ f ∘ᵗ η⊣ in
     opᵀ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
                 curryᵗ g ⟩ᵗ
-  
+
+  ⟦ handle M `with H `in N ⟧ᶜᵗ = {!!}
+
   ⟦ unbox {Γ'} {τ = τ} p q V M ⟧ᶜᵗ =
     ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
                     ε⊣

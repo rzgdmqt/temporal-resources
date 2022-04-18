@@ -103,7 +103,19 @@ mutual
             -------------------------------------------------------
             → Γ ⊢C⦂ A ‼ (op-time op + τ)
 
-    -- TODO: in the future, add effect handlers as well
+    -- effect handling
+
+    handle_`with_`in
+            : {A B : VType}
+            → {τ τ' : Time}
+            → Γ ⊢C⦂ A ‼ τ
+            → ((op : Op) → (τ'' : Time) →                                  -- more formally there should be a
+                 Γ ∷ type-of-gtype (param op)                              -- parametricity condition here as
+                   ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')   -- well on the quantified time τ''
+                 ⊢C⦂ B ‼ (op-time op + τ''))
+            → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
+            --------------------------------------------------
+            → Γ ⊢C⦂ B ‼ (τ + τ')
 
     -- unboxing a boxed value/resource after enough time has passed for it to be ready
 
@@ -127,7 +139,7 @@ mutual
     delay   : {A : VType}
             → {τ τ'' : Time}
             → (τ' : Time)
-            → τ'' ≡ τ + τ'
+            → τ'' ≡ τ + τ'           -- abstracting τ + τ' into a separate variable for inductive proofs
             → Γ ⟨ τ' ⟩ ⊢C⦂ A ‼ τ
             --------------------
             → Γ ⊢C⦂ A ‼ τ''
