@@ -105,7 +105,7 @@ mutual
 
     -- effect handling
 
-    handle_`with_`in
+    handle_`with_`in_
             : {A B : VType}
             → {τ τ' : Time}
             → Γ ⊢C⦂ A ‼ τ

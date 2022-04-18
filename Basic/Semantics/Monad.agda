@@ -157,7 +157,9 @@ T-[]-module = tset-map T-[]-moduleˢ
 
 -- Multiplication
 
-μˢ : ∀ {A τ τ'} → {t : Time} → carrier (Tᵒ (Tᵒ A τ') τ) t → carrier (Tᵒ A (τ + τ')) t
+μˢ : ∀ {A τ τ'} → {t : Time}
+   → carrier (Tᵒ (Tᵒ A τ') τ) t → carrier (Tᵒ A (τ + τ')) t
+   
 μˢ {A} {τ} {τ'} {t} (leaf c) =
   T-[]-moduleˢ (monotone (Tᵒ A τ') (≤-reflexive (+-comm τ t)) c)
 μˢ (node op v k p) =
@@ -168,7 +170,10 @@ T-[]-module = tset-map T-[]-moduleˢ
 
 -- Strength
 
-strˢ : ∀ {A B τ τ' t} → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t → carrier (Tᵒ B τ) t → carrier (Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ) t
+strˢ : ∀ {A B τ τ' t}
+     → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t → carrier (Tᵒ B τ) t
+     → carrier (Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ) t
+     
 strˢ {A} {B} {τ} {τ'} {t} (vp , vx) (leaf w) =
   leaf (
     (≤-trans vp (≤-reflexive (+-comm t τ)) ,
@@ -208,3 +213,51 @@ opᵀ : ∀ {A τ} → (op : Op)
 opᵀ {A} {τ} op =
      tset-map (λ { (v , k) → node op v (λ {t'} → k {t'}) refl })
   ∘ᵗ mapˣᵗ idᵗ (⇒ᵗ-[] {B = Tᵒ A τ} {τ = op-time op})
+
+-- Semantics of effect handling (the mediating
+-- homomorphism induced by a given algebra)
+
+handleˢ : ∀ {A B τ τ' t}
+        → carrier (Tᵒ A τ) t
+        → ((op : Op) → (τ'' : Time) →
+             {t' : Time} → t ≤ t' → 
+             carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
+             ({t'' : Time} → t' + op-time op ≤ t'' →
+                carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ B τ'') t'') →
+             carrier (Tᵒ B (op-time op + τ'')) t')
+        → ({t' : Time} → t + τ ≤ t' → carrier A t' → carrier (Tᵒ B τ') t')
+        → carrier (Tᵒ B (τ + τ')) t
+        
+handleˢ {τ = τ} {t = t} (leaf v) h k =
+  T-[]-moduleˢ
+    (Tˢ-≤t
+      (≤-reflexive (+-comm τ t))
+      (k (≤-reflexive (+-comm t τ)) v))
+handleˢ {τ' = τ'} {t = t} (node {τ = τ''} op v k refl) h k' =
+  Tˢ-≤τ
+    (≤-reflexive (sym (+-assoc (op-time op) τ'' τ')))
+    (h op (τ'' + τ') ≤-refl v
+      (λ q y →
+        handleˢ
+          (k q y)
+          (λ op τ''' r x k'' →
+            h op τ'''
+              (≤-trans (m+n≤o⇒m≤o t q) r)
+              x
+              k'')
+          (λ r z →
+            k' (≤-trans
+                 (≤-trans
+                   (≤-reflexive (sym (+-assoc t (op-time op) τ'')))
+                   (+-monoˡ-≤ τ'' q)) r) z)))
+
+handleᵀ : ∀ {A B τ τ'}
+        → Tᵒ A τ ×ᵗ
+          Π Op (λ op → Π Time (λ τ'' →
+           ConstTSet ⟦ param op ⟧ᵍ ×ᵗ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ [ op-time op ]ᵒ (Tᵒ B τ'')) ⇒ᵗ Tᵒ B (op-time op + τ''))) ×ᵗ
+          [ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')
+        →ᵗ Tᵒ B (τ + τ')
+
+handleᵀ = tset-map (λ { (c , h , k) →
+  handleˢ c (λ op τ'' p x k' →
+    h op τ'' p (x , λ q y → k' (+-monoˡ-≤ (op-time op) q) y)) k })

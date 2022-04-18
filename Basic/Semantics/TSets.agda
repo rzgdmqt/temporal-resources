@@ -94,7 +94,7 @@ terminalᵗ = tset-map (λ _ → tt)
 initialᵗ : ∀ {A} → 𝟘ᵗ →ᵗ A
 initialᵗ = tset-map (λ ())
 
----- products
+---- binary products
 
 _×ᵗ_ : TSet → TSet → TSet
 A ×ᵗ B =
@@ -118,6 +118,25 @@ sndᵗ = tset-map proj₂
 mapˣᵗ : ∀ {A B C D} → A →ᵗ C → B →ᵗ D → A ×ᵗ B →ᵗ C ×ᵗ D
 mapˣᵗ f g = tset-map (mapˣ (map-carrier f) (map-carrier g))
 
+---- Set-indexed products
+
+Π : (I : Set) → (I → TSet) → TSet
+Π I A =
+  tset
+    (λ τ → (i : I) → carrier (A i) τ)
+    (λ p f i → monotone (A i) p (f i))
+    (λ f → fun-ext (λ i → monotone-refl (A i) (f i)))
+    (λ p q f → fun-ext (λ i → monotone-trans (A i) p q (f i)))
+
+projᵗ : ∀ {I A} → (i : I) → Π I A →ᵗ A i
+projᵗ i = tset-map (λ f → f i)
+
+⟨_⟩ⁱᵗ : ∀ {A I B} → ((i : I) → A →ᵗ B i) → A →ᵗ Π I B
+⟨ fs ⟩ⁱᵗ = tset-map (λ x i → map-carrier (fs i) x)
+
+mapⁱˣᵗ : ∀ {I A B} → ((i : I) → A i →ᵗ B i) → Π I A →ᵗ Π I B
+mapⁱˣᵗ fs = tset-map (λ f i → map-carrier (fs i) (f i))
+
 ---- exponentials
 
 _⇒ᵗ_ : TSet → TSet → TSet
@@ -130,7 +149,7 @@ A ⇒ᵗ B =
     (λ p q f → ifun-ext (fun-ext (λ r → fun-ext (λ x →
                  cong (λ p → f p x) (≤-irrelevant _ _)))))
 
-infix 22 _⇒ᵗ_
+infixr 22 _⇒ᵗ_
 
 appᵗ : ∀ {A B} → (A ⇒ᵗ B) ×ᵗ A →ᵗ B
 appᵗ = tset-map λ { {t} (f , a) → f ≤-refl a }

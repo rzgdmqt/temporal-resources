@@ -122,7 +122,18 @@ mutual
     opᵀ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
                 curryᵗ g ⟩ᵗ
 
-  ⟦ handle M `with H `in N ⟧ᶜᵗ = {!!}
+  ⟦_⟧ᶜᵗ {Γ} (handle_`with_`in_ {A} {B} {τ} {τ'} M H N) =
+    let f : ⟦ Γ ⟧ᵉ →ᵗ Π Op (λ op → Π Time (λ τ'' → ⟦ Γ ⟧ᵉ))
+        f = ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ⁱᵗ) ⟩ⁱᵗ in
+    let g : ⟦ Γ ⟧ᵉ →ᵗ [ τ ]ᵒ (⟦ A ⟧ᵛ ⇒ᵗ Tᵒ ⟦ B ⟧ᵛ τ')
+        g = {!!} in
+        
+    --let gs : (op : Op) → (τ'' : Time)
+    --       → ⟦ Γ ⟧ᵉ → 
+           
+    handleᵀ ∘ᵗ ⟨ ⟦ M ⟧ᶜᵗ , ⟨
+                 {!!} ,
+                 {!!} ⟩ᵗ ⟩ᵗ
 
   ⟦ unbox {Γ'} {τ = τ} p q V M ⟧ᶜᵗ =
     ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
