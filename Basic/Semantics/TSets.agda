@@ -118,6 +118,12 @@ sndᵗ = tset-map proj₂
 mapˣᵗ : ∀ {A B C D} → A →ᵗ C → B →ᵗ D → A ×ᵗ B →ᵗ C ×ᵗ D
 mapˣᵗ f g = tset-map (mapˣ (map-carrier f) (map-carrier g))
 
+×-assocᵗ : ∀ {A B C} → A ×ᵗ (B ×ᵗ C) →ᵗ (A ×ᵗ B) ×ᵗ C
+×-assocᵗ = ⟨ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ , sndᵗ ∘ᵗ sndᵗ ⟩ᵗ
+
+×-assocᵗ⁻¹ : ∀ {A B C} → (A ×ᵗ B) ×ᵗ C →ᵗ A ×ᵗ (B ×ᵗ C)
+×-assocᵗ⁻¹ = ⟨ fstᵗ ∘ᵗ fstᵗ , ⟨ sndᵗ ∘ᵗ fstᵗ , sndᵗ ⟩ᵗ ⟩ᵗ
+
 ---- Set-indexed products
 
 Π : (I : Set) → (I → TSet) → TSet
@@ -153,6 +159,9 @@ infixr 22 _⇒ᵗ_
 
 appᵗ : ∀ {A B} → (A ⇒ᵗ B) ×ᵗ A →ᵗ B
 appᵗ = tset-map λ { {t} (f , a) → f ≤-refl a }
+
+map⇒ᵗ : ∀ {A B C D} → (A →ᵗ B) → (C →ᵗ D) → B ⇒ᵗ C →ᵗ A ⇒ᵗ D
+map⇒ᵗ f g = tset-map λ h p x → map-carrier g (h p (map-carrier f x)) 
 
 curryᵗ : ∀ {A B C} → A ×ᵗ B →ᵗ C → A →ᵗ B ⇒ᵗ C
 curryᵗ {A} f = tset-map (λ a → λ p b → map-carrier f (monotone A p a , b))

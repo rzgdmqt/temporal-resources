@@ -252,12 +252,13 @@ handleˢ {τ' = τ'} {t = t} (node {τ = τ''} op v k refl) h k' =
                    (+-monoˡ-≤ τ'' q)) r) z)))
 
 handleᵀ : ∀ {A B τ τ'}
-        → Tᵒ A τ ×ᵗ
-          Π Op (λ op → Π Time (λ τ'' →
-           ConstTSet ⟦ param op ⟧ᵍ ×ᵗ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ [ op-time op ]ᵒ (Tᵒ B τ'')) ⇒ᵗ Tᵒ B (op-time op + τ''))) ×ᵗ
-          [ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')
+        → Tᵒ A τ
+       ×ᵗ Π Op (λ op → Π Time (λ τ'' →
+           ConstTSet ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ B τ'')))
+             ⇒ᵗ Tᵒ B (op-time op + τ'')))
+       ×ᵗ [ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')
         →ᵗ Tᵒ B (τ + τ')
 
 handleᵀ = tset-map (λ { (c , h , k) →
   handleˢ c (λ op τ'' p x k' →
-    h op τ'' p (x , λ q y → k' (+-monoˡ-≤ (op-time op) q) y)) k })
+    h op τ'' p (x , λ q y → k' q y)) k })

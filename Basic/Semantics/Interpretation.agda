@@ -122,18 +122,25 @@ mutual
     opᵀ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
                 curryᵗ g ⟩ᵗ
 
-  ⟦_⟧ᶜᵗ {Γ} (handle_`with_`in_ {A} {B} {τ} {τ'} M H N) =
+  ⟦_⟧ᶜᵗ {Γ} (handle_`with_`in {A} {B} {τ} {τ'} M H N) =
     let f : ⟦ Γ ⟧ᵉ →ᵗ Π Op (λ op → Π Time (λ τ'' → ⟦ Γ ⟧ᵉ))
         f = ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ⁱᵗ) ⟩ⁱᵗ in
     let g : ⟦ Γ ⟧ᵉ →ᵗ [ τ ]ᵒ (⟦ A ⟧ᵛ ⇒ᵗ Tᵒ ⟦ B ⟧ᵛ τ')
-        g = {!!} in
-        
-    --let gs : (op : Op) → (τ'' : Time)
-    --       → ⟦ Γ ⟧ᵉ → 
-           
-    handleᵀ ∘ᵗ ⟨ ⟦ M ⟧ᶜᵗ , ⟨
-                 {!!} ,
-                 {!!} ⟩ᵗ ⟩ᵗ
+        g = [ τ ]ᶠ (curryᵗ ⟦ N ⟧ᶜᵗ) ∘ᵗ η⊣ in
+    let h : (op : Op) → (τ'' : Time)
+          → ⟦ type-of-gtype (param op) ⟧ᵛ ×ᵗ [ op-time op ]ᵒ (⟦ type-of-gtype (arity op) ⟧ᵛ
+              ⇒ᵗ (Tᵒ ⟦ B ⟧ᵛ τ'')) ⇒ᵗ Tᵒ ⟦ B ⟧ᵛ (op-time op + τ'')
+          →ᵗ ConstTSet ⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ
+              ⇒ᵗ (Tᵒ ⟦ B ⟧ᵛ τ'')) ⇒ᵗ Tᵒ ⟦ B ⟧ᵛ (op-time op + τ'')
+        h = λ op τ'' →
+               map⇒ᵗ (mapˣᵗ
+                       (⟦⟧ᵍ-⟦⟧ᵛ (param op))
+                       ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) (idᵗ {A = Tᵒ ⟦ B ⟧ᵛ τ''}))))
+                      (idᵗ {A = Tᵒ ⟦ B ⟧ᵛ (op-time op + τ'')}) in
+    handleᵀ ∘ᵗ ⟨ ⟦ M ⟧ᶜᵗ ,
+                 ⟨ mapⁱˣᵗ (λ op → mapⁱˣᵗ (λ τ'' →
+                     h op τ'' ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×-assocᵗ))) ∘ᵗ f ,
+                   g ⟩ᵗ ⟩ᵗ
 
   ⟦ unbox {Γ'} {τ = τ} p q V M ⟧ᶜᵗ =
     ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
