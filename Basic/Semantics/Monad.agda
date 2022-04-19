@@ -296,7 +296,6 @@ opᵀ {A} {τ} op =
     (λ { (v , k) → node op v (λ p y → map-carrier k (p , y)) refl })
     (λ { p (x , k) → refl })
 
-{-
 -- Semantics of effect handling (the mediating
 -- homomorphism induced by a given algebra)
 
@@ -336,14 +335,29 @@ handleˢ {τ' = τ'} {t = t} (node {τ = τ''} op v k refl) h k' =
 
 handleᵀ : ∀ {A B τ τ'}
         → Tᵒ A τ
-       ×ᵗ Π Op (λ op → Π Time (λ τ'' →
-           ConstTSet ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ B τ'')))
-             ⇒ᵗ Tᵒ B (op-time op + τ'')))
-       ×ᵗ [ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')
+        ×ᵗ Π Op (λ op → Π Time (λ τ'' →
+            ConstTSet ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ B τ'')))
+              ⇒ᵗ Tᵒ B (op-time op + τ'')))
+        ×ᵗ [ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')
         →ᵗ Tᵒ B (τ + τ')
 
-handleᵀ = tset-map (λ { (c , h , k) →
-  handleˢ c (λ op τ'' p x k' →
-    h op τ'' p (x , λ q y → k' q y)) k })
-
+handleᵀ =
+  tset-map
+    (λ { (c , h , k) →
+      handleˢ c
+        (λ op τ'' p x k' →
+          map-carrier (h op τ'')
+            (p , x ,
+             tset-map
+               (λ { (q , y) → k' q y })
+               {!!}))
+        (λ p x → map-carrier k (p , x)) })
+    {!!}
+    
+{-
+  tset-map
+    (λ { (c , h , k) →
+      handleˢ c (λ op τ'' p x k' →
+        h op τ'' p (x , λ q y → k' q y)) k })
+    ?
 -}
