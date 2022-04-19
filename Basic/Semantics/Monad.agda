@@ -45,6 +45,7 @@ data Tˢ (A : TSet) : (τ : Time) → (t : Time) → Set where  -- 1st time inde
        → τ' ≡ op-time op + τ                                    -- abstracting into a variable for easier recursive defs.
        → Tˢ A τ' t
 
+
 -- Monotonicity wrt TSets' time-indices
 
 Tˢ-≤t : ∀ {A τ t t'} → t ≤ t' → Tˢ A τ t → Tˢ A τ t'
@@ -83,6 +84,21 @@ Tˢ-≤t-trans {A} p q (node op v k r) =
     (ifun-ext (fun-ext (λ s → fun-ext (λ y →
       cong (λ r → k r y) (≤-irrelevant _ _)))))
 
+-- Functorial action on →ᵗ
+
+Tˢᶠ : ∀ {A B τ} → A →ᵗ B → {t : Time} → Tˢ A τ t → Tˢ B τ t
+Tˢᶠ f (leaf v)   =
+  leaf (map-carrier f v)
+Tˢᶠ f (node op v k q) =
+  node op v (λ p y → Tˢᶠ f (k p y)) q
+
+Tˢᶠ-nat : ∀ {A B τ} → (f : A →ᵗ B) → {t t' : ℕ}
+        → (p : t ≤ t') → (c : Tˢ A τ t)
+        → Tˢᶠ f (Tˢ-≤t p c) ≡ Tˢ-≤t p (Tˢᶠ f c)
+        
+Tˢᶠ-nat f p (leaf v) = cong leaf (map-nat f _ v)
+Tˢᶠ-nat f p (node op v k q) = refl
+
 -- Monotonicity wrt time-gradings
 
 Tˢ-≤τ : ∀ {A τ τ' t} → τ ≤ τ' → Tˢ A τ t → Tˢ A τ' t
@@ -93,13 +109,17 @@ Tˢ-≤τ p (node op v k q) =
     (λ r y → Tˢ-≤τ (proj₂ (proj₂ (n≡m+k≤n' (trans q (+-comm (op-time op) _)) p))) (k r y))
     (trans (proj₁ (proj₂ (n≡m+k≤n' (trans q (+-comm (op-time op) _)) p))) (+-comm _ (op-time op)))
 
--- Functorial action on →ᵗ
-
-Tˢᶠ : ∀ {A B τ} → A →ᵗ B → {t : Time} → Tˢ A τ t → Tˢ B τ t
-Tˢᶠ (tset-map f) (leaf a)   =
-  leaf (f a)
-Tˢᶠ (tset-map f) (node op v k q) =
-  node op v (λ p y → Tˢᶠ (tset-map f) (k p y)) q
+Tˢ-≤τ-nat : ∀ {A τ τ'} → (p : τ ≤ τ') → {t t' : ℕ}
+          → (q : t ≤ t') (c : Tˢ A τ t)
+          → Tˢ-≤τ p (Tˢ-≤t q c) ≡ Tˢ-≤t q (Tˢ-≤τ p c)
+Tˢ-≤τ-nat {A} p q (leaf v) =
+  cong leaf
+    (trans
+      (monotone-trans A _ _ v)
+      (trans
+        (cong (λ r → monotone A r v) (≤-irrelevant _ _))
+        (sym (monotone-trans A _ _ v))))
+Tˢ-≤τ-nat p q (node op v k r) = refl
 
 -- Packaging it all up into a functor
 
@@ -107,10 +127,10 @@ Tᵒ : TSet → Time → TSet
 Tᵒ A τ = tset (λ t → Tˢ A τ t) Tˢ-≤t Tˢ-≤t-refl Tˢ-≤t-trans
 
 Tᶠ : ∀ {A B τ} → A →ᵗ B → Tᵒ A τ →ᵗ Tᵒ B τ
-Tᶠ f = tset-map (Tˢᶠ f)
+Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-nat f)
 
 T-≤τ : ∀ {A τ τ'} → τ ≤ τ' → Tᵒ A τ →ᵗ Tᵒ A τ'
-T-≤τ p = tset-map (Tˢ-≤τ p)
+T-≤τ p = tset-map (Tˢ-≤τ p) (Tˢ-≤τ-nat p)
 
 -- T is a [_]-module
 
@@ -142,13 +162,34 @@ T-[]-moduleˢ {A} {τ} {τ'} {t} (node {τ = τ''} op v k p) =
           (cong (_+ τ'') (+-comm τ (op-time op)))
           (+-assoc (op-time op) τ _))))
 
+T-[]-moduleˢ-t-nat : ∀ {A τ τ' t t'}
+                   → (p : t ≤ t') → (c : Tˢ A τ' (t + τ))
+                   → T-[]-moduleˢ (Tˢ-≤t (+-mono-≤ p (≤-reflexive refl)) c)
+                   ≡ Tˢ-≤t p (T-[]-moduleˢ c)
+
+T-[]-moduleˢ-t-nat {A} p (leaf v) =
+  cong leaf
+    (trans
+      (monotone-trans A _ _ v)
+      (trans
+        (cong (λ r → monotone A r v) (≤-irrelevant _ _))
+        (sym (monotone-trans A _ _ v))))
+T-[]-moduleˢ-t-nat p (node op v k q) =
+  cong₂ (node op v)
+    (ifun-ext (fun-ext (λ r → fun-ext (λ y →
+      cong (λ s → T-[]-moduleˢ (k s y)) (≤-irrelevant _ _)))))
+    refl
+
 T-[]-module : ∀ {A τ τ'} → [ τ ]ᵒ (Tᵒ A τ') →ᵗ Tᵒ A (τ + τ')
-T-[]-module = tset-map T-[]-moduleˢ
+T-[]-module = tset-map T-[]-moduleˢ T-[]-moduleˢ-t-nat 
 
 -- Unit
 
 ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
-ηᵀ = tset-map (λ v → leaf v)
+ηᵀ {A} =
+  tset-map
+    (λ v → leaf v)
+    (λ p x → cong leaf (cong (λ q → monotone A q x) (≤-irrelevant _ _)))
 
 -- Multiplication
 
@@ -160,8 +201,23 @@ T-[]-module = tset-map T-[]-moduleˢ
 μˢ (node op v k p) =
   node op v (λ q y → μˢ (k q y)) (trans (cong (_+ _) p) (+-assoc (op-time op) _ _))
 
+μˢ-t-nat : ∀ {A τ τ' t t'}
+         → (p : t ≤ t')
+         → (c : Tˢ (tset (Tˢ A τ') Tˢ-≤t Tˢ-≤t-refl Tˢ-≤t-trans) τ t)
+         → μˢ (Tˢ-≤t p c) ≡ Tˢ-≤t p (μˢ c)
+μˢ-t-nat p (leaf c) =
+  trans
+    (cong T-[]-moduleˢ
+      (trans
+        (Tˢ-≤t-trans _ _ c)
+        (trans
+          (cong (λ q → Tˢ-≤t q c) (≤-irrelevant _ _))
+          (sym (Tˢ-≤t-trans _ _ c)))))
+    (T-[]-moduleˢ-t-nat p _)
+μˢ-t-nat p (node op v k q) = refl
+
 μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
-μᵀ = tset-map μˢ
+μᵀ = tset-map μˢ μˢ-t-nat
 
 -- Strength
 
@@ -195,8 +251,37 @@ strˢ {A} {B} {τ' = τ''} {t} (vp , vx) (node {τ = τ} {τ' = τ'} op w k p) =
         (k q y))
     p
 
+strˢ-t-nat : ∀ {A B τ τ'} → {t t' : ℕ} → (p : t ≤ t')
+           → (x : carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ) t)
+           → strˢ {A = A} {B = B} (monotone ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) p (proj₁ x)) (Tˢ-≤t p (proj₂ x))
+           ≡ Tˢ-≤t p (strˢ {A = A} {B = B} (proj₁ x) (proj₂ x))
+
+strˢ-t-nat {A} p (x , leaf v) =
+  cong leaf
+    (cong₂ _,_
+      (cong₂ _,_
+        (≤-irrelevant _ _)
+        (trans
+          (monotone-trans A _ _ (proj₂ x))
+          (trans
+            (cong (λ q → monotone A q (proj₂ x)) (≤-irrelevant _ _))
+            (sym (monotone-trans A _ _ (proj₂ x))))))
+      refl)
+strˢ-t-nat {A} p (x , node op v k q) =
+  cong₂ (node op v)
+    (ifun-ext (fun-ext (λ r → fun-ext (λ y →
+      cong₂ strˢ
+        (cong₂ _,_
+          (≤-irrelevant _ _)
+          (trans
+            (monotone-trans A _ _ (proj₂ x))
+            (cong (λ s → monotone A s (proj₂ x)) (≤-irrelevant _ _))))
+        refl))))
+    refl
+
 strᵀ : ∀ {A B τ τ'} → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
-strᵀ {A} {B} {τ} {τ'} = tset-map λ { (v , c) → strˢ {A} {B} {τ} {τ'} v c }
+strᵀ {A} {B} {τ} {τ'} =
+  tset-map (λ { (v , c) → strˢ {A} {B} {τ} {τ'} v c }) strˢ-t-nat
 
 -- Algebraic operations
 
@@ -207,8 +292,11 @@ opᵀ : ∀ {A τ} → (op : Op)
    →ᵗ Tᵒ A (op-time op + τ)
    
 opᵀ {A} {τ} op =
-  tset-map (λ { (v , k) → node op v k refl })
+  tset-map
+    (λ { (v , k) → node op v (λ p y → map-carrier k (p , y)) refl })
+    (λ { p (x , k) → refl })
 
+{-
 -- Semantics of effect handling (the mediating
 -- homomorphism induced by a given algebra)
 
@@ -257,3 +345,5 @@ handleᵀ : ∀ {A B τ τ'}
 handleᵀ = tset-map (λ { (c , h , k) →
   handleˢ c (λ op τ'' p x k' →
     h op τ'' p (x , λ q y → k' q y)) k })
+
+-}
