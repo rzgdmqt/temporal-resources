@@ -16,6 +16,7 @@ open Eq.≡-Reasoning
 
 open import Axiom.Extensionality.Propositional
 
+open import Util.Equality
 open import Util.Time
 
 module Semantics.TSets where
@@ -24,15 +25,17 @@ postulate
   fun-ext  : ∀ {a b} → Extensionality a b            -- assuming function extensionality
   ifun-ext : ∀ {a b} → ExtensionalityImplicit a b   -- and the same for functions with implicit arguments
 
--- Time-varying sets
+-- Time-varying sets (covariant presheaves on (ℕ,≤))
 
 record TSet : Set₁ where
   constructor
     tset
   field
+    -- object map / carrier of the presheaf
     carrier  : Time → Set
+    -- functorial action / monotonicity on (ℕ,≤) of the presheaf
     monotone : ∀ {t t'} → t ≤ t' → carrier t → carrier t'
-
+    -- functorial action preserves identities and composition
     monotone-refl  : ∀ {t}
                    → (x : carrier t) → monotone (≤-refl {t}) x ≡ x
     monotone-trans : ∀ {t t' t''} → (p : t ≤ t') → (q : t' ≤ t'')
@@ -51,7 +54,12 @@ record _→ᵗ_ (A B : TSet) : Set where
   constructor
     tset-map
   field
+    -- carrier of a map between two presheaves
     map-carrier : ∀ {t} → carrier A t → carrier B t
+    -- naturality of the map
+    map-nat : ∀ {t t'} → (p : t ≤ t')
+            → (x : carrier A t)
+            → map-carrier (monotone A p x) ≡ monotone B p (map-carrier x)
 
     -- TODO: also include naturality law
 
@@ -66,13 +74,28 @@ _≡ᵗ_ {A} f g = ∀ {t} → (x : carrier A t) → map-carrier f x ≡ map-car
 
 infix 5 _≡ᵗ_
 
+-- ≡ᵗ implies ≡
+
+≡ᵗ-≡ : ∀ {A B} → {f : A →ᵗ B} {g : A →ᵗ B} → f ≡ᵗ g → f ≡ g
+≡ᵗ-≡ p =
+  dcong₂
+    tset-map
+      (ifun-ext (fun-ext p))
+      (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ x → uip)))))
+
 -- Identity and composition of maps
 
 idᵗ : ∀ {A} → A →ᵗ A
-idᵗ = tset-map id
+idᵗ = tset-map id (λ p x → refl)
 
 _∘ᵗ_ : ∀ {A B C} → B →ᵗ C → A →ᵗ B → A →ᵗ C
-g ∘ᵗ f = tset-map (map-carrier g ∘ map-carrier f)
+g ∘ᵗ f =
+  tset-map
+    (map-carrier g ∘ map-carrier f)
+    (λ p x →
+      trans
+        (cong (λ y → map-carrier g y) (map-nat f p x))
+        (map-nat g p (map-carrier f x)))
 
 infixr 9 _∘ᵗ_
 
@@ -84,7 +107,7 @@ infixr 9 _∘ᵗ_
 𝟙ᵗ = tset (λ _ → ⊤) (λ _ → id) (λ _ → refl) (λ _ _ _ → refl)
 
 terminalᵗ : ∀ {A} → A →ᵗ 𝟙ᵗ
-terminalᵗ = tset-map (λ _ → tt)
+terminalᵗ = tset-map (λ _ → tt) (λ p x → refl)
 
 ---- initial object
 
@@ -92,7 +115,7 @@ terminalᵗ = tset-map (λ _ → tt)
 𝟘ᵗ = tset (λ _ → ⊥) (λ _ → id) (λ _ → refl) (λ _ _ _ → refl)
 
 initialᵗ : ∀ {A} → 𝟘ᵗ →ᵗ A
-initialᵗ = tset-map (λ ())
+initialᵗ = tset-map (λ ()) (λ { p () })
 
 ---- binary products
 
@@ -107,16 +130,19 @@ A ×ᵗ B =
 infixr 23 _×ᵗ_
 
 fstᵗ : ∀ {A B} → A ×ᵗ B →ᵗ A
-fstᵗ = tset-map proj₁
+fstᵗ = tset-map proj₁ (λ { p (x , y) → refl })
 
 sndᵗ : ∀ {A B} → A ×ᵗ B →ᵗ B
-sndᵗ = tset-map proj₂
+sndᵗ = tset-map proj₂ (λ { p (x , y) → refl })
 
 ⟨_,_⟩ᵗ : ∀ {A B C} → A →ᵗ B → A →ᵗ C → A →ᵗ B ×ᵗ C
-⟨ f , g ⟩ᵗ = tset-map < map-carrier f , map-carrier g >
+⟨ f , g ⟩ᵗ =
+  tset-map
+    < map-carrier f , map-carrier g >
+    (λ p x → cong₂ _,_ (map-nat f p x) (map-nat g p x))
 
 mapˣᵗ : ∀ {A B C D} → A →ᵗ C → B →ᵗ D → A ×ᵗ B →ᵗ C ×ᵗ D
-mapˣᵗ f g = tset-map (mapˣ (map-carrier f) (map-carrier g))
+mapˣᵗ f g = ⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ
 
 ×-assocᵗ : ∀ {A B C} → A ×ᵗ (B ×ᵗ C) →ᵗ (A ×ᵗ B) ×ᵗ C
 ×-assocᵗ = ⟨ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ , sndᵗ ∘ᵗ sndᵗ ⟩ᵗ
@@ -135,15 +161,57 @@ mapˣᵗ f g = tset-map (mapˣ (map-carrier f) (map-carrier g))
     (λ p q f → fun-ext (λ i → monotone-trans (A i) p q (f i)))
 
 projᵗ : ∀ {I A} → (i : I) → Π I A →ᵗ A i
-projᵗ i = tset-map (λ f → f i)
-
-⟨_⟩ⁱᵗ : ∀ {A I B} → ((i : I) → A →ᵗ B i) → A →ᵗ Π I B
-⟨ fs ⟩ⁱᵗ = tset-map (λ x i → map-carrier (fs i) x)
+projᵗ i =
+  tset-map
+    (λ f → f i)
+    (λ p f → refl)
+    
+⟨_⟩ᵢᵗ : ∀ {A I B} → ((i : I) → A →ᵗ B i) → A →ᵗ Π I B
+⟨ fs ⟩ᵢᵗ =
+  tset-map
+    (λ x i → map-carrier (fs i) x)
+    (λ p x → fun-ext (λ i → map-nat (fs i) p x))
 
 mapⁱˣᵗ : ∀ {I A B} → ((i : I) → A i →ᵗ B i) → Π I A →ᵗ Π I B
-mapⁱˣᵗ fs = tset-map (λ f i → map-carrier (fs i) (f i))
+mapⁱˣᵗ fs = ⟨ (λ i → fs i ∘ᵗ projᵗ i) ⟩ᵢᵗ
+
+---- covariant hom-functor
+
+homᵒ : Time → TSet
+homᵒ t =
+  tset
+    (λ t' → t ≤ t')
+    (λ p q → ≤-trans q p)
+    (λ p → ≤-irrelevant _ _)
+    (λ p q r → ≤-irrelevant _ _)
+
+homᶠ : ∀ {t t'} → t ≤ t' → homᵒ t' →ᵗ homᵒ t
+homᶠ p =
+  tset-map
+    (λ q → ≤-trans p q)
+    (λ p q → ≤-irrelevant _ _)
+
+homᶠ-refl : ∀ {t} → homᶠ (≤-refl {t}) ≡ᵗ idᵗ
+homᶠ-refl p = ≤-irrelevant _ _
+
+homᶠ-trans : ∀ {t t' t''}
+           → (p : t ≤ t') → (q : t' ≤ t'') → homᶠ p ∘ᵗ homᶠ q ≡ᵗ homᶠ (≤-trans p q)
+homᶠ-trans p q r = ≤-irrelevant _ _
 
 ---- exponentials
+
+_⇒ᵗ_ : TSet → TSet → TSet
+A ⇒ᵗ B =
+  tset
+    (λ t → homᵒ t ×ᵗ A →ᵗ B)
+    (λ p f → f ∘ᵗ mapˣᵗ (homᶠ p) idᵗ)
+    (λ {t} f →
+      ≡ᵗ-≡ (λ { (p , x) →
+        cong (λ q → map-carrier f (q , x)) (≤-irrelevant _ _) }))
+    (λ p q f →
+      ≡ᵗ-≡ (λ { (r , x) →
+        cong (λ s → map-carrier f (s , x)) (≤-irrelevant _ _) }))
+{-
 
 _⇒ᵗ_ : TSet → TSet → TSet
 A ⇒ᵗ B =
@@ -158,7 +226,18 @@ A ⇒ᵗ B =
 infixr 22 _⇒ᵗ_
 
 appᵗ : ∀ {A B} → (A ⇒ᵗ B) ×ᵗ A →ᵗ B
-appᵗ = tset-map λ { {t} (f , a) → f ≤-refl a }
+appᵗ {A} {B} =
+  tset-map
+    (λ { (f , x) → f ≤-refl x })
+    (λ { p (f , x) →
+      trans
+        (cong (λ q → f q (monotone A p x)) (≤-irrelevant _ p))
+        (trans
+          {!!}
+          (cong (λ q → monotone B p (f q x)) refl)) })
+
+--             → (x : carrier A t) → map-carrier (monotone A p x) ≡ monotone B p (map-carrier x)
+    
 
 map⇒ᵗ : ∀ {A B C D} → (A →ᵗ B) → (C →ᵗ D) → B ⇒ᵗ C →ᵗ A ⇒ᵗ D
 map⇒ᵗ f g = tset-map λ h p x → map-carrier g (h p (map-carrier f x)) 
@@ -169,3 +248,4 @@ curryᵗ {A} f = tset-map (λ a → λ p b → map-carrier f (monotone A p a , b
 uncurryᵗ : ∀ {A B C} → A →ᵗ B ⇒ᵗ C → A ×ᵗ B →ᵗ C
 uncurryᵗ f = tset-map λ { (a , b) → map-carrier f a ≤-refl b }
 
+-}

@@ -27,6 +27,10 @@ module Everything where
 -- UTILS
 --------
 
+---- Equality
+
+open import Util.Equality
+
 ---- Time
 
 open import Util.Time
