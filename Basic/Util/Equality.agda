@@ -7,7 +7,7 @@ open Eq hiding (Extensionality)
 
 module Util.Equality where
 
--- Congruence for dependent functions
+-- Congruence rules for dependent functions
 
 dcong : ∀ {A : Set} {B : A → Set} (f : (x : A) → B x) {x y}
       → (p : x ≡ y) → subst B p (f x) ≡ f y

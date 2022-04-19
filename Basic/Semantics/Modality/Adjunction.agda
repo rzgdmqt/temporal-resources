@@ -34,6 +34,14 @@ module Semantics.Modality.Adjunction where
     (λ {t'} a →
       m≤n+m τ t' ,
       monotone A (≤-reflexive (sym (m+n∸n≡m t' τ))) a)
+    (λ p x →
+      cong₂ _,_
+        (≤-irrelevant _ _)
+        (trans
+          (monotone-trans A _ _ x)
+          (trans
+            (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+            (sym (monotone-trans A _ _ x)))))
 
 -- Counit of the adjunction
 
@@ -41,6 +49,12 @@ module Semantics.Modality.Adjunction where
 ε⊣ {A} {τ} =
   tset-map
     (λ { {t'} (p , a) → monotone A (n≤m⇒m∸n+n≤m τ t' p) a })
+    (λ { p (q , x) →
+      trans
+        (monotone-trans A _ _ x)
+        (trans
+          (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+          (sym (monotone-trans A _ _ x))) })
 
 
 -- PROPERTIES
@@ -66,6 +80,13 @@ module Semantics.Modality.Adjunction where
       (monotone-refl A x))
 
 -- ...
+
+
+
+
+
+
+
 
 
 

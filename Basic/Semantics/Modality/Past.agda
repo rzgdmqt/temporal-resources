@@ -34,7 +34,7 @@ module Semantics.Modality.Past where
 ⟨ τ ⟩ᵒ (A) =
   tset
     (λ t' → τ ≤ t' × carrier A (t' ∸ τ))
-    (λ p (q , a) → ≤-trans q p , monotone A (∸-mono p (≤-refl {τ})) a)
+    (λ p (q , x) → ≤-trans q p , monotone A (∸-mono p (≤-refl {τ})) x)
     (λ x → cong₂ _,_
              (≤-irrelevant _ _)
              (trans
@@ -49,7 +49,8 @@ module Semantics.Modality.Past where
 ⟨_⟩ᶠ : ∀ {A B} → (τ : Time) → A →ᵗ B → ⟨ τ ⟩ᵒ A →ᵗ ⟨ τ ⟩ᵒ B
 ⟨ τ ⟩ᶠ f =
   tset-map
-    (λ { (p , a) → p , map-carrier f a })
+    (λ { (p , x) → p , map-carrier f x })
+    (λ { p (q , x) → cong (≤-trans q p ,_) (map-nat f _ x) })
 
 -- (Contravariant) monotonicity for gradings
 
@@ -57,44 +58,61 @@ module Semantics.Modality.Past where
 ⟨⟩-≤ {A} p =
   tset-map
     (λ { {t} (q , a) → ≤-trans p q , monotone A (∸-mono (≤-refl {t}) p) a })
+    (λ { q (r , x) →
+      cong₂ _,_
+        (≤-irrelevant _ _)
+        (trans
+          (monotone-trans A _ _ x)
+          (trans
+            (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+            (sym (monotone-trans A _ _ x)))) })
 
 -- Unit
 
 η : ∀ {A} → A →ᵗ ⟨ 0 ⟩ᵒ A
-η =
+η {A} =
   tset-map
-    (λ a → z≤n , a)
+    (λ x → z≤n , x)
+    (λ p x → cong (z≤n ,_) (cong (λ q → monotone A q x) (≤-irrelevant _ _)))
 
 η⁻¹ : ∀ {A} → ⟨ 0 ⟩ᵒ A →ᵗ A
-η⁻¹ =
+η⁻¹ {A} =
   tset-map
-    (λ { (p , a) → a })
+    (λ { (p , x) → x })
+    (λ { p (q , x) → cong (λ r → monotone A r x) (≤-irrelevant _ _) })
 
 -- Multiplication
 
 μ : ∀ {A τ₁ τ₂} → ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A) →ᵗ ⟨ τ₁ + τ₂ ⟩ᵒ A
 μ {A} {τ₁} {τ₂} =
   tset-map
-    (λ { {t} (p , q , a) → n≤k⇒m≤k∸n⇒n+m≤k τ₁ τ₂ t p q ,
-                           monotone A (≤-reflexive (n∸m∸k≡n∸m+k t τ₁ τ₂)) a })
-
+    (λ { {t} (p , q , x) → n≤k⇒m≤k∸n⇒n+m≤k τ₁ τ₂ t p q ,
+                           monotone A (≤-reflexive (n∸m∸k≡n∸m+k t τ₁ τ₂)) x })
+    (λ { p (q , r , x) →
+      cong₂ _,_
+        (≤-irrelevant _ _)
+        (trans
+          (monotone-trans A _ _ x)
+          (trans
+            (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+            (sym (monotone-trans A _ _ x)))) })
+    
 μ⁻¹ : ∀ {A τ₁ τ₂} → ⟨ τ₁ + τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A)
 μ⁻¹ {A} {τ₁} {τ₂} =
   tset-map
     (λ { {t} (p , a) → m+n≤o⇒m≤o τ₁ p ,
                        n+m≤k⇒m≤k∸n τ₁ τ₂ t p ,
                        monotone A (≤-reflexive (sym (n∸m∸k≡n∸m+k t τ₁ τ₂))) a })
-
--- Costrength
-
-costr-⟨⟩ : ∀ {A B τ} → ⟨ τ ⟩ᵒ (A ×ᵗ B) →ᵗ ⟨ τ ⟩ᵒ A ×ᵗ B
-costr-⟨⟩ {B = B} {τ = τ} =
-  tset-map (λ { {t} (p , x , y) → (p , x) , monotone B (m∸n≤m t τ) y })
-
--- Strength (for constant time-varying sets)
-
-str-⟨⟩ : ∀ {A B τ} → ⟨ τ ⟩ᵒ A ×ᵗ ConstTSet B →ᵗ ⟨ τ ⟩ᵒ (A ×ᵗ ConstTSet B)
-str-⟨⟩ = tset-map (λ { ((p , x) , y) → p , x , y })
+    λ { p (q , x) →
+      cong₂ _,_
+        (≤-irrelevant _ _)
+        (cong₂ _,_
+          (≤-irrelevant _ _)
+          (trans
+            (monotone-trans A _ _ x)
+            (trans
+              (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+              (sym (monotone-trans A _ _ x))))) }
 
 -- Derived counit map (a value that was available
 -- τ time steps in the past is also available now)

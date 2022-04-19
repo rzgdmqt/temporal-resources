@@ -34,7 +34,7 @@ module Semantics.Modality.Future where
 [ τ ]ᵒ A =
   tset
     (λ t' → carrier A (t' + τ))
-    (λ p a → monotone A (+-mono-≤ p ≤-refl) a)
+    (λ p x → monotone A (+-mono-≤ p ≤-refl) x)
     (λ x → trans
              (cong (λ p → monotone A p x) (≤-irrelevant _ ≤-refl))
              (monotone-refl A x))
@@ -45,37 +45,71 @@ module Semantics.Modality.Future where
                    (≤-irrelevant _ (+-mono-≤ (≤-trans p q) ≤-refl))))
 
 [_]ᶠ : ∀ {A B} → (τ : Time) → A →ᵗ B → [ τ ]ᵒ A →ᵗ [ τ ]ᵒ B
-[ τ ]ᶠ (tset-map f) = tset-map f
+[ τ ]ᶠ f =
+  tset-map
+    (map-carrier f)
+    (λ p x → map-nat f (+-mono-≤ p ≤-refl) x)
 
 -- Monotonicity for gradings
 
 []-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → [ τ₁ ]ᵒ A →ᵗ [ τ₂ ]ᵒ A
 []-≤ {A} p =
   tset-map
-    (λ a → monotone A (+-mono-≤ ≤-refl p) a)
+    (λ x → monotone A (+-mono-≤ ≤-refl p) x)
+    (λ p x →
+      trans
+        (monotone-trans A _ _ x)
+        (trans
+          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+          (sym (monotone-trans A _ _ x))))
 
 -- Counit
 
 ε : ∀ {A} → [ 0 ]ᵒ A →ᵗ A
 ε {A} =
   tset-map
-    (λ {t} a → monotone A (≤-reflexive (+-identityʳ t)) a)
+    (λ {t} x → monotone A (≤-reflexive (+-identityʳ t)) x)
+    (λ p x →
+      trans
+        (monotone-trans A _ _ x)
+        (trans
+          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+          (sym (monotone-trans A _ _ x))))
 
 ε⁻¹ : ∀ {A} → A →ᵗ [ 0 ]ᵒ A
 ε⁻¹ {A} =
   tset-map
-    (λ {t} a → monotone A (≤-reflexive (sym (+-identityʳ t))) a)
+    (λ {t} x → monotone A (≤-reflexive (sym (+-identityʳ t))) x)
+    (λ p x →
+      trans
+        (monotone-trans A _ _ x)
+        (trans
+          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+          (sym (monotone-trans A _ _ x))))
 
 -- Comultiplication
 
 δ : ∀ {A τ₁ τ₂} → [ τ₁ + τ₂ ]ᵒ A →ᵗ [ τ₁ ]ᵒ ([ τ₂ ]ᵒ A)
 δ {A} {τ₁} {τ₂} =
   tset-map
-    (λ {t} a → monotone A (≤-reflexive (sym (+-assoc t τ₁ τ₂))) a)
+    (λ {t} x → monotone A (≤-reflexive (sym (+-assoc t τ₁ τ₂))) x)
+    (λ p x →
+      trans
+        (monotone-trans A _ _ x)
+        (trans
+          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+          (sym (monotone-trans A _ _ x))))
 
 δ⁻¹ : ∀ {A τ₁ τ₂} → [ τ₁ ]ᵒ ([ τ₂ ]ᵒ A) →ᵗ [ τ₁ + τ₂ ]ᵒ A
 δ⁻¹ {A} {τ₁} {τ₂} =
-  tset-map (λ {t} a → monotone A (≤-reflexive (+-assoc t τ₁ τ₂)) a)
+  tset-map
+    (λ {t} x → monotone A (≤-reflexive (+-assoc t τ₁ τ₂)) x)
+    (λ p x →
+      trans
+        (monotone-trans A _ _ x)
+        (trans
+          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+          (sym (monotone-trans A _ _ x))))
 
 -- Derived general unit map (a value now is
 -- also available in at most τ time steps)
@@ -83,17 +117,7 @@ module Semantics.Modality.Future where
 η-[] : ∀ {A τ} → A →ᵗ [ τ ]ᵒ A
 η-[] {A} {τ} = []-≤ {A = A} z≤n ∘ᵗ ε⁻¹
 
-
 -- PROPERTIES
-
--- [_]ᵒ commutes with ⇒ᵗ on constant domain
-
-[]-⇒ᵗ : ∀ {A B τ} → [ τ ]ᵒ (ConstTSet A ⇒ᵗ B) →ᵗ ConstTSet A ⇒ᵗ [ τ ]ᵒ B
-[]-⇒ᵗ {τ = τ} = tset-map (λ f p x → f  (+-monoˡ-≤ τ p) x)
-
-⇒ᵗ-[] : ∀ {A B τ} → ConstTSet A ⇒ᵗ [ τ ]ᵒ B →ᵗ [ τ ]ᵒ (ConstTSet A ⇒ᵗ B)
-⇒ᵗ-[] {B = B} {τ = τ} =
-  tset-map (λ {t} f p x → monotone B p (f {t} ≤-refl x))
 
 -- [_]ᵒ is functorial in the gradings
 
