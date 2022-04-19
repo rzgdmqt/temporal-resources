@@ -45,7 +45,6 @@ data Tˢ (A : TSet) : (τ : Time) → (t : Time) → Set where  -- 1st time inde
        → τ' ≡ op-time op + τ                                    -- abstracting into a variable for easier recursive defs.
        → Tˢ A τ' t
 
-
 -- Monotonicity wrt TSets' time-indices
 
 Tˢ-≤t : ∀ {A τ t t'} → t ≤ t' → Tˢ A τ t → Tˢ A τ t'
@@ -285,8 +284,6 @@ strᵀ {A} {B} {τ} {τ'} =
 
 -- Algebraic operations
 
--- note: op's continuation executes after `op-time op` time steps
-
 opᵀ : ∀ {A τ} → (op : Op)
     → ConstTSet ⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)
    →ᵗ Tᵒ A (op-time op + τ)
@@ -341,18 +338,27 @@ handleᵀ : ∀ {A B τ τ'}
         ×ᵗ [ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')
         →ᵗ Tᵒ B (τ + τ')
 
-handleᵀ =
-  tset-map
-    (λ { (c , h , k) →
-      handleˢ c
-        (λ op τ'' p x k' →
-          map-carrier (h op τ'')
-            (p , x ,
-             tset-map
-               (λ { (q , y) → k' q y })
-               {!!}))
-        (λ p x → map-carrier k (p , x)) })
-    {!!}
+handleᵀ {A} {B} {τ} {τ'} =
+  let handle-map : {t : Time}
+                 → carrier (
+                     Tᵒ A τ ×ᵗ
+                     Π Op (λ op → Π Time (λ τ'' →
+                       ConstTSet ⟦ param op ⟧ᵍ ×ᵗ
+                       [ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')
+                         ⇒ᵗ Tᵒ B (op-time op + τ''))) ×ᵗ
+                     [ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')) t
+                 → carrier (Tᵒ B (τ + τ')) t
+      handle-map =
+        λ { (c , h , k) →
+          handleˢ c
+            (λ op τ'' p x k' →
+              map-carrier (h op τ'')
+                (p , x ,
+                 tset-map
+                   (λ { (q , y) → Tˢ-≤t q (k' ≤-refl y) })
+                   (λ { q (r , y) → sym (Tˢ-≤t-trans _ _ _) })))
+            (λ p x → map-carrier k (p , x)) } in
+  tset-map handle-map {!!}
     
 {-
   tset-map
