@@ -195,8 +195,18 @@ homᶠ-refl : ∀ {t} → homᶠ (≤-refl {t}) ≡ᵗ idᵗ
 homᶠ-refl p = ≤-irrelevant _ _
 
 homᶠ-trans : ∀ {t t' t''}
-           → (p : t ≤ t') → (q : t' ≤ t'') → homᶠ p ∘ᵗ homᶠ q ≡ᵗ homᶠ (≤-trans p q)
+           → (p : t ≤ t') → (q : t' ≤ t'')
+           → homᶠ p ∘ᵗ homᶠ q ≡ᵗ homᶠ (≤-trans p q)
 homᶠ-trans p q r = ≤-irrelevant _ _
+
+hom-iso-map : ∀ {A t} → carrier A t → homᵒ t →ᵗ A
+hom-iso-map {A} x =
+  tset-map
+    (λ p → monotone A p x)
+    (λ p q → sym (monotone-trans A q p x))
+
+hom-iso-map⁻¹ : ∀ {A t} → homᵒ t →ᵗ A → carrier A t
+hom-iso-map⁻¹ {A} f = map-carrier f ≤-refl
 
 ---- exponentials
 
@@ -211,41 +221,30 @@ A ⇒ᵗ B =
     (λ p q f →
       ≡ᵗ-≡ (λ { (r , x) →
         cong (λ s → map-carrier f (s , x)) (≤-irrelevant _ _) }))
-{-
-
-_⇒ᵗ_ : TSet → TSet → TSet
-A ⇒ᵗ B =
-  tset
-    (λ t → {t' : Time} → t ≤ t' → carrier A t' → carrier B t')
-    (λ p f q a → f (≤-trans p q) a)
-    (λ f → ifun-ext (fun-ext (λ p → fun-ext λ x →
-             cong (λ p → f p x) (≤-irrelevant _ _))))
-    (λ p q f → ifun-ext (fun-ext (λ r → fun-ext (λ x →
-                 cong (λ p → f p x) (≤-irrelevant _ _)))))
 
 infixr 22 _⇒ᵗ_
 
 appᵗ : ∀ {A B} → (A ⇒ᵗ B) ×ᵗ A →ᵗ B
 appᵗ {A} {B} =
   tset-map
-    (λ { (f , x) → f ≤-refl x })
+    (λ { (f , x) → map-carrier f (≤-refl , x) })
     (λ { p (f , x) →
       trans
-        (cong (λ q → f q (monotone A p x)) (≤-irrelevant _ p))
-        (trans
-          {!!}
-          (cong (λ q → monotone B p (f q x)) refl)) })
-
---             → (x : carrier A t) → map-carrier (monotone A p x) ≡ monotone B p (map-carrier x)
-    
+        (cong (λ q → map-carrier f (q , monotone A p x)) (≤-irrelevant _ _))
+        (map-nat f p (≤-reflexive refl , x)) })
 
 map⇒ᵗ : ∀ {A B C D} → (A →ᵗ B) → (C →ᵗ D) → B ⇒ᵗ C →ᵗ A ⇒ᵗ D
-map⇒ᵗ f g = tset-map λ h p x → map-carrier g (h p (map-carrier f x)) 
+map⇒ᵗ f g =
+  tset-map
+    (λ h → g ∘ᵗ h ∘ᵗ mapˣᵗ idᵗ f)
+    (λ p h → ≡ᵗ-≡ (λ { (q , x) → refl }))
 
 curryᵗ : ∀ {A B C} → A ×ᵗ B →ᵗ C → A →ᵗ B ⇒ᵗ C
-curryᵗ {A} f = tset-map (λ a → λ p b → map-carrier f (monotone A p a , b))
-
-uncurryᵗ : ∀ {A B C} → A →ᵗ B ⇒ᵗ C → A ×ᵗ B →ᵗ C
-uncurryᵗ f = tset-map λ { (a , b) → map-carrier f a ≤-refl b }
-
--}
+curryᵗ {A} f =
+  tset-map
+    (λ x → f ∘ᵗ mapˣᵗ (hom-iso-map x) idᵗ)
+    (λ p x →
+      ≡ᵗ-≡ (λ { (q , y) →
+        cong
+          (map-carrier f)
+          (cong (_, y) (monotone-trans A p q x)) }))
