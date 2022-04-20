@@ -84,8 +84,8 @@ Tˢ-≤t-trans {A} p q (node op v k r) =
     (ifun-ext (fun-ext (λ s → fun-ext (λ y →
       cong (λ r → k r y) (≤-irrelevant _ _)))))
 
--- Refinement of the object mapping to operations whose
--- continuations are natural (i.e., maps of TSets)
+-- Extrinsic refinement of the object mapping to
+-- operations whose continuations are natural
 
 data Tˢ-natcont {A : TSet} : ∀ {τ t} → Tˢ A τ t → Set where
 
@@ -105,8 +105,21 @@ data Tˢ-natcont {A : TSet} : ∀ {τ t} → Tˢ A τ t → Set where
                               → Tˢ-natcont (k q y))
                → Tˢ-natcont (node {A} {τ} {τ'} {t} op x k p)
 
+-- The extrinsic predicate is a proposition
+
+Tˢ-natcont-isprop : ∀ {A τ t}
+                  → {c : Tˢ A τ t}
+                  → (p q : Tˢ-natcont c)
+                  → p ≡ q
+
+Tˢ-natcont-isprop natcont-leaf natcont-leaf = refl
+Tˢ-natcont-isprop (natcont-node p q) (natcont-node p' q') =
+  cong₂ natcont-node
+    (ifun-ext (ifun-ext (fun-ext (λ r → fun-ext (λ s → fun-ext (λ y → uip))))))
+    (ifun-ext (fun-ext (λ r → fun-ext (λ y → Tˢ-natcont-isprop (q r y) (q' r y)))))
+
 Tˢʳ : TSet → Time → Time → Set
-Tˢʳ A τ t = Σ[ c ∈ Tˢ A τ t ] ∥ Tˢ-natcont c ∥  -- notice the truncation of the naturality proof
+Tˢʳ A τ t = Σ[ c ∈ Tˢ A τ t ] Tˢ-natcont c
 
 -- Monotonicity wrt TSets' time-indices
 
@@ -127,22 +140,20 @@ Tˢ-≤t-natcont p {c = node op v k _} (natcont-node q r) =
         (Tˢ-≤t-natcont s (r (+-monoˡ-≤ (op-time op) p) y)))
 
 Tˢʳ-≤t : ∀ {A τ t t'} → t ≤ t' → Tˢʳ A τ t → Tˢʳ A τ t'
-Tˢʳ-≤t p (c , q) =
-  Tˢ-≤t p c ,
-  ∥∥-elim ∥∥-is-proposition (λ q → ∣ Tˢ-≤t-natcont p q ∣) q 
+Tˢʳ-≤t p (c , q) = Tˢ-≤t p c , Tˢ-≤t-natcont p q 
 
 Tˢʳ-≤t-refl : ∀ {A τ t} → (c : Tˢʳ A τ t)
             → Tˢʳ-≤t ≤-refl c ≡ c
 
 Tˢʳ-≤t-refl (c , p) =
-  dcong₂ _,_ (Tˢ-≤t-refl c) (∥∥-is-proposition _ _)
+  dcong₂ _,_ (Tˢ-≤t-refl c) (Tˢ-natcont-isprop _ _)
 
 Tˢʳ-≤t-trans : ∀ {A τ t t' t''}
              → (p : t ≤ t') → (q : t' ≤ t'') → (c : Tˢʳ A τ t)
              → Tˢʳ-≤t q (Tˢʳ-≤t p c) ≡ Tˢʳ-≤t (≤-trans p q) c
 
 Tˢʳ-≤t-trans p q (c , r) =
-  dcong₂ _,_ (Tˢ-≤t-trans p q c) (∥∥-is-proposition _ _)
+  dcong₂ _,_ (Tˢ-≤t-trans p q c) (Tˢ-natcont-isprop _ _)
 
 -- Functorial action on →ᵗ
 
@@ -172,16 +183,14 @@ Tˢᶠ-natcont f {c = node op v k _} (natcont-node p q) =
     (λ r y → Tˢᶠ-natcont f (q r y))
 
 Tˢʳᶠ : ∀ {A B τ} → A →ᵗ B → {t : Time} → Tˢʳ A τ t → Tˢʳ B τ t
-Tˢʳᶠ f (c , p) =
-  Tˢᶠ f c ,
-  ∥∥-elim ∥∥-is-proposition (λ p → ∣ Tˢᶠ-natcont f p ∣) p
+Tˢʳᶠ f (c , p) = Tˢᶠ f c , Tˢᶠ-natcont f p
 
 Tˢʳᶠ-nat : ∀ {A B τ} → (f : A →ᵗ B) → {t t' : ℕ}
          → (p : t ≤ t') → (c : Tˢʳ A τ t)
          → Tˢʳᶠ f (Tˢʳ-≤t p c) ≡ Tˢʳ-≤t p (Tˢʳᶠ f c)
 
 Tˢʳᶠ-nat f p (c , q) =
-  dcong₂ _,_ (Tˢᶠ-nat f p c) (∥∥-is-proposition _ _)
+  dcong₂ _,_ (Tˢᶠ-nat f p c) (Tˢ-natcont-isprop _ _)
 
 -- Monotonicity wrt time-gradings
 
@@ -229,16 +238,14 @@ Tˢ-≤τ-natcont p {c = node {τ = τ} op v k u} (natcont-node q r) =
         (r s y))
 
 Tˢʳ-≤τ : ∀ {A τ τ' t} → τ ≤ τ' → Tˢʳ A τ t → Tˢʳ A τ' t
-Tˢʳ-≤τ p (c , q) =
-  Tˢ-≤τ p c ,
-  ∥∥-elim ∥∥-is-proposition (λ q → ∣ Tˢ-≤τ-natcont p q ∣) q
+Tˢʳ-≤τ p (c , q) = Tˢ-≤τ p c , Tˢ-≤τ-natcont p q
 
 Tˢʳ-≤τ-nat : ∀ {A τ τ'} → (p : τ ≤ τ') → {t t' : ℕ}
            → (q : t ≤ t') (c : Tˢʳ A τ t)
            → Tˢʳ-≤τ p (Tˢʳ-≤t q c) ≡ Tˢʳ-≤t q (Tˢʳ-≤τ p c)
 
 Tˢʳ-≤τ-nat p q (c , r) =
-  dcong₂ _,_ (Tˢ-≤τ-nat p q c) (∥∥-is-proposition _ _)
+  dcong₂ _,_ (Tˢ-≤τ-nat p q c) (Tˢ-natcont-isprop _ _)
 
 -- Packaging it all up into a functor
 
@@ -256,11 +263,15 @@ T-≤τ p = tset-map (Tˢʳ-≤τ p) (Tˢʳ-≤τ-nat p)
 
 T-[]-moduleˢ : ∀ {A τ τ' t} → Tˢ A τ' (t + τ) → Tˢ A (τ + τ') t
 T-[]-moduleˢ {A} {τ} {τ'} {t} (leaf v) =
-  leaf (monotone A (≤-reflexive (trans
-                          (trans
-                            (cong (τ' +_) (+-comm t τ))
-                            (sym (+-assoc τ' τ t)))
-                          (cong (_+ t) (+-comm τ' τ)))) v)
+  leaf
+    (monotone A
+      (≤-reflexive
+        (trans
+          (trans
+            (cong (τ' +_) (+-comm t τ))
+            (sym (+-assoc τ' τ t)))
+          (cong (_+ t) (+-comm τ' τ))))
+      v)
 T-[]-moduleˢ {A} {τ} {τ'} {t} (node {τ = τ''} op v k p) =
   node op v
     (λ {t'} q y →
@@ -328,16 +339,14 @@ T-[]-moduleˢ-natcont {A} {τ} {τ'} {t} {node {τ = τ''} op v k _} (natcont-no
           y))
 
 T-[]-moduleˢʳ : ∀ {A τ τ' t} → Tˢʳ A τ' (t + τ) → Tˢʳ A (τ + τ') t
-T-[]-moduleˢʳ (c , p) =
-  T-[]-moduleˢ c ,
-  ∥∥-elim ∥∥-is-proposition (λ p → ∣ T-[]-moduleˢ-natcont p ∣) p
+T-[]-moduleˢʳ (c , p) = T-[]-moduleˢ c , T-[]-moduleˢ-natcont p
 
 T-[]-moduleˢʳ-t-nat : ∀ {A τ τ' t t'}
                     → (p : t ≤ t') → (c : Tˢʳ A τ' (t + τ))
                     → T-[]-moduleˢʳ (Tˢʳ-≤t (+-mono-≤ p (≤-reflexive refl)) c)
                     ≡ Tˢʳ-≤t p (T-[]-moduleˢʳ c)
 T-[]-moduleˢʳ-t-nat p (c , q) =
-  dcong₂ _,_ (T-[]-moduleˢ-t-nat p c) (∥∥-is-proposition _ _)
+  dcong₂ _,_ (T-[]-moduleˢ-t-nat p c) (Tˢ-natcont-isprop _ _)
 
 T-[]-module : ∀ {A τ τ'} → [ τ ]ᵒ (Tᵒ A τ') →ᵗ Tᵒ A (τ + τ')
 T-[]-module = tset-map T-[]-moduleˢʳ T-[]-moduleˢʳ-t-nat
@@ -347,12 +356,15 @@ T-[]-module = tset-map T-[]-moduleˢʳ T-[]-moduleˢʳ-t-nat
 ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
 ηᵀ {A} =
   tset-map
-    (λ v → leaf v , ∣ natcont-leaf ∣)
+    (λ v → leaf v , natcont-leaf)
     (λ p x →
       dcong₂ _,_
-        (cong leaf (cong (λ q → monotone A q x) (≤-irrelevant _ _)))
-        (∥∥-is-proposition _ _))
-  
+        (cong leaf
+          (cong
+            (λ q → monotone A q x)
+            (≤-irrelevant _ _)))
+        (Tˢ-natcont-isprop _ _))
+
 -- Multiplication
 
 μˢ : ∀ {A τ τ'} → {t : Time}
@@ -384,82 +396,30 @@ T-[]-module = tset-map T-[]-moduleˢʳ T-[]-moduleˢʳ-t-nat
            → Tˢ-natcont c
            → Tˢ-natcont (μˢ c)
 μˢ-natcont {A} {τ} {τ'} {t} {leaf (c , p)} natcont-leaf =
-  T-[]-moduleˢ-natcont (Tˢ-≤t-natcont {!!} {!!})
-  {-
-  ∥∥-elim ∥∥-is-proposition
-    (λ p → ∣ T-[]-moduleˢ-natcont
-               (Tˢ-≤t-natcont
-                 (≤-reflexive (+-comm τ t)) p) ∣) p
-  -}
+  T-[]-moduleˢ-natcont (Tˢ-≤t-natcont (≤-reflexive (+-comm τ t)) p)
 μˢ-natcont {A} {τ} {τ'} {t} {node op v k _} (natcont-node p q) =
-  {!!}
-  {-
-  ∣ natcont-node
-      (λ r s y →
-        trans
-          (cong μˢ (p r s y))
-          (μˢ-t-nat s (k r y)))
-      (λ r y → {!μˢ-natcont (q ? ?)!}) ∣
-  -}
+  natcont-node
+    (λ r s y →
+      trans
+        (cong μˢ (p r s y))
+        (μˢ-t-nat s (k r y)))
+    (λ r y → μˢ-natcont (q r y))
 
 μˢʳ : ∀ {A τ τ'} → {t : Time}
     → carrier (Tᵒ (Tᵒ A τ') τ) t → carrier (Tᵒ A (τ + τ')) t
-μˢʳ (c , p) = μˢ c , {!!} --∥∥-elim ∥∥-is-proposition μˢ-natcont p
+μˢʳ (c , p) = μˢ c , μˢ-natcont p
+
+μˢʳ-t-nat : ∀ {A τ τ' t t'}
+          → (p : t ≤ t')
+          → (c : carrier (Tᵒ (Tᵒ A τ') τ) t)
+          → μˢʳ (Tˢʳ-≤t p c) ≡ Tˢʳ-≤t p (μˢʳ c)
+μˢʳ-t-nat p (c , q) =
+  dcong₂ _,_ (μˢ-t-nat p c) (Tˢ-natcont-isprop _ _)
 
 μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
-μᵀ = tset-map {!!} {!!} --μˢ μˢ-t-nat
-
-
-{-
-{-# TERMINATING #-} -- Agda doesn't see termination
-μˢ : ∀ {A τ τ'} → {t : Time}
-   → carrier (Tᵒ (Tᵒ A τ') τ) t → carrier (Tᵒ A (τ + τ')) t
-   
-μˢ {A} {τ} {τ'} {t} (leaf (c , p) , q) =
-  T-[]-moduleˢ (Tˢ-≤t (≤-reflexive (+-comm τ t)) c) ,
-  ∥∥-elim ∥∥-is-proposition
-    (λ p → ∣ T-[]-moduleˢ-natconst
-              (Tˢ-≤t-natcont (≤-reflexive (+-comm τ t)) p) ∣)
-    p
-μˢ {A} {τ} {τ'} {t} (node op v k p , q) =
-  node op v
-    (λ r y →
-      proj₁
-        (μˢ
-          (k r y ,
-           ∥∥-elim ∥∥-is-proposition (λ { (natcont-node s t) → ∣ t r y ∣ }) q)))
-    (trans (cong (_+ _) p) (+-assoc (op-time op) _ _)) ,
-  ∥∥-elim ∥∥-is-proposition
-    (λ { (natcont-node s t) →
-      ∣ natcont-node
-          (λ u u' y → {!!})
-          {!!} ∣ })
-    q
--}
+μᵀ = tset-map μˢʳ μˢʳ-t-nat
 
 {-
-μˢ {A} {τ} {τ'} {t} (leaf c) =
-  T-[]-moduleˢ (monotone (Tᵒ A τ') (≤-reflexive (+-comm τ t)) c)
-μˢ (node op v k p) =
-  node op v (λ q y → μˢ (k q y)) (trans (cong (_+ _) p) (+-assoc (op-time op) _ _))
-
-μˢ-t-nat : ∀ {A τ τ' t t'}
-         → (p : t ≤ t')
-         → (c : Tˢ (tset (Tˢ A τ') Tˢ-≤t Tˢ-≤t-refl Tˢ-≤t-trans) τ t)
-         → μˢ (Tˢ-≤t p c) ≡ Tˢ-≤t p (μˢ c)
-μˢ-t-nat p (leaf c) =
-  trans
-    (cong T-[]-moduleˢ
-      (trans
-        (Tˢ-≤t-trans _ _ c)
-        (trans
-          (cong (λ q → Tˢ-≤t q c) (≤-irrelevant _ _))
-          (sym (Tˢ-≤t-trans _ _ c)))))
-    (T-[]-moduleˢ-t-nat p _)
-μˢ-t-nat p (node op v k q) = refl
-
-μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
-μᵀ = tset-map μˢ μˢ-t-nat
 
 -- Strength
 
