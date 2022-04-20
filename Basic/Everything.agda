@@ -39,6 +39,9 @@ open import Util.Time
 
 open import Util.Operations
 
+---- Propositions as [Types]
+
+open import Util.HProp
 
 -- SYNTAX
 ---------

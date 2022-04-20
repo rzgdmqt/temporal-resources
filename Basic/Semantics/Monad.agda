@@ -92,11 +92,10 @@ data Tˢ-natcont {A : TSet} : ∀ {τ t} → Tˢ A τ t → Set where
   natconst-leaf : ∀ {τ t v}
                 → Tˢ-natcont (leaf {A} {τ} {t} v)
 
-  natconst-node : ∀ {τ τ' t op x}
+  natconst-node : ∀ {τ τ' t op x p}
                     {k : {t' : Time} → t + op-time op ≤ t'
                                      → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'
                                      → Tˢ A τ t'}
-                    {p}
                 → ({t' t'' : Time} → (p : t + op-time op ≤ t')
                                    → (q : t' ≤ t'')
                                    → (y : carrier (ConstTSet ⟦ arity op ⟧ᵍ) t')
@@ -234,6 +233,13 @@ Tˢʳ-≤τ p (c , q) =
   Tˢ-≤τ p c ,
   ∥∥-elim ∥∥-is-proposition (λ q → ∣ Tˢ-≤τ-natcont p q ∣) q
 
+Tˢʳ-≤τ-nat : ∀ {A τ τ'} → (p : τ ≤ τ') → {t t' : ℕ}
+           → (q : t ≤ t') (c : Tˢʳ A τ t)
+           → Tˢʳ-≤τ p (Tˢʳ-≤t q c) ≡ Tˢʳ-≤t q (Tˢʳ-≤τ p c)
+
+Tˢʳ-≤τ-nat p q (c , r) =
+  dcong₂ _,_ (Tˢ-≤τ-nat p q c) (∥∥-is-proposition _ _)
+
 -- Packaging it all up into a functor
 
 Tᵒ : TSet → Time → TSet
@@ -242,9 +248,9 @@ Tᵒ A τ = tset (λ t → Tˢʳ A τ t) Tˢʳ-≤t Tˢʳ-≤t-refl Tˢʳ-≤t-t
 Tᶠ : ∀ {A B τ} → A →ᵗ B → Tᵒ A τ →ᵗ Tᵒ B τ
 Tᶠ f = tset-map (Tˢʳᶠ f) (Tˢʳᶠ-nat f)
 
-{-
+
 T-≤τ : ∀ {A τ τ'} → τ ≤ τ' → Tᵒ A τ →ᵗ Tᵒ A τ'
-T-≤τ p = tset-map (Tˢ-≤τ p) (Tˢ-≤τ-nat p)
+T-≤τ p = tset-map (Tˢʳ-≤τ p) (Tˢʳ-≤τ-nat p)
 
 -- T is a [_]-module
 
@@ -294,17 +300,60 @@ T-[]-moduleˢ-t-nat p (node op v k q) =
       cong (λ s → T-[]-moduleˢ (k s y)) (≤-irrelevant _ _)))))
     refl
 
+T-[]-moduleˢ-natconst : ∀ {A τ τ' t} {c : Tˢ A τ' (t + τ)}
+                      → Tˢ-natcont c
+                      → Tˢ-natcont (T-[]-moduleˢ {A} {τ} {τ'} {t} c)
+T-[]-moduleˢ-natconst natconst-leaf =
+  natconst-leaf
+T-[]-moduleˢ-natconst {A} {τ} {τ'} {t} {node {τ = τ''} op v k _} (natconst-node p q) =
+  natconst-node
+    (λ r s y →
+      trans
+      (cong T-[]-moduleˢ
+        (trans
+          (cong (λ p → k p y) (≤-irrelevant _ _))
+          (p _ _ y)))
+      (T-[]-moduleˢ-t-nat s _))
+    (λ r  y →
+      T-[]-moduleˢ-natconst
+        (q
+          (≤-trans
+            (≤-reflexive
+              (trans
+                (+-assoc t τ (op-time op))
+                (trans
+                  (cong (t +_) (+-comm τ (op-time op)))
+                  (sym (+-assoc t (op-time op) τ)))))
+            (+-monoˡ-≤ _ r))
+          y))
+
+T-[]-moduleˢʳ : ∀ {A τ τ' t} → Tˢʳ A τ' (t + τ) → Tˢʳ A (τ + τ') t
+T-[]-moduleˢʳ (c , p) =
+  T-[]-moduleˢ c ,
+  ∥∥-elim ∥∥-is-proposition (λ p → ∣ T-[]-moduleˢ-natconst p ∣) p
+
+T-[]-moduleˢʳ-t-nat : ∀ {A τ τ' t t'}
+                    → (p : t ≤ t') → (c : Tˢʳ A τ' (t + τ))
+                    → T-[]-moduleˢʳ (Tˢʳ-≤t (+-mono-≤ p (≤-reflexive refl)) c)
+                    ≡ Tˢʳ-≤t p (T-[]-moduleˢʳ c)
+T-[]-moduleˢʳ-t-nat p (c , q) =
+  dcong₂ _,_ (T-[]-moduleˢ-t-nat p c) (∥∥-is-proposition _ _)
+
 T-[]-module : ∀ {A τ τ'} → [ τ ]ᵒ (Tᵒ A τ') →ᵗ Tᵒ A (τ + τ')
-T-[]-module = tset-map T-[]-moduleˢ T-[]-moduleˢ-t-nat 
+T-[]-module = tset-map T-[]-moduleˢʳ T-[]-moduleˢʳ-t-nat
 
 -- Unit
 
 ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
 ηᵀ {A} =
   tset-map
-    (λ v → leaf v)
-    (λ p x → cong leaf (cong (λ q → monotone A q x) (≤-irrelevant _ _)))
-
+    (λ v → leaf v , ∣ natconst-leaf ∣)
+    (λ p x →
+      dcong₂ _,_
+        (cong leaf (cong (λ q → monotone A q x) (≤-irrelevant _ _)))
+        (∥∥-is-proposition _ _))
+  
+{-
 -- Multiplication
 
 μˢ : ∀ {A τ τ'} → {t : Time}
