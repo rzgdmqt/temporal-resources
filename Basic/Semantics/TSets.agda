@@ -14,16 +14,10 @@ import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding (Extensionality)
 open Eq.≡-Reasoning
 
-open import Axiom.Extensionality.Propositional
-
 open import Util.Equality
 open import Util.Time
 
 module Semantics.TSets where
-
-postulate
-  fun-ext  : ∀ {a b} → Extensionality a b            -- assuming function extensionality
-  ifun-ext : ∀ {a b} → ExtensionalityImplicit a b   -- and the same for functions with implicit arguments
 
 -- Time-varying sets (covariant presheaves on (ℕ,≤))
 

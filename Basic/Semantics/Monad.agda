@@ -8,14 +8,12 @@ open import Data.Empty
 open import Data.Product
 open import Data.Unit hiding (_≤_)
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq hiding ([_])
-open Eq.≡-Reasoning
-
 open import Semantics.TSets
 open import Semantics.Modality.Future
 open import Semantics.Modality.Past
 
+open import Util.HProp
+open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
@@ -63,12 +61,15 @@ Tˢ-≤t-refl {A} (leaf v) =
 Tˢ-≤t-refl {A} (node {τ} {τ'} {t} op v k p) =
   cong
     (λ (k : ({t' : Time} → t + op-time op ≤ t'
-                         → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t' → Tˢ A τ t')) → node op v k p)
+                         → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'
+                         → Tˢ A τ t'))
+      → node op v k p)
     (ifun-ext (fun-ext (λ q → fun-ext (λ y →
       cong (λ q → k q y) (≤-irrelevant _ _)))))
 
-Tˢ-≤t-trans : ∀ {A τ t t' t''} → (p : t ≤ t') → (q : t' ≤ t'')
-            → (c : Tˢ A τ t) → Tˢ-≤t q (Tˢ-≤t p c) ≡ Tˢ-≤t (≤-trans p q) c
+Tˢ-≤t-trans : ∀ {A τ t t' t''}
+            → (p : t ≤ t') → (q : t' ≤ t'') → (c : Tˢ A τ t)
+            → Tˢ-≤t q (Tˢ-≤t p c) ≡ Tˢ-≤t (≤-trans p q) c
 
 Tˢ-≤t-trans {A} p q (leaf v) =
   cong
@@ -82,6 +83,67 @@ Tˢ-≤t-trans {A} p q (node op v k r) =
                             → node op (monotone (ConstTSet ⟦ param op ⟧ᵍ) (≤-trans p q) v) k r)
     (ifun-ext (fun-ext (λ s → fun-ext (λ y →
       cong (λ r → k r y) (≤-irrelevant _ _)))))
+
+-- Refinement of the object mapping to operations whose
+-- continuations are natural (i.e., maps of TSets)
+
+data Tˢ-natcont {A : TSet} : ∀ {τ t} → Tˢ A τ t → Set where
+
+  natconst-leaf : ∀ {τ t v}
+                → Tˢ-natcont (leaf {A} {τ} {t} v)
+
+  natconst-node : ∀ {τ τ' t op x}
+                    {k : {t' : Time} → t + op-time op ≤ t'
+                                     → carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'
+                                     → Tˢ A τ t'}
+                    {p}
+                → ({t' t'' : Time} → (p : t + op-time op ≤ t')
+                                   → (q : t' ≤ t'')
+                                   → (y : carrier (ConstTSet ⟦ arity op ⟧ᵍ) t')
+                                   → k (≤-trans p q) y ≡ Tˢ-≤t q (k p y))
+                → ({t' : Time} → (q : t + op-time op ≤ t')
+                               → (y : carrier (ConstTSet ⟦ arity op ⟧ᵍ) t')
+                               → Tˢ-natcont (k q y))
+                → Tˢ-natcont (node {A} {τ} {τ'} {t} op x k p)
+
+Tˢʳ : TSet → Time → Time → Set
+Tˢʳ A τ t = Σ[ c ∈ Tˢ A τ t ] ∥ Tˢ-natcont c ∥  -- notice the truncation of the naturality proof
+
+-- Monotonicity wrt TSets' time-indices
+
+Tˢ-≤t-natcont : ∀ {A τ t t'} → (p : t ≤ t') → {c : Tˢ A τ t}
+              → Tˢ-natcont c
+              → Tˢ-natcont (Tˢ-≤t p c)
+Tˢ-≤t-natcont p natconst-leaf = natconst-leaf
+Tˢ-≤t-natcont p {c = node op v k _} (natconst-node q r) =
+  natconst-node
+    (λ s t y →
+      trans
+        (cong (λ p → k p y) (≤-irrelevant _ _))
+        (q _ _ y))
+    (λ s y →
+      subst
+        Tˢ-natcont
+        (sym (q _ _ y))
+        (Tˢ-≤t-natcont s (r (+-monoˡ-≤ (op-time op) p) y)))
+
+Tˢʳ-≤t : ∀ {A τ t t'} → t ≤ t' → Tˢʳ A τ t → Tˢʳ A τ t'
+Tˢʳ-≤t p (c , q) =
+  Tˢ-≤t p c ,
+  ∥∥-elim ∥∥-is-proposition (λ q → ∣ Tˢ-≤t-natcont p q ∣) q 
+
+Tˢʳ-≤t-refl : ∀ {A τ t} → (c : Tˢʳ A τ t)
+            → Tˢʳ-≤t ≤-refl c ≡ c
+
+Tˢʳ-≤t-refl (c , p) =
+  dcong₂ _,_ (Tˢ-≤t-refl c) (∥∥-is-proposition _ _)
+
+Tˢʳ-≤t-trans : ∀ {A τ t t' t''}
+             → (p : t ≤ t') → (q : t' ≤ t'') → (c : Tˢʳ A τ t)
+             → Tˢʳ-≤t q (Tˢʳ-≤t p c) ≡ Tˢʳ-≤t (≤-trans p q) c
+
+Tˢʳ-≤t-trans p q (c , r) =
+  dcong₂ _,_ (Tˢ-≤t-trans p q c) (∥∥-is-proposition _ _)
 
 -- Functorial action on →ᵗ
 
@@ -98,6 +160,30 @@ Tˢᶠ-nat : ∀ {A B τ} → (f : A →ᵗ B) → {t t' : ℕ}
 Tˢᶠ-nat f p (leaf v) = cong leaf (map-nat f _ v)
 Tˢᶠ-nat f p (node op v k q) = refl
 
+Tˢᶠ-natcont : ∀ {A B τ} → (f : A →ᵗ B)
+            → {t : Time} → {c : Tˢ A τ t}
+            → Tˢ-natcont c
+            → Tˢ-natcont (Tˢᶠ f c)
+              
+Tˢᶠ-natcont f natconst-leaf = natconst-leaf
+Tˢᶠ-natcont f {c = node op v k _} (natconst-node p q) =
+  natconst-node
+    (λ r s y →
+      trans (cong (Tˢᶠ f) (p r s y)) (Tˢᶠ-nat f s (k r y)))
+    (λ r y → Tˢᶠ-natcont f (q r y))
+
+Tˢʳᶠ : ∀ {A B τ} → A →ᵗ B → {t : Time} → Tˢʳ A τ t → Tˢʳ B τ t
+Tˢʳᶠ f (c , p) =
+  Tˢᶠ f c ,
+  ∥∥-elim ∥∥-is-proposition (λ p → ∣ Tˢᶠ-natcont f p ∣) p
+
+Tˢʳᶠ-nat : ∀ {A B τ} → (f : A →ᵗ B) → {t t' : ℕ}
+         → (p : t ≤ t') → (c : Tˢʳ A τ t)
+         → Tˢʳᶠ f (Tˢʳ-≤t p c) ≡ Tˢʳ-≤t p (Tˢʳᶠ f c)
+
+Tˢʳᶠ-nat f p (c , q) =
+  dcong₂ _,_ (Tˢᶠ-nat f p c) (∥∥-is-proposition _ _)
+
 -- Monotonicity wrt time-gradings
 
 Tˢ-≤τ : ∀ {A τ τ' t} → τ ≤ τ' → Tˢ A τ t → Tˢ A τ' t
@@ -105,8 +191,13 @@ Tˢ-≤τ {A} p (leaf v) =
   leaf (monotone A (+-monoˡ-≤ _ p) v)
 Tˢ-≤τ p (node op v k q) =
   node op v
-    (λ r y → Tˢ-≤τ (proj₂ (proj₂ (n≡m+k≤n' (trans q (+-comm (op-time op) _)) p))) (k r y))
-    (trans (proj₁ (proj₂ (n≡m+k≤n' (trans q (+-comm (op-time op) _)) p))) (+-comm _ (op-time op)))
+    (λ r y →
+      Tˢ-≤τ
+        (proj₂ (proj₂ (n≡m+k≤n' (trans q (+-comm (op-time op) _)) p)))
+        (k r y))
+    (trans
+      (proj₁ (proj₂ (n≡m+k≤n' (trans q (+-comm (op-time op) _)) p)))
+      (+-comm _ (op-time op)))
 
 Tˢ-≤τ-nat : ∀ {A τ τ'} → (p : τ ≤ τ') → {t t' : ℕ}
           → (q : t ≤ t') (c : Tˢ A τ t)
@@ -120,14 +211,38 @@ Tˢ-≤τ-nat {A} p q (leaf v) =
         (sym (monotone-trans A _ _ v))))
 Tˢ-≤τ-nat p q (node op v k r) = refl
 
+Tˢ-≤τ-natcont : ∀ {A τ τ' t} → (p : τ ≤ τ') → {c : Tˢ A τ t}
+              → Tˢ-natcont c
+              → Tˢ-natcont (Tˢ-≤τ p c)
+Tˢ-≤τ-natcont p natconst-leaf = natconst-leaf
+Tˢ-≤τ-natcont p {c = node {τ = τ} op v k u} (natconst-node q r) =
+  natconst-node
+    (λ s t y →
+      trans
+        (cong (Tˢ-≤τ _) (q s t y))
+        (Tˢ-≤τ-nat
+          (proj₂ (proj₂ (n≡m+k≤n' (trans u (+-comm (op-time op) τ)) p)))
+          t
+          (k s y)))
+    (λ s y →
+      Tˢ-≤τ-natcont
+        (proj₂ (proj₂ (n≡m+k≤n' (trans u (+-comm (op-time op) τ)) p)))
+        (r s y))
+
+Tˢʳ-≤τ : ∀ {A τ τ' t} → τ ≤ τ' → Tˢʳ A τ t → Tˢʳ A τ' t
+Tˢʳ-≤τ p (c , q) =
+  Tˢ-≤τ p c ,
+  ∥∥-elim ∥∥-is-proposition (λ q → ∣ Tˢ-≤τ-natcont p q ∣) q
+
 -- Packaging it all up into a functor
 
 Tᵒ : TSet → Time → TSet
-Tᵒ A τ = tset (λ t → Tˢ A τ t) Tˢ-≤t Tˢ-≤t-refl Tˢ-≤t-trans
+Tᵒ A τ = tset (λ t → Tˢʳ A τ t) Tˢʳ-≤t Tˢʳ-≤t-refl Tˢʳ-≤t-trans
 
 Tᶠ : ∀ {A B τ} → A →ᵗ B → Tᵒ A τ →ᵗ Tᵒ B τ
-Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-nat f)
+Tᶠ f = tset-map (Tˢʳᶠ f) (Tˢʳᶠ-nat f)
 
+{-
 T-≤τ : ∀ {A τ τ'} → τ ≤ τ' → Tᵒ A τ →ᵗ Tᵒ A τ'
 T-≤τ p = tset-map (Tˢ-≤τ p) (Tˢ-≤τ-nat p)
 
@@ -366,4 +481,7 @@ handleᵀ {A} {B} {τ} {τ'} =
       handleˢ c (λ op τ'' p x k' →
         h op τ'' p (x , λ q y → k' q y)) k })
     ?
+-}
+
+
 -}

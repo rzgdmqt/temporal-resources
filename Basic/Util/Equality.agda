@@ -2,10 +2,18 @@
 -- Equality related auxiliary proofs --
 ---------------------------------------
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq hiding (Extensionality)
-
 module Util.Equality where
+
+import Relation.Binary.PropositionalEquality as Eq
+open Eq public hiding (Extensionality)
+
+open import Axiom.Extensionality.Propositional
+
+-- Assuming function extensionality
+
+postulate
+  fun-ext  : ∀ {a b} → Extensionality a b
+  ifun-ext : ∀ {a b} → ExtensionalityImplicit a b
 
 -- Congruence rules for dependent functions
 
