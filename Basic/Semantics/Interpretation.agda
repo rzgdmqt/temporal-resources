@@ -84,7 +84,7 @@ var-in-env {A = A} (Tl-⟨⟩ {τ = τ} x) = μ {A = ⟦ A ⟧ᵛ} ∘ᵗ ⟨ τ
 -- Semantic constants for base-typed value constants
 
 constᵗ : ∀ {B} → BaseSet B → 𝟙ᵗ →ᵗ ConstTSet (BaseSet B)
-constᵗ c = tset-map (λ _ → c)
+constᵗ c = tset-map (λ _ → c) (λ _ _ → refl)
 
 -- Interpretation of well-typed value and computation terms
 
@@ -127,7 +127,7 @@ mutual
         g = [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) (idᵗ {A = Tᵒ ⟦ A ⟧ᵛ τ})) in
     opᵀ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
                 g ∘ᵗ f ⟩ᵗ
-
+  {-
   ⟦_⟧ᶜᵗ {Γ} (handle_`with_`in {A} {B} {τ} {τ'} M H N) =
     let f : ⟦ Γ ⟧ᵉ →ᵗ Π Op (λ op → Π Time (λ τ'' → ⟦ Γ ⟧ᵉ))
         f = ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ⁱᵗ) ⟩ⁱᵗ in
@@ -148,7 +148,7 @@ mutual
       ⟦ M ⟧ᶜᵗ , ⟨
       mapⁱˣᵗ (λ op → mapⁱˣᵗ (λ τ'' → h op τ'' ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×-assocᵗ))) ∘ᵗ f ,
       g ⟩ᵗ ⟩ᵗ
-
+  -}
   ⟦ unbox {Γ'} {τ = τ} p q V M ⟧ᶜᵗ =
     ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
                     ε⊣

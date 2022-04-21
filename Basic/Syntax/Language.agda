@@ -105,6 +105,7 @@ mutual
 
     -- effect handling
 
+    {-
     handle_`with_`in
             : {A B : VType}
             → {τ τ' : Time}
@@ -116,6 +117,7 @@ mutual
             → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
             --------------------------------------------------
             → Γ ⊢C⦂ B ‼ (τ + τ')
+    -}
 
     -- unboxing a boxed value/resource after enough time has passed for it to be ready
 

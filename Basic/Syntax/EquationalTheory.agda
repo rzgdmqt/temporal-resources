@@ -153,6 +153,8 @@ mutual
                  ---------------------------------------------------------------
                  → Γ ⊢C⦂ perform op V M == perform op W N
 
+    -- TODO: handle-cong
+
     unbox-cong : ∀ {Γ' Γ'' A C τ}
                → {p : Γ' , Γ'' split Γ}
                → {q : τ ≤ ctx-time Γ''}
@@ -215,6 +217,7 @@ mutual
 
     -- computational/beta equations for effect handling
 
+    {-
     handle-return : ∀ {A B τ'}
                   → (V : Γ ⊢V⦂ A)
                   → (H : (op : Op) → (τ'' : Time) →
@@ -251,7 +254,7 @@ mutual
                                                   (   cong-ren {Γ'' = [] ⟨ τ ⟩} wk-ren
                                                    ∘ʳ ⟨⟩-μ-ren))
                                                 N))) ]c)
-
+    -}
     -- computational/beta equation for unboxing
 
     unbox-box : ∀ {Γ' Γ'' A B τ τ'}
@@ -358,7 +361,7 @@ mutual
                                (cong-ren {Γ'' = [] ∷ type-of-gtype (arity op)}
                                  exch-⟨⟩-⟨⟩-ren)
                                M))
-
+    {-
     handle-delay : ∀ {A B τ τ' τ'' τ'''}
                  → (p : τ'' ≡ τ + τ')
                  → (M : Γ ⟨ τ' ⟩ ⊢C⦂ A ‼ τ)
@@ -386,6 +389,6 @@ mutual
                                  (cong-ren {Γ'' = [] ∷ A}
                                    (⟨⟩-μ-ren ∘ʳ ⟨⟩-≤-ren (≤-reflexive (trans p (+-comm τ τ')))))
                                  N))
-
+  -}
   infix 18 _⊢C⦂_==_
 

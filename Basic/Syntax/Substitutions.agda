@@ -72,10 +72,10 @@ mutual
     absurd (V [ x ↦ W ]v)
   perform op V M [ x ↦ W ]c =
     perform op (V [ x ↦ W ]v) (M [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c)
-  handle M `with H `in N [ x ↦ W ]c =
+  {-handle M `with H `in N [ x ↦ W ]c =
     handle M [ x ↦ W ]c
     `with (λ op τ'' → (H op τ'') [ Tl-∷ (Tl-∷ x) ↦ W ]c)
-    `in (N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c)
+    `in (N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c)-}
   _[_↦_]c {A = A} (unbox {Γ' = Γ'} {Γ'' = Γ''} p q V M) x W with var-in-split p x
   ... | inj₁ (y , r , s) =
     unbox

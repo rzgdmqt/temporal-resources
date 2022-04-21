@@ -423,7 +423,8 @@ T-[]-module = tset-map T-[]-moduleˢʳ T-[]-moduleˢʳ-t-nat
 -- Strength
 
 strˢ : ∀ {A B τ τ' t}
-     → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t → Tˢ B τ t
+     → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t
+     → Tˢ B τ t
      → Tˢ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ t
      
 strˢ {A} {B} {τ} {τ'} {t} (vp , vx) (leaf w) =
@@ -537,6 +538,164 @@ opᵀ {A} {τ} op =
         (λ p y → proj₂ (map-carrier k (p , y))) })
     (λ { p (v , k) →
       dcong₂ _,_ refl (Tˢ-natcont-isprop _ _) })
+
+
+
+
+
+-- TODO: figure out the right recursion pattern
+
+-- Semantics of effect handling (the mediating
+-- homomorphism induced by a given algebra)
+
+{-
+handleˢ : ∀ {A B τ τ' t}
+        → Tˢ A τ t
+        → carrier (Π Op (λ op → Π Time (λ τ'' →
+                    ConstTSet ⟦ param op ⟧ᵍ ×ᵗ
+                    ([ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ B τ'')))
+                      ⇒ᵗ Tᵒ B (op-time op + τ'')))) t
+        → carrier ([ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')) t
+        → carrier (Tᵒ B (τ + τ')) t
+
+handleˢ {τ = τ} {t = t} (leaf v) h k =
+  T-[]-moduleˢʳ
+    (Tˢʳ-≤t
+      (≤-reflexive (+-comm τ t))
+      (map-carrier k ((≤-reflexive (+-comm t τ)) , v)) )
+handleˢ {τ' = τ'} {t = t} (node {τ = τ''} op v k p) h k' =
+  Tˢʳ-≤τ
+    (≤-reflexive
+      (trans
+        (sym (+-assoc (op-time op) τ'' τ'))
+        (cong (_+ τ') (sym p))))
+    (map-carrier (h op (τ'' + τ'))
+      (≤-refl , v ,
+       tset-map
+         (λ { (q , y) → handleˢ (k q y) {!!} {! !} })
+         {!!}))
+
+-}
+
+
+
+{-
+handleˢ : ∀ {A B τ τ' t}
+        → Tˢ A τ t
+        → ((op : Op) → (τ'' : Time) →
+             {t' : Time} → t ≤ t' → 
+             carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
+             ({t'' : Time} → t' + op-time op ≤ t'' →
+                carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ B τ'') t'') →
+             carrier (Tᵒ B (op-time op + τ'')) t')
+        → ({t' : Time} → t + τ ≤ t' → carrier A t' → carrier (Tᵒ B τ') t')
+        → carrier (Tᵒ B (τ + τ')) t
+
+handleˢ {τ = τ} {t = t} (leaf v) h k =
+  T-[]-moduleˢʳ
+    (Tˢʳ-≤t
+      (≤-reflexive (+-comm τ t))
+      (k (≤-reflexive (+-comm t τ)) v))
+handleˢ {τ' = τ'} {t = t} (node {τ = τ''} op v k p) h k' =
+  Tˢʳ-≤τ
+    (≤-reflexive
+      (trans
+        (sym (+-assoc (op-time op) τ'' τ'))
+        (cong (_+ τ') (sym p))))
+    (h op (τ'' + τ') ≤-refl v
+      (λ q y →
+        handleˢ
+          (k q y)
+            (λ op τ''' r x k'' →
+              h op τ''' (≤-trans (m+n≤o⇒m≤o t q) r) x k'')
+            (λ r z → k'
+              (≤-trans
+                (≤-reflexive (cong (t +_) p))
+                (≤-trans
+                  (≤-trans
+                    (≤-reflexive (sym (+-assoc t (op-time op) τ'')))
+                    (+-monoˡ-≤ τ'' q))
+                  r)) z)))
+
+handleˢ-t-nat : ∀ {A B τ τ' t t'}
+              → (p : t ≤ t')
+              → (c : Tˢ A τ t)
+              → (h : (op : Op) → (τ'' : Time) →
+                       {t' : Time} → t ≤ t' → 
+                       carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
+                       ({t'' : Time} → t' + op-time op ≤ t'' →
+                         carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ B τ'') t'') →
+                       carrier (Tᵒ B (op-time op + τ'')) t')
+              → (k : {t' : Time} → t + τ ≤ t' → carrier A t' → carrier (Tᵒ B τ') t')
+              → handleˢ
+                  (Tˢ-≤t p c)
+                  (λ op τ'' q x k' → h op τ'' (≤-trans p q) x k')
+                  (λ q z → k (≤-trans (+-monoˡ-≤ τ p) q) z)
+              ≡ Tˢʳ-≤t p (handleˢ c h k)
+
+handleˢ-t-nat = {!!}
+
+
+
+
+handleˢʳ : ∀ {A B τ τ' t}
+         → carrier (Tᵒ A τ) t
+         → ((op : Op) → (τ'' : Time) →
+              {t' : Time} → t ≤ t' → 
+              carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
+              ({t'' : Time} → t' + op-time op ≤ t'' →
+                 carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ B τ'') t'') →
+              carrier (Tᵒ B (op-time op + τ'')) t')
+         → ({t' : Time} → t + τ ≤ t' → carrier A t' → carrier (Tᵒ B τ') t')
+         → carrier (Tᵒ B (τ + τ')) t
+
+handleˢʳ (c , p) h k = handleˢ c h k
+-}
+
+{-
+handleᵀ : ∀ {A B τ τ'}
+        → Tᵒ A τ
+        ×ᵗ Π Op (λ op → Π Time (λ τ'' →
+            ConstTSet ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ B τ'')))
+              ⇒ᵗ Tᵒ B (op-time op + τ'')))
+        ×ᵗ [ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')
+        →ᵗ Tᵒ B (τ + τ')
+
+handleᵀ {A} {B} {τ} {τ'} =
+  let handle-map : {t : Time}
+                 → carrier (
+                     Tᵒ A τ ×ᵗ
+                     Π Op (λ op → Π Time (λ τ'' →
+                       ConstTSet ⟦ param op ⟧ᵍ ×ᵗ
+                       [ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')
+                         ⇒ᵗ Tᵒ B (op-time op + τ''))) ×ᵗ
+                     [ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')) t
+                 → carrier (Tᵒ B (τ + τ')) t
+      handle-map =
+        λ { (c , h , k) →
+          handleˢʳ
+            c
+            (λ op τ'' p x k' →
+              map-carrier (h op τ'') (p , x , tset-map (λ { (q , y) → k' q y }) {!!}))
+            {!!} } in
+  tset-map
+    handle-map
+    {!!}
+-}
+
+{-
+      handle-map =
+        λ { (c , h , k) →
+          handleˢ c
+            (λ op τ'' p x k' →
+              map-carrier (h op τ'')
+                (p , x ,
+                 tset-map
+                   (λ { (q , y) → Tˢ-≤t q (k' ≤-refl y) })
+                   (λ { q (r , y) → sym (Tˢ-≤t-trans _ _ _) })))
+            (λ p x → map-carrier k (p , x)) } in
+-}
+
 
 {-
 -- Semantics of effect handling (the mediating
