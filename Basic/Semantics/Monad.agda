@@ -540,6 +540,9 @@ opᵀ {A} {τ} op =
       dcong₂ _,_ refl (Tˢ-natcont-isprop _ _) })
 
 
+
+-- TODO: figure out the right recursive arguments
+
 -- Semantics of effect handling (every effect
 -- handler induces a corresponding monad algebra)
 
@@ -591,7 +594,7 @@ handler-to-algˢʳ-t-nat : ∀ {A τ τ' t t'}
                                 → (x : carrier (ConstTSet ⟦ param op ⟧ᵍ) t')
                                 → (k : {t'' : Time} → t' + op-time op ≤ t'' →
                                          carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ A τ'') t'')
-                                → h op τ'' (≤-trans p q) x (λ r y → Tˢʳ-≤t r (k (+-monoˡ-≤ (op-time op) q) y))
+                                → h op τ'' (≤-trans p q) x (λ r y → Tˢʳ-≤t r (k (+-monoˡ-≤ (op-time op) q) y))  -- TODO: try moving r and q around
                                 ≡ Tˢʳ-≤t q (h op τ'' p x k))
                        → (c : carrier (Tᵒ (Tᵒ A τ') τ) t)
                        → handler-to-algˢ (λ op τ'' q x k → h op τ'' (≤-trans p q) x k) (Tˢ-≤t p (proj₁ c))
@@ -675,66 +678,112 @@ handler-to-alg =
           trans
             (cong (map-carrier (h op τ''))
               (cong (λ k → (≤-trans q r , x , k))
-                ?))
+                (≡ᵗ-≡ (λ { (s , y) → {!!} }))))
             (map-nat (h op τ'') r _))
         c })
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {-
 
-(dcong₂
-                  tset-map
-                    (ifun-ext (fun-ext (λ { (s , y) →
-                      trans
-                        (Tˢʳ-≤t-trans _ _ _)
-                        {!!} })))
-                    {!!})
+-- OLDER HANDLER EXPERIMENTS
 
+{-# TERMINATING #-}
+
+mutual
+  handler-to-algˢʳ : ∀ {A τ τ' t}
+                   → ((op : Op) → (τ'' : Time) → {t' : Time} → t ≤ t' → 
+                       carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
+                       carrier ([ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ'')) t' →
+                       carrier (Tᵒ A (op-time op + τ'')) t')
+                   → (c : Tˢ (Tᵒ A τ') τ t)
+                   → Tˢ-natcont c
+                   → carrier (Tᵒ A (τ + τ')) t
+   
+  handler-to-algˢʳ {τ = τ} {t = t} h (leaf (c , p)) q =
+    T-[]-moduleˢ (Tˢ-≤t (≤-reflexive (+-comm τ t)) c) ,
+    T-[]-moduleˢ-natcont (Tˢ-≤t-natcont (≤-reflexive (+-comm τ t)) p)
+  handler-to-algˢʳ {A} {τ' = τ'} {t = t} h (node {τ = τ''} op v k p) (natcont-node q q') =
+    Tˢʳ-≤τ
+      (≤-reflexive
+        (trans
+          (sym (+-assoc (op-time op) τ'' τ'))
+          (cong (_+ τ') (sym p))))
+      (h op (τ'' + τ') ≤-refl v
+        (tset-map
+          (λ { (r , y) →
+            handler-to-algˢʳ
+              (λ op τ''' s x k' → h op τ''' (≤-trans (m+n≤o⇒m≤o t r) s) x k')
+              (k r y) (q' _ _) })
+          (λ { r (s , y) →
+            trans
+              {!!}
+              (handler-to-algˢʳ-t-nat r
+                (λ op τ''' s' → h op τ''' (≤-trans (m+n≤o⇒m≤o t s) s'))
+                (λ op τ''' s' s'' x k' →
+                  {!!})
+                (k s y)
+                (q' s y)) }))) 
+
+  handler-to-algˢʳ-t-nat : ∀ {A τ τ' t t'}
+                         → (p : t ≤ t')
+                         → (h : (op : Op) → (τ'' : Time) → {t' : Time} → t ≤ t' → 
+                             carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
+                             carrier ([ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ'')) t' →
+                             carrier (Tᵒ A (op-time op + τ'')) t')
+                         → (h-nat : (op : Op) → (τ'' : Time)
+                                  → {t' : Time} → (p : t ≤ t')
+                                  → {t'' : Time} → (q : t' ≤ t'')
+                                  → (x : carrier (ConstTSet ⟦ param op ⟧ᵍ) t')
+                                  → (k : carrier ([ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ'')) t')
+                                  → h op τ'' (≤-trans p q) x (monotone ([ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ'')) q k)
+                                  ≡ Tˢʳ-≤t q (h op τ'' p x k))
+                         → (c : Tˢ (Tᵒ A τ') τ t)
+                         → (q : Tˢ-natcont c)
+                         → handler-to-algˢʳ (λ op τ'' q x k → h op τ'' (≤-trans p q) x k) (Tˢ-≤t p c) (Tˢ-≤t-natcont p q)
+                         ≡ Tˢʳ-≤t p (handler-to-algˢʳ h c q)
+
+  handler-to-algˢʳ-t-nat = {!!}
 -}
 
 
+
+
+
+
 {-
-handler-to-algˢʳ-t-nat : ∀ {A τ τ' t t'}
-                       → (p : t ≤ t')
-                       → (h : (op : Op) → (τ'' : Time) → {t' : Time} → t ≤ t' → 
-                           carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
-                           ({t'' : Time} → t' + op-time op ≤ t'' →
-                             carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ A τ'') t'') →
-                           carrier (Tᵒ A (op-time op + τ'')) t')
-                       → (h-nat : (op : Op) → (τ'' : Time)
-                                → {t' : Time} → (p : t ≤ t')
-                                → {t'' : Time} → (q : t' ≤ t'')
-                                → (x : carrier (ConstTSet ⟦ param op ⟧ᵍ) t')
-                                → (k : {t'' : Time} → t' + op-time op ≤ t'' →
-                                         carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ A τ'') t'')
-                                → h op τ'' (≤-trans p q) x (λ r y → Tˢʳ-≤t r (k (+-monoˡ-≤ (op-time op) q) y))
-                                ≡ Tˢʳ-≤t q (h op τ'' p x k))
-                       → (c : carrier (Tᵒ (Tᵒ A τ') τ) t)
-                       → handler-to-algˢ (λ op τ'' q x k → h op τ'' (≤-trans p q) x k) (Tˢ-≤t p (proj₁ c))
-                       ≡ Tˢʳ-≤t p (handler-to-algˢʳ h c)
--}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 -- TODO: figure out the right recursion pattern
 
 -- Semantics of effect handling (the mediating
 -- homomorphism induced by a given algebra)
-{-
+
 handleˢ : ∀ {A B τ τ' t}
         → Tˢ A τ t
         → ((op : Op) → (τ'' : Time) →
