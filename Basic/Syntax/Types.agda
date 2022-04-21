@@ -28,6 +28,7 @@ mutual
 -- Embedding ground types into types
 
 type-of-gtype : GType → VType
-type-of-gtype (Base B) = Base B
-type-of-gtype Unit     = Unit
-type-of-gtype Empty    = Empty
+type-of-gtype (Base B)   = Base B
+type-of-gtype Unit       = Unit
+type-of-gtype Empty      = Empty
+type-of-gtype ([ τ ]ᵍ A) = [ τ ] (type-of-gtype A)

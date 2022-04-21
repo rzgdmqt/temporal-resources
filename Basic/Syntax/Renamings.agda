@@ -209,10 +209,10 @@ mutual
     absurd (V-rename ρ V)
   C-rename ρ (perform op V M) =
     perform op (V-rename ρ V) (C-rename (cong-ren ρ) M)
-  {- C-rename ρ (handle M `with H `in N) =
+  C-rename ρ (handle M `with H `in N) =
     handle C-rename ρ M
     `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'') )
-    `in (C-rename (cong-ren ρ) N) -}
+    `in (C-rename (cong-ren ρ) N)
   C-rename ρ (unbox q r V M) with split-ren ρ q r
   ... | Γ₁' , Γ₂' , ρ' , p' , q' =
     unbox p' (≤-trans r q') (V-rename ρ' V) (C-rename (cong-ren ρ) M)

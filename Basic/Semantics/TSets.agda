@@ -242,3 +242,18 @@ curryᵗ {A} f =
         cong
           (map-carrier f)
           (cong (_, y) (monotone-trans A p q x)) }))
+
+uncurryᵗ : ∀ {A B C} → A →ᵗ B ⇒ᵗ C → A ×ᵗ B →ᵗ C
+uncurryᵗ {A} {B} {C} f =
+  tset-map
+    (λ { (x , y) → map-carrier (map-carrier f x) (≤-refl , y) })
+    (λ { p (x , y) →
+      trans
+        (cong
+          (λ z → map-carrier z (≤-reflexive refl , monotone B p y))
+          (map-nat f p x))
+        (trans
+          (cong
+            (λ q → map-carrier (map-carrier f x) (q , monotone B p y))
+            (≤-irrelevant _ _))
+          (map-nat (map-carrier f x) p (≤-reflexive refl , y))) })

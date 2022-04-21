@@ -6,10 +6,6 @@ open import Function
 
 open import Data.Product
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq hiding ([_])
-open Eq.≡-Reasoning
-
 open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Language
@@ -21,6 +17,7 @@ open import Semantics.Modality.Future
 open import Semantics.Modality.Past
 open import Semantics.Modality.Adjunction
 
+open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
@@ -45,15 +42,17 @@ mutual
 
 -- Relating the interpretation of ground types and ground type to type conversion
 
-⟦⟧ᵛ-⟦⟧ᵍ : (B : GType) → ⟦ type-of-gtype B ⟧ᵛ →ᵗ ConstTSet ⟦ B ⟧ᵍ
+⟦⟧ᵛ-⟦⟧ᵍ : (B : GType) → ⟦ type-of-gtype B ⟧ᵛ →ᵗ ⟦ B ⟧ᵍ
 ⟦⟧ᵛ-⟦⟧ᵍ (Base B) = idᵗ
 ⟦⟧ᵛ-⟦⟧ᵍ Unit     = idᵗ
 ⟦⟧ᵛ-⟦⟧ᵍ Empty    = idᵗ
+⟦⟧ᵛ-⟦⟧ᵍ ([ τ ]ᵍ A) = [ τ ]ᶠ (⟦⟧ᵛ-⟦⟧ᵍ A)
 
-⟦⟧ᵍ-⟦⟧ᵛ : (B : GType) → ConstTSet ⟦ B ⟧ᵍ →ᵗ ⟦ type-of-gtype B ⟧ᵛ
+⟦⟧ᵍ-⟦⟧ᵛ : (B : GType) → ⟦ B ⟧ᵍ →ᵗ ⟦ type-of-gtype B ⟧ᵛ
 ⟦⟧ᵍ-⟦⟧ᵛ (Base B) = idᵗ
 ⟦⟧ᵍ-⟦⟧ᵛ Unit     = idᵗ
 ⟦⟧ᵍ-⟦⟧ᵛ Empty    = idᵗ
+⟦⟧ᵍ-⟦⟧ᵛ ([ τ ]ᵍ A) = [ τ ]ᶠ (⟦⟧ᵍ-⟦⟧ᵛ A)
 
 -- Interpretation of contexts as environments
 
@@ -119,36 +118,38 @@ mutual
   
   ⟦ absurd V ⟧ᶜᵗ = initialᵗ ∘ᵗ ⟦ V ⟧ᵛᵗ
   
-  ⟦ perform {A} {τ} op V M ⟧ᶜᵗ =
-    let f : ⟦ _ ⟧ᵉ →ᵗ [ op-time op ]ᵒ (⟦ type-of-gtype (arity op) ⟧ᵛ ⇒ᵗ Tᵒ ⟦ A ⟧ᵛ τ)
+  ⟦_⟧ᶜᵗ {Γ} (perform {A} {τ} op V M) =
+    let f : ⟦ Γ ⟧ᵉ →ᵗ [ op-time op ]ᵒ (⟦ type-of-gtype (arity op) ⟧ᵛ ⇒ᵗ Tᵒ ⟦ A ⟧ᵛ τ)
         f = [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ) ∘ᵗ η⊣ in
     let g : [ op-time op ]ᵒ (⟦ type-of-gtype (arity op) ⟧ᵛ ⇒ᵗ Tᵒ ⟦ A ⟧ᵛ τ)
-         →ᵗ [ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ ⟦ A ⟧ᵛ τ)
+         →ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ ⟦ A ⟧ᵛ τ)
         g = [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) (idᵗ {A = Tᵒ ⟦ A ⟧ᵛ τ})) in
     opᵀ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
                 g ∘ᵗ f ⟩ᵗ
-  {-
+
   ⟦_⟧ᶜᵗ {Γ} (handle_`with_`in {A} {B} {τ} {τ'} M H N) =
     let f : ⟦ Γ ⟧ᵉ →ᵗ Π Op (λ op → Π Time (λ τ'' → ⟦ Γ ⟧ᵉ))
-        f = ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ⁱᵗ) ⟩ⁱᵗ in
-    let g : ⟦ Γ ⟧ᵉ →ᵗ [ τ ]ᵒ (⟦ A ⟧ᵛ ⇒ᵗ Tᵒ ⟦ B ⟧ᵛ τ')
-        g = [ τ ]ᶠ (curryᵗ ⟦ N ⟧ᶜᵗ) ∘ᵗ η⊣ in
-    let h : (op : Op) → (τ'' : Time)
+        f = ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ᵢᵗ) ⟩ᵢᵗ in
+    let g : (op : Op) → (τ'' : Time)
           → ⟦ type-of-gtype (param op) ⟧ᵛ ×ᵗ [ op-time op ]ᵒ (⟦ type-of-gtype (arity op) ⟧ᵛ
               ⇒ᵗ (Tᵒ ⟦ B ⟧ᵛ τ'')) ⇒ᵗ Tᵒ ⟦ B ⟧ᵛ (op-time op + τ'')
-          →ᵗ ConstTSet ⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ
+          →ᵗ ⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ
               ⇒ᵗ (Tᵒ ⟦ B ⟧ᵛ τ'')) ⇒ᵗ Tᵒ ⟦ B ⟧ᵛ (op-time op + τ'')
-        h = λ op τ'' →
+        g = λ op τ'' →
                map⇒ᵗ
                  (mapˣᵗ
                    (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                    ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) (idᵗ {A = Tᵒ ⟦ B ⟧ᵛ τ''}))))
                  (idᵗ {A = Tᵒ ⟦ B ⟧ᵛ (op-time op + τ'')}) in
-    handleᵀ ∘ᵗ ⟨
-      ⟦ M ⟧ᶜᵗ , ⟨
-      mapⁱˣᵗ (λ op → mapⁱˣᵗ (λ τ'' → h op τ'' ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×-assocᵗ))) ∘ᵗ f ,
-      g ⟩ᵗ ⟩ᵗ
-  -}
+       uncurryᵗ (
+            alg-of-handler
+         ∘ᵗ mapⁱˣᵗ (λ op → mapⁱˣᵗ (λ τ'' →
+              g op τ'' ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×-assocᵗ)))
+         ∘ᵗ f)
+    ∘ᵗ mapˣᵗ idᵗ (Tᶠ ⟦ N ⟧ᶜᵗ)
+    ∘ᵗ mapˣᵗ idᵗ (strᵀ {A = ⟦ Γ ⟧ᵉ} {τ' = τ})
+    ∘ᵗ ⟨ idᵗ , ⟨ η⊣ {A = ⟦ Γ ⟧ᵉ} {τ = τ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ
+    
   ⟦ unbox {Γ'} {τ = τ} p q V M ⟧ᶜᵗ =
     ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
                     ε⊣
@@ -162,4 +163,3 @@ mutual
     ∘ᵗ η⊣ 
 
   infix 25 ⟦_⟧ᶜᵗ
-

@@ -5,7 +5,7 @@
 module Util.Equality where
 
 import Relation.Binary.PropositionalEquality as Eq
-open Eq public hiding (Extensionality)
+open Eq public hiding (Extensionality) renaming ([_] to [|_|])
 
 open import Axiom.Extensionality.Propositional
 

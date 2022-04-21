@@ -22,6 +22,9 @@ data GType : Set where
   Base  : BaseType → GType                -- base types
   Unit  : GType                           -- unit type
   Empty : GType                           -- empty type
+  [_]ᵍ_ : Time → GType → GType            -- temporal modality: values of type `[ t ] A`
+                                          -- become available in at most `t` time steps
+infix 37 [_]ᵍ_
 
 -- Signature of (ground-typed) operation symbols
 
