@@ -663,12 +663,56 @@ handler-to-alg =
                (λ { (q , y) → Tˢʳ-≤t q (k ≤-refl y) })
                (λ { q (r , y) → sym (Tˢʳ-≤t-trans _ _ _) })))
         c })
-    (λ { p (h , c) → {!!} })
+    (λ { p (h , c) →
+      handler-to-algˢʳ-t-nat p
+        (λ op τ'' p₁ x k →
+          map-carrier (h op τ'')
+          (p₁ ,
+           x ,
+           tset-map (λ { (q , y) → Tˢʳ-≤t q (k ≤-refl y) })
+           (λ { q (r , y) → sym (Tˢʳ-≤t-trans r q (k ≤-refl y)) })))
+        (λ op τ'' q r x k → 
+          trans
+            (cong (map-carrier (h op τ''))
+              (cong (λ k → (≤-trans q r , x , k))
+                ?))
+            (map-nat (h op τ'') r _))
+        c })
 
 
+{-
+
+(dcong₂
+                  tset-map
+                    (ifun-ext (fun-ext (λ { (s , y) →
+                      trans
+                        (Tˢʳ-≤t-trans _ _ _)
+                        {!!} })))
+                    {!!})
+
+-}
 
 
-
+{-
+handler-to-algˢʳ-t-nat : ∀ {A τ τ' t t'}
+                       → (p : t ≤ t')
+                       → (h : (op : Op) → (τ'' : Time) → {t' : Time} → t ≤ t' → 
+                           carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
+                           ({t'' : Time} → t' + op-time op ≤ t'' →
+                             carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ A τ'') t'') →
+                           carrier (Tᵒ A (op-time op + τ'')) t')
+                       → (h-nat : (op : Op) → (τ'' : Time)
+                                → {t' : Time} → (p : t ≤ t')
+                                → {t'' : Time} → (q : t' ≤ t'')
+                                → (x : carrier (ConstTSet ⟦ param op ⟧ᵍ) t')
+                                → (k : {t'' : Time} → t' + op-time op ≤ t'' →
+                                         carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ A τ'') t'')
+                                → h op τ'' (≤-trans p q) x (λ r y → Tˢʳ-≤t r (k (+-monoˡ-≤ (op-time op) q) y))
+                                ≡ Tˢʳ-≤t q (h op τ'' p x k))
+                       → (c : carrier (Tᵒ (Tᵒ A τ') τ) t)
+                       → handler-to-algˢ (λ op τ'' q x k → h op τ'' (≤-trans p q) x k) (Tˢ-≤t p (proj₁ c))
+                       ≡ Tˢʳ-≤t p (handler-to-algˢʳ h c)
+-}
 
 
 
