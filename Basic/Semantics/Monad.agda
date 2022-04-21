@@ -207,17 +207,17 @@ Tˢ-≤τ p (node op v k q) =
       (proj₁ (proj₂ (n≡m+k≤n' (trans q (+-comm (op-time op) _)) p)))
       (+-comm _ (op-time op)))
 
-Tˢ-≤τ-nat : ∀ {A τ τ'} → (p : τ ≤ τ') → {t t' : ℕ}
-          → (q : t ≤ t') (c : Tˢ A τ t)
-          → Tˢ-≤τ p (Tˢ-≤t q c) ≡ Tˢ-≤t q (Tˢ-≤τ p c)
-Tˢ-≤τ-nat {A} p q (leaf v) =
+Tˢ-≤τ-t-nat : ∀ {A τ τ'} → (p : τ ≤ τ') → {t t' : ℕ}
+            → (q : t ≤ t') (c : Tˢ A τ t)
+            → Tˢ-≤τ p (Tˢ-≤t q c) ≡ Tˢ-≤t q (Tˢ-≤τ p c)
+Tˢ-≤τ-t-nat {A} p q (leaf v) =
   cong leaf
     (trans
       (monotone-trans A _ _ v)
       (trans
         (cong (λ r → monotone A r v) (≤-irrelevant _ _))
         (sym (monotone-trans A _ _ v))))
-Tˢ-≤τ-nat p q (node op v k r) = refl
+Tˢ-≤τ-t-nat p q (node op v k r) = refl
 
 Tˢ-≤τ-natcont : ∀ {A τ τ' t} → (p : τ ≤ τ') → {c : Tˢ A τ t}
               → Tˢ-natcont c
@@ -228,7 +228,7 @@ Tˢ-≤τ-natcont p {c = node {τ = τ} op v k u} (natcont-node q r) =
     (λ s t y →
       trans
         (cong (Tˢ-≤τ _) (q s t y))
-        (Tˢ-≤τ-nat
+        (Tˢ-≤τ-t-nat
           (proj₂ (proj₂ (n≡m+k≤n' (trans u (+-comm (op-time op) τ)) p)))
           t
           (k s y)))
@@ -240,12 +240,12 @@ Tˢ-≤τ-natcont p {c = node {τ = τ} op v k u} (natcont-node q r) =
 Tˢʳ-≤τ : ∀ {A τ τ' t} → τ ≤ τ' → Tˢʳ A τ t → Tˢʳ A τ' t
 Tˢʳ-≤τ p (c , q) = Tˢ-≤τ p c , Tˢ-≤τ-natcont p q
 
-Tˢʳ-≤τ-nat : ∀ {A τ τ'} → (p : τ ≤ τ') → {t t' : ℕ}
-           → (q : t ≤ t') (c : Tˢʳ A τ t)
-           → Tˢʳ-≤τ p (Tˢʳ-≤t q c) ≡ Tˢʳ-≤t q (Tˢʳ-≤τ p c)
+Tˢʳ-≤τ-t-nat : ∀ {A τ τ'} → (p : τ ≤ τ') → {t t' : ℕ}
+             → (q : t ≤ t') (c : Tˢʳ A τ t)
+             → Tˢʳ-≤τ p (Tˢʳ-≤t q c) ≡ Tˢʳ-≤t q (Tˢʳ-≤τ p c)
 
-Tˢʳ-≤τ-nat p q (c , r) =
-  dcong₂ _,_ (Tˢ-≤τ-nat p q c) (Tˢ-natcont-isprop _ _)
+Tˢʳ-≤τ-t-nat p q (c , r) =
+  dcong₂ _,_ (Tˢ-≤τ-t-nat p q c) (Tˢ-natcont-isprop _ _)
 
 -- Packaging it all up into a functor
 
@@ -257,7 +257,7 @@ Tᶠ f = tset-map (Tˢʳᶠ f) (Tˢʳᶠ-nat f)
 
 
 T-≤τ : ∀ {A τ τ'} → τ ≤ τ' → Tᵒ A τ →ᵗ Tᵒ A τ'
-T-≤τ p = tset-map (Tˢʳ-≤τ p) (Tˢʳ-≤τ-nat p)
+T-≤τ p = tset-map (Tˢʳ-≤τ p) (Tˢʳ-≤τ-t-nat p)
 
 -- T is a [_]-module
 
@@ -540,6 +540,269 @@ opᵀ {A} {τ} op =
       dcong₂ _,_ refl (Tˢ-natcont-isprop _ _) })
 
 
+-- Semantics of effect handling
+
+-- Effect handler induces a monad algebra
+
+handler-to-algˢ : ∀ {A τ τ' t}
+                → ((op : Op) → (τ'' : Time) → {t' : Time} → t ≤ t' → 
+                    carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
+                    ({t'' : Time} → t' + op-time op ≤ t'' →
+                      carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ A τ'') t'') →
+                    carrier (Tᵒ A (op-time op + τ'')) t')
+                → Tˢ (Tᵒ A τ') τ t
+                → carrier (Tᵒ A (τ + τ')) t
+
+handler-to-algˢ {τ = τ} {t = t} h (leaf (c , p)) =
+  T-[]-moduleˢ (Tˢ-≤t (≤-reflexive (+-comm τ t)) c) ,
+  T-[]-moduleˢ-natcont (Tˢ-≤t-natcont (≤-reflexive (+-comm τ t)) p)
+handler-to-algˢ {A} {τ' = τ'} {t = t} h (node {τ = τ''} op v k p) =
+  Tˢʳ-≤τ
+    (≤-reflexive
+      (trans
+        (sym (+-assoc (op-time op) τ'' τ'))
+        (cong (_+ τ') (sym p))))
+    (h op (τ'' + τ') ≤-refl v
+      (λ q y →
+        handler-to-algˢ
+          (λ op τ''' r x k' →
+            h op τ''' (≤-trans (m+n≤o⇒m≤o t q) r) x k')
+          (k q y)))
+
+handler-to-algˢ-t-nat : ∀ {A τ τ' t t'}
+                      → (p : t ≤ t')
+                      → (h : (op : Op) → (τ'' : Time) → {t' : Time} → t ≤ t' → 
+                          carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
+                          ({t'' : Time} → t' + op-time op ≤ t'' →
+                            carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ A τ'') t'') →
+                          carrier (Tᵒ A (op-time op + τ'')) t')
+                      → (h-nat : (op : Op) → (τ'' : Time)
+                               → {t' : Time} → (p : t ≤ t')
+                               → {t'' : Time} → (q : t' ≤ t'')
+                               → (x : carrier (ConstTSet ⟦ param op ⟧ᵍ) t')
+                               → (k : {t'' : Time} → t' + op-time op ≤ t'' →
+                                        carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ A τ'') t'')
+                               → h op τ'' (≤-trans p q) x (λ r y → Tˢʳ-≤t r (k (+-monoˡ-≤ (op-time op) q) y))
+                               ≡ Tˢʳ-≤t q (h op τ'' p x k))
+                      → (c : carrier (Tᵒ (Tᵒ A τ') τ) t)
+                      → handler-to-algˢ (λ op τ'' q x k → h op τ'' (≤-trans p q) x k) (Tˢ-≤t p (proj₁ c))
+                      ≡ Tˢʳ-≤t p (handler-to-algˢ h (proj₁ c))
+
+handler-to-algˢ-t-nat p h h-nat (leaf (c , q) , r) =
+  trans
+    (cong T-[]-moduleˢʳ
+      (trans
+        (Tˢʳ-≤t-trans _ _ _)
+        (trans
+          (cong
+            (λ s → Tˢʳ-≤t s (c , q))
+            (≤-irrelevant _ _))
+          (sym (Tˢʳ-≤t-trans _ _ _)))))
+    (T-[]-moduleˢʳ-t-nat _ _)
+
+handler-to-algˢ-t-nat {A} {τ} {τ'} {t} {t'} p h h-nat (node {τ = τ''} op v k q , natcont-node s s') =
+  trans
+    (cong
+      (Tˢʳ-≤τ (≤-reflexive
+        (trans (sym (+-assoc (op-time op) τ'' τ')) (cong (_+ τ') (sym q)))))
+      (trans
+        (trans
+          (trans
+            ((cong (λ s → (h op (τ'' + τ') s v
+               (λ q₁ y → handler-to-algˢ (λ op₁ τ''' r →
+                 h op₁ τ''' (≤-trans p (≤-trans (m+n≤o⇒m≤o t' q₁) r)))
+                   (k (≤-trans (+-monoˡ-≤ (op-time op) p) q₁) y))))
+               (≤-irrelevant _ p)))
+            (cong (h op (τ'' + τ') p v)
+              (ifun-ext (fun-ext (λ r → fun-ext (λ y →
+                trans
+                  (cong₂ handler-to-algˢ
+                    (fun-ext (λ op → fun-ext (λ τ''' → ifun-ext (fun-ext (λ r' →
+                      cong (h op τ''') (≤-irrelevant _ _))))))
+                    (s _ _ _))
+                  (handler-to-algˢ-t-nat r
+                    (λ op₁ τ''' r₁ →
+                      h op₁ τ''' (≤-trans (m+n≤o⇒m≤o t (+-monoˡ-≤ (op-time op) p)) r₁))
+                    (λ op τ''' r' r'' x' k' →
+                      trans
+                        (cong (λ r'' → h op τ''' r'' x' _) (≤-irrelevant _ _))
+                        (h-nat op τ''' _ _ _ _))
+                    (k (+-monoˡ-≤ (op-time op) p) y , s' _ y))))))))
+          (cong
+            (λ s → h op (τ'' + τ') s v
+              (λ r y → Tˢʳ-≤t r (handler-to-algˢ (λ op₁ τ''' r₁ →
+                h op₁ τ''' (≤-trans (m+n≤o⇒m≤o t (+-monoˡ-≤ (op-time op) p)) r₁))
+                 (k (+-monoˡ-≤ (op-time op) p) y))))
+            (≤-irrelevant p _)))
+        (h-nat op (τ'' + τ') _ _ _ _)))
+    (Tˢʳ-≤τ-t-nat _ _ _)
+  
+{-
+handler-to-algˢ-t-nat p h h-nat (leaf (c , q)) =
+  {!!}
+
+handler-to-algˢ-t-nat {A} {τ} {τ'} {t} {t'} p h h-nat (node {τ = τ''} op v k q) =
+  trans
+    (cong
+      (Tˢʳ-≤τ (≤-reflexive
+        (trans (sym (+-assoc (op-time op) τ'' τ')) (cong (_+ τ') (sym q)))))
+      (trans
+        (trans
+          (trans
+            (cong (λ s → (h op (τ'' + τ') s v
+               (λ q₁ y → handler-to-algˢ (λ op₁ τ''' r →
+                 h op₁ τ''' (≤-trans p (≤-trans (m+n≤o⇒m≤o t' q₁) r)))
+                   (k (≤-trans (+-monoˡ-≤ (op-time op) p) q₁) y))))
+               (≤-irrelevant _ p))
+            (cong (h op (τ'' + τ') p v)
+              (ifun-ext (fun-ext (λ r → fun-ext (λ y →
+                trans
+                  {!!}
+                  (handler-to-algˢ-t-nat r
+                    (λ op₁ τ''' r₁ → h op₁ τ''' (≤-trans (m+n≤o⇒m≤o t (+-monoˡ-≤ (op-time op) p)) r₁))
+                    {!!}
+                    (k (+-monoˡ-≤ (op-time op) p) y))))))))
+          (cong (λ s → h op (τ'' + τ') s v
+              (λ r y → Tˢʳ-≤t r (handler-to-algˢ (λ op₁ τ''' r₁ →
+                h op₁ τ''' (≤-trans (m+n≤o⇒m≤o t (+-monoˡ-≤ (op-time op) p)) r₁))
+                 (k (+-monoˡ-≤ (op-time op) p) y))))
+            (≤-irrelevant p _)))
+        (h-nat op (τ'' + τ') _ _ _ _)))
+    (Tˢʳ-≤τ-t-nat _ _ _)
+-}
+
+{-
+handler-to-algˢ-t-nat p h (leaf (c , q)) =
+  {!!}
+handler-to-algˢ-t-nat {A} {τ} {τ'} p h (node {τ = τ''} op v k q) =
+  trans
+    (cong
+      (Tˢʳ-≤τ (≤-reflexive
+        (trans (sym (+-assoc (op-time op) τ'' τ')) (cong (_+ τ') (sym q)))))
+      {!!})
+    (Tˢʳ-≤τ-t-nat _ _ _)
+-}
+
+{-
+Goal: (proj₁
+       (h op (τ'' + τ') (≤-trans p ≤-refl) v
+        (λ q₁ y →
+           handler-to-algˢ
+           (λ op₁ τ''' r →
+              h op₁ τ''' (≤-trans p (≤-trans (m+n≤o⇒m≤o t' q₁) r)))
+           (k (≤-trans (+-monoˡ-≤ (op-time op) p) q₁) y)))
+       ,
+       proj₂
+       (h op (τ'' + τ') (≤-trans p ≤-refl) v
+        (λ q₁ y →
+           handler-to-algˢ
+           (λ op₁ τ''' r →
+              h op₁ τ''' (≤-trans p (≤-trans (m+n≤o⇒m≤o t' q₁) r)))
+           (k (≤-trans (+-monoˡ-≤ (op-time op) p) q₁) y))))
+      ≡
+      (proj₁
+       (Tˢʳ-≤t p
+        (proj₁
+         (h op (τ'' + τ') ≤-refl v
+          (λ q₁ y →
+             handler-to-algˢ
+             (λ op₁ τ''' r → h op₁ τ''' (≤-trans (m+n≤o⇒m≤o t q₁) r)) (k q₁ y)))
+         ,
+         proj₂
+         (h op (τ'' + τ') ≤-refl v
+          (λ q₁ y →
+             handler-to-algˢ
+             (λ op₁ τ''' r → h op₁ τ''' (≤-trans (m+n≤o⇒m≤o t q₁) r))
+             (k q₁ y)))))
+       ,
+       Tˢ-≤t-natcont p
+       (proj₂
+        (h op (τ'' + τ') ≤-refl v
+         (λ q₁ y →
+            handler-to-algˢ
+            (λ op₁ τ''' r → h op₁ τ''' (≤-trans (m+n≤o⇒m≤o t q₁) r))
+            (k q₁ y)))))
+-}
+
+
+{-
+handler-to-algˢ : ∀ {A τ τ' t}
+                → ((op : Op) → (τ'' : Time) → {t' : Time} → t ≤ t' → 
+                    carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
+                    ({t'' : Time} → t' + op-time op ≤ t'' →
+                      carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ A τ'') t'') →
+                    carrier (Tᵒ A (op-time op + τ'')) t')
+                → Tˢ (Tᵒ A τ') τ t
+                → carrier (Tᵒ A (τ + τ')) t
+
+handler-to-algˢ {τ = τ} {t = t} h (leaf (c , p)) =
+  T-[]-moduleˢ (Tˢ-≤t (≤-reflexive (+-comm τ t)) c) ,
+  T-[]-moduleˢ-natcont (Tˢ-≤t-natcont (≤-reflexive (+-comm τ t)) p)
+handler-to-algˢ {A} {τ' = τ'} {t = t} h (node {τ = τ''} op v k p) =
+  Tˢʳ-≤τ
+    (≤-reflexive
+      (trans
+        (sym (+-assoc (op-time op) τ'' τ'))
+        (cong (_+ τ') (sym p))))
+    (h op (τ'' + τ') ≤-refl v
+      (λ q y →
+        handler-to-algˢ
+          (λ op τ''' r x k' →
+            h op τ''' (≤-trans (m+n≤o⇒m≤o t q) r) x k')
+          (k q y)))
+
+handler-to-algˢ-t-nat : ∀ {A τ τ' t t'}
+                      → (p : t ≤ t')
+                      → (h : (op : Op) → (τ'' : Time) → {t' : Time} → t ≤ t' → 
+                          carrier (ConstTSet ⟦ param op ⟧ᵍ) t' →
+                          ({t'' : Time} → t' + op-time op ≤ t'' →
+                            carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ A τ'') t'') →
+                          carrier (Tᵒ A (op-time op + τ'')) t')
+                      → (c : Tˢ (Tᵒ A τ') τ t)
+                      → handler-to-algˢ
+                          (λ op τ'' q x k → h op τ'' (≤-trans p q) x k)
+                          (Tˢ-≤t p c)
+                      ≡ Tˢʳ-≤t p (handler-to-algˢ h c)
+
+handler-to-algˢ-t-nat p h (leaf (c , q)) =
+  {!!}
+handler-to-algˢ-t-nat {A} {τ} {τ'} p h (node {τ = τ''} op v k q) =
+  trans
+    (cong
+      (Tˢʳ-≤τ (≤-reflexive
+        (trans (sym (+-assoc (op-time op) τ'' τ')) (cong (_+ τ') (sym q)))))
+      {!!})
+    (Tˢʳ-≤τ-t-nat _ _ _)
+-}
+
+
+handler-to-alg : ∀ {A τ τ'}
+               → Π Op (λ op → Π Time (λ τ'' →
+                  ConstTSet ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ A τ'')))
+                    ⇒ᵗ Tᵒ A (op-time op + τ'')))
+              ×ᵗ Tᵒ (Tᵒ A τ') τ 
+              →ᵗ (Tᵒ A (τ + τ'))
+              
+handler-to-alg = {!!}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -547,38 +810,6 @@ opᵀ {A} {τ} op =
 
 -- Semantics of effect handling (the mediating
 -- homomorphism induced by a given algebra)
-
-{-
-handleˢ : ∀ {A B τ τ' t}
-        → Tˢ A τ t
-        → carrier (Π Op (λ op → Π Time (λ τ'' →
-                    ConstTSet ⟦ param op ⟧ᵍ ×ᵗ
-                    ([ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ B τ'')))
-                      ⇒ᵗ Tᵒ B (op-time op + τ'')))) t
-        → carrier ([ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')) t
-        → carrier (Tᵒ B (τ + τ')) t
-
-handleˢ {τ = τ} {t = t} (leaf v) h k =
-  T-[]-moduleˢʳ
-    (Tˢʳ-≤t
-      (≤-reflexive (+-comm τ t))
-      (map-carrier k ((≤-reflexive (+-comm t τ)) , v)) )
-handleˢ {τ' = τ'} {t = t} (node {τ = τ''} op v k p) h k' =
-  Tˢʳ-≤τ
-    (≤-reflexive
-      (trans
-        (sym (+-assoc (op-time op) τ'' τ'))
-        (cong (_+ τ') (sym p))))
-    (map-carrier (h op (τ'' + τ'))
-      (≤-refl , v ,
-       tset-map
-         (λ { (q , y) → handleˢ (k q y) {!!} {! !} })
-         {!!}))
-
--}
-
-
-
 {-
 handleˢ : ∀ {A B τ τ' t}
         → Tˢ A τ t
@@ -626,17 +857,36 @@ handleˢ-t-nat : ∀ {A B τ τ' t t'}
                        ({t'' : Time} → t' + op-time op ≤ t'' →
                          carrier (ConstTSet ⟦ arity op ⟧ᵍ) t'' → carrier (Tᵒ B τ'') t'') →
                        carrier (Tᵒ B (op-time op + τ'')) t')
-              → (k : {t' : Time} → t + τ ≤ t' → carrier A t' → carrier (Tᵒ B τ') t')
+              → (k : carrier ([ τ ]ᵒ (A ⇒ᵗ Tᵒ B τ')) t)
               → handleˢ
                   (Tˢ-≤t p c)
                   (λ op τ'' q x k' → h op τ'' (≤-trans p q) x k')
-                  (λ q z → k (≤-trans (+-monoˡ-≤ τ p) q) z)
-              ≡ Tˢʳ-≤t p (handleˢ c h k)
+                  (λ q z → map-carrier k (≤-trans (+-monoˡ-≤ τ p) q , z))
+              ≡ Tˢʳ-≤t p (handleˢ c h (λ q z → map-carrier k (q , z)))
 
-handleˢ-t-nat = {!!}
+handleˢ-t-nat {A} {B} {τ} {τ'} {t} {t'} p (leaf v) h k =
+  trans
+    (cong T-[]-moduleˢʳ
+      (trans
+        (sym (map-nat k _ _))
+        (trans
+          (trans
+            (cong (map-carrier k)
+              (cong₂ _,_
+                (≤-irrelevant _ _)
+                (trans
+                  (monotone-trans A _ _ _)
+                  (cong
+                    (λ p → monotone A p v)
+                    (≤-irrelevant _ _)))))
+            (map-nat k _ _))
+          (sym (monotone-trans (Tᵒ B τ') _ _ _)))))
+    (T-[]-moduleˢʳ-t-nat _ _)
+handleˢ-t-nat p (node op v k q) h k' =
+  {!!}
+-}
 
-
-
+{-
 
 handleˢʳ : ∀ {A B τ τ' t}
          → carrier (Tᵒ A τ) t
