@@ -105,6 +105,9 @@ data Tˢ-natcont {A : TSet} : ∀ {τ t} → Tˢ A τ t → Set where
                               → Tˢ-natcont (k q y))
                → Tˢ-natcont (node {A} {τ} {τ'} {t} op x k p)
 
+Tˢʳ : TSet → Time → Time → Set
+Tˢʳ A τ t = Σ[ c ∈ Tˢ A τ t ] Tˢ-natcont c
+
 -- The extrinsic predicate is a proposition
 
 Tˢ-natcont-isprop : ∀ {A τ t}
@@ -117,9 +120,6 @@ Tˢ-natcont-isprop (natcont-node p q) (natcont-node p' q') =
   cong₂ natcont-node
     (ifun-ext (ifun-ext (fun-ext (λ r → fun-ext (λ s → fun-ext (λ y → uip))))))
     (ifun-ext (fun-ext (λ r → fun-ext (λ y → Tˢ-natcont-isprop (q r y) (q' r y)))))
-
-Tˢʳ : TSet → Time → Time → Set
-Tˢʳ A τ t = Σ[ c ∈ Tˢ A τ t ] Tˢ-natcont c
 
 -- Monotonicity wrt TSets' time-indices
 
@@ -419,13 +419,12 @@ T-[]-module = tset-map T-[]-moduleˢʳ T-[]-moduleˢʳ-t-nat
 μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
 μᵀ = tset-map μˢʳ μˢʳ-t-nat
 
-{-
 
 -- Strength
 
 strˢ : ∀ {A B τ τ' t}
-     → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t → carrier (Tᵒ B τ) t
-     → carrier (Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ) t
+     → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t → Tˢ B τ t
+     → Tˢ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ t
      
 strˢ {A} {B} {τ} {τ'} {t} (vp , vx) (leaf w) =
   leaf (
@@ -454,8 +453,10 @@ strˢ {A} {B} {τ' = τ''} {t} (vp , vx) (node {τ = τ} {τ' = τ'} op w k p) =
     p
 
 strˢ-t-nat : ∀ {A B τ τ'} → {t t' : ℕ} → (p : t ≤ t')
-           → (x : carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ) t)
-           → strˢ {A = A} {B = B} (monotone ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) p (proj₁ x)) (Tˢ-≤t p (proj₂ x))
+           → (x : carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t × Tˢ B τ t)
+           → strˢ {A = A} {B = B}
+               (monotone ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) p (proj₁ x))
+               (Tˢ-≤t p (proj₂ x))
            ≡ Tˢ-≤t p (strˢ {A = A} {B = B} (proj₁ x) (proj₂ x))
 
 strˢ-t-nat {A} p (x , leaf v) =
@@ -481,21 +482,63 @@ strˢ-t-nat {A} p (x , node op v k q) =
         refl))))
     refl
 
+strˢʳ-natcont : ∀ {A B τ τ' t}
+              → {x : carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t}
+              → {c : Tˢ B τ t}
+              → (p : Tˢ-natcont c)
+              → Tˢ-natcont (strˢ {A} {B} {τ} {τ'} {t} x c)
+strˢʳ-natcont natcont-leaf = natcont-leaf
+strˢʳ-natcont {A} {B} {τ} {τ'} {t} {x} (natcont-node p q) =
+  natcont-node
+    (λ r s y →
+      trans
+        (cong₂ strˢ
+          (cong₂ _,_
+            (≤-irrelevant _ _)
+            (trans
+              (cong (λ p → monotone A p (proj₂ x)) (≤-irrelevant _ _))
+              (sym (monotone-trans A _ _ (proj₂ x)))))
+          (p r s y))
+        (strˢ-t-nat _ _))
+    (λ r y → strˢʳ-natcont (q r y))
+
+strˢʳ : ∀ {A B τ τ' t}
+      → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t × carrier (Tᵒ B τ) t
+      → carrier (Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ) t
+strˢʳ {A} {B} {τ} {τ'} {t} (x , (c , p)) =
+  strˢ {A} {B} {τ} {τ'} {t} x c , strˢʳ-natcont p
+
+strˢʳ-t-nat : ∀ {A B τ τ' t t'} → (p : t ≤ t')
+            → (xc : carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ) t)
+            → strˢʳ {A} {B} {τ} {τ'}
+                (monotone ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ) p xc)
+            ≡ monotone (Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ) p (strˢʳ {A} {B} {τ} {τ'} xc)
+strˢʳ-t-nat p (x , (c , q)) =
+  dcong₂ _,_ (strˢ-t-nat p (x , c)) (Tˢ-natcont-isprop _ _)
+
 strᵀ : ∀ {A B τ τ'} → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
 strᵀ {A} {B} {τ} {τ'} =
-  tset-map (λ { (v , c) → strˢ {A} {B} {τ} {τ'} v c }) strˢ-t-nat
+  tset-map (strˢʳ {A} {B} {τ} {τ'}) strˢʳ-t-nat
 
 -- Algebraic operations
 
 opᵀ : ∀ {A τ} → (op : Op)
-    → ConstTSet ⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)
-   →ᵗ Tᵒ A (op-time op + τ)
+    → ConstTSet ⟦ param op ⟧ᵍ
+    ×ᵗ [ op-time op ]ᵒ (ConstTSet ⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)
+    →ᵗ Tᵒ A (op-time op + τ)
    
 opᵀ {A} {τ} op =
   tset-map
-    (λ { (v , k) → node op v (λ p y → map-carrier k (p , y)) refl })
-    (λ { p (x , k) → refl })
+    (λ { (v , k) →
+      node op v
+        (λ p y → proj₁ (map-carrier k (p , y))) refl ,
+      natcont-node
+        (λ p q y → cong proj₁ (map-nat k q (p , y)))
+        (λ p y → proj₂ (map-carrier k (p , y))) })
+    (λ { p (v , k) →
+      dcong₂ _,_ refl (Tˢ-natcont-isprop _ _) })
 
+{-
 -- Semantics of effect handling (the mediating
 -- homomorphism induced by a given algebra)
 
