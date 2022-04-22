@@ -163,17 +163,17 @@ module Semantics.Modality.Future where
 -- δ and δ⁻¹ are natural
 
 []-δ-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
-         → [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f) ∘ᵗ δ {A = A} ≡ᵗ δ {A = B} ∘ᵗ [ τ₁ + τ₂ ]ᶠ f
+         → [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f) ∘ᵗ δ {A} ≡ᵗ δ {B} ∘ᵗ [ τ₁ + τ₂ ]ᶠ f
 []-δ-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} x =
   map-nat f (≤-reflexive (sym (+-assoc t τ₁ τ₂))) x
 
 []-δ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
-           → [ τ₁ + τ₂ ]ᶠ f ∘ᵗ δ⁻¹ {A = A} ≡ᵗ δ⁻¹ {A = B} ∘ᵗ [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f)
+           → [ τ₁ + τ₂ ]ᶠ f ∘ᵗ δ⁻¹ {A} ≡ᵗ δ⁻¹ {B} ∘ᵗ [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f)
 []-δ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} x = map-nat f (≤-reflexive (+-assoc t τ₁ τ₂)) x
 
 []-δ-≤ : ∀ {A τ₁ τ₂ τ₁' τ₂'} → (p : τ₁ ≤ τ₁') → (q : τ₂ ≤ τ₂')
-       → [ τ₁' ]ᶠ ([]-≤ {A = A} q) ∘ᵗ []-≤ {A = [ τ₂ ]ᵒ A} p ∘ᵗ δ {A = A}
-       ≡ᵗ δ {A = A} ∘ᵗ []-≤ {A = A} (+-mono-≤ p q)
+       → [ τ₁' ]ᶠ ([]-≤ {A} q) ∘ᵗ []-≤ {[ τ₂ ]ᵒ A} p ∘ᵗ δ {A = A}
+       ≡ᵗ δ {A} ∘ᵗ []-≤ {A} (+-mono-≤ p q)
 []-δ-≤ {A} p q x =
   trans
     (monotone-trans A _ _ _)
@@ -223,4 +223,31 @@ module Semantics.Modality.Future where
 
 -- graded comonad laws
 
--- ...
+[]-ε∘δ≡id : ∀ {A τ} → ε ∘ᵗ δ {A} {0} {τ} ≡ᵗ idᵗ
+[]-ε∘δ≡id {A} {τ} x =
+  trans
+    (monotone-trans A _ _ x)
+    (trans
+      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+      (monotone-refl A x))
+
+[]-Dε∘δ≡≤ : ∀ {A τ}
+          → [ τ ]ᶠ (ε {A}) ∘ᵗ δ {A} {τ} {0}
+          ≡ᵗ []-≤ {A} (≤-reflexive (+-identityʳ τ))
+[]-Dε∘δ≡≤ {A} x =
+  trans
+    (monotone-trans A _ _ x)
+    (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+             
+[]-δ∘δ≡Dδ∘δ∘≤ : ∀ {A τ₁ τ₂ τ₃}
+              → δ {[ τ₃ ]ᵒ A} {τ₁} {τ₂} ∘ᵗ δ {A} {τ₁ + τ₂} {τ₃}
+              ≡ᵗ    [ τ₁ ]ᶠ (δ {A} {τ₂} {τ₃}) ∘ᵗ δ {A} {τ₁} {τ₂ + τ₃}
+                 ∘ᵗ []-≤ {A} (≤-reflexive (+-assoc τ₁ τ₂ τ₃))
+[]-δ∘δ≡Dδ∘δ∘≤ {A} x =
+  trans
+    (monotone-trans A _ _ x)
+    (trans
+      (trans
+        (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+        (sym (monotone-trans A _ _ _)))
+      (sym (monotone-trans A _ _ _)))
