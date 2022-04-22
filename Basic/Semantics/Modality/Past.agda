@@ -123,4 +123,145 @@ module Semantics.Modality.Past where
 
 -- PROPERTIES
 
--- ...
+-- ⟨_⟩ is functorial
+
+⟨⟩-id : ∀ {A τ} → ⟨ τ ⟩ᶠ (idᵗ {A = A}) ≡ᵗ idᵗ
+⟨⟩-id x = refl
+
+⟨⟩-∘ : ∀ {A B C τ} → (f : A →ᵗ B) → (g : B →ᵗ C)
+     → ⟨ τ ⟩ᶠ (g ∘ᵗ f) ≡ᵗ ⟨ τ ⟩ᶠ g ∘ᵗ ⟨ τ ⟩ᶠ f
+⟨⟩-∘ f g x = refl
+
+-- ⟨⟩-≤ is natural
+
+⟨⟩-≤-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B) → (p : τ₁ ≤ τ₂)
+         → ⟨ τ₁ ⟩ᶠ f ∘ᵗ ⟨⟩-≤ {A = A} p ≡ᵗ ⟨⟩-≤ {A = B} p ∘ᵗ ⟨ τ₂ ⟩ᶠ f
+⟨⟩-≤-nat f p (q , x) =
+  cong (_ ,_) (map-nat f (∸-mono (≤-reflexive refl) p) x)
+
+-- ⟨_⟩ is functorial in the gradings
+
+⟨⟩-≤-refl : ∀ {A τ} → ⟨⟩-≤ {A} (≤-refl {τ}) ≡ᵗ idᵗ
+⟨⟩-≤-refl {A} (p , x) = 
+  trans
+    (cong₂ _,_
+      (≤-irrelevant _ _)
+      (cong (λ q → monotone A q x) (≤-irrelevant _ _)))
+    (cong (_ ,_) (monotone-refl A x))
+
+⟨⟩-≤-trans : ∀ {A τ τ' τ''} → (p : τ ≤ τ') → (q : τ' ≤ τ'')
+           → ⟨⟩-≤ {A} p ∘ᵗ ⟨⟩-≤ {A} q ≡ᵗ ⟨⟩-≤ {A} (≤-trans p q)
+⟨⟩-≤-trans {A} p q (r , x) =
+  trans
+    (cong₂ _,_ refl (monotone-trans A _ _ x))
+    (cong₂ _,_
+      (≤-irrelevant _ _)
+      (cong (λ q → monotone A q x) (≤-irrelevant _ _)))
+
+-- η and η⁻¹ are natural
+
+⟨⟩-η-nat : ∀ {A B} → (f : A →ᵗ B)
+         → ⟨ 0 ⟩ᶠ f ∘ᵗ η ≡ᵗ η ∘ᵗ f
+⟨⟩-η-nat f {t} x = refl
+
+⟨⟩-η⁻¹-nat : ∀ {A B} → (f : A →ᵗ B)
+           → f ∘ᵗ η⁻¹ ≡ᵗ η⁻¹ ∘ᵗ ⟨ 0 ⟩ᶠ f
+⟨⟩-η⁻¹-nat f {t} x = refl
+
+-- μ and μ⁻¹ are natural
+
+⟨⟩-μ-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
+           → ⟨ τ₁ + τ₂ ⟩ᶠ f ∘ᵗ μ {A} ≡ᵗ μ {B} ∘ᵗ ⟨ τ₁ ⟩ᶠ (⟨ τ₂ ⟩ᶠ f)
+⟨⟩-μ-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} (r , x) =
+  cong (_ ,_) (map-nat f _ _)
+
+⟨⟩-μ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
+         → ⟨ τ₁ ⟩ᶠ (⟨ τ₂ ⟩ᶠ f) ∘ᵗ μ⁻¹ {A} ≡ᵗ μ⁻¹ {B} ∘ᵗ ⟨ τ₁ + τ₂ ⟩ᶠ f
+⟨⟩-μ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} (r , x) =
+  cong (m+n≤o⇒m≤o τ₁ r ,_)
+    (cong (n+m≤k⇒m≤k∸n τ₁ τ₂ t r ,_)
+      (map-nat f _ _))
+
+⟨⟩-μ-≤ : ∀ {A τ₁ τ₂ τ₁' τ₂'} → (p : τ₁ ≤ τ₁') → (q : τ₂ ≤ τ₂')
+       → ⟨⟩-≤ {A} (+-mono-≤ p q) ∘ᵗ μ {A}
+       ≡ᵗ μ {A} ∘ᵗ ⟨ τ₁ ⟩ᶠ (⟨⟩-≤ {A} q) ∘ᵗ ⟨⟩-≤ {⟨ τ₂' ⟩ᵒ A} p
+⟨⟩-μ-≤ {A} p q (r , s , x) =
+  cong₂ _,_
+    (≤-irrelevant _ _)
+    (trans
+      (monotone-trans A _ _ _)
+      (trans
+        (trans
+          (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+          (sym (monotone-trans A _ _ _)))
+        (sym (monotone-trans A _ _ _))))
+
+-- ⟨_⟩ is strong monoidal
+
+---- unit is an isomorphism
+
+⟨⟩-η∘η⁻¹≡id : ∀ {A} → η {A} ∘ᵗ η⁻¹ ≡ᵗ idᵗ
+⟨⟩-η∘η⁻¹≡id {A} (p , x) =
+  cong₂ _,_ (≤-irrelevant _ _) refl
+
+⟨⟩-η⁻¹∘η≡id : ∀ {A} → η⁻¹ {A} ∘ᵗ η ≡ᵗ idᵗ
+⟨⟩-η⁻¹∘η≡id {A} x =
+  refl
+
+---- multiplication is an isomorphism
+
+⟨⟩-μ∘μ⁻¹≡id : ∀ {A τ₁ τ₂}
+            → μ {A} {τ₁} {τ₂} ∘ᵗ μ⁻¹ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+⟨⟩-μ∘μ⁻¹≡id {A} {τ₁} {τ₂} (p , x) =
+  cong₂ _,_
+    (≤-irrelevant _ _)
+    (trans
+      (monotone-trans A _ _ _)
+      (trans
+        (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+        (monotone-refl A _)))
+
+⟨⟩-μ⁻¹∘μ≡id : ∀ {A τ₁ τ₂}
+            → μ⁻¹ {A} {τ₁} {τ₂} ∘ᵗ μ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+⟨⟩-μ⁻¹∘μ≡id {A} {τ₁} {τ₂} (p , q , x) =
+  cong₂ _,_
+    (≤-irrelevant _ _)
+    (cong₂ _,_
+      (≤-irrelevant _ _)
+      (trans
+        (monotone-trans A _ _ _)
+        (trans
+          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+          (monotone-refl A _))))
+
+-- Graded monad laws
+
+⟨⟩-μ∘η≡id : ∀ {A τ} → μ {A} {0} {τ} ∘ᵗ η {⟨ τ ⟩ᵒ A} ≡ᵗ idᵗ
+⟨⟩-μ∘η≡id {A} (p , x) =
+  cong (p ,_)
+    (trans
+      (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+      (monotone-refl A _))
+
+⟨⟩-μ∘Tη≡id : ∀ {A τ}
+          → μ {A} {τ} {0} ∘ᵗ ⟨ τ ⟩ᶠ (η {A})
+          ≡ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-identityʳ τ))
+⟨⟩-μ∘Tη≡id {A} (p , x) =
+  cong₂ _,_
+    (≤-irrelevant _ _)
+    (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+
+⟨⟩-μ∘μ≡≤∘μ∘Tμ : ∀ {A τ₁ τ₂ τ₃}
+              → μ {A} {τ₁ + τ₂} {τ₃} ∘ᵗ μ {⟨ τ₃ ⟩ᵒ A} {τ₁} {τ₂}
+              ≡ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-assoc τ₁ τ₂ τ₃)) ∘ᵗ μ {A} {τ₁} {τ₂ + τ₃} ∘ᵗ ⟨ τ₁ ⟩ᶠ (μ {A} {τ₂} {τ₃})
+              
+⟨⟩-μ∘μ≡≤∘μ∘Tμ {A} (p , q , r , x) =
+  cong₂ _,_
+    (≤-irrelevant _ _)
+    (trans
+      (monotone-trans A _ _ _)
+      (trans
+        (trans
+          (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+          (sym (monotone-trans A _ _ _)))
+        (sym (monotone-trans A _ _ _))))

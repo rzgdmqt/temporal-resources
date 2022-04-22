@@ -19,7 +19,10 @@ open import Util.Time
 
 module Semantics.Monad where
 
--- Interpretation of ground types as sets
+-- Interpretation of ground types
+
+-- Note: To apply Adamek's theorem to construct T, likely
+-- want to limit them to finite, countable, etc presheaves
 
 ⟦_⟧ᵍ : GType → TSet
 ⟦ Base B ⟧ᵍ   = ConstTSet (BaseSet B)

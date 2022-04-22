@@ -126,7 +126,7 @@ module Semantics.Modality.Future where
 []-id x = refl
 
 []-∘ : ∀ {A B C τ} → (f : A →ᵗ B) → (g : B →ᵗ C)
-      → [ τ ]ᶠ (g ∘ᵗ f) ≡ᵗ [ τ ]ᶠ g ∘ᵗ [ τ ]ᶠ f
+     → [ τ ]ᶠ (g ∘ᵗ f) ≡ᵗ [ τ ]ᶠ g ∘ᵗ [ τ ]ᶠ f
 []-∘ f g x = refl
 
 -- []-≤ is natural
@@ -169,7 +169,8 @@ module Semantics.Modality.Future where
 
 []-δ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
            → [ τ₁ + τ₂ ]ᶠ f ∘ᵗ δ⁻¹ {A} ≡ᵗ δ⁻¹ {B} ∘ᵗ [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f)
-[]-δ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} x = map-nat f (≤-reflexive (+-assoc t τ₁ τ₂)) x
+[]-δ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} x =
+  map-nat f (≤-reflexive (+-assoc t τ₁ τ₂)) x
 
 []-δ-≤ : ∀ {A τ₁ τ₂ τ₁' τ₂'} → (p : τ₁ ≤ τ₁') → (q : τ₂ ≤ τ₂')
        → [ τ₁' ]ᶠ ([]-≤ {A} q) ∘ᵗ []-≤ {[ τ₂ ]ᵒ A} p ∘ᵗ δ {A = A}
@@ -221,7 +222,7 @@ module Semantics.Modality.Future where
       (cong (λ p → monotone A p x) (≤-irrelevant _ _))
       (monotone-refl A x))
 
--- graded comonad laws
+-- Graded comonad laws
 
 []-ε∘δ≡id : ∀ {A τ} → ε ∘ᵗ δ {A} {0} {τ} ≡ᵗ idᵗ
 []-ε∘δ≡id {A} {τ} x =

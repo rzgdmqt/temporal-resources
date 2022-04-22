@@ -59,6 +59,18 @@ module Semantics.Modality.Adjunction where
 
 -- PROPERTIES
 
+-- η is natural
+
+⊣-η-nat : ∀ {A B τ} → (f : A →ᵗ B)
+         → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵗ η-⊣ ≡ᵗ η-⊣ ∘ᵗ f
+⊣-η-nat f {t} x = cong₂ _,_ refl (map-nat f _ _)
+
+-- ε is natural
+
+⊣-ε-nat : ∀ {A B τ} → (f : A →ᵗ B)
+         → f ∘ᵗ ε-⊣ ≡ᵗ ε-⊣ ∘ᵗ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
+⊣-ε-nat f {t} (p , x) = map-nat f _ _
+
 -- Triangle equations of the adjunction
 
 ⊣-ε∘Fη≡id : ∀ {A τ} → ε-⊣ {⟨ τ ⟩ᵒ A} ∘ᵗ ⟨ τ ⟩ᶠ (η-⊣ {A}) ≡ᵗ idᵗ
@@ -80,6 +92,11 @@ module Semantics.Modality.Adjunction where
       (monotone-refl A x))
 
 -- ...
+
+
+
+
+
 
 
 
