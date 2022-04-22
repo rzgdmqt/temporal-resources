@@ -99,7 +99,7 @@ mutual
   
   ⟦ lam M ⟧ᵛᵗ = curryᵗ ⟦ M ⟧ᶜᵗ
   
-  ⟦ box {τ = τ} V ⟧ᵛᵗ = [ τ ]ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ η⊣ 
+  ⟦ box {τ = τ} V ⟧ᵛᵗ = [ τ ]ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ η-⊣ 
 
   infix 25 ⟦_⟧ᵛᵗ
 
@@ -112,7 +112,7 @@ mutual
        μᵀ
     ∘ᵗ Tᶠ ⟦ N ⟧ᶜᵗ
     ∘ᵗ strᵀ {A = ⟦ Γ ⟧ᵉ} {τ' = τ} 
-    ∘ᵗ ⟨ η⊣ {A = ⟦ Γ ⟧ᵉ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ
+    ∘ᵗ ⟨ η-⊣ {A = ⟦ Γ ⟧ᵉ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ
 
   ⟦ V · W ⟧ᶜᵗ = appᵗ ∘ᵗ ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵗ
   
@@ -120,7 +120,7 @@ mutual
   
   ⟦_⟧ᶜᵗ {Γ} (perform {A} {τ} op V M) =
     let f : ⟦ Γ ⟧ᵉ →ᵗ [ op-time op ]ᵒ (⟦ type-of-gtype (arity op) ⟧ᵛ ⇒ᵗ Tᵒ ⟦ A ⟧ᵛ τ)
-        f = [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ) ∘ᵗ η⊣ in
+        f = [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ) ∘ᵗ η-⊣ in
     let g : [ op-time op ]ᵒ (⟦ type-of-gtype (arity op) ⟧ᵛ ⇒ᵗ Tᵒ ⟦ A ⟧ᵛ τ)
          →ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ ⟦ A ⟧ᵛ τ)
         g = [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) (idᵗ {A = Tᵒ ⟦ A ⟧ᵛ τ})) in
@@ -148,11 +148,11 @@ mutual
          ∘ᵗ f)
     ∘ᵗ mapˣᵗ idᵗ (Tᶠ ⟦ N ⟧ᶜᵗ)
     ∘ᵗ mapˣᵗ idᵗ (strᵀ {A = ⟦ Γ ⟧ᵉ} {τ' = τ})
-    ∘ᵗ ⟨ idᵗ , ⟨ η⊣ {A = ⟦ Γ ⟧ᵉ} {τ = τ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ
+    ∘ᵗ ⟨ idᵗ , ⟨ η-⊣ {A = ⟦ Γ ⟧ᵉ} {τ = τ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ
     
   ⟦ unbox {Γ'} {τ = τ} p q V M ⟧ᶜᵗ =
     ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
-                    ε⊣
+                    ε-⊣
                  ∘ᵗ (⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ)
                  ∘ᵗ ⟨⟩-≤ {A = ⟦ Γ' ⟧ᵉ} q
                  ∘ᵗ split-env-⟨⟩ p ⟩ᵗ
@@ -160,6 +160,6 @@ mutual
   ⟦ delay τ refl M ⟧ᶜᵗ =
        T-≤τ (≤-reflexive (+-comm τ _))
     ∘ᵗ T-[]-module ∘ᵗ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
-    ∘ᵗ η⊣ 
+    ∘ᵗ η-⊣ 
 
   infix 25 ⟦_⟧ᶜᵗ

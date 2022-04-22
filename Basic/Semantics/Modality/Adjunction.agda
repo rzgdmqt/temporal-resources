@@ -28,8 +28,8 @@ module Semantics.Modality.Adjunction where
 
 -- Unit of the adjunction
 
-η⊣ : ∀ {A τ} → A →ᵗ [ τ ]ᵒ (⟨ τ ⟩ᵒ A)
-η⊣ {A} {τ} =
+η-⊣ : ∀ {A τ} → A →ᵗ [ τ ]ᵒ (⟨ τ ⟩ᵒ A)
+η-⊣ {A} {τ} =
   tset-map
     (λ {t'} a →
       m≤n+m τ t' ,
@@ -45,8 +45,8 @@ module Semantics.Modality.Adjunction where
 
 -- Counit of the adjunction
 
-ε⊣ : ∀ {A τ} → ⟨ τ ⟩ᵒ ([ τ ]ᵒ A) →ᵗ A
-ε⊣ {A} {τ} =
+ε-⊣ : ∀ {A τ} → ⟨ τ ⟩ᵒ ([ τ ]ᵒ A) →ᵗ A
+ε-⊣ {A} {τ} =
   tset-map
     (λ { {t'} (p , a) → monotone A (n≤m⇒m∸n+n≤m τ t' p) a })
     (λ { p (q , x) →
@@ -61,7 +61,7 @@ module Semantics.Modality.Adjunction where
 
 -- Triangle equations of the adjunction
 
-⊣-ε∘Fη≡id : ∀ {A τ} → ε⊣ {⟨ τ ⟩ᵒ A} ∘ᵗ ⟨ τ ⟩ᶠ (η⊣ {A}) ≡ᵗ idᵗ
+⊣-ε∘Fη≡id : ∀ {A τ} → ε-⊣ {⟨ τ ⟩ᵒ A} ∘ᵗ ⟨ τ ⟩ᶠ (η-⊣ {A}) ≡ᵗ idᵗ
 ⊣-ε∘Fη≡id {A} {τ} x =
   cong₂ _,_
     (≤-irrelevant _ _)
@@ -71,7 +71,7 @@ module Semantics.Modality.Adjunction where
         (cong (λ p → monotone A p (proj₂ x)) (≤-irrelevant _ _))
         (monotone-refl A (proj₂ x))))
 
-⊣-Gε∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε⊣ {A}) ∘ᵗ η⊣ {[ τ ]ᵒ A} ≡ᵗ idᵗ
+⊣-Gε∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε-⊣ {A}) ∘ᵗ η-⊣ {[ τ ]ᵒ A} ≡ᵗ idᵗ
 ⊣-Gε∘η≡id {A} {τ} x =
   trans
     (monotone-trans A _ _ _)

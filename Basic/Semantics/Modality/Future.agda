@@ -117,9 +117,25 @@ module Semantics.Modality.Future where
 η-[] : ∀ {A τ} → A →ᵗ [ τ ]ᵒ A
 η-[] {A} {τ} = []-≤ {A = A} z≤n ∘ᵗ ε⁻¹
 
+
 -- PROPERTIES
 
--- [_]ᵒ is functorial in the gradings
+-- [_] is functorial
+
+[]-id : ∀ {A τ} → [ τ ]ᶠ (idᵗ {A = A}) ≡ᵗ idᵗ
+[]-id x = refl
+
+[]-∘ : ∀ {A B C τ} → (f : A →ᵗ B) → (g : B →ᵗ C)
+      → [ τ ]ᶠ (g ∘ᵗ f) ≡ᵗ [ τ ]ᶠ g ∘ᵗ [ τ ]ᶠ f
+[]-∘ f g x = refl
+
+-- []-≤ is natural
+
+[]-≤-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B) → (p : τ₁ ≤ τ₂)
+         → [ τ₂ ]ᶠ f ∘ᵗ []-≤ {A = A} p ≡ᵗ []-≤ {A = B} p ∘ᵗ [ τ₁ ]ᶠ f
+[]-≤-nat f p x = map-nat f (+-mono-≤ (≤-reflexive refl) p) x
+
+-- [_] is functorial in the gradings
 
 []-≤-refl : ∀ {A τ} → []-≤ {A} (≤-refl {τ}) ≡ᵗ idᵗ
 []-≤-refl {A} x = 
@@ -134,7 +150,40 @@ module Semantics.Modality.Future where
     (monotone-trans A _ _ x)
     (cong (λ r → monotone A r x) (≤-irrelevant _ _))
 
--- [_]ᵒ is strong monoidal
+-- ε and ε⁻¹ are natural
+
+[]-ε-nat : ∀ {A B} → (f : A →ᵗ B)
+         → f ∘ᵗ ε ≡ᵗ ε ∘ᵗ [ 0 ]ᶠ f
+[]-ε-nat f {t} x = map-nat f (≤-reflexive (+-identityʳ t)) x
+
+[]-ε⁻¹-nat : ∀ {A B} → (f : A →ᵗ B)
+           → [ 0 ]ᶠ f ∘ᵗ ε⁻¹ ≡ᵗ ε⁻¹ ∘ᵗ f
+[]-ε⁻¹-nat f {t} x = map-nat f (≤-reflexive (sym (+-identityʳ t))) x
+
+-- δ and δ⁻¹ are natural
+
+[]-δ-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
+         → [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f) ∘ᵗ δ {A = A} ≡ᵗ δ {A = B} ∘ᵗ [ τ₁ + τ₂ ]ᶠ f
+[]-δ-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} x =
+  map-nat f (≤-reflexive (sym (+-assoc t τ₁ τ₂))) x
+
+[]-δ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
+           → [ τ₁ + τ₂ ]ᶠ f ∘ᵗ δ⁻¹ {A = A} ≡ᵗ δ⁻¹ {A = B} ∘ᵗ [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f)
+[]-δ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} x = map-nat f (≤-reflexive (+-assoc t τ₁ τ₂)) x
+
+[]-δ-≤ : ∀ {A τ₁ τ₂ τ₁' τ₂'} → (p : τ₁ ≤ τ₁') → (q : τ₂ ≤ τ₂')
+       → [ τ₁' ]ᶠ ([]-≤ {A = A} q) ∘ᵗ []-≤ {A = [ τ₂ ]ᵒ A} p ∘ᵗ δ {A = A}
+       ≡ᵗ δ {A = A} ∘ᵗ []-≤ {A = A} (+-mono-≤ p q)
+[]-δ-≤ {A} p q x =
+  trans
+    (monotone-trans A _ _ _)
+    (trans
+      (monotone-trans A _ _ _)
+      (trans
+        (cong (λ r → monotone A r x) (≤-irrelevant _ _))
+        (sym (monotone-trans A _ _ _))))
+
+-- [_] is strong monoidal
 
 ---- counit is an isomorphism
 
@@ -171,3 +220,7 @@ module Semantics.Modality.Future where
     (trans
       (cong (λ p → monotone A p x) (≤-irrelevant _ _))
       (monotone-refl A x))
+
+-- graded comonad laws
+
+-- ...
