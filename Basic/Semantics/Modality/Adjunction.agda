@@ -59,13 +59,13 @@ module Semantics.Modality.Adjunction where
 
 -- PROPERTIES
 
--- η is natural
+-- η-⊣ is natural
 
 ⊣-η-nat : ∀ {A B τ} → (f : A →ᵗ B)
          → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵗ η-⊣ ≡ᵗ η-⊣ ∘ᵗ f
 ⊣-η-nat f {t} x = cong₂ _,_ refl (map-nat f _ _)
 
--- ε is natural
+-- ε-⊣ is natural
 
 ⊣-ε-nat : ∀ {A B τ} → (f : A →ᵗ B)
          → f ∘ᵗ ε-⊣ ≡ᵗ ε-⊣ ∘ᵗ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
@@ -90,6 +90,16 @@ module Semantics.Modality.Adjunction where
     (trans
       (cong (λ p → monotone A p x) (≤-irrelevant _ _))
       (monotone-refl A x))
+
+-- Interaction between η-⊣/ε-⊣ of the adjunction and η/ε of the modalities
+
+⊣-η⊣≡ε⁻¹∘η : ∀ {A} → η-⊣ {A} ≡ᵗ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵗ η {A}
+⊣-η⊣≡ε⁻¹∘η {A} x =
+  cong₂ _,_ (≤-irrelevant _ _) (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+
+⊣-ε⊣≡ε∘η⁻¹ : ∀ {A} → ε-⊣ {A} ≡ᵗ ε {A} ∘ᵗ η⁻¹ {[ 0 ]ᵒ A}
+⊣-ε⊣≡ε∘η⁻¹ {A} (p , x) =
+  cong (λ q → monotone A q x) (≤-irrelevant _ _)
 
 -- ...
 
