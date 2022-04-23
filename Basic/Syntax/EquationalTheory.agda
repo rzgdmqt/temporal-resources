@@ -153,24 +153,38 @@ mutual
                  ---------------------------------------------------------------
                  → Γ ⊢C⦂ perform op V M == perform op W N
 
-    -- TODO: handle-cong
+    handle-cong : ∀ {A B τ τ'}
+                → {M M' : Γ ⊢C⦂ A ‼ τ}
+                → {H H' : ((op : Op) → (τ'' : Time) → 
+                             Γ ∷ type-of-gtype (param op)
+                               ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
+                             ⊢C⦂ B ‼ (op-time op + τ''))}
+                → {N N' : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'}
+                → Γ ⊢C⦂ M == M'
+                → ((op : Op) → (τ'' : Time) →
+                     Γ ∷ type-of-gtype (param op)
+                       ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
+                     ⊢C⦂ H op τ'' == H' op τ'')
+                → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ N == N'
+                ----------------------------------------------
+                → Γ ⊢C⦂ handle M `with H `in N == handle M' `with H' `in N'
 
     unbox-cong : ∀ {Γ' Γ'' A C τ}
-               → {p : Γ' , Γ'' split Γ}
-               → {q : τ ≤ ctx-time Γ''}
+               → {p q : Γ' , Γ'' split Γ}                   -- proof-irrelevant, no need for p ≡ q assumption 
+               → {r s : τ ≤ ctx-time Γ''}                   -- proof-irrelevant, no need for r ≡ s assumption
                → {V W : Γ' ⊢V⦂ [ τ ] A}
                → {M N : Γ ∷ A  ⊢C⦂ C}
                → Γ' ⊢V⦂ V == W
                → Γ ∷ A ⊢C⦂ M == N
                --------------------------------------
-               → Γ ⊢C⦂ unbox p q V M == unbox p q W N
+               → Γ ⊢C⦂ unbox p r V M == unbox q s W N
 
     delay-cong  : ∀ {A τ τ' τ''}
-                → {p : τ'' ≡ τ + τ'}
+                → {p q : τ'' ≡ τ + τ'}                      -- proof-irrelevant, no need for p ≡ q assumption
                 → {M N : Γ ⟨ τ' ⟩ ⊢C⦂ A ‼ τ}
                 → Γ ⟨ τ' ⟩ ⊢C⦂ M == N
                 ------------------------------------
-                → Γ ⊢C⦂ delay τ' p M == delay τ' p N
+                → Γ ⊢C⦂ delay τ' p M == delay τ' q N
 
     -- computational/beta equations for sequential composition
 
