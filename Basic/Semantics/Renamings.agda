@@ -25,7 +25,7 @@ module Semantics.Renamings where
 ⟦_⟧ʳ : ∀ {Γ Γ' : Ctx} → Ren Γ Γ' → ⟦ Γ' ⟧ᵉ →ᵗ ⟦ Γ ⟧ᵉ
 ⟦_⟧ʳ {[]} ρ =
   terminalᵗ
-⟦_⟧ʳ {Γ ∷ A} ρ with ρ Hd
+⟦_⟧ʳ {Γ ∷ A} ρ with ren-map ρ Hd
 ... | τ , p , y =
   ⟨ ⟦_⟧ʳ {Γ} (ρ ∘ʳ wk-ren) , ε-⟨⟩ ∘ᵗ var-in-env y ⟩ᵗ
 ⟦_⟧ʳ {Γ ⟨ τ ⟩} ρ with split-ren ρ (split-⟨⟩ split-[]) ≤-refl
