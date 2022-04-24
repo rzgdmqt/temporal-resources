@@ -4,18 +4,18 @@
 
 open import Function hiding (const)
 
-open import Data.Bool hiding (_≤_)
+open import Data.Bool hiding (_≤_;_≤?_)
 open import Data.Product
 open import Data.Sum
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq hiding ([_])
-open Eq.≡-Reasoning
+open import Relation.Nullary
+open import Relation.Binary.Definitions
 
 open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Language
 
+open import Util.Equality
 open import Util.Time
 
 module Syntax.Renamings where
@@ -258,18 +258,75 @@ wk-⟨⟩-ctx-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
 
 -- Splitting a renaming
 
-postulate
-  -- TODO: work this out formally; need to calculate the
-  -- smallest prefix of Γ' that includes the image of Γ₁
+_-ᶜ_,_ : (Γ : Ctx) → (τ : Time) → τ ≤ ctx-time Γ
+       → Σ[ Γ' ∈ Ctx ] Σ[ Γ'' ∈ Ctx ] Γ' , Γ'' split Γ × τ ≤ ctx-time Γ''
+Γ          -ᶜ zero  , p = Γ , [] , split-[] , z≤n
+[]         -ᶜ suc τ , ()
+(Γ ∷ A)    -ᶜ suc τ , p with Γ -ᶜ suc τ , p
+... | Γ' , Γ'' , q , r =
+  Γ' , Γ'' ∷ A , split-∷ q , r
+(Γ ⟨ τ' ⟩) -ᶜ suc τ , p with <-cmp (suc τ) τ'
+(Γ ⟨ τ' ⟩) -ᶜ suc τ , p | tri<  τ<τ' ¬τ≡τ' ¬τ>τ' =
+  Γ , [] ⟨ τ' ⟩ , split-⟨⟩ split-[] , ≤-trans (n≤1+n (suc τ)) τ<τ'
+(Γ ⟨ τ' ⟩) -ᶜ suc τ , p | tri≈ ¬τ<τ'  τ≡τ' ¬τ>τ' =
+  Γ , [] ⟨ τ' ⟩ , split-⟨⟩ split-[] , ≤-reflexive τ≡τ'
+(Γ ⟨ τ' ⟩) -ᶜ suc τ , p | tri> ¬τ<τ' ¬τ≡τ'  τ>τ'
+  with Γ -ᶜ (suc τ ∸ τ') ,
+       ≤-trans
+         (∸-monoˡ-≤ τ' p)
+         (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))
+... | Γ' , Γ'' , q , r =
+  Γ' , Γ'' ⟨ τ' ⟩ , split-⟨⟩ q ,
+  ≤-trans
+    (≤-trans
+      (m≤n+m∸n (suc τ) τ')
+      (≤-reflexive (+-comm τ' (suc τ ∸ τ'))))
+    (+-monoˡ-≤ τ' r)
 
-  split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
-            → Ren Γ Γ'
-            → Γ₁ , Γ₂ split Γ
-            → τ ≤ ctx-time Γ₂
-            → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
-                 Ren Γ₁ Γ₁'
-               × Γ₁' , Γ₂' split Γ'
-               × ctx-time Γ₂ ≤ ctx-time Γ₂'
+ren-ᶜ : ∀ {Γ Γ' τ}
+      → (ρ : Ren (Γ ⟨ τ ⟩) Γ')
+      → Ren Γ (proj₁ (Γ' -ᶜ τ , ≤-trans (≤-stepsˡ (ctx-time Γ) ≤-refl) (ren-≤ ρ)))
+ren-ᶜ ρ = ren {!!} {!ren-≤ ρ!}
+
+-- NOTE: current defs. break when e.g. ρ : Ren (Γ ⟨ τ' ⟩ ⟨ τ ⟩) (Γ' ⟨ τ' + τ ⟩)
+--       * perhaps -ᶜ needs weakening, by returning a triple of contexts + a renaming; or
+--       * perhaps the definition of `unbox` needs weakening with a renaming, so as to
+--         make sure that ⟨_⟩'s multiplication and its inverse are admissible for `unbox`
+
+split-ren : ∀ {Γ Γ' Γ₁ Γ₂}
+          → Ren Γ Γ'
+          → Γ₁ , Γ₂ split Γ
+          --→ τ ≤ ctx-time Γ₂
+          → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
+               Ren Γ₁ Γ₁'
+             × Γ₁' , Γ₂' split Γ'
+             × ctx-time Γ₂ ≤ ctx-time Γ₂'
+
+split-ren {Γ' = Γ'} ρ split-[] =
+  Γ' , [] , ρ , split-[] , z≤n
+split-ren {Γ' = Γ'} ρ (split-∷ p) =
+  split-ren (ρ ∘ʳ wk-ren) p
+split-ren {Γ' = Γ'} ρ (split-⟨⟩ {Γ'' = Γ''} {τ = τ} p)
+  with split-ren (ren-ᶜ ρ) p
+... | Γ₁' , Γ₂' , ρ' , p' , q' =
+  let Γ'-ᶜτ = Γ' -ᶜ τ , ≤-trans (≤-stepsˡ (ctx-time Γ'') ≤-refl) (ren-≤ ρ) in
+  let Γ₂'' = proj₁ (proj₂ Γ'-ᶜτ) in
+  let p'' = (proj₁ (proj₂ (proj₂ Γ'-ᶜτ))) in
+  let q'' = (proj₂ (proj₂ (proj₂ Γ'-ᶜτ))) in
+  Γ₁' ,
+  Γ₂' ++ᶜ Γ₂'' ,
+  ρ' ,
+  ≡-split
+    (trans
+      (sym (++ᶜ-assoc Γ₁' Γ₂' Γ₂''))
+      (trans
+        (cong (_++ᶜ Γ₂'') (split-≡ p'))
+        (split-≡ p''))) ,
+  ≤-trans
+    (+-monoˡ-≤ τ q')
+    (≤-trans
+      (+-monoʳ-≤ (ctx-time Γ₂') q'')
+      (≤-reflexive (sym (ctx-time-++ᶜ Γ₂' Γ₂''))))
 
 -- Action of renamings on well-typed values and computations
 
@@ -307,7 +364,7 @@ mutual
     handle C-rename ρ M
     `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'') )
     `in (C-rename (cong-ren ρ) N)
-  C-rename ρ (unbox q r V M) with split-ren ρ q r
+  C-rename ρ (unbox q r V M) with split-ren ρ q
   ... | Γ₁' , Γ₂' , ρ' , p' , q' =
     unbox p' (≤-trans r q') (V-rename ρ' V) (C-rename (cong-ren ρ) M)
   C-rename ρ (delay τ q M) =
