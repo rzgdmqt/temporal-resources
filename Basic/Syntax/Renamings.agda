@@ -225,6 +225,53 @@ var-rename (cong-⟨⟩-ren ρ) (Tl-⟨⟩ x) with var-rename ρ x
 ... | τ , p , y =
   _ , +-monoʳ-≤ _ p , Tl-⟨⟩ y
 
+-- var-rename applied to identity renaming doesn't change variable split
+
+var-split₁-id : ∀ {Γ A τ}
+              → (x : A ∈[ τ ] Γ)
+              → proj₁ (var-split x)
+              ≡ proj₁ (var-split (proj₂ (proj₂ (var-rename id-ren x))))
+              
+var-split₁-id Hd        = refl
+var-split₁-id (Tl-∷ x)  = var-split₁-id x
+var-split₁-id (Tl-⟨⟩ x) = var-split₁-id x
+
+var-split₂-id : ∀ {Γ A τ}
+              → (x : A ∈[ τ ] Γ)
+              → proj₁ (proj₂ (var-split x))
+              ≡ proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename id-ren x)))))
+              
+var-split₂-id Hd                = refl
+var-split₂-id (Tl-∷ {B = B} x)  = cong (_∷ B) (var-split₂-id x)
+var-split₂-id (Tl-⟨⟩ {τ = τ} x) = cong (_⟨ τ ⟩) (var-split₂-id x)
+
+-- Interaction of var-split, var-rename, and wk-ctx-ren
+
+var-split₁-wk-ctx-ren : ∀ {Γ Γ' A τ}
+                      → (x : A ∈[ τ ] Γ)
+                      → proj₁ (var-split x)
+                      ≡ proj₁ (var-split
+                          (proj₂ (proj₂ (var-rename (wk-ctx-ren {Γ' = Γ'}) x))))
+
+var-split₁-wk-ctx-ren {Γ' = []} x =
+  var-split₁-id x
+var-split₁-wk-ctx-ren {Γ' = Γ' ∷ A} x =
+  var-split₁-wk-ctx-ren {Γ' = Γ'} x
+var-split₁-wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} x =
+  var-split₁-wk-ctx-ren {Γ' = Γ'} x
+
+var-split₂-wk-ctx-ren : ∀ {Γ Γ' A τ}
+                      → (x : A ∈[ τ ] Γ)
+                      → proj₁ (proj₂ (var-split x)) ++ᶜ Γ'
+                      ≡ proj₁ (proj₂ (var-split
+                          (proj₂ (proj₂ (var-rename (wk-ctx-ren {Γ' = Γ'}) x)))))
+var-split₂-wk-ctx-ren {Γ' = []} x =
+  var-split₂-id x
+var-split₂-wk-ctx-ren {Γ' = Γ' ∷ A} x =
+  cong (_∷ A) (var-split₂-wk-ctx-ren x)
+var-split₂-wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} x =
+  cong (_⟨ τ ⟩) (var-split₂-wk-ctx-ren x)
+
 -- Action of renamings on well-typed values and computations
 
 mutual

@@ -181,10 +181,10 @@ mutual
     
     delay-cong  : ∀ {A τ τ' τs τs'}
                 → {p : τ' ≡ τ + tctx-time τs}                      -- proof-irrelevant, no need for p ≡ q assumption
-                → {q : τ' ≡ τ + tctx-time τs'}                      -- proof-irrelevant, no need for p ≡ q assumption
+                → {q : τ' ≡ τ + tctx-time τs'}                     -- proof-irrelevant, no need for p ≡ q assumption
                 → {M : Γ ++ᶜ tctx-ctx τs ⊢C⦂ A ‼ τ}
                 → {N : Γ ++ᶜ tctx-ctx τs' ⊢C⦂ A ‼ τ}
-                → (r : τs ≡ τs')
+                → (r : τs ≡ τs')                                   -- useful for equating not on the nose equal τs
                 → Γ ++ᶜ tctx-ctx τs ⊢C⦂ M == C-rename (eq-ren (sym (cong (λ τs → Γ ++ᶜ tctx-ctx τs) r))) N
                 ------------------------------------------------------------------------------------------
                 → Γ ⊢C⦂ delay τs p M == delay τs' q N
@@ -310,7 +310,7 @@ mutual
                              ((C-rename (exch-ren ∘ʳ wk-ren) M)
                                 [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c))
 
-    -- coercion equations
+    -- delay equations
     
     delay-[] : ∀ {A τ}
              → (M : Γ ⊢C⦂ A ‼ τ)
@@ -339,81 +339,59 @@ mutual
                                (cong (Γ ++ᶜ_) (sym (++ᶜ-tctx-ctx τs₂ τs₁)))))
                            M)
     
-    ;-delay₁ : ∀ {A B τ τ' τ'' τs}
-             → (p : τ' ≡ τ + tctx-time τs)
-             → (M : Γ ++ᶜ tctx-ctx τs ⊢C⦂ A ‼ τ)
-             → (N : Γ ⟨ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ'')
-             -------------------------------------------------------------------
-             → Γ ⊢C⦂ delay τs p M ; N
-                 == delay τs
-                      (trans
-                        (cong (_+ τ'') p)
-                        (trans
-                          (+-assoc τ (tctx-time τs) τ'')
-                          (trans
-                            (cong (τ +_) (+-comm (tctx-time τs) τ''))
-                            (sym (+-assoc τ τ'' (tctx-time τs))))))
-                      (M ;
-                       C-rename
-                         (cong-∷-ren
-                           (   cong-⟨⟩-ren (wk-⟨⟩-tctx-ren τs)
-                            ∘ʳ ⟨⟩-μ-ren {τ = tctx-time τs} {τ' = τ}
-                            ∘ʳ ⟨⟩-≤-ren (≤-reflexive
-                                 (trans p (+-comm τ (tctx-time τs))))))
-                       N)
-    {-
-    ;-delay₂ : ∀ {A B τ τ' τ''' τs}
-             → (p : τ''' ≡ τ' + tctx-time τs)
-             → (M : Γ ⊢C⦂ A ‼ τ)
-             → (N : Γ ⟨ τ ⟩ ++ᶜ tctx-ctx τs ∷ A ⊢C⦂ B ‼ τ')                            -- unfortunately cannot assume x:A between the ⟨_⟩s
-             -------------------------------------------------------------             -- because otherwise cannot type the RHS of the equation, 
-             → Γ ⊢C⦂ M ; delay τs p (C-rename (exch-⟨⟩-tctx-var-ren τs) N)              -- though then the LHS wouldn't have a renaming in it
-                 == delay τs
-                      {!!}
-                      (C-rename wk-ctx-ren M ;
-                       C-rename {!!} N)
-    -}
+    delay-; : ∀ {A B τ τ' τ'' τs}
+            → (p : τ' ≡ τ + tctx-time τs)
+            → (M : Γ ++ᶜ tctx-ctx τs ⊢C⦂ A ‼ τ)
+            → (N : Γ ⟨ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ'')
+            -------------------------------------------------------------------
+            → Γ ⊢C⦂ delay τs p M ; N
+                == delay τs
+                     (trans
+                       (cong (_+ τ'') p)
+                       (trans
+                         (+-assoc τ (tctx-time τs) τ'')
+                         (trans
+                           (cong (τ +_) (+-comm (tctx-time τs) τ''))
+                           (sym (+-assoc τ τ'' (tctx-time τs))))))
+                     (M ;
+                      C-rename
+                        (cong-∷-ren
+                          (   cong-⟨⟩-ren (wk-⟨⟩-tctx-ren τs)
+                           ∘ʳ ⟨⟩-μ-ren {τ = tctx-time τs} {τ' = τ}
+                           ∘ʳ ⟨⟩-≤-ren (≤-reflexive
+                                (trans p (+-comm τ (tctx-time τs))))))
+                      N)
     
-    perform-delay : ∀ {A τ τ'' τs}
-                  → (p : τ'' ≡ τ + tctx-time τs)
-                  → (op : Op)
-                  → (V : Γ ⊢V⦂ type-of-gtype (param op))
-                  → (M : Γ ⟨ op-time op ⟩ ++ᶜ tctx-ctx τs ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)        -- same as above regarding var. not being betweel ⟨_⟩s
-                  -----------------------------------------------------------------------------
-                  → Γ ⊢C⦂ perform op V (delay τs p (C-rename (exch-⟨⟩-tctx-var-ren τs) M))
-                      == delay τs
-                           {!!}
-                           (perform op
-                             {!!}
-                             {!!})                      
-    {-
-    handle-delay : ∀ {A B τ τ' τ'' τ'''}
-                 → (p : τ'' ≡ τ + τ')
-                 → (M : Γ ⟨ τ' ⟩ ⊢C⦂ A ‼ τ)
-                 → (H : (op : Op) → (τ'''' : Time) →
+    delay-handle : ∀ {A B τ τ' τ'' τs}
+                 → (p : τ' ≡ τ + tctx-time τs)
+                 → (M : Γ ++ᶜ tctx-ctx τs ⊢C⦂ A ‼ τ)
+                 → (H : (op : Op) → (τ''' : Time) →
                           Γ ∷ type-of-gtype (param op)
-                            ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'''')
-                          ⊢C⦂ B ‼ (op-time op + τ''''))
-                 → (N : Γ ⟨ τ'' ⟩ ∷ A ⊢C⦂ B ‼ τ''')
-                 --------------------------------------------------------------------------------
-                 → Γ ⊢C⦂ handle delay τ' p M `with H `in N
-                     == delay τ'
+                            ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ''')
+                          ⊢C⦂ B ‼ (op-time op + τ'''))
+                 → (N : Γ ⟨ τ' ⟩ ∷ A ⊢C⦂ B ‼ τ'')
+                 ----------------------------------------------------------------------
+                 → Γ ⊢C⦂ handle delay τs p M `with H `in N
+                     == delay τs
                           (trans
-                            (cong (_+ τ''') p)
+                            (cong (_+ τ'') p)
                             (trans
+                              (+-assoc τ (tctx-time τs) τ'')
                               (trans
-                                (+-assoc τ τ' τ''')
-                                (cong (τ +_) (+-comm τ' τ''')))
-                              (sym (+-assoc τ τ''' τ'))))
+                                (cong (τ +_) (+-comm (tctx-time τs) τ''))
+                                (sym (+-assoc τ τ'' (tctx-time τs))))))
                           (handle M
-                           `with (λ op τ'''' →
+                           `with (λ op τ''' →
                                    C-rename
-                                     (cong-ren {Γ'' = [] ∷ _ ∷ _} (⟨⟩-≤-ren z≤n ∘ʳ ⟨⟩-η⁻¹-ren))
-                                     (H op τ''''))
+                                     (cong-∷-ren (cong-∷-ren wk-ctx-ren))
+                                     (H op τ'''))
                            `in (C-rename
-                                 (cong-ren {Γ'' = [] ∷ A}
-                                   (⟨⟩-μ-ren ∘ʳ ⟨⟩-≤-ren (≤-reflexive (trans p (+-comm τ τ')))))
-                                 N))
-  -}
+                                 (cong-∷-ren
+                                   (   cong-⟨⟩-ren (wk-⟨⟩-tctx-ren τs)
+                                    ∘ʳ ⟨⟩-μ-ren {τ = tctx-time τs} {τ' = τ}
+                                    ∘ʳ ⟨⟩-≤-ren
+                                         (≤-reflexive
+                                           (trans p (+-comm τ (tctx-time τs)))))) N))
+
   infix 18 _⊢C⦂_==_
 

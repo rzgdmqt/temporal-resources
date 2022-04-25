@@ -2,8 +2,6 @@
 -- Substitution of well-typed values for variables --
 -----------------------------------------------------
 
-{-# OPTIONS --allow-unsolved-metas #-}
-
 open import Data.Product
 open import Data.Sum
 
@@ -106,7 +104,22 @@ mutual
   delay τs p M [ x ↦ W ]c =
     delay τs p
       (C-rename
-        (eq-ren {!!})
-          (M [ proj₂ (proj₂ (var-rename (wk-ctx-ren) x)) ↦ V-rename {!!} W ]c))
-          
-    --delay τ p (M [ Tl-⟨⟩ x ↦ W ]c)
+        (eq-ren
+          (trans
+            (trans
+              (cong
+                (proj₁ (var-split
+                  (proj₂ (proj₂ (var-rename (wk-ctx-ren {Γ' = tctx-ctx τs}) x)))) ++ᶜ_)
+                (sym (var-split₂-wk-ctx-ren {Γ' = tctx-ctx τs} x)))
+              (sym
+                (++ᶜ-assoc
+                   (proj₁ (var-split
+                     (proj₂ (proj₂ (var-rename (wk-ctx-ren {Γ' = tctx-ctx τs}) x)))))
+                   (proj₁ (proj₂ (var-split x)))
+                   (tctx-ctx τs))))
+            (cong
+              (λ Γ → Γ ++ᶜ proj₁ (proj₂ (var-split x)) ++ᶜ tctx-ctx τs)
+              (sym (var-split₁-wk-ctx-ren {Γ' = tctx-ctx τs} x)) )))
+        (M [ proj₂ (proj₂ (var-rename (wk-ctx-ren) x))
+             ↦
+             V-rename (eq-ren (var-split₁-wk-ctx-ren {Γ' = tctx-ctx τs} x)) W ]c))
