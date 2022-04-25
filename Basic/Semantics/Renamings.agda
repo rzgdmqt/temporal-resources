@@ -23,11 +23,24 @@ module Semantics.Renamings where
 -- Semantics of renamings as maps between environments
 
 ⟦_⟧ʳ : ∀ {Γ Γ' : Ctx} → Ren Γ Γ' → ⟦ Γ' ⟧ᵉ →ᵗ ⟦ Γ ⟧ᵉ
-⟦_⟧ʳ {[]} ρ =
-  terminalᵗ
-⟦_⟧ʳ {Γ ∷ A} ρ with ren-map ρ Hd
-... | τ , p , y =
-  ⟨ ⟦_⟧ʳ {Γ} (ρ ∘ʳ wk-ren) , ε-⟨⟩ ∘ᵗ var-in-env y ⟩ᵗ
-⟦_⟧ʳ {Γ ⟨ τ ⟩} ρ with split-ren ρ (split-⟨⟩ split-[]) ≤-refl
-... | Γ₁' , Γ₂' , ρ' , p , q =
-  ⟨ τ ⟩ᶠ ⟦ ρ' ⟧ʳ ∘ᵗ ⟨⟩-≤ {A = ⟦ Γ₁' ⟧ᵉ} q ∘ᵗ split-env-⟨⟩ p
+⟦ []-ren ⟧ʳ =
+  idᵗ
+⟦ ρ' ∘ʳ ρ ⟧ʳ =
+  ⟦ ρ ⟧ʳ ∘ᵗ ⟦ ρ' ⟧ʳ
+⟦ wk-ren ⟧ʳ =
+  fstᵗ
+⟦ var-ren x ⟧ʳ =
+  ⟨ idᵗ , ε-⟨⟩ ∘ᵗ var-in-env x ⟩ᵗ
+⟦ ⟨⟩-η-ren ⟧ʳ =
+  η
+⟦ ⟨⟩-η⁻¹-ren ⟧ʳ =
+  η⁻¹
+⟦ ⟨⟩-μ-ren {Γ} {τ} {τ'} ⟧ʳ =
+     ⟨⟩-≤ {A = ⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ τ'))
+  ∘ᵗ μ {A = ⟦ Γ ⟧ᵉ}
+⟦ ⟨⟩-≤-ren {Γ} p ⟧ʳ =
+  ⟨⟩-≤ {A = ⟦ Γ ⟧ᵉ} p
+⟦ cong-∷-ren ρ ⟧ʳ =
+  mapˣᵗ ⟦ ρ ⟧ʳ idᵗ
+⟦ cong-⟨⟩-ren {Γ} {Γ'} {τ} ρ ⟧ʳ =
+  ⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ
