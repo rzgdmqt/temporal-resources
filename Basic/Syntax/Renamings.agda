@@ -246,7 +246,7 @@ mutual
     handle C-rename ρ M
     `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'') )
     `in (C-rename (cong-ren ρ) N)
-  C-rename ρ (unbox q r V M)  with split-ren ρ q r
+  C-rename ρ (unbox q r V M) with split-ren ρ q r
   ... | Γ₁' , Γ₂' , ρ' , p' , q' =
     unbox p' q' (V-rename ρ' V) (C-rename (cong-ren ρ) M)
-  C-rename ρ (delay τ q M)      = delay τ q (C-rename (cong-ren ρ) M)
+  C-rename ρ (delay τs q M)      = delay τs q (C-rename (cong-ren ρ) M)

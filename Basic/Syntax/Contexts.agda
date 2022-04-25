@@ -173,3 +173,17 @@ var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A}
     cong (_⟨ τ ⟩) (trans r (cong (_++ᶜ Γ₂) (var-in-split-proj₂-subst y _))))
 ... | inj₂ (Γ' , Γ'' , q , r , s) =
   inj₂ (Γ' , Γ'' ⟨ τ ⟩ , split-⟨⟩ q , r , cong (_⟨ τ ⟩) s)
+
+-- Temporal-only contexts
+
+data TCtx : Set where
+  []   : TCtx
+  _⟨_⟩ : TCtx → Time → TCtx
+
+tctx-time : TCtx → Time
+tctx-time []        = 0
+tctx-time (Γ ⟨ τ ⟩) = tctx-time Γ + τ
+
+tctx-ctx : TCtx → Ctx
+tctx-ctx [] = []
+tctx-ctx (Γ ⟨ τ ⟩) = (tctx-ctx Γ) ⟨ τ ⟩

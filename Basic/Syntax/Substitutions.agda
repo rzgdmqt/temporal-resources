@@ -101,5 +101,6 @@ mutual
           (≤-reflexive (sym (ctx-time-++ᶜ Γ''' Γ'' )))))
       V
       (M [ Tl-∷ x ↦ W ]c)
-  delay τ p M [ x ↦ W ]c =
-    delay τ p (M [ Tl-⟨⟩ x ↦ W ]c)
+  delay τs p M [ x ↦ W ]c =
+    delay τs p {!!}
+    --delay τ p (M [ Tl-⟨⟩ x ↦ W ]c)
