@@ -22,221 +22,56 @@ module Syntax.Renamings where
 
 -- Variable renamings
 
--- Note 1: This allows one to move a variable under more ⟨_⟩s but not vice versa.
--- Note 2: This disallows the time-passage modelled by the context to decrease.
+data Ren : Ctx → Ctx → Set where
+  -- identity renaming on empty contexts
+  []-ren      : Ren [] []
+  -- composition
+  _∘ʳ_        : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
+  -- weakening renaming
+  wk-ren      : ∀ {Γ A} → Ren Γ (Γ ∷ A)
+  -- variable renaming
+  var-ren     : ∀ {Γ A τ} → A ∈[ τ ] Γ → Ren (Γ ∷ A) Γ
+  -- ⟨⟩ modality
+  ⟨⟩-η-ren    : ∀ {Γ} → Ren (Γ ⟨ 0 ⟩) Γ
+  ⟨⟩-η⁻¹-ren  : ∀ {Γ} → Ren Γ (Γ ⟨ 0 ⟩)
+  ⟨⟩-μ-ren    : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ + τ' ⟩) (Γ ⟨ τ ⟩ ⟨ τ' ⟩)
+  ⟨⟩-≤-ren    : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
+  -- congruences
+  cong-∷-ren  : ∀ {Γ Γ' A} → Ren Γ Γ' → Ren (Γ ∷ A) (Γ' ∷ A)
+  cong-⟨⟩-ren : ∀ {Γ Γ' τ} → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
 
-RenMap : Ctx → Ctx → Set
-RenMap Γ Γ' = ∀ {A τ} → A ∈[ τ ] Γ → Σ[ τ' ∈ Time ] (τ ≤ τ' × A ∈[ τ' ] Γ')
-
-record Ren (Γ Γ' : Ctx) : Set where
-  constructor
-    ren
-  field
-    ren-map : RenMap Γ Γ'
-    ren-≤   : ctx-time Γ ≤ ctx-time Γ'
-
-open Ren public
+infixr 20 _∘ʳ_
 
 -- Identity renaming
 
-id-ren-map : ∀ {Γ} → RenMap Γ Γ
-id-ren-map {.(_ ∷ _)}   Hd        = _ , ≤-refl , Hd
-id-ren-map {.(_ ∷ _)}   (Tl-∷ x)  = _ , ≤-refl , Tl-∷ x
-id-ren-map {.(_ ⟨ _ ⟩)} (Tl-⟨⟩ x) = _ , ≤-refl , Tl-⟨⟩ x
-
 id-ren : ∀ {Γ} → Ren Γ Γ
-id-ren = ren id-ren-map ≤-refl
+id-ren {Γ = []}      = []-ren
+id-ren {Γ = Γ ∷ A}   = cong-∷-ren id-ren
+id-ren {Γ = Γ ⟨ τ ⟩} = cong-⟨⟩-ren id-ren
 
--- Composition of renamings
-
-_∘ʳᵐ_ : ∀ {Γ Γ' Γ''} → RenMap Γ' Γ'' → RenMap Γ Γ' → RenMap Γ Γ''
-(ρ' ∘ʳᵐ ρ) {A} {τ} Hd with ρ {A} {τ} Hd
-... | τ , p , x with ρ' x
-... | τ' , p' , y = τ' , ≤-trans p p' , y
-(ρ' ∘ʳᵐ ρ) (Tl-∷ x) = (ρ' ∘ʳᵐ (ρ ∘ Tl-∷)) x
-(ρ' ∘ʳᵐ ρ) (Tl-⟨⟩ x) with ρ (Tl-⟨⟩ x)
-... | τ , p , y with ρ' y
-... | τ' , p' , z = τ' , ≤-trans p p' , z
-
-_∘ʳ_ : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
-ρ' ∘ʳ ρ =
-  ren
-    (ren-map ρ' ∘ʳᵐ ren-map ρ)
-    (≤-trans (ren-≤ ρ) (ren-≤ ρ'))
-
-infixr 20 _∘ʳ_
-infixr 20 _∘ʳᵐ_
-
--- Variable weakening renaming
-
-wk-ren-map : ∀ {Γ A} → RenMap Γ (Γ ∷ A)
-wk-ren-map x = _ , ≤-refl , Tl-∷ x
-
-wk-ren : ∀ {Γ A} → Ren Γ (Γ ∷ A)
-wk-ren = ren wk-ren-map ≤-refl
-
-wk-ctx-ren-map : ∀ {Γ Γ'} → RenMap Γ (Γ ++ᶜ Γ')
-wk-ctx-ren-map {Γ' = []}       x = _ , ≤-refl , x
-wk-ctx-ren-map {Γ' = Γ' ∷ A}   x with wk-ctx-ren-map {Γ' = Γ'} x
-... | τ' , p , y = τ' , p , Tl-∷ y
-wk-ctx-ren-map {Γ' = Γ' ⟨ τ ⟩} x with wk-ctx-ren-map {Γ' = Γ'} x
-... | τ' , p , y = τ + τ' , ≤-stepsˡ τ p , Tl-⟨⟩ y
-
-wk-ctx-ren : ∀ {Γ Γ'} → Ren Γ (Γ ++ᶜ Γ')
-wk-ctx-ren {Γ} {Γ'} =
-  ren
-    wk-ctx-ren-map
-    (≤-trans
-      (≤-stepsʳ (ctx-time Γ') ≤-refl)
-      (≤-reflexive (sym (ctx-time-++ᶜ Γ Γ'))))
-
--- Exchange renamings
-
-exch-ren-map : ∀ {Γ A B} → RenMap (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
-exch-ren-map Hd              = _ , ≤-refl , Tl-∷ Hd
-exch-ren-map (Tl-∷ Hd)       = _ , ≤-refl , Hd
-exch-ren-map (Tl-∷ (Tl-∷ x)) = _ , ≤-refl , Tl-∷ (Tl-∷ x)
-
-exch-ren : ∀ {Γ A B} → Ren (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
-exch-ren = ren exch-ren-map ≤-refl
-
-exch-⟨⟩-var-ren-map : ∀ {Γ A τ} → RenMap (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
-exch-⟨⟩-var-ren-map Hd               = _ , z≤n , Tl-⟨⟩ Hd
-exch-⟨⟩-var-ren-map (Tl-∷ (Tl-⟨⟩ x)) = _ , ≤-refl , Tl-⟨⟩ (Tl-∷ x)
-
-exch-⟨⟩-var-ren : ∀ {Γ A τ} → Ren (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
-exch-⟨⟩-var-ren = ren exch-⟨⟩-var-ren-map ≤-refl
-
-exch-⟨⟩-⟨⟩-ren-map : ∀ {Γ τ τ'} → RenMap (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ' ⟩ ⟨ τ ⟩)
-exch-⟨⟩-⟨⟩-ren-map {τ = τ} {τ' = τ'} (Tl-⟨⟩ (Tl-⟨⟩ {τ' = τ''} x)) =
-  τ + (τ' + τ'') ,
-  ≤-reflexive
-    (trans
-      (sym (+-assoc τ' τ τ''))
-      (trans
-        (cong (_+ τ'') (+-comm τ' τ))
-        (+-assoc τ τ' τ''))) ,
-  Tl-⟨⟩ (Tl-⟨⟩ x)
-
-exch-⟨⟩-⟨⟩-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ' ⟩ ⟨ τ ⟩)
-exch-⟨⟩-⟨⟩-ren {Γ} {τ} {τ'} =
-  ren
-    exch-⟨⟩-⟨⟩-ren-map
-    (≤-reflexive
-      (trans
-        (+-assoc (ctx-time Γ) τ τ')
-        (trans
-          (cong (ctx-time Γ +_) (+-comm τ τ'))
-          (sym (+-assoc (ctx-time Γ) τ' τ)))))
-
--- Contraction renaming
-
-contract-ren-map : ∀ {Γ A} → RenMap (Γ ∷ A ∷ A) (Γ ∷ A)
-contract-ren-map Hd       = _ , ≤-refl , Hd
-contract-ren-map (Tl-∷ x) = _ , ≤-refl , x
-
-contract-ren : ∀ {Γ A} → Ren (Γ ∷ A ∷ A) (Γ ∷ A)
-contract-ren = ren contract-ren-map ≤-refl
-
--- Extending a renaming
-
-extend-ren-map : ∀ {Γ Γ' A τ} → RenMap Γ Γ' → A ∈[ τ ] Γ' → RenMap (Γ ∷ A) Γ'
-extend-ren-map ρ x Hd       = _ , z≤n , x
-extend-ren-map ρ x (Tl-∷ y) = ρ y
+-- Extending a renaming with a variable
 
 extend-ren : ∀ {Γ Γ' A τ} → Ren Γ Γ' → A ∈[ τ ] Γ' → Ren (Γ ∷ A) Γ'
-extend-ren ρ x = ren (extend-ren-map (ren-map ρ) x) (ren-≤ ρ)
+extend-ren ρ x = var-ren x ∘ʳ cong-∷-ren ρ
 
--- Congruence of context renamings
-
-cong-ren-map : ∀ {Γ Γ' Γ''} → RenMap Γ Γ' → RenMap (Γ ++ᶜ Γ'') (Γ' ++ᶜ Γ'')
-cong-ren-map {Γ'' = []} ρ x = ρ x
-cong-ren-map {Γ'' = Γ'' ∷ A} ρ Hd = _ , ≤-refl , Hd
-cong-ren-map {Γ'' = Γ'' ∷ A} ρ (Tl-∷ x) with cong-ren-map ρ x
-... | τ' , p , y = τ' , p , Tl-∷ y
-cong-ren-map {Γ'' = Γ'' ⟨ τ ⟩} ρ (Tl-⟨⟩ x) with cong-ren-map ρ x
-... | τ' , p , y = τ + τ' , +-monoʳ-≤ τ p , Tl-⟨⟩ y
+-- Congruence of renamings
 
 cong-ren : ∀ {Γ Γ' Γ''} → Ren Γ Γ' → Ren (Γ ++ᶜ Γ'') (Γ' ++ᶜ Γ'')
-cong-ren {Γ} {Γ'} {Γ''} ρ =
-  ren
-    (cong-ren-map (ren-map ρ))
-    (≤-trans
-      (≤-reflexive (ctx-time-++ᶜ Γ Γ''))
-      (≤-trans
-        (+-monoˡ-≤ (ctx-time Γ'') (ren-≤ ρ))
-        (≤-reflexive (sym (ctx-time-++ᶜ Γ' Γ'')))))
+cong-ren {Γ'' = []} ρ = ρ
+cong-ren {Γ'' = Γ'' ∷ A} ρ = cong-∷-ren (cong-ren ρ)
+cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ = cong-⟨⟩-ren (cong-ren ρ)
 
--- Unit of ⟨_⟩ (and its inverse)
-
-⟨⟩-η-ren-map : ∀ {Γ} → RenMap (Γ ⟨ 0 ⟩) Γ
-⟨⟩-η-ren-map (Tl-⟨⟩ x) = _ , ≤-refl , x
-
-⟨⟩-η-ren : ∀ {Γ} → Ren (Γ ⟨ 0 ⟩) Γ
-⟨⟩-η-ren {Γ} =
-  ren
-    ⟨⟩-η-ren-map
-    (≤-reflexive (+-identityʳ (ctx-time Γ)))
-
-⟨⟩-η⁻¹-ren-map : ∀ {Γ} → RenMap Γ (Γ ⟨ 0 ⟩)
-⟨⟩-η⁻¹-ren-map x = _ , ≤-refl , Tl-⟨⟩ x
-
-⟨⟩-η⁻¹-ren : ∀ {Γ} → Ren Γ (Γ ⟨ 0 ⟩)
-⟨⟩-η⁻¹-ren {Γ} =
-  ren
-    ⟨⟩-η⁻¹-ren-map
-    (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
-
--- Multiplication of ⟨_⟩ (and its inverse)
-
-⟨⟩-μ-ren-map : ∀ {Γ τ τ'} → RenMap (Γ ⟨ τ + τ' ⟩) (Γ ⟨ τ ⟩ ⟨ τ' ⟩)
-⟨⟩-μ-ren-map {τ = τ} {τ' = τ'} (Tl-⟨⟩ {τ' = τ''} x) =
-  _ ,
-  ≤-reflexive (trans
-                (cong (_+ τ'') (+-comm τ τ'))
-                (+-assoc τ' τ τ'')) ,
-  Tl-⟨⟩ (Tl-⟨⟩ x)
-
-⟨⟩-μ-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ + τ' ⟩) (Γ ⟨ τ ⟩ ⟨ τ' ⟩)
-⟨⟩-μ-ren {Γ} {τ} {τ'} =
-  ren
-    ⟨⟩-μ-ren-map
-    (≤-reflexive (sym (+-assoc (ctx-time Γ) τ τ')))
-
-⟨⟩-μ⁻¹-ren-map : ∀ {Γ τ τ'} → RenMap (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ + τ' ⟩)
-⟨⟩-μ⁻¹-ren-map {τ = τ} {τ' = τ'} (Tl-⟨⟩ (Tl-⟨⟩ {τ' = τ''} x)) =
-  _ ,
-  ≤-reflexive (trans
-                (sym (+-assoc τ' τ τ''))
-                (cong (_+ τ'') (+-comm τ' τ))) ,
-  Tl-⟨⟩ x
-
-⟨⟩-μ⁻¹-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ + τ' ⟩)
-⟨⟩-μ⁻¹-ren {Γ} {τ} {τ'} =
-  ren
-    ⟨⟩-μ⁻¹-ren-map
-    (≤-reflexive (+-assoc (ctx-time Γ) τ τ'))
-
--- Monotonicity of ⟨_⟩
-
-⟨⟩-≤-ren-map : ∀ {Γ τ τ'} → τ ≤ τ' → RenMap (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
-⟨⟩-≤-ren-map p (Tl-⟨⟩ {τ' = τ'} x) = _ , +-monoˡ-≤ τ' p , Tl-⟨⟩ x
-
-⟨⟩-≤-ren : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
-⟨⟩-≤-ren {Γ} p =
-  ren
-    (⟨⟩-≤-ren-map p)
-    (+-monoʳ-≤ (ctx-time Γ) p)
-
--- Renaming from an equality of contexts
-
-eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
-eq-ren refl = id-ren
-
--- Weakening a context with a ⟨ τ ⟩ renaming
+-- Weakening by a modality renaming
 
 wk-⟨⟩-ren : ∀ {Γ τ} → Ren Γ (Γ ⟨ τ ⟩)
 wk-⟨⟩-ren = ⟨⟩-≤-ren z≤n ∘ʳ ⟨⟩-η⁻¹-ren
+
+-- Weakening by a context renaming
+
+wk-ctx-ren : ∀ {Γ Γ'} → Ren Γ (Γ ++ᶜ Γ')
+wk-ctx-ren {Γ' = []} = id-ren
+wk-ctx-ren {Γ' = Γ' ∷ A} = wk-ren ∘ʳ wk-ctx-ren
+wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} = wk-⟨⟩-ren ∘ʳ wk-ctx-ren
 
 -- Weakening a ⟨ τ ⟩ modality into a context with at least τ time-passage
 
@@ -256,77 +91,129 @@ wk-⟨⟩-ctx-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
   ∘ʳ ⟨⟩-μ-ren
   ∘ʳ ⟨⟩-≤-ren (n≤n∸m+m τ τ')
 
+-- Exchange renamings
+
+exch-ren : ∀ {Γ A B} → Ren (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
+exch-ren = extend-ren (extend-ren wk-ctx-ren Hd) (Tl-∷ Hd)
+
+exch-⟨⟩-var-ren : ∀ {Γ A τ} → Ren (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
+exch-⟨⟩-var-ren {A = A} {τ = τ} =
+  var-ren (Tl-⟨⟩ Hd) ∘ʳ cong-ren {Γ'' = [] ⟨ _ ⟩ ∷ _} wk-ren
+
+-- Contraction renaming
+
+contract-ren : ∀ {Γ A} → Ren (Γ ∷ A ∷ A) (Γ ∷ A)
+contract-ren = var-ren Hd
+
+-- Renaming from an equality of contexts
+
+eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
+eq-ren refl = id-ren
+
 -- Splitting a renaming
 
-_-ᶜ_,_ : (Γ : Ctx) → (τ : Time) → τ ≤ ctx-time Γ
-       → Σ[ Γ' ∈ Ctx ] Σ[ Γ'' ∈ Ctx ] Γ' , Γ'' split Γ × τ ≤ ctx-time Γ''
-Γ          -ᶜ zero  , p = Γ , [] , split-[] , z≤n
-[]         -ᶜ suc τ , ()
-(Γ ∷ A)    -ᶜ suc τ , p with Γ -ᶜ suc τ , p
-... | Γ' , Γ'' , q , r =
-  Γ' , Γ'' ∷ A , split-∷ q , r
-(Γ ⟨ τ' ⟩) -ᶜ suc τ , p with <-cmp (suc τ) τ'
-(Γ ⟨ τ' ⟩) -ᶜ suc τ , p | tri<  τ<τ' ¬τ≡τ' ¬τ>τ' =
-  Γ , [] ⟨ τ' ⟩ , split-⟨⟩ split-[] , ≤-trans (n≤1+n (suc τ)) τ<τ'
-(Γ ⟨ τ' ⟩) -ᶜ suc τ , p | tri≈ ¬τ<τ'  τ≡τ' ¬τ>τ' =
-  Γ , [] ⟨ τ' ⟩ , split-⟨⟩ split-[] , ≤-reflexive τ≡τ'
-(Γ ⟨ τ' ⟩) -ᶜ suc τ , p | tri> ¬τ<τ' ¬τ≡τ'  τ>τ'
-  with Γ -ᶜ (suc τ ∸ τ') ,
-       ≤-trans
-         (∸-monoˡ-≤ τ' p)
-         (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))
-... | Γ' , Γ'' , q , r =
-  Γ' , Γ'' ⟨ τ' ⟩ , split-⟨⟩ q ,
-  ≤-trans
-    (≤-trans
-      (m≤n+m∸n (suc τ) τ')
-      (≤-reflexive (+-comm τ' (suc τ ∸ τ'))))
-    (+-monoˡ-≤ τ' r)
+--postulate
+  -- TODO: work this out formally; need to calculate the
+  -- smallest prefix of Γ' that includes the image of Γ₁
 
-ren-ᶜ : ∀ {Γ Γ' τ}
-      → (ρ : Ren (Γ ⟨ τ ⟩) Γ')
-      → Ren Γ (proj₁ (Γ' -ᶜ τ , ≤-trans (≤-stepsˡ (ctx-time Γ) ≤-refl) (ren-≤ ρ)))
-ren-ᶜ ρ = ren {!!} {!ren-≤ ρ!}
-
--- NOTE: current defs. break when e.g. ρ : Ren (Γ ⟨ τ' ⟩ ⟨ τ ⟩) (Γ' ⟨ τ' + τ ⟩)
---       * perhaps -ᶜ needs weakening, by returning a triple of contexts + a renaming; or
---       * perhaps the definition of `unbox` needs weakening with a renaming, so as to
---         make sure that ⟨_⟩'s multiplication and its inverse are admissible for `unbox`
-
-split-ren : ∀ {Γ Γ' Γ₁ Γ₂}
+split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
           → Ren Γ Γ'
           → Γ₁ , Γ₂ split Γ
-          --→ τ ≤ ctx-time Γ₂
+          → τ ≤ ctx-time Γ₂
           → Σ[ Γ₁' ∈ Ctx ] Σ[ Γ₂' ∈ Ctx ]
                Ren Γ₁ Γ₁'
              × Γ₁' , Γ₂' split Γ'
-             × ctx-time Γ₂ ≤ ctx-time Γ₂'
+             × τ ≤ ctx-time Γ₂'
 
-split-ren {Γ' = Γ'} ρ split-[] =
-  Γ' , [] , ρ , split-[] , z≤n
-split-ren {Γ' = Γ'} ρ (split-∷ p) =
-  split-ren (ρ ∘ʳ wk-ren) p
-split-ren {Γ' = Γ'} ρ (split-⟨⟩ {Γ'' = Γ''} {τ = τ} p)
-  with split-ren (ren-ᶜ ρ) p
-... | Γ₁' , Γ₂' , ρ' , p' , q' =
-  let Γ'-ᶜτ = Γ' -ᶜ τ , ≤-trans (≤-stepsˡ (ctx-time Γ'') ≤-refl) (ren-≤ ρ) in
-  let Γ₂'' = proj₁ (proj₂ Γ'-ᶜτ) in
-  let p'' = (proj₁ (proj₂ (proj₂ Γ'-ᶜτ))) in
-  let q'' = (proj₂ (proj₂ (proj₂ Γ'-ᶜτ))) in
-  Γ₁' ,
-  Γ₂' ++ᶜ Γ₂'' ,
-  ρ' ,
-  ≡-split
-    (trans
-      (sym (++ᶜ-assoc Γ₁' Γ₂' Γ₂''))
-      (trans
-        (cong (_++ᶜ Γ₂'') (split-≡ p'))
-        (split-≡ p''))) ,
+split-ren []-ren split-[] q =
+  [] , [] , []-ren , split-[] , q
+
+split-ren (ρ' ∘ʳ ρ) p q with split-ren ρ p q
+... | Γ₁' , Γ₂' , ρ'' , p' , q' with split-ren ρ' p' q'
+... | Γ₁'' , Γ₂'' , ρ''' , p'' , q'' =
+  Γ₁'' , Γ₂'' , ρ''' ∘ʳ ρ'' , p'' , q''
+
+split-ren wk-ren p q =
+  _ , _ , id-ren , split-∷ p , q
+
+split-ren (var-ren x) split-[] q =
+  _ , _ , var-ren x , split-[] , q
+split-ren (var-ren x) (split-∷ p) q =
+  _ , _ , id-ren , p , q
+
+split-ren ⟨⟩-η-ren split-[] q =
+  _ , _ , ⟨⟩-η-ren , split-[] , q
+split-ren ⟨⟩-η-ren (split-⟨⟩ {Γ' = Γ'} p) q =
+  _ , _ , id-ren , p , ≤-trans q (≤-reflexive (+-identityʳ (ctx-time Γ')))
+
+split-ren ⟨⟩-η⁻¹-ren p q =
+  _ , _ , id-ren , split-⟨⟩ p , ≤-stepsʳ 0 q
+
+split-ren ⟨⟩-μ-ren split-[] q =
+  _ , _ , ⟨⟩-μ-ren , split-[] , q
+split-ren (⟨⟩-μ-ren {τ = τ} {τ' = τ'}) (split-⟨⟩ {Γ' = Γ'} p) q =
+  _ , _ , id-ren , split-⟨⟩ (split-⟨⟩ p) ,
+  ≤-trans q (≤-reflexive (sym (+-assoc (ctx-time Γ') τ τ')))
+
+split-ren (⟨⟩-≤-ren r) split-[] q =
+  _ , _ , ⟨⟩-≤-ren r , split-[] , q
+split-ren (⟨⟩-≤-ren r) (split-⟨⟩ p) q =
+  _ , _ , id-ren , split-⟨⟩ p , ≤-trans q (+-monoʳ-≤ _ r)
+
+split-ren (cong-∷-ren ρ) split-[] q =
+  _ , _ , cong-∷-ren ρ , split-[] , q
+split-ren (cong-∷-ren ρ) (split-∷ p) q with split-ren ρ p q
+... | Γ₁ , Γ₂ , ρ' , p' , q' =
+  _ , _ , ρ' , split-∷ p' , q'
+
+split-ren (cong-⟨⟩-ren ρ) split-[] q =
+  _ , _ , cong-⟨⟩-ren ρ , split-[] , q
+split-ren {τ = τ} (cong-⟨⟩-ren {τ = τ'} ρ) (split-⟨⟩ {Γ' = Γ'} p) q
+  with split-ren {τ = τ ∸ τ'} ρ p
+         (≤-trans (∸-monoˡ-≤ τ' q) (≤-reflexive (m+n∸n≡m (ctx-time Γ') τ')))
+... | Γ₁ , Γ₂ , ρ' , p' , q' =
+  _ , _ , ρ' , split-⟨⟩ p' ,
   ≤-trans
-    (+-monoˡ-≤ τ q')
-    (≤-trans
-      (+-monoʳ-≤ (ctx-time Γ₂') q'')
-      (≤-reflexive (sym (ctx-time-++ᶜ Γ₂' Γ₂''))))
+    (n≤n∸m+m τ τ')
+    (+-monoˡ-≤ τ' q')
+
+-- Action of renamings on variables (showing that reamings
+-- allow one to move any variable under more ⟨_⟩ modalities)
+
+var-rename : ∀ {Γ Γ'}
+           → Ren Γ Γ'
+           →  ∀ {A τ} → A ∈[ τ ] Γ → Σ[ τ' ∈ Time ] (τ ≤ τ' × A ∈[ τ' ] Γ')
+
+var-rename (ρ' ∘ʳ ρ) x with (var-rename ρ) x
+... | τ , p , y with (var-rename ρ') y
+... | τ' , p' , y' =
+  _ , ≤-trans p p' , y'
+var-rename wk-ren x =
+  _ , ≤-refl , Tl-∷ x
+var-rename (var-ren y) Hd =
+  _ , z≤n , y
+var-rename (var-ren y) (Tl-∷ x) =
+  _ , ≤-refl , x
+var-rename ⟨⟩-η-ren (Tl-⟨⟩ x) =
+  _ , ≤-refl , x
+var-rename ⟨⟩-η⁻¹-ren x =
+  _ , ≤-refl , Tl-⟨⟩ x
+var-rename (⟨⟩-μ-ren {τ = τ} {τ' = τ'}) (Tl-⟨⟩ {τ' = τ''} x) =
+  _ ,
+  ≤-reflexive (trans
+                (cong (_+ τ'') (+-comm τ τ'))
+                (+-assoc τ' τ τ'')) ,
+  Tl-⟨⟩ (Tl-⟨⟩ x)
+var-rename (⟨⟩-≤-ren p) (Tl-⟨⟩ x) =
+  _ , +-monoˡ-≤ _ p , Tl-⟨⟩ x
+var-rename (cong-∷-ren ρ) Hd =
+  _ , z≤n , Hd
+var-rename (cong-∷-ren ρ) (Tl-∷ x) with var-rename ρ x
+... | τ , p , y =
+  _ , p , Tl-∷ y
+var-rename (cong-⟨⟩-ren ρ) (Tl-⟨⟩ x) with var-rename ρ x
+... | τ , p , y =
+  _ , +-monoʳ-≤ _ p , Tl-⟨⟩ y
 
 -- Action of renamings on well-typed values and computations
 
@@ -338,7 +225,7 @@ mutual
            ------------
            → Γ' ⊢V⦂ A
 
-  V-rename ρ (var x)   = var (proj₂ (proj₂ (ren-map ρ x)))
+  V-rename ρ (var x)   = var (proj₂ (proj₂ (var-rename ρ x)))
   V-rename ρ (const c) = const c
   V-rename ρ ⋆         = ⋆
   V-rename ρ (lam M)   = lam (C-rename (cong-ren ρ) M)
@@ -350,23 +237,16 @@ mutual
            ------------
            → Γ' ⊢C⦂ C
 
-  C-rename ρ (return V) =
-    return (V-rename ρ V)
-  C-rename ρ (M ; N) =
-    C-rename ρ M ; C-rename (cong-ren ρ) N
-  C-rename ρ (V · W) =
-    V-rename ρ V · V-rename ρ W
-  C-rename ρ (absurd V) =
-    absurd (V-rename ρ V)
-  C-rename ρ (perform op V M) =
-    perform op (V-rename ρ V) (C-rename (cong-ren ρ) M)
+  C-rename ρ (return V)       = return (V-rename ρ V)
+  C-rename ρ (M ; N)          = C-rename ρ M ; C-rename (cong-ren ρ) N
+  C-rename ρ (V · W)          = V-rename ρ V · V-rename ρ W
+  C-rename ρ (absurd V)       = absurd (V-rename ρ V)
+  C-rename ρ (perform op V M) = perform op (V-rename ρ V) (C-rename (cong-ren ρ) M)
   C-rename ρ (handle M `with H `in N) =
     handle C-rename ρ M
     `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'') )
     `in (C-rename (cong-ren ρ) N)
-  C-rename ρ (unbox q r V M) with split-ren ρ q
+  C-rename ρ (unbox q r V M)  with split-ren ρ q r
   ... | Γ₁' , Γ₂' , ρ' , p' , q' =
-    unbox p' (≤-trans r q') (V-rename ρ' V) (C-rename (cong-ren ρ) M)
-  C-rename ρ (delay τ q M) =
-    delay τ q (C-rename (cong-ren ρ) M)
-
+    unbox p' q' (V-rename ρ' V) (C-rename (cong-ren ρ) M)
+  C-rename ρ (delay τ q M)      = delay τ q (C-rename (cong-ren ρ) M)

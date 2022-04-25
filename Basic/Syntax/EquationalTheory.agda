@@ -323,7 +323,7 @@ mutual
                     == delay
                          (τ₁ + τ₂)
                          (trans q (+-assoc τ τ₁ τ₂))
-                         (C-rename (⟨⟩-≤-ren (≤-reflexive (+-comm τ₂ τ₁)) ∘ʳ ⟨⟩-μ⁻¹-ren) M)
+                         (C-rename {!⟨⟩-≤-ren (≤-reflexive (+-comm τ₂ τ₁)) ∘ʳ ⟨⟩-μ⁻¹-ren!} M)
 
     ;-delay₁ : ∀ {A B τ τ' τ'' τ'''}
              → (p : τ'' ≡ τ + τ')
@@ -355,7 +355,7 @@ mutual
                  == delay τ''
                       (trans (cong (τ +_) p) (sym (+-assoc τ τ' τ'')))
                       (C-rename wk-⟨⟩-ren M ;
-                       C-rename (cong-ren {Γ'' = [] ∷ A} exch-⟨⟩-⟨⟩-ren) N)
+                       C-rename (cong-ren {Γ'' = [] ∷ A} {!exch-⟨⟩-⟨⟩-ren!}) N)
 
     perform-delay : ∀ {A τ τ' τ''}
                   → (p : τ'' ≡ τ + τ')
@@ -372,7 +372,7 @@ mutual
                              (V-rename wk-⟨⟩-ren V)
                              (C-rename
                                (cong-ren {Γ'' = [] ∷ type-of-gtype (arity op)}
-                                 exch-⟨⟩-⟨⟩-ren)
+                                 {!exch-⟨⟩-⟨⟩-ren!})
                                M))
     
     handle-delay : ∀ {A B τ τ' τ'' τ'''}
