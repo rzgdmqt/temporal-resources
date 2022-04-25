@@ -85,6 +85,22 @@ var-in-env {A = A} (Tl-⟨⟩ {τ = τ} x) = μ {A = ⟦ A ⟧ᵛ} ∘ᵗ ⟨ τ
 constᵗ : ∀ {B} → BaseSet B → 𝟙ᵗ →ᵗ ConstTSet (BaseSet B)
 constᵗ c = tset-map (λ _ → c) (λ _ _ → refl)
 
+-- Interpreting a temporal context as the ⟨_⟩ modality
+
+env-++ᶜ : ∀ {Γ} → (τs : TCtx) → ⟦ Γ ++ᶜ tctx-ctx τs ⟧ᵉ →ᵗ ⟨ tctx-time τs ⟩ᵒ ⟦ Γ ⟧ᵉ
+env-++ᶜ [] = η
+env-++ᶜ {Γ} (τs ⟨ τ ⟩) =
+     ⟨⟩-≤ {A = ⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm (tctx-time τs) τ))
+  ∘ᵗ μ {A = ⟦ Γ ⟧ᵉ}
+  ∘ᵗ ⟨ τ ⟩ᶠ (env-++ᶜ τs)
+
+env-++ᶜ⁻¹ : ∀ {Γ} → (τs : TCtx) → ⟨ tctx-time τs ⟩ᵒ ⟦ Γ ⟧ᵉ →ᵗ ⟦ Γ ++ᶜ tctx-ctx τs ⟧ᵉ
+env-++ᶜ⁻¹ {Γ} [] = η⁻¹
+env-++ᶜ⁻¹ {Γ} (τs ⟨ τ ⟩) =
+     ⟨ τ ⟩ᶠ (env-++ᶜ⁻¹ τs)
+  ∘ᵗ μ⁻¹ {A = ⟦ Γ ⟧ᵉ}
+  ∘ᵗ ⟨⟩-≤ {A = ⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ (tctx-time τs)))
+
 -- Interpretation of well-typed value and computation terms
 
 mutual
@@ -157,9 +173,12 @@ mutual
                  ∘ᵗ ⟨⟩-≤ {A = ⟦ Γ' ⟧ᵉ} q
                  ∘ᵗ split-env-⟨⟩ p ⟩ᵗ
 
-  ⟦ delay τ refl M ⟧ᶜᵗ =
-       T-≤τ (≤-reflexive (+-comm τ _))
-    ∘ᵗ T-[]-module ∘ᵗ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
-    ∘ᵗ η-⊣ 
+  ⟦ delay τs refl M ⟧ᶜᵗ =
+       T-≤τ (≤-reflexive (+-comm (tctx-time τs) _))
+    ∘ᵗ T-[]-module
+    ∘ᵗ ([ tctx-time τs ]ᶠ ⟦ M ⟧ᶜᵗ)
+    ∘ᵗ [ tctx-time τs ]ᶠ (env-++ᶜ⁻¹ τs)
+    ∘ᵗ η-⊣
 
   infix 25 ⟦_⟧ᶜᵗ
+
