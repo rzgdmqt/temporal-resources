@@ -137,9 +137,9 @@ mutual
     -- such as (delay p M) ; N == delay (p + id) (M ; N)
 
     delay   : {A : VType}
-            → {τ τ'' : Time}
-            → (Γ' : TCtx)
-            → τ'' ≡ τ + tctx-time Γ'               -- abstracting τ + τ' into a separate variable for inductive proofs
-            → Γ ++ᶜ tctx-ctx Γ' ⊢C⦂ A ‼ τ
+            → {τ τ' : Time}
+            → (τs : TCtx)
+            → τ' ≡ τ + tctx-time τs               -- abstracting τ + τ' into a separate variable for inductive proofs
+            → Γ ++ᶜ tctx-ctx τs ⊢C⦂ A ‼ τ
             -----------------------------
-            → Γ ⊢C⦂ A ‼ τ''
+            → Γ ⊢C⦂ A ‼ τ'

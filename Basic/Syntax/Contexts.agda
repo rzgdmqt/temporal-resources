@@ -180,10 +180,31 @@ data TCtx : Set where
   []   : TCtx
   _⟨_⟩ : TCtx → Time → TCtx
 
+_++ᶜᵗ_ : TCtx → TCtx → TCtx
+τs ++ᶜᵗ []          = τs
+τs ++ᶜᵗ (τs' ⟨ τ ⟩) = (τs ++ᶜᵗ τs') ⟨ τ ⟩
+
+infixl 30 _++ᶜᵗ_
+
 tctx-time : TCtx → Time
 tctx-time []        = 0
-tctx-time (Γ ⟨ τ ⟩) = tctx-time Γ + τ
+tctx-time (τs ⟨ τ ⟩) = tctx-time τs + τ
+
+++ᶜ-tctx-time : (τs τs' : TCtx)
+              → tctx-time (τs ++ᶜᵗ τs') ≡ tctx-time τs + tctx-time τs'
+++ᶜ-tctx-time τs [] =
+  sym (+-identityʳ (tctx-time τs))
+++ᶜ-tctx-time τs (τs' ⟨ τ ⟩) =
+  trans
+    (cong (_+ τ) (++ᶜ-tctx-time τs τs'))
+    (+-assoc (tctx-time τs) (tctx-time τs') τ)
 
 tctx-ctx : TCtx → Ctx
 tctx-ctx [] = []
-tctx-ctx (Γ ⟨ τ ⟩) = (tctx-ctx Γ) ⟨ τ ⟩
+tctx-ctx (τs ⟨ τ ⟩) = (tctx-ctx τs) ⟨ τ ⟩
+
+++ᶜ-tctx-ctx : (τs τs' : TCtx)
+             → tctx-ctx (τs ++ᶜᵗ τs') ≡ tctx-ctx τs ++ᶜ tctx-ctx τs'
+++ᶜ-tctx-ctx τs [] = refl
+++ᶜ-tctx-ctx τs (τs' ⟨ τ ⟩) =
+  cong _⟨ τ ⟩ (++ᶜ-tctx-ctx τs τs')

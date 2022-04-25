@@ -2,6 +2,8 @@
 -- Substitution of well-typed values for variables --
 -----------------------------------------------------
 
+{-# OPTIONS --allow-unsolved-metas #-}
+
 open import Data.Product
 open import Data.Sum
 
@@ -102,5 +104,9 @@ mutual
       V
       (M [ Tl-∷ x ↦ W ]c)
   delay τs p M [ x ↦ W ]c =
-    delay τs p {!!}
+    delay τs p
+      (C-rename
+        (eq-ren {!!})
+          (M [ proj₂ (proj₂ (var-rename (wk-ctx-ren) x)) ↦ V-rename {!!} W ]c))
+          
     --delay τ p (M [ Tl-⟨⟩ x ↦ W ]c)

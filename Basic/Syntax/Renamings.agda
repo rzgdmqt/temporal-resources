@@ -91,6 +91,12 @@ wk-⟨⟩-ctx-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
   ∘ʳ ⟨⟩-μ-ren
   ∘ʳ ⟨⟩-≤-ren (n≤n∸m+m τ τ')
 
+-- Weakening a ⟨ tctx-time τs ⟩ modality into a temporal context
+
+wk-⟨⟩-tctx-ren : ∀ {Γ} (τs : TCtx) → Ren (Γ ⟨ tctx-time τs ⟩) (Γ ++ᶜ tctx-ctx τs)
+wk-⟨⟩-tctx-ren [] = ⟨⟩-η-ren
+wk-⟨⟩-tctx-ren (τs ⟨ τ ⟩) = cong-⟨⟩-ren (wk-⟨⟩-tctx-ren τs) ∘ʳ ⟨⟩-μ-ren
+
 -- Exchange renamings
 
 exch-ren : ∀ {Γ A B} → Ren (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
@@ -98,7 +104,15 @@ exch-ren = extend-ren (extend-ren wk-ctx-ren Hd) (Tl-∷ Hd)
 
 exch-⟨⟩-var-ren : ∀ {Γ A τ} → Ren (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
 exch-⟨⟩-var-ren {A = A} {τ = τ} =
-  var-ren (Tl-⟨⟩ Hd) ∘ʳ cong-ren {Γ'' = [] ⟨ _ ⟩ ∷ _} wk-ren
+     var-ren (Tl-⟨⟩ Hd)
+  ∘ʳ cong-ren {Γ'' = [] ⟨ _ ⟩ ∷ _} wk-ren
+
+exch-⟨⟩-tctx-var-ren : ∀ {Γ A} → (τs : TCtx)
+                     → Ren (Γ ++ᶜ tctx-ctx τs ∷ A) ((Γ ∷ A) ++ᶜ tctx-ctx τs)
+exch-⟨⟩-tctx-var-ren [] = id-ren
+exch-⟨⟩-tctx-var-ren (τs ⟨ τ ⟩) =
+     cong-⟨⟩-ren (exch-⟨⟩-tctx-var-ren τs)
+  ∘ʳ exch-⟨⟩-var-ren
 
 -- Contraction renaming
 
@@ -111,10 +125,6 @@ eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren refl = id-ren
 
 -- Splitting a renaming
-
---postulate
-  -- TODO: work this out formally; need to calculate the
-  -- smallest prefix of Γ' that includes the image of Γ₁
 
 split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
           → Ren Γ Γ'
