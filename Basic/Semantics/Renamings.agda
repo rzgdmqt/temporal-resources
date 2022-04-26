@@ -23,7 +23,7 @@ module Semantics.Renamings where
 -- Semantics of renamings as maps between environments
 
 ⟦_⟧ʳ : ∀ {Γ Γ' : Ctx} → Ren Γ Γ' → ⟦ Γ' ⟧ᵉ →ᵗ ⟦ Γ ⟧ᵉ
-⟦ []-ren ⟧ʳ =
+⟦ id-ren ⟧ʳ =
   idᵗ
 ⟦ ρ' ∘ʳ ρ ⟧ʳ =
   ⟦ ρ ⟧ʳ ∘ᵗ ⟦ ρ' ⟧ʳ

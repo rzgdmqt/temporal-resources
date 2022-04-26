@@ -1,10 +1,10 @@
 -------------------------------------------------------------------
 -- Semantics of the past modality `Γ ⟨ t ⟩` as a graded monad    --
 --                                                               --
--- While `Γ ⟨ t ⟩` is in fact a strong monoidal functor, then we --
--- prefer to speak abour it in terms of the graded monad view of --
--- it due to the analogy with the monad on contexts in Fitch     --
--- style modal lambda calculi (that this language is based on).  --
+-- While `Γ ⟨ t ⟩` is in fact a strong monoidal functor in this  --
+-- concrete presheaf semantics, then for renamings/substitutions --
+-- to be admissible in the language, then the syntactic modality --
+-- on contexts is only a graded monad with invertible unit.      --
 -------------------------------------------------------------------
 
 open import Function
@@ -67,7 +67,7 @@ module Semantics.Modality.Past where
             (cong (λ s → monotone A s x) (≤-irrelevant _ _))
             (sym (monotone-trans A _ _ x)))) })
 
--- Unit
+-- Unit (and its inverse)
 
 η : ∀ {A} → A →ᵗ ⟨ 0 ⟩ᵒ A
 η {A} =
@@ -97,23 +97,6 @@ module Semantics.Modality.Past where
             (cong (λ s → monotone A s x) (≤-irrelevant _ _))
             (sym (monotone-trans A _ _ x)))) })
     
-μ⁻¹ : ∀ {A τ₁ τ₂} → ⟨ τ₁ + τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A)
-μ⁻¹ {A} {τ₁} {τ₂} =
-  tset-map
-    (λ { {t} (p , a) → m+n≤o⇒m≤o τ₁ p ,
-                       n+m≤k⇒m≤k∸n τ₁ τ₂ t p ,
-                       monotone A (≤-reflexive (sym (n∸m∸k≡n∸m+k t τ₁ τ₂))) a })
-    λ { p (q , x) →
-      cong₂ _,_
-        (≤-irrelevant _ _)
-        (cong₂ _,_
-          (≤-irrelevant _ _)
-          (trans
-            (monotone-trans A _ _ x)
-            (trans
-              (cong (λ s → monotone A s x) (≤-irrelevant _ _))
-              (sym (monotone-trans A _ _ x))))) }
-
 -- Derived counit map (a value that was available
 -- τ time steps in the past is also available now)
 
@@ -168,19 +151,12 @@ module Semantics.Modality.Past where
            → f ∘ᵗ η⁻¹ ≡ᵗ η⁻¹ ∘ᵗ ⟨ 0 ⟩ᶠ f
 ⟨⟩-η⁻¹-nat f {t} x = refl
 
--- μ and μ⁻¹ are natural
+-- μ is natural
 
 ⟨⟩-μ-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
            → ⟨ τ₁ + τ₂ ⟩ᶠ f ∘ᵗ μ {A} ≡ᵗ μ {B} ∘ᵗ ⟨ τ₁ ⟩ᶠ (⟨ τ₂ ⟩ᶠ f)
 ⟨⟩-μ-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} (r , x) =
   cong (_ ,_) (map-nat f _ _)
-
-⟨⟩-μ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
-         → ⟨ τ₁ ⟩ᶠ (⟨ τ₂ ⟩ᶠ f) ∘ᵗ μ⁻¹ {A} ≡ᵗ μ⁻¹ {B} ∘ᵗ ⟨ τ₁ + τ₂ ⟩ᶠ f
-⟨⟩-μ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} (r , x) =
-  cong (m+n≤o⇒m≤o τ₁ r ,_)
-    (cong (n+m≤k⇒m≤k∸n τ₁ τ₂ t r ,_)
-      (map-nat f _ _))
 
 ⟨⟩-μ-≤ : ∀ {A τ₁ τ₂ τ₁' τ₂'} → (p : τ₁ ≤ τ₁') → (q : τ₂ ≤ τ₂')
        → ⟨⟩-≤ {A} (+-mono-≤ p q) ∘ᵗ μ {A}
@@ -196,9 +172,7 @@ module Semantics.Modality.Past where
           (sym (monotone-trans A _ _ _)))
         (sym (monotone-trans A _ _ _))))
 
--- ⟨_⟩ is strong monoidal
-
----- unit is an isomorphism
+-- η is invertible
 
 ⟨⟩-η∘η⁻¹≡id : ∀ {A} → η {A} ∘ᵗ η⁻¹ ≡ᵗ idᵗ
 ⟨⟩-η∘η⁻¹≡id {A} (p , x) =
@@ -207,32 +181,6 @@ module Semantics.Modality.Past where
 ⟨⟩-η⁻¹∘η≡id : ∀ {A} → η⁻¹ {A} ∘ᵗ η ≡ᵗ idᵗ
 ⟨⟩-η⁻¹∘η≡id {A} x =
   refl
-
----- multiplication is an isomorphism
-
-⟨⟩-μ∘μ⁻¹≡id : ∀ {A τ₁ τ₂}
-            → μ {A} {τ₁} {τ₂} ∘ᵗ μ⁻¹ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
-⟨⟩-μ∘μ⁻¹≡id {A} {τ₁} {τ₂} (p , x) =
-  cong₂ _,_
-    (≤-irrelevant _ _)
-    (trans
-      (monotone-trans A _ _ _)
-      (trans
-        (cong (λ q → monotone A q x) (≤-irrelevant _ _))
-        (monotone-refl A _)))
-
-⟨⟩-μ⁻¹∘μ≡id : ∀ {A τ₁ τ₂}
-            → μ⁻¹ {A} {τ₁} {τ₂} ∘ᵗ μ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
-⟨⟩-μ⁻¹∘μ≡id {A} {τ₁} {τ₂} (p , q , x) =
-  cong₂ _,_
-    (≤-irrelevant _ _)
-    (cong₂ _,_
-      (≤-irrelevant _ _)
-      (trans
-        (monotone-trans A _ _ _)
-        (trans
-          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
-          (monotone-refl A _))))
 
 -- Graded monad laws
 
@@ -265,3 +213,54 @@ module Semantics.Modality.Past where
           (cong (λ s → monotone A s x) (≤-irrelevant _ _))
           (sym (monotone-trans A _ _ _)))
         (sym (monotone-trans A _ _ _))))
+
+
+-- In this concrete semantics, [_] is in fact strong monoidal
+
+μ⁻¹ : ∀ {A τ₁ τ₂} → ⟨ τ₁ + τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A)
+μ⁻¹ {A} {τ₁} {τ₂} =
+  tset-map
+    (λ { {t} (p , a) → m+n≤o⇒m≤o τ₁ p ,
+                       n+m≤k⇒m≤k∸n τ₁ τ₂ t p ,
+                       monotone A (≤-reflexive (sym (n∸m∸k≡n∸m+k t τ₁ τ₂))) a })
+    λ { p (q , x) →
+      cong₂ _,_
+        (≤-irrelevant _ _)
+        (cong₂ _,_
+          (≤-irrelevant _ _)
+          (trans
+            (monotone-trans A _ _ x)
+            (trans
+              (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+              (sym (monotone-trans A _ _ x))))) }
+
+⟨⟩-μ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
+         → ⟨ τ₁ ⟩ᶠ (⟨ τ₂ ⟩ᶠ f) ∘ᵗ μ⁻¹ {A} ≡ᵗ μ⁻¹ {B} ∘ᵗ ⟨ τ₁ + τ₂ ⟩ᶠ f
+⟨⟩-μ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} (r , x) =
+  cong (m+n≤o⇒m≤o τ₁ r ,_)
+    (cong (n+m≤k⇒m≤k∸n τ₁ τ₂ t r ,_)
+      (map-nat f _ _))
+
+⟨⟩-μ∘μ⁻¹≡id : ∀ {A τ₁ τ₂}
+            → μ {A} {τ₁} {τ₂} ∘ᵗ μ⁻¹ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+⟨⟩-μ∘μ⁻¹≡id {A} {τ₁} {τ₂} (p , x) =
+  cong₂ _,_
+    (≤-irrelevant _ _)
+    (trans
+      (monotone-trans A _ _ _)
+      (trans
+        (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+        (monotone-refl A _)))
+
+⟨⟩-μ⁻¹∘μ≡id : ∀ {A τ₁ τ₂}
+            → μ⁻¹ {A} {τ₁} {τ₂} ∘ᵗ μ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+⟨⟩-μ⁻¹∘μ≡id {A} {τ₁} {τ₂} (p , q , x) =
+  cong₂ _,_
+    (≤-irrelevant _ _)
+    (cong₂ _,_
+      (≤-irrelevant _ _)
+      (trans
+        (monotone-trans A _ _ _)
+        (trans
+          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+          (monotone-refl A _))))

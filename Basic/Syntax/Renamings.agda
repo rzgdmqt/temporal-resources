@@ -20,34 +20,29 @@ open import Util.Time
 
 module Syntax.Renamings where
 
--- Variable renamings
+-- Variable renamings (as the least relation closed under
+-- identities, composition, ordinary variable renamings,
+-- and graded monad operations for the ⟨_⟩ modality).
 
 data Ren : Ctx → Ctx → Set where
-  -- identity renaming on empty contexts
-  []-ren      : Ren [] []
-  -- composition
+  -- identity renaming
+  id-ren      : ∀ {Γ} → Ren Γ Γ
+  -- composition of renamings
   _∘ʳ_        : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
   -- weakening renaming
   wk-ren      : ∀ {Γ A} → Ren Γ (Γ ∷ A)
   -- variable renaming
   var-ren     : ∀ {Γ A τ} → A ∈[ τ ] Γ → Ren (Γ ∷ A) Γ
-  -- ⟨⟩ modality
+  -- graded monad renamings for ⟨⟩ modality
   ⟨⟩-η-ren    : ∀ {Γ} → Ren (Γ ⟨ 0 ⟩) Γ
   ⟨⟩-η⁻¹-ren  : ∀ {Γ} → Ren Γ (Γ ⟨ 0 ⟩)
   ⟨⟩-μ-ren    : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ + τ' ⟩) (Γ ⟨ τ ⟩ ⟨ τ' ⟩)
   ⟨⟩-≤-ren    : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
-  -- congruences
+  -- congruence renamings
   cong-∷-ren  : ∀ {Γ Γ' A} → Ren Γ Γ' → Ren (Γ ∷ A) (Γ' ∷ A)
   cong-⟨⟩-ren : ∀ {Γ Γ' τ} → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
 
 infixr 20 _∘ʳ_
-
--- Identity renaming
-
-id-ren : ∀ {Γ} → Ren Γ Γ
-id-ren {Γ = []}      = []-ren
-id-ren {Γ = Γ ∷ A}   = cong-∷-ren id-ren
-id-ren {Γ = Γ ⟨ τ ⟩} = cong-⟨⟩-ren id-ren
 
 -- Extending a renaming with a variable
 
@@ -57,8 +52,8 @@ extend-ren ρ x = var-ren x ∘ʳ cong-∷-ren ρ
 -- Congruence of renamings
 
 cong-ren : ∀ {Γ Γ' Γ''} → Ren Γ Γ' → Ren (Γ ++ᶜ Γ'') (Γ' ++ᶜ Γ'')
-cong-ren {Γ'' = []} ρ = ρ
-cong-ren {Γ'' = Γ'' ∷ A} ρ = cong-∷-ren (cong-ren ρ)
+cong-ren {Γ'' = []} ρ        = ρ
+cong-ren {Γ'' = Γ'' ∷ A} ρ   = cong-∷-ren (cong-ren ρ)
 cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ = cong-⟨⟩-ren (cong-ren ρ)
 
 -- Weakening by a modality renaming
@@ -69,8 +64,8 @@ wk-⟨⟩-ren = ⟨⟩-≤-ren z≤n ∘ʳ ⟨⟩-η⁻¹-ren
 -- Weakening by a context renaming
 
 wk-ctx-ren : ∀ {Γ Γ'} → Ren Γ (Γ ++ᶜ Γ')
-wk-ctx-ren {Γ' = []} = id-ren
-wk-ctx-ren {Γ' = Γ' ∷ A} = wk-ren ∘ʳ wk-ctx-ren
+wk-ctx-ren {Γ' = []}       = id-ren
+wk-ctx-ren {Γ' = Γ' ∷ A}   = wk-ren ∘ʳ wk-ctx-ren
 wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} = wk-⟨⟩-ren ∘ʳ wk-ctx-ren
 
 -- Weakening a ⟨ τ ⟩ modality into a context with at least τ time-passage
@@ -81,7 +76,9 @@ wk-⟨⟩-ctx-ren : ∀ {Γ Γ' Γ'' τ}
               → Ren (Γ' ⟨ τ ⟩) Γ
 
 wk-⟨⟩-ctx-ren split-[] z≤n = ⟨⟩-η-ren
-wk-⟨⟩-ctx-ren (split-∷ p) q = wk-ren ∘ʳ (wk-⟨⟩-ctx-ren p q)
+wk-⟨⟩-ctx-ren (split-∷ p) q =
+     wk-ren
+  ∘ʳ (wk-⟨⟩-ctx-ren p q)
 wk-⟨⟩-ctx-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
      cong-ren {Γ'' = [] ⟨ τ' ⟩}
        (wk-⟨⟩-ctx-ren {τ = τ ∸ τ'} p
@@ -94,8 +91,11 @@ wk-⟨⟩-ctx-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
 -- Weakening a ⟨ tctx-time τs ⟩ modality into a temporal context
 
 wk-⟨⟩-tctx-ren : ∀ {Γ} (τs : TCtx) → Ren (Γ ⟨ tctx-time τs ⟩) (Γ ++ᶜ tctx-ctx τs)
-wk-⟨⟩-tctx-ren [] = ⟨⟩-η-ren
-wk-⟨⟩-tctx-ren (τs ⟨ τ ⟩) = cong-⟨⟩-ren (wk-⟨⟩-tctx-ren τs) ∘ʳ ⟨⟩-μ-ren
+wk-⟨⟩-tctx-ren [] =
+  ⟨⟩-η-ren
+wk-⟨⟩-tctx-ren (τs ⟨ τ ⟩) =
+     cong-⟨⟩-ren (wk-⟨⟩-tctx-ren τs)
+  ∘ʳ ⟨⟩-μ-ren
 
 -- Exchange renamings
 
@@ -109,7 +109,8 @@ exch-⟨⟩-var-ren {A = A} {τ = τ} =
 
 exch-⟨⟩-tctx-var-ren : ∀ {Γ A} → (τs : TCtx)
                      → Ren (Γ ++ᶜ tctx-ctx τs ∷ A) ((Γ ∷ A) ++ᶜ tctx-ctx τs)
-exch-⟨⟩-tctx-var-ren [] = id-ren
+exch-⟨⟩-tctx-var-ren [] =
+  id-ren
 exch-⟨⟩-tctx-var-ren (τs ⟨ τ ⟩) =
      cong-⟨⟩-ren (exch-⟨⟩-tctx-var-ren τs)
   ∘ʳ exch-⟨⟩-var-ren
@@ -135,8 +136,8 @@ split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
              × Γ₁' , Γ₂' split Γ'
              × τ ≤ ctx-time Γ₂'
 
-split-ren []-ren split-[] q =
-  [] , [] , []-ren , split-[] , q
+split-ren {Γ₁ = Γ₁} {Γ₂ = Γ₂} id-ren p q =
+  Γ₁ , Γ₂ , id-ren , p , q
 
 split-ren (ρ' ∘ʳ ρ) p q with split-ren ρ p q
 ... | Γ₁' , Γ₂' , ρ'' , p' , q' with split-ren ρ' p' q'
@@ -194,56 +195,49 @@ var-rename : ∀ {Γ Γ'}
            → Ren Γ Γ'
            →  ∀ {A τ} → A ∈[ τ ] Γ → Σ[ τ' ∈ Time ] (τ ≤ τ' × A ∈[ τ' ] Γ')
 
+var-rename id-ren x =
+  _ , ≤-refl , x
+  
 var-rename (ρ' ∘ʳ ρ) x with (var-rename ρ) x
 ... | τ , p , y with (var-rename ρ') y
 ... | τ' , p' , y' =
   _ , ≤-trans p p' , y'
+  
 var-rename wk-ren x =
   _ , ≤-refl , Tl-∷ x
+  
 var-rename (var-ren y) Hd =
   _ , z≤n , y
+  
 var-rename (var-ren y) (Tl-∷ x) =
   _ , ≤-refl , x
+  
 var-rename ⟨⟩-η-ren (Tl-⟨⟩ x) =
   _ , ≤-refl , x
+  
 var-rename ⟨⟩-η⁻¹-ren x =
   _ , ≤-refl , Tl-⟨⟩ x
+  
 var-rename (⟨⟩-μ-ren {τ = τ} {τ' = τ'}) (Tl-⟨⟩ {τ' = τ''} x) =
   _ ,
   ≤-reflexive (trans
                 (cong (_+ τ'') (+-comm τ τ'))
                 (+-assoc τ' τ τ'')) ,
   Tl-⟨⟩ (Tl-⟨⟩ x)
+  
 var-rename (⟨⟩-≤-ren p) (Tl-⟨⟩ x) =
   _ , +-monoˡ-≤ _ p , Tl-⟨⟩ x
+  
 var-rename (cong-∷-ren ρ) Hd =
   _ , z≤n , Hd
+  
 var-rename (cong-∷-ren ρ) (Tl-∷ x) with var-rename ρ x
 ... | τ , p , y =
   _ , p , Tl-∷ y
+  
 var-rename (cong-⟨⟩-ren ρ) (Tl-⟨⟩ x) with var-rename ρ x
 ... | τ , p , y =
   _ , +-monoʳ-≤ _ p , Tl-⟨⟩ y
-
--- var-rename applied to identity renaming doesn't change variable split
-
-var-split₁-id : ∀ {Γ A τ}
-              → (x : A ∈[ τ ] Γ)
-              → proj₁ (var-split x)
-              ≡ proj₁ (var-split (proj₂ (proj₂ (var-rename id-ren x))))
-              
-var-split₁-id Hd        = refl
-var-split₁-id (Tl-∷ x)  = var-split₁-id x
-var-split₁-id (Tl-⟨⟩ x) = var-split₁-id x
-
-var-split₂-id : ∀ {Γ A τ}
-              → (x : A ∈[ τ ] Γ)
-              → proj₁ (proj₂ (var-split x))
-              ≡ proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename id-ren x)))))
-              
-var-split₂-id Hd                = refl
-var-split₂-id (Tl-∷ {B = B} x)  = cong (_∷ B) (var-split₂-id x)
-var-split₂-id (Tl-⟨⟩ {τ = τ} x) = cong (_⟨ τ ⟩) (var-split₂-id x)
 
 -- Interaction of var-split, var-rename, and wk-ctx-ren
 
@@ -254,7 +248,7 @@ var-split₁-wk-ctx-ren : ∀ {Γ Γ' A τ}
                           (proj₂ (proj₂ (var-rename (wk-ctx-ren {Γ' = Γ'}) x))))
 
 var-split₁-wk-ctx-ren {Γ' = []} x =
-  var-split₁-id x
+  refl
 var-split₁-wk-ctx-ren {Γ' = Γ' ∷ A} x =
   var-split₁-wk-ctx-ren {Γ' = Γ'} x
 var-split₁-wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} x =
@@ -266,7 +260,7 @@ var-split₂-wk-ctx-ren : ∀ {Γ Γ' A τ}
                       ≡ proj₁ (proj₂ (var-split
                           (proj₂ (proj₂ (var-rename (wk-ctx-ren {Γ' = Γ'}) x)))))
 var-split₂-wk-ctx-ren {Γ' = []} x =
-  var-split₂-id x
+  refl
 var-split₂-wk-ctx-ren {Γ' = Γ' ∷ A} x =
   cong (_∷ A) (var-split₂-wk-ctx-ren x)
 var-split₂-wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} x =
