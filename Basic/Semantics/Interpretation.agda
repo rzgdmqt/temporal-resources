@@ -88,34 +88,34 @@ constᵗ c = tset-map (λ _ → c) (λ _ _ → refl)
 -- Interpretation of temporal contexts as functors in terms of [_] and ⟨_⟩ modalities
 
 [_]ᵗᵒ : (τs : TCtx) → TSet → TSet
-[ [] ]ᵗᵒ       A = A
+[ ⦉ τ ⦊ ]ᵗᵒ A = [ τ ]ᵒ A
 [ τs ⟨ τ ⟩ ]ᵗᵒ A = [ τs ]ᵗᵒ ([ τ ]ᵒ A)
 
 [_]ᵗᶠ : ∀ {A B} → (τs : TCtx) → A →ᵗ B → [ τs ]ᵗᵒ A →ᵗ [ τs ]ᵗᵒ B
-[ [] ]ᵗᶠ       f = f
+[ ⦉ τ ⦊ ]ᵗᶠ f = [ τ ]ᶠ f
 [ τs ⟨ τ ⟩ ]ᵗᶠ f = [ τs ]ᵗᶠ ([ τ ]ᶠ f)
 
 ⟨_⟩ᵗᵒ : (τs : TCtx) → TSet → TSet
-⟨ [] ⟩ᵗᵒ       A = A
+⟨ ⦉ τ ⦊ ⟩ᵗᵒ A = ⟨ τ ⟩ᵒ A
 ⟨ τs ⟨ τ ⟩ ⟩ᵗᵒ A = ⟨ τ ⟩ᵒ (⟨ τs ⟩ᵗᵒ A)
 
 ⟨_⟩ᵗᶠ : ∀ {A B} → (τs : TCtx) → A →ᵗ B → ⟨ τs ⟩ᵗᵒ A →ᵗ ⟨ τs ⟩ᵗᵒ B
-⟨ [] ⟩ᵗᶠ       f = f
+⟨ ⦉ τ ⦊ ⟩ᵗᶠ f = ⟨ τ ⟩ᶠ f
 ⟨ τs ⟨ τ ⟩ ⟩ᵗᶠ f = ⟨ τ ⟩ᶠ (⟨ τs ⟩ᵗᶠ f)
 
 η-⊣-tctx : ∀ {A τs} → A →ᵗ [ τs ]ᵗᵒ (⟨ τs ⟩ᵗᵒ A)
-η-⊣-tctx {τs = []}       = idᵗ
+η-⊣-tctx {τs = ⦉ τ ⦊} = η-⊣
 η-⊣-tctx {τs = τs ⟨ τ ⟩} = [ τs ]ᵗᶠ η-⊣ ∘ᵗ η-⊣-tctx {τs = τs}
 
 T-[]-tctx-module : ∀ {A τs τ'} → [ τs ]ᵗᵒ (Tᵒ A τ') →ᵗ Tᵒ A (tctx-time τs + τ')
-T-[]-tctx-module {τs = []}       = idᵗ
+T-[]-tctx-module {τs = ⦉ τ ⦊} = T-[]-module
 T-[]-tctx-module {τs = τs ⟨ τ ⟩} =
      T-≤τ (≤-reflexive (sym (+-assoc (tctx-time τs) τ _)))
   ∘ᵗ T-[]-tctx-module {τs = τs}
   ∘ᵗ [ τs ]ᵗᶠ T-[]-module
 
 ⟨⟩-tctx-++ᶜ : ∀ {Γ} → (τs : TCtx) → ⟨ τs ⟩ᵗᵒ ⟦ Γ ⟧ᵉ →ᵗ ⟦ Γ ++ᶜ tctx-ctx τs ⟧ᵉ
-⟨⟩-tctx-++ᶜ []         = idᵗ
+⟨⟩-tctx-++ᶜ ⦉ τ ⦊ = idᵗ
 ⟨⟩-tctx-++ᶜ (τs ⟨ τ ⟩) = ⟨ τ ⟩ᶠ (⟨⟩-tctx-++ᶜ τs)
 
 -- Interpretation of well-typed value and computation terms
@@ -198,4 +198,3 @@ mutual
     ∘ᵗ η-⊣-tctx {τs = τs}
     
   infix 25 ⟦_⟧ᶜᵗ
-

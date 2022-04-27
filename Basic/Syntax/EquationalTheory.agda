@@ -34,7 +34,7 @@ coerce : ∀ {Γ A τ τ'}
 
 coerce p M =
   delay
-    ([] ⟨ proj₁ (n≤m⇒m≡n+n' p) ⟩)
+    ⦉ proj₁ (n≤m⇒m≡n+n' p) ⦊
     (proj₂ (n≤m⇒m≡n+n' p))
     (C-rename wk-⟨⟩-ren M)
 
@@ -194,16 +194,16 @@ mutual
     ;-return : ∀ {A B τ}
              → (V : Γ ⊢V⦂ A)
              → (M : Γ ⟨ 0 ⟩ ∷ A ⊢C⦂ B ‼ τ)
-             ----------------------------------------------------------------
+             -----------------------------------------------------
              → Γ ⊢C⦂ return V ; M
-                 == C-rename ⟨⟩-η-ren (M [ Hd ↦ V-rename ⟨⟩-η⁻¹-ren V ]c)   -- M[V/x]
+                 == (C-rename (cong-∷-ren ⟨⟩-η-ren) M [ Hd ↦ V ]c)
                   
     ;-perform : ∀ {A B τ τ'}
               → (op : Op)
               → (V : Γ ⊢V⦂ type-of-gtype (param op))
               → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
               → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
-              -----------------------------------------------------------------------------------------------------
+              --------------------------------------------------------------
               → Γ ⊢C⦂ (perform op V M) ; N
                   == coerce (≤-reflexive (sym (+-assoc (op-time op) τ τ')))
                        (perform op V
@@ -218,7 +218,7 @@ mutual
             → (M : Γ ⊢C⦂ A ‼ τ)
             → (N : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
             → (P : Γ ⟨ τ + τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
-            -----------------------------------------------------------------------------------
+            ---------------------------------------------------------------------
             → Γ ⊢C⦂ (M ; N) ; P
                 == coerce (≤-reflexive (sym (+-assoc τ τ' τ'')))
                      (M ; (N ; C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
@@ -241,9 +241,9 @@ mutual
                              ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
                            ⊢C⦂ B ‼ (op-time op + τ''))
                   → (N : Γ ⟨ 0 ⟩ ∷ A ⊢C⦂ B ‼ τ')
-                  ---------------------------------------------------
+                  ----------------------------------------------------------------
                   → Γ ⊢C⦂ handle return V `with H `in N
-                      == (C-rename ⟨⟩-η-ren (N [ Hd ↦ V-rename ⟨⟩-η⁻¹-ren V ]c))
+                      == (C-rename (cong-∷-ren ⟨⟩-η-ren) N [ Hd ↦ V ]c)
 
     handle-op : ∀ {A B τ τ'}
               → (op : Op)
@@ -311,12 +311,13 @@ mutual
 
     -- delay equations
     
-    delay-[] : ∀ {A τ}
-             → (M : Γ ⊢C⦂ A ‼ τ)
-             ---------------------------------------------
-             → Γ ⊢C⦂ delay [] (sym (+-identityʳ τ)) M == M
+    delay-zero : ∀ {A τ}
+               → (M : Γ ⟨ 0 ⟩ ⊢C⦂ A ‼ τ)
+               ------------------------------------------
+               → Γ ⊢C⦂ delay ⦉ 0 ⦊ (sym (+-identityʳ τ)) M
+                   == C-rename ⟨⟩-η-ren M
 
-    delay-trans : ∀ {A τ τ' τ'' τs₁ τs₂}
+    delay-delay : ∀ {A τ τ' τ'' τs₁ τs₂}
                 → (p : τ' ≡ τ + tctx-time τs₁)
                 → (q : τ'' ≡ τ' + tctx-time τs₂)
                 → (M : Γ ++ᶜ tctx-ctx τs₂ ++ᶜ tctx-ctx τs₁ ⊢C⦂ A ‼ τ)

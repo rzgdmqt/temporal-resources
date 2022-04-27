@@ -91,8 +91,8 @@ wk-⟨⟩-ctx-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
 -- Weakening a ⟨ tctx-time τs ⟩ modality into a temporal context
 
 wk-⟨⟩-tctx-ren : ∀ {Γ} (τs : TCtx) → Ren (Γ ⟨ tctx-time τs ⟩) (Γ ++ᶜ tctx-ctx τs)
-wk-⟨⟩-tctx-ren [] =
-  ⟨⟩-η-ren
+wk-⟨⟩-tctx-ren ⦉ τ ⦊ =
+  id-ren
 wk-⟨⟩-tctx-ren (τs ⟨ τ ⟩) =
      cong-⟨⟩-ren (wk-⟨⟩-tctx-ren τs)
   ∘ʳ ⟨⟩-μ-ren
@@ -109,8 +109,8 @@ exch-⟨⟩-var-ren {A = A} {τ = τ} =
 
 exch-⟨⟩-tctx-var-ren : ∀ {Γ A} → (τs : TCtx)
                      → Ren (Γ ++ᶜ tctx-ctx τs ∷ A) ((Γ ∷ A) ++ᶜ tctx-ctx τs)
-exch-⟨⟩-tctx-var-ren [] =
-  id-ren
+exch-⟨⟩-tctx-var-ren ⦉ τ ⦊ =
+  exch-⟨⟩-var-ren
 exch-⟨⟩-tctx-var-ren (τs ⟨ τ ⟩) =
      cong-⟨⟩-ren (exch-⟨⟩-tctx-var-ren τs)
   ∘ʳ exch-⟨⟩-var-ren
@@ -301,3 +301,4 @@ mutual
   ... | Γ₁' , Γ₂' , ρ' , p' , q' =
     unbox p' q' (V-rename ρ' V) (C-rename (cong-ren ρ) M)
   C-rename ρ (delay τs q M)      = delay τs q (C-rename (cong-ren ρ) M)
+
