@@ -59,8 +59,16 @@ open _→ᵗ_ public
 
 -- Equality of TSet-morphisms
 
-_≡ᵗ_ : ∀ {A B} → A →ᵗ B → A →ᵗ B → Set
-_≡ᵗ_ {A} f g = ∀ {t} → (x : carrier A t) → map-carrier f x ≡ map-carrier g x
+-- _≡ᵗ_ : ∀ {A B} → A →ᵗ B → A →ᵗ B → Set
+-- _≡ᵗ_ {A} f g = ∀ {t} → (x : carrier A t) → map-carrier f x ≡ map-carrier g x
+
+record _≡ᵗ_ {A B : TSet} (f g : A →ᵗ B) : Set where
+  constructor
+    eqᵗ
+  field
+    prf : ∀ {t} → (x : carrier A t) → map-carrier f x ≡ map-carrier g x
+
+open _≡ᵗ_
 
 infix 5 _≡ᵗ_
 
@@ -70,7 +78,7 @@ infix 5 _≡ᵗ_
 ≡ᵗ-≡ p =
   dcong₂
     tset-map
-      (ifun-ext (fun-ext p))
+      (ifun-ext (fun-ext (prf p)))
       (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ x → uip)))))
 
 -- Begin-qed style reasoning for ≡ᵗ
@@ -86,10 +94,10 @@ _≡⟨⟩_ : ∀ {A B} (f {g} : A →ᵗ B) → f ≡ᵗ g → f ≡ᵗ g
 _ ≡⟨⟩ f≡g = f≡g
 
 step-≡ : ∀ {A B} (f {g h} : A →ᵗ B) → g ≡ᵗ h → f ≡ᵗ g → f ≡ᵗ h
-step-≡ _ g≡h f≡g = λ x → trans (f≡g x) (g≡h x)
+step-≡ _ g≡h f≡g = eqᵗ λ x → trans (prf f≡g x) (prf g≡h x)
 
 _∎ : ∀ {A B} (f : A →ᵗ B) → f ≡ᵗ f
-_∎ _ = λ x → refl
+_∎ _ = eqᵗ λ x → refl
 
 syntax step-≡ f g≡h f≡g = f ≡⟨ f≡g ⟩ g≡h
 
@@ -202,12 +210,12 @@ homᶠ p =
     (λ p q → ≤-irrelevant _ _)
 
 homᶠ-refl : ∀ {t} → homᶠ (≤-refl {t}) ≡ᵗ idᵗ
-homᶠ-refl p = ≤-irrelevant _ _
+homᶠ-refl = eqᵗ λ p → ≤-irrelevant _ _
 
 homᶠ-trans : ∀ {t t' t''}
            → (p : t ≤ t') → (q : t' ≤ t'')
            → homᶠ p ∘ᵗ homᶠ q ≡ᵗ homᶠ (≤-trans p q)
-homᶠ-trans p q r = ≤-irrelevant _ _
+homᶠ-trans p q = eqᵗ (λ r → ≤-irrelevant _ _)
 
 hom-iso-map : ∀ {A t} → carrier A t → homᵒ t →ᵗ A
 hom-iso-map {A} x =
@@ -226,11 +234,11 @@ A ⇒ᵗ B =
     (λ t → homᵒ t ×ᵗ A →ᵗ B)
     (λ p f → f ∘ᵗ mapˣᵗ (homᶠ p) idᵗ)
     (λ {t} f →
-      ≡ᵗ-≡ (λ { (p , x) →
-        cong (λ q → map-carrier f (q , x)) (≤-irrelevant _ _) }))
+      ≡ᵗ-≡ (eqᵗ (λ { (p , x) →
+        cong (λ q → map-carrier f (q , x)) (≤-irrelevant _ _) })))
     (λ p q f →
-      ≡ᵗ-≡ (λ { (r , x) →
-        cong (λ s → map-carrier f (s , x)) (≤-irrelevant _ _) }))
+      ≡ᵗ-≡ (eqᵗ (λ { (r , x) →
+        cong (λ s → map-carrier f (s , x)) (≤-irrelevant _ _) })))
 
 infixr 22 _⇒ᵗ_
 
@@ -247,17 +255,17 @@ map⇒ᵗ : ∀ {A B C D} → (A →ᵗ B) → (C →ᵗ D) → B ⇒ᵗ C →�
 map⇒ᵗ f g =
   tset-map
     (λ h → g ∘ᵗ h ∘ᵗ mapˣᵗ idᵗ f)
-    (λ p h → ≡ᵗ-≡ (λ { (q , x) → refl }))
+    (λ p h → ≡ᵗ-≡ (eqᵗ (λ { (q , x) → refl })))
 
 curryᵗ : ∀ {A B C} → A ×ᵗ B →ᵗ C → A →ᵗ B ⇒ᵗ C
 curryᵗ {A} f =
   tset-map
     (λ x → f ∘ᵗ mapˣᵗ (hom-iso-map x) idᵗ)
     (λ p x →
-      ≡ᵗ-≡ (λ { (q , y) →
+      ≡ᵗ-≡ (eqᵗ (λ { (q , y) →
         cong
           (map-carrier f)
-          (cong (_, y) (monotone-trans A p q x)) }))
+          (cong (_, y) (monotone-trans A p q x)) })))
 
 uncurryᵗ : ∀ {A B C} → A →ᵗ B ⇒ᵗ C → A ×ᵗ B →ᵗ C
 uncurryᵗ {A} {B} {C} f =
