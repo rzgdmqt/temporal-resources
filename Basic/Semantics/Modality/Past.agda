@@ -14,14 +14,11 @@ open import Data.Product renaming (map to mapˣ)
 open import Data.Sum renaming (map to map⁺)
 open import Data.Unit hiding (_≤_)
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq
-open Eq.≡-Reasoning
-
 open import Syntax.Language
 
 open import Semantics.TSets
 
+open import Util.Equality
 open import Util.Time
 
 module Semantics.Modality.Past where

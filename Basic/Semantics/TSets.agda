@@ -10,10 +10,6 @@ open import Data.Product renaming (map to mapˣ)
 open import Data.Sum renaming (map to map⁺)
 open import Data.Unit hiding (_≤_)
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq hiding (Extensionality)
-open Eq.≡-Reasoning
-
 open import Util.Equality
 open import Util.Time
 
@@ -76,6 +72,26 @@ infix 5 _≡ᵗ_
     tset-map
       (ifun-ext (fun-ext p))
       (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ x → uip)))))
+
+-- Begin-qed style reasoning for ≡ᵗ
+
+infix  3 _∎
+infixr 2 _≡⟨⟩_ step-≡
+infix  1 begin_
+
+begin_ : ∀ {A B} {f g : A →ᵗ B} → f ≡ᵗ g → f ≡ᵗ g
+begin_ f≡g = f≡g
+
+_≡⟨⟩_ : ∀ {A B} (f {g} : A →ᵗ B) → f ≡ᵗ g → f ≡ᵗ g
+_ ≡⟨⟩ f≡g = f≡g
+
+step-≡ : ∀ {A B} (f {g h} : A →ᵗ B) → g ≡ᵗ h → f ≡ᵗ g → f ≡ᵗ h
+step-≡ _ g≡h f≡g = λ x → trans (f≡g x) (g≡h x)
+
+_∎ : ∀ {A B} (f : A →ᵗ B) → f ≡ᵗ f
+_∎ _ = λ x → refl
+
+syntax step-≡ f g≡h f≡g = f ≡⟨ f≡g ⟩ g≡h
 
 -- Identity and composition of maps
 

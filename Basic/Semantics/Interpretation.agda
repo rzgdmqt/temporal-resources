@@ -54,31 +54,48 @@ mutual
 ⟦⟧ᵍ-⟦⟧ᵛ Empty    = idᵗ
 ⟦⟧ᵍ-⟦⟧ᵛ ([ τ ]ᵍ A) = [ τ ]ᶠ (⟦⟧ᵍ-⟦⟧ᵛ A)
 
--- Interpretation of contexts as environments
+-- Interpretation of contexts as functors
+
+⟦_⟧ᵉᵒ : Ctx → TSet → TSet
+⟦ [] ⟧ᵉᵒ      B = B
+⟦ Γ ∷ A ⟧ᵉᵒ   B = ⟦ Γ ⟧ᵉᵒ B ×ᵗ ⟦ A ⟧ᵛ
+⟦ Γ ⟨ τ ⟩ ⟧ᵉᵒ B = ⟨ τ ⟩ᵒ (⟦ Γ ⟧ᵉᵒ B)
+
+⟦_⟧ᵉᶠ : ∀ {A B} → (Γ : Ctx) → A →ᵗ B → ⟦ Γ ⟧ᵉᵒ A →ᵗ ⟦ Γ ⟧ᵉᵒ B
+⟦ [] ⟧ᵉᶠ      f = f
+⟦ Γ ∷ A ⟧ᵉᶠ   f = mapˣᵗ (⟦ Γ ⟧ᵉᶠ f) idᵗ
+⟦ Γ ⟨ τ ⟩ ⟧ᵉᶠ f = ⟨ τ ⟩ᶠ (⟦ Γ ⟧ᵉᶠ f)
+
+-- Environments are such functors applied to the terminal object
 
 ⟦_⟧ᵉ : Ctx → TSet
-⟦ [] ⟧ᵉ      = 𝟙ᵗ
-⟦ Γ ∷ A ⟧ᵉ   = ⟦ Γ ⟧ᵉ ×ᵗ ⟦ A ⟧ᵛ
-⟦ Γ ⟨ τ ⟩ ⟧ᵉ = ⟨ τ ⟩ᵒ ⟦ Γ ⟧ᵉ
+⟦ Γ ⟧ᵉ = ⟦ Γ ⟧ᵉᵒ 𝟙ᵗ
 
 infix 25 ⟦_⟧ᵉ
 
+-- Splitting an environment according to context splitting
+
+split-env : ∀ {Γ Γ' Γ''} → Γ' , Γ'' split Γ → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵗ ⟦ Γ'' ⟧ᵉᵒ (⟦ Γ' ⟧ᵉᵒ A)
+split-env split-[]             = idᵗ
+split-env (split-∷ p)          = mapˣᵗ (split-env p) idᵗ
+split-env (split-⟨⟩ {τ = τ} p) = ⟨ τ ⟩ᶠ (split-env p)
+
 -- Total time-passage of an environment as a single ⟨_⟩ modality
 
-split-env-⟨⟩ : ∀ {Γ Γ' Γ''} → Γ' , Γ'' split Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟨ ctx-time Γ'' ⟩ᵒ ⟦ Γ' ⟧ᵉ
-split-env-⟨⟩ split-[]    = η
-split-env-⟨⟩ (split-∷ p) = split-env-⟨⟩ p ∘ᵗ fstᵗ
-split-env-⟨⟩ {Γ' = Γ'} {Γ'' = Γ'' ⟨ τ ⟩} (split-⟨⟩ p) =
-     ⟨⟩-≤ {A = ⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (ctx-time Γ'') τ))
-  ∘ᵗ μ {A = ⟦ Γ' ⟧ᵉ}
-  ∘ᵗ ⟨ τ ⟩ᶠ (split-env-⟨⟩ p)
+env-ctx-time-⟨⟩ : (Γ : Ctx) → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵗ ⟨ ctx-time Γ ⟩ᵒ A
+env-ctx-time-⟨⟩ []        = η
+env-ctx-time-⟨⟩ (Γ ∷ A)   = env-ctx-time-⟨⟩ Γ ∘ᵗ fstᵗ
+env-ctx-time-⟨⟩ (Γ ⟨ τ ⟩) {A} =
+     ⟨⟩-≤ {A = A} (≤-reflexive (+-comm (ctx-time Γ) τ))
+  ∘ᵗ μ {A = A}
+  ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
 
 -- Projecting a variable out of an environment
 
-var-in-env : ∀ {Γ A τ} → A ∈[ τ ] Γ → ⟦ Γ ⟧ᵉ →ᵗ ⟨ τ ⟩ᵒ ⟦ A ⟧ᵛ
-var-in-env {A = A} Hd                = η ∘ᵗ sndᵗ
-var-in-env {A = A} (Tl-∷ x)          = var-in-env x ∘ᵗ fstᵗ
-var-in-env {A = A} (Tl-⟨⟩ {τ = τ} x) = μ {A = ⟦ A ⟧ᵛ} ∘ᵗ ⟨ τ ⟩ᶠ (var-in-env x)
+var-in-env : ∀ {Γ A τ} → (x : A ∈[ τ ] Γ) → ⟦ Γ ⟧ᵉ →ᵗ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᵒ ⟦ A ⟧ᵛ
+var-in-env Hd        = sndᵗ
+var-in-env (Tl-∷ x)  = mapˣᵗ (var-in-env x) idᵗ
+var-in-env (Tl-⟨⟩ {τ = τ} x) = ⟨ τ ⟩ᶠ (var-in-env x)
 
 -- Semantic constants for base-typed value constants
 
@@ -124,7 +141,10 @@ mutual
 
   ⟦_⟧ᵛᵗ : ∀ {Γ A} → Γ ⊢V⦂ A → ⟦ Γ ⟧ᵉ →ᵗ ⟦ A ⟧ᵛ
   
-  ⟦ var x ⟧ᵛᵗ = ε-⟨⟩ ∘ᵗ var-in-env x
+  ⟦ var x ⟧ᵛᵗ =
+       ε-⟨⟩
+    ∘ᵗ (env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))))
+    ∘ᵗ var-in-env x
   
   ⟦ const c ⟧ᵛᵗ = constᵗ c ∘ᵗ terminalᵗ
   
@@ -183,12 +203,13 @@ mutual
     ∘ᵗ mapˣᵗ idᵗ (strᵀ {A = ⟦ Γ ⟧ᵉ} {τ' = τ})
     ∘ᵗ ⟨ idᵗ , ⟨ η-⊣ {A = ⟦ Γ ⟧ᵉ} {τ = τ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ
     
-  ⟦ unbox {Γ'} {τ = τ} p q V M ⟧ᶜᵗ =
+  ⟦ unbox {Γ'} {Γ''} {τ = τ} p q V M ⟧ᶜᵗ =
     ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
                     ε-⊣
                  ∘ᵗ (⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ)
                  ∘ᵗ ⟨⟩-≤ {A = ⟦ Γ' ⟧ᵉ} q
-                 ∘ᵗ split-env-⟨⟩ p ⟩ᵗ
+                 ∘ᵗ env-ctx-time-⟨⟩ Γ''
+                 ∘ᵗ split-env p ⟩ᵗ
 
   ⟦ delay τs refl M ⟧ᶜᵗ =
        T-≤τ (≤-reflexive (+-comm (tctx-time τs) _))
@@ -198,3 +219,4 @@ mutual
     ∘ᵗ η-⊣-tctx {τs = τs}
     
   infix 25 ⟦_⟧ᶜᵗ
+

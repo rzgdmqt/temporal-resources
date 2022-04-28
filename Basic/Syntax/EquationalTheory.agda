@@ -196,7 +196,7 @@ mutual
              → (M : Γ ⟨ 0 ⟩ ∷ A ⊢C⦂ B ‼ τ)
              -----------------------------------------------------
              → Γ ⊢C⦂ return V ; M
-                 == (C-rename (cong-∷-ren ⟨⟩-η-ren) M [ Hd ↦ V ]c)
+                 == (C-rename (cong-∷-ren ⟨⟩-η-ren) M) [ Hd ↦ V ]c
                   
     ;-perform : ∀ {A B τ τ'}
               → (op : Op)
