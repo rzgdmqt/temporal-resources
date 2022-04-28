@@ -48,10 +48,7 @@ module Semantics.Renamings where
 ⟦ cong-⟨⟩-ren {Γ} {Γ'} {τ} ρ ⟧ʳ =
   ⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ
 
--- Relating syntactic wk-⟨⟩-ctx-ren and semantic split-env-⟨⟩
-
-z≤n≡≤-refl : z≤n ≡ ≤-refl {0}
-z≤n≡≤-refl = ≤-irrelevant _ _
+-- Relating syntactic wk-⟨⟩-ctx-ren and semantic split-env
 
 wk-⟨⟩-ctx≡split-env-≤ : ∀ {Γ Γ' Γ'' τ}
                       → (p : Γ' , Γ'' split Γ)
@@ -66,14 +63,70 @@ wk-⟨⟩-ctx≡split-env-≤ {Γ' = Γ'} split-[] z≤n =
     η
    ≡⟨ ≡ᵗ-sym (∘ᵗ-identityˡ η) ⟩
      idᵗ ∘ᵗ η
-   ≡⟨ ∘ᵗ-congˡ η (≡ᵗ-sym (⟨⟩-≤-refl {⟦ Γ' ⟧ᵉ})) ⟩
+   ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym (⟨⟩-≤-refl {⟦ Γ' ⟧ᵉ})) ⟩
      ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} ≤-refl ∘ᵗ η
-   ≡⟨ ∘ᵗ-congˡ η (⟨⟩-≤-≡ {⟦ Γ' ⟧ᵉ} ≤-refl z≤n) ⟩
+   ≡⟨ ∘ᵗ-congˡ (⟨⟩-≤-≡ {⟦ Γ' ⟧ᵉ} ≤-refl z≤n) ⟩
      ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} z≤n ∘ᵗ η
    ≡⟨ ≡ᵗ-sym (∘ᵗ-identityʳ (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} z≤n ∘ᵗ η)) ⟩
      ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} z≤n ∘ᵗ η ∘ᵗ idᵗ
    ∎
 
-wk-⟨⟩-ctx≡split-env-≤ (split-∷ p) q = {!!}
+wk-⟨⟩-ctx≡split-env-≤ {Γ' = Γ'} {Γ'' = Γ'' ∷ A} (split-∷ p) q = 
+  begin
+    ⟦ wk-⟨⟩-ctx-ren p q ⟧ʳ ∘ᵗ fstᵗ
+  ≡⟨ ∘ᵗ-congˡ (wk-⟨⟩-ctx≡split-env-≤ p q) ⟩
+    ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q ∘ᵗ (env-ctx-time-⟨⟩ Γ'' ∘ᵗ (split-env p ∘ᵗ fstᵗ))
+  ≡⟨ ∘ᵗ-congʳ {h = ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q}
+       (∘ᵗ-congʳ {h = env-ctx-time-⟨⟩ Γ''}
+         (≡ᵗ-sym (⟨⟩ᵗ-fstᵗ (split-env p ∘ᵗ fstᵗ) (idᵗ ∘ᵗ sndᵗ)))) ⟩
+    ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q ∘ᵗ (env-ctx-time-⟨⟩ Γ'' ∘ᵗ (fstᵗ ∘ᵗ mapˣᵗ (split-env p) idᵗ))
+  ≡⟨ ∘ᵗ-congʳ {h = ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q}
+       (≡ᵗ-sym (∘ᵗ-assoc (env-ctx-time-⟨⟩ Γ'') fstᵗ (mapˣᵗ (split-env p) idᵗ))) ⟩
+    ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q ∘ᵗ (env-ctx-time-⟨⟩ Γ'' ∘ᵗ fstᵗ) ∘ᵗ mapˣᵗ (split-env p) idᵗ
+  ∎
 
-wk-⟨⟩-ctx≡split-env-≤ (split-⟨⟩ p) q = {!!}
+wk-⟨⟩-ctx≡split-env-≤ {Γ' = Γ'} {Γ'' = Γ'' ⟨ τ ⟩} {τ = τ'} (split-⟨⟩ p) q =
+  begin
+         (   ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (n≤n∸m+m τ' τ)
+          ∘ᵗ ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (τ' ∸ τ) τ))
+          ∘ᵗ μ {⟦ Γ' ⟧ᵉ})
+      ∘ᵗ ⟨ τ ⟩ᶠ ⟦ wk-⟨⟩-ctx-ren p (≤-trans (∸-monoˡ-≤ τ q) (≤-reflexive (m+n∸n≡m (ctx-time Γ'') τ))) ⟧ʳ
+   ≡⟨ ∘ᵗ-congʳ {h = ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (n≤n∸m+m τ' τ) ∘ᵗ ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (τ' ∸ τ) τ)) ∘ᵗ μ {⟦ Γ' ⟧ᵉ}}
+         (⟨⟩-≡
+           (wk-⟨⟩-ctx≡split-env-≤ p
+             (≤-trans (∸-monoˡ-≤ τ q) (≤-reflexive (m+n∸n≡m (ctx-time Γ'') τ)))))
+    ⟩
+         (   ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (n≤n∸m+m τ' τ)
+          ∘ᵗ ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (τ' ∸ τ) τ))
+          ∘ᵗ μ {⟦ Γ' ⟧ᵉ})
+      ∘ᵗ ⟨ τ ⟩ᶠ (   ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (∸-monoˡ-≤ τ q) (≤-reflexive (m+n∸n≡m (ctx-time Γ'') τ)))
+                 ∘ᵗ env-ctx-time-⟨⟩ Γ''
+                 ∘ᵗ split-env p)
+   ≡⟨ ∘ᵗ-congʳ {h = ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (n≤n∸m+m τ' τ) ∘ᵗ ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (τ' ∸ τ) τ)) ∘ᵗ μ {⟦ Γ' ⟧ᵉ}}
+         (⟨⟩-∘
+           (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (∸-monoˡ-≤ τ q) (≤-reflexive (m+n∸n≡m (ctx-time Γ'') τ))))
+           (env-ctx-time-⟨⟩ Γ'' ∘ᵗ split-env p))
+    ⟩
+         (   ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (n≤n∸m+m τ' τ)
+          ∘ᵗ ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (τ' ∸ τ) τ))
+          ∘ᵗ μ {⟦ Γ' ⟧ᵉ})
+      ∘ᵗ ⟨ τ ⟩ᶠ (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (∸-monoˡ-≤ τ q) (≤-reflexive (m+n∸n≡m (ctx-time Γ'') τ))))
+      ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ'' ∘ᵗ split-env p)
+   ≡⟨ ∘ᵗ-congʳ {h = ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (n≤n∸m+m τ' τ) ∘ᵗ ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (τ' ∸ τ) τ)) ∘ᵗ μ {⟦ Γ' ⟧ᵉ}}
+        (∘ᵗ-congʳ {h = ⟨ τ ⟩ᶠ (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (∸-monoˡ-≤ τ q) (≤-reflexive (m+n∸n≡m (ctx-time Γ'') τ))))}
+          (⟨⟩-∘ (env-ctx-time-⟨⟩ Γ'') (split-env p)))
+    ⟩
+         (   ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (n≤n∸m+m τ' τ)
+          ∘ᵗ ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (τ' ∸ τ) τ))
+          ∘ᵗ μ {⟦ Γ' ⟧ᵉ})
+      ∘ᵗ ⟨ τ ⟩ᶠ (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (∸-monoˡ-≤ τ q) (≤-reflexive (m+n∸n≡m (ctx-time Γ'') τ))))
+      ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ'')
+      ∘ᵗ ⟨ τ ⟩ᶠ (split-env p)
+   ≡⟨ {!!}
+    ⟩
+        ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q
+     ∘ᵗ (   ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-reflexive (+-comm (ctx-time Γ'') τ))
+         ∘ᵗ μ {⟦ Γ' ⟧ᵉ}
+         ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ''))
+     ∘ᵗ ⟨ τ ⟩ᶠ (split-env p)
+   ∎

@@ -108,9 +108,17 @@ module Semantics.Modality.Past where
 ⟨⟩-id : ∀ {A τ} → ⟨ τ ⟩ᶠ (idᵗ {A = A}) ≡ᵗ idᵗ
 ⟨⟩-id = eqᵗ (λ {t} x → refl)
 
-⟨⟩-∘ : ∀ {A B C τ} → (f : A →ᵗ B) → (g : B →ᵗ C)
+⟨⟩-∘ : ∀ {A B C τ} → (g : B →ᵗ C) → (f : A →ᵗ B)
      → ⟨ τ ⟩ᶠ (g ∘ᵗ f) ≡ᵗ ⟨ τ ⟩ᶠ g ∘ᵗ ⟨ τ ⟩ᶠ f
-⟨⟩-∘ f g = eqᵗ (λ {t} x → refl)
+⟨⟩-∘ g f = eqᵗ (λ {t} x → refl)
+
+⟨⟩-≡ : ∀ {A B τ} {f g : A →ᵗ B}
+     → f ≡ᵗ g
+     → ⟨ τ ⟩ᶠ f ≡ᵗ ⟨ τ ⟩ᶠ g
+⟨⟩-≡ p = eqᵗ (λ x →
+  cong₂ _,_
+    refl
+    (cong-app (fun-ext (prf p)) (proj₂ x)))
 
 -- ⟨⟩-≤ is natural
 

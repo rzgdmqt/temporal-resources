@@ -65,7 +65,7 @@ record _≡ᵗ_ {A B : TSet} (f g : A →ᵗ B) : Set where
   field
     prf : ∀ {t} → (x : carrier A t) → map-carrier f x ≡ map-carrier g x
 
-open _≡ᵗ_
+open _≡ᵗ_ public
 
 infix 5 _≡ᵗ_
 
@@ -82,10 +82,10 @@ infix 5 _≡ᵗ_
 
 ≡ᵗ-refl : ∀ {A B} {f : A →ᵗ B} → f ≡ᵗ f
 ≡ᵗ-refl = eqᵗ (λ x → refl)
-
+ 
 ≡ᵗ-sym : ∀ {A B} {f g : A →ᵗ B} → f ≡ᵗ g → g ≡ᵗ f
 ≡ᵗ-sym p = eqᵗ (λ x → sym (prf p x))
-
+ 
 ≡ᵗ-trans : ∀ {A B} {f g h : A →ᵗ B} → f ≡ᵗ g → g ≡ᵗ h → f ≡ᵗ h
 ≡ᵗ-trans p q = eqᵗ (λ x → trans (prf p x) (prf q x))
 
@@ -138,26 +138,26 @@ infixr 9 _∘ᵗ_
 ∘ᵗ-identityʳ f = eqᵗ (λ x → refl)
 
 ∘ᵗ-assoc : ∀ {A B C D}
-         → (f : A →ᵗ B)
-         → (g : B →ᵗ C)
          → (h : C →ᵗ D)
+         → (g : B →ᵗ C)
+         → (f : A →ᵗ B)
          → (h ∘ᵗ g) ∘ᵗ f ≡ᵗ h ∘ᵗ (g ∘ᵗ f)
-∘ᵗ-assoc f g h = eqᵗ (λ x → refl)
+∘ᵗ-assoc h g f = eqᵗ (λ x → refl)
 
 ∘ᵗ-congˡ : ∀ {A B C}
-         → (f : A →ᵗ B)
+         → {f : A →ᵗ B}
          → {g h : B →ᵗ C}
          → g ≡ᵗ h
          → g ∘ᵗ f ≡ᵗ h ∘ᵗ f
-∘ᵗ-congˡ f p =
+∘ᵗ-congˡ {f = f} p =
   eqᵗ (λ x → cong-app (fun-ext (prf p)) (map-carrier f x))
 
 ∘ᵗ-congʳ : ∀ {A B C}
          → {f g : A →ᵗ B}
-         → (h : B →ᵗ C)
+         → {h : B →ᵗ C}
          → f ≡ᵗ g
          → h ∘ᵗ f ≡ᵗ h ∘ᵗ g
-∘ᵗ-congʳ h p = eqᵗ (λ x → cong (map-carrier h) (prf p x))
+∘ᵗ-congʳ {h = h} p = eqᵗ (λ x → cong (map-carrier h) (prf p x))
 
 -- Product, sum, exponent, etc structures
 
@@ -209,6 +209,18 @@ mapˣᵗ f g = ⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ
 
 ×-assocᵗ⁻¹ : ∀ {A B C} → (A ×ᵗ B) ×ᵗ C →ᵗ A ×ᵗ (B ×ᵗ C)
 ×-assocᵗ⁻¹ = ⟨ fstᵗ ∘ᵗ fstᵗ , ⟨ sndᵗ ∘ᵗ fstᵗ , sndᵗ ⟩ᵗ ⟩ᵗ
+
+⟨⟩ᵗ-fstᵗ : ∀ {A B C}
+         → (f : A →ᵗ B)
+         → (g : A →ᵗ C)
+         → fstᵗ ∘ᵗ ⟨ f , g ⟩ᵗ ≡ᵗ f
+⟨⟩ᵗ-fstᵗ f g = eqᵗ (λ x → refl)
+
+⟨⟩ᵗ-sndᵗ : ∀ {A B C}
+         → (f : A →ᵗ B)
+         → (g : A →ᵗ C)
+         → sndᵗ ∘ᵗ ⟨ f , g ⟩ᵗ ≡ᵗ g
+⟨⟩ᵗ-sndᵗ f g = eqᵗ (λ x → refl)
 
 ---- Set-indexed products
 
