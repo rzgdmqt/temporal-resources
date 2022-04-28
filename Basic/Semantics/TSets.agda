@@ -59,9 +59,6 @@ open _→ᵗ_ public
 
 -- Equality of TSet-morphisms
 
--- _≡ᵗ_ : ∀ {A B} → A →ᵗ B → A →ᵗ B → Set
--- _≡ᵗ_ {A} f g = ∀ {t} → (x : carrier A t) → map-carrier f x ≡ map-carrier g x
-
 record _≡ᵗ_ {A B : TSet} (f g : A →ᵗ B) : Set where
   constructor
     eqᵗ
@@ -81,6 +78,17 @@ infix 5 _≡ᵗ_
       (ifun-ext (fun-ext (prf p)))
       (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ x → uip)))))
 
+-- Reflexivity, symmetry, transitivity
+
+≡ᵗ-refl : ∀ {A B} {f : A →ᵗ B} → f ≡ᵗ f
+≡ᵗ-refl = eqᵗ (λ x → refl)
+
+≡ᵗ-sym : ∀ {A B} {f g : A →ᵗ B} → f ≡ᵗ g → g ≡ᵗ f
+≡ᵗ-sym p = eqᵗ (λ x → sym (prf p x))
+
+≡ᵗ-trans : ∀ {A B} {f g h : A →ᵗ B} → f ≡ᵗ g → g ≡ᵗ h → f ≡ᵗ h
+≡ᵗ-trans p q = eqᵗ (λ x → trans (prf p x) (prf q x))
+
 -- Begin-qed style reasoning for ≡ᵗ
 
 infix  3 _∎
@@ -94,10 +102,10 @@ _≡⟨⟩_ : ∀ {A B} (f {g} : A →ᵗ B) → f ≡ᵗ g → f ≡ᵗ g
 _ ≡⟨⟩ f≡g = f≡g
 
 step-≡ : ∀ {A B} (f {g h} : A →ᵗ B) → g ≡ᵗ h → f ≡ᵗ g → f ≡ᵗ h
-step-≡ _ g≡h f≡g = eqᵗ λ x → trans (prf f≡g x) (prf g≡h x)
+step-≡ _ g≡h f≡g = ≡ᵗ-trans f≡g g≡h
 
 _∎ : ∀ {A B} (f : A →ᵗ B) → f ≡ᵗ f
-_∎ _ = eqᵗ λ x → refl
+_∎ _ = ≡ᵗ-refl
 
 syntax step-≡ f g≡h f≡g = f ≡⟨ f≡g ⟩ g≡h
 
@@ -116,6 +124,40 @@ g ∘ᵗ f =
         (map-nat g p (map-carrier f x)))
 
 infixr 9 _∘ᵗ_
+
+-- Identity, associativity, and congruence laws
+
+∘ᵗ-identityˡ : ∀ {A B}
+             → (f : A →ᵗ B)
+             → idᵗ ∘ᵗ f ≡ᵗ f
+∘ᵗ-identityˡ f = eqᵗ (λ x → refl)
+
+∘ᵗ-identityʳ : ∀ {A B}
+             → (f : A →ᵗ B)
+             → f ∘ᵗ idᵗ ≡ᵗ f
+∘ᵗ-identityʳ f = eqᵗ (λ x → refl)
+
+∘ᵗ-assoc : ∀ {A B C D}
+         → (f : A →ᵗ B)
+         → (g : B →ᵗ C)
+         → (h : C →ᵗ D)
+         → (h ∘ᵗ g) ∘ᵗ f ≡ᵗ h ∘ᵗ (g ∘ᵗ f)
+∘ᵗ-assoc f g h = eqᵗ (λ x → refl)
+
+∘ᵗ-congˡ : ∀ {A B C}
+         → (f : A →ᵗ B)
+         → {g h : B →ᵗ C}
+         → g ≡ᵗ h
+         → g ∘ᵗ f ≡ᵗ h ∘ᵗ f
+∘ᵗ-congˡ f p =
+  eqᵗ (λ x → cong-app (fun-ext (prf p)) (map-carrier f x))
+
+∘ᵗ-congʳ : ∀ {A B C}
+         → {f g : A →ᵗ B}
+         → (h : B →ᵗ C)
+         → f ≡ᵗ g
+         → h ∘ᵗ f ≡ᵗ h ∘ᵗ g
+∘ᵗ-congʳ h p = eqᵗ (λ x → cong (map-carrier h) (prf p x))
 
 -- Product, sum, exponent, etc structures
 

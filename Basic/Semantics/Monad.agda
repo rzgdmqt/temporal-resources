@@ -63,7 +63,7 @@ postulate
 
   -- Strength
 
-  strᵀ : ∀ {A B τ τ'} → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
+  strᵀ : ∀ {A B τ} → [ τ ]ᵒ A ×ᵗ Tᵒ B τ →ᵗ Tᵒ (A ×ᵗ B) τ
 
   -- Algebraic operations
 

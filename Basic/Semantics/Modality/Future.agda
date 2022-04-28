@@ -112,110 +112,120 @@ module Semantics.Modality.Future where
 -- [_] is functorial
 
 []-id : ∀ {A τ} → [ τ ]ᶠ (idᵗ {A = A}) ≡ᵗ idᵗ
-[]-id x = refl
+[]-id = eqᵗ (λ {t} x → refl)
 
 []-∘ : ∀ {A B C τ} → (f : A →ᵗ B) → (g : B →ᵗ C)
      → [ τ ]ᶠ (g ∘ᵗ f) ≡ᵗ [ τ ]ᶠ g ∘ᵗ [ τ ]ᶠ f
-[]-∘ f g x = refl
+[]-∘ f g = eqᵗ (λ {t} x → refl)
 
 -- []-≤ is natural
 
 []-≤-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B) → (p : τ₁ ≤ τ₂)
          → [ τ₂ ]ᶠ f ∘ᵗ []-≤ {A = A} p ≡ᵗ []-≤ {A = B} p ∘ᵗ [ τ₁ ]ᶠ f
-[]-≤-nat f p x = map-nat f (+-mono-≤ (≤-reflexive refl) p) x
+[]-≤-nat f p = eqᵗ (λ {t} x → map-nat f (+-mono-≤ (≤-reflexive refl) p) x)
 
 -- [_] is functorial in the gradings
 
 []-≤-refl : ∀ {A τ} → []-≤ {A} (≤-refl {τ}) ≡ᵗ idᵗ
-[]-≤-refl {A} x = 
-  trans
-    (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-    (monotone-refl A x)
+[]-≤-refl {A} =
+  eqᵗ (λ {t} x → 
+    trans
+      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+      (monotone-refl A x))
 
 []-≤-trans : ∀ {A τ τ' τ''} → (p : τ ≤ τ') → (q : τ' ≤ τ'')
            → []-≤ {A} q ∘ᵗ []-≤ {A} p ≡ᵗ []-≤ {A} (≤-trans p q)
-[]-≤-trans {A} p q x =
-  trans
-    (monotone-trans A _ _ x)
-    (cong (λ r → monotone A r x) (≤-irrelevant _ _))
+[]-≤-trans {A} p q =
+  eqᵗ (λ {t} x → 
+    trans
+      (monotone-trans A _ _ x)
+      (cong (λ r → monotone A r x) (≤-irrelevant _ _)))
 
 -- ε and ε⁻¹ are natural
 
 []-ε-nat : ∀ {A B} → (f : A →ᵗ B)
          → f ∘ᵗ ε ≡ᵗ ε ∘ᵗ [ 0 ]ᶠ f
-[]-ε-nat f {t} x = map-nat f (≤-reflexive (+-identityʳ t)) x
+[]-ε-nat f =
+  eqᵗ (λ {t} x → map-nat f (≤-reflexive (+-identityʳ t)) x)
 
 []-ε⁻¹-nat : ∀ {A B} → (f : A →ᵗ B)
            → [ 0 ]ᶠ f ∘ᵗ ε⁻¹ ≡ᵗ ε⁻¹ ∘ᵗ f
-[]-ε⁻¹-nat f {t} x = map-nat f (≤-reflexive (sym (+-identityʳ t))) x
+[]-ε⁻¹-nat f =
+  eqᵗ (λ {t} x → map-nat f (≤-reflexive (sym (+-identityʳ t))) x)
 
 -- δ is natural
 
 []-δ-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
          → [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f) ∘ᵗ δ {A} ≡ᵗ δ {B} ∘ᵗ [ τ₁ + τ₂ ]ᶠ f
-[]-δ-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} x =
-  map-nat f (≤-reflexive (sym (+-assoc t τ₁ τ₂))) x
+[]-δ-nat {τ₁ = τ₁} {τ₂ = τ₂} f =
+  eqᵗ (λ {t} x → map-nat f (≤-reflexive (sym (+-assoc t τ₁ τ₂))) x)
 
 []-δ-≤ : ∀ {A τ₁ τ₂ τ₁' τ₂'} → (p : τ₁ ≤ τ₁') → (q : τ₂ ≤ τ₂')
        → [ τ₁' ]ᶠ ([]-≤ {A} q) ∘ᵗ []-≤ {[ τ₂ ]ᵒ A} p ∘ᵗ δ {A = A}
        ≡ᵗ δ {A} ∘ᵗ []-≤ {A} (+-mono-≤ p q)
-[]-δ-≤ {A} p q x =
-  trans
-    (monotone-trans A _ _ _)
-    (trans
+[]-δ-≤ {A} p q =
+  eqᵗ (λ {t} x →
+    trans
       (monotone-trans A _ _ _)
       (trans
-        (cong (λ r → monotone A r x) (≤-irrelevant _ _))
-        (sym (monotone-trans A _ _ _))))
+        (monotone-trans A _ _ _)
+        (trans
+          (cong (λ r → monotone A r x) (≤-irrelevant _ _))
+          (sym (monotone-trans A _ _ _)))))
 
 -- ε is invertible
 
 []-ε∘ε⁻¹≡id : ∀ {A} → ε {A} ∘ᵗ ε⁻¹ ≡ᵗ idᵗ
-[]-ε∘ε⁻¹≡id {A} x =
-  trans
-    (monotone-trans A _ _ x)
-    (trans
-      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-      (monotone-refl A x))
+[]-ε∘ε⁻¹≡id {A} =
+  eqᵗ (λ {t} x →
+    trans
+      (monotone-trans A _ _ x)
+      (trans
+        (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+        (monotone-refl A x)))
 
 []-ε⁻¹∘ε≡id : ∀ {A} → ε⁻¹ {A} ∘ᵗ ε ≡ᵗ idᵗ
-[]-ε⁻¹∘ε≡id {A} x =
-  trans
-    (monotone-trans A _ _ x)
-    (trans
-      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-      (monotone-refl A x))
+[]-ε⁻¹∘ε≡id {A} =
+  eqᵗ (λ {t} x →
+    trans
+      (monotone-trans A _ _ x)
+      (trans
+        (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+        (monotone-refl A x)))
 
 -- Graded comonad laws
 
 []-ε∘δ≡id : ∀ {A τ} → ε ∘ᵗ δ {A} {0} {τ} ≡ᵗ idᵗ
-[]-ε∘δ≡id {A} {τ} x =
-  trans
-    (monotone-trans A _ _ x)
-    (trans
-      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-      (monotone-refl A x))
+[]-ε∘δ≡id {A} {τ} =
+  eqᵗ (λ {t} x →
+    trans
+      (monotone-trans A _ _ x)
+      (trans
+        (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+        (monotone-refl A x)))
 
 []-Dε∘δ≡≤ : ∀ {A τ}
           → [ τ ]ᶠ (ε {A}) ∘ᵗ δ {A} {τ} {0}
           ≡ᵗ []-≤ {A} (≤-reflexive (+-identityʳ τ))
-[]-Dε∘δ≡≤ {A} x =
-  trans
-    (monotone-trans A _ _ x)
-    (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+[]-Dε∘δ≡≤ {A} =
+  eqᵗ (λ {t} x →
+    trans
+      (monotone-trans A _ _ x)
+      (cong (λ p → monotone A p x) (≤-irrelevant _ _)))
              
 []-δ∘δ≡Dδ∘δ∘≤ : ∀ {A τ₁ τ₂ τ₃}
               → δ {[ τ₃ ]ᵒ A} {τ₁} {τ₂} ∘ᵗ δ {A} {τ₁ + τ₂} {τ₃}
               ≡ᵗ    [ τ₁ ]ᶠ (δ {A} {τ₂} {τ₃}) ∘ᵗ δ {A} {τ₁} {τ₂ + τ₃}
                  ∘ᵗ []-≤ {A} (≤-reflexive (+-assoc τ₁ τ₂ τ₃))
-[]-δ∘δ≡Dδ∘δ∘≤ {A} x =
-  trans
-    (monotone-trans A _ _ x)
-    (trans
+[]-δ∘δ≡Dδ∘δ∘≤ {A} =
+  eqᵗ (λ {t} x →
+    trans
+      (monotone-trans A _ _ x)
       (trans
-        (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-        (sym (monotone-trans A _ _ _)))
-      (sym (monotone-trans A _ _ _)))
+        (trans
+          (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+          (sym (monotone-trans A _ _ _)))
+        (sym (monotone-trans A _ _ _))))
 
 -- In this concrete semantics, ⟨_⟩ is in fact strong monoidal
 
@@ -232,22 +242,24 @@ module Semantics.Modality.Future where
 
 []-δ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
            → [ τ₁ + τ₂ ]ᶠ f ∘ᵗ δ⁻¹ {A} ≡ᵗ δ⁻¹ {B} ∘ᵗ [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f)
-[]-δ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f {t} x =
-  map-nat f (≤-reflexive (+-assoc t τ₁ τ₂)) x
+[]-δ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f =
+  eqᵗ (λ {t} x → map-nat f (≤-reflexive (+-assoc t τ₁ τ₂)) x)
 
 []-δ∘δ⁻¹≡id : ∀ {A τ₁ τ₂} → δ {A} {τ₁} {τ₂} ∘ᵗ δ⁻¹ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
-[]-δ∘δ⁻¹≡id {A} {τ₁} {τ₂} x =
-  trans
-    (monotone-trans A _ _ x)
-    (trans
-      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-      (monotone-refl A x))
+[]-δ∘δ⁻¹≡id {A} {τ₁} {τ₂} =
+  eqᵗ (λ {t} x →
+    trans
+      (monotone-trans A _ _ x)
+      (trans
+        (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+        (monotone-refl A x)))
 
 []-δ⁻¹∘δ≡id : ∀ {A τ₁ τ₂} → δ⁻¹ {A} {τ₁} {τ₂} ∘ᵗ δ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
-[]-δ⁻¹∘δ≡id {A} {τ₁} {τ₂} x =
-  trans
-    (monotone-trans A _ _ x)
-    (trans
-      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-      (monotone-refl A x))
+[]-δ⁻¹∘δ≡id {A} {τ₁} {τ₂} =
+  eqᵗ (λ {t} x →
+    trans
+      (monotone-trans A _ _ x)
+      (trans
+        (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+        (monotone-refl A x)))
 
