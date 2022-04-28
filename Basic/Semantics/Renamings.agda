@@ -67,7 +67,7 @@ wk-⟨⟩-ctx≡split-env-≤ {Γ' = Γ'} split-[] z≤n =
      ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} ≤-refl ∘ᵗ η
    ≡⟨ ∘ᵗ-congˡ (⟨⟩-≤-≡ {⟦ Γ' ⟧ᵉ} ≤-refl z≤n) ⟩
      ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} z≤n ∘ᵗ η
-   ≡⟨ ≡ᵗ-sym (∘ᵗ-identityʳ (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} z≤n ∘ᵗ η)) ⟩
+   ≡⟨ ∘ᵗ-congʳ (≡ᵗ-sym (∘ᵗ-identityʳ η)) ⟩
      ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} z≤n ∘ᵗ η ∘ᵗ idᵗ
    ∎
 
@@ -75,6 +75,10 @@ wk-⟨⟩-ctx≡split-env-≤ {Γ' = Γ'} {Γ'' = Γ'' ∷ A} (split-∷ p) q =
   begin
     ⟦ wk-⟨⟩-ctx-ren p q ⟧ʳ ∘ᵗ fstᵗ
   ≡⟨ ∘ᵗ-congˡ (wk-⟨⟩-ctx≡split-env-≤ p q) ⟩
+    (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q ∘ᵗ (env-ctx-time-⟨⟩ Γ'' ∘ᵗ split-env p)) ∘ᵗ fstᵗ
+  ≡⟨ ∘ᵗ-assoc (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q) (env-ctx-time-⟨⟩ Γ'' ∘ᵗ split-env p) fstᵗ ⟩
+    ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q ∘ᵗ ((env-ctx-time-⟨⟩ Γ'' ∘ᵗ split-env p) ∘ᵗ fstᵗ)
+  ≡⟨ ∘ᵗ-congʳ {h = ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q} (∘ᵗ-assoc (env-ctx-time-⟨⟩ Γ'') (split-env p) fstᵗ) ⟩
     ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q ∘ᵗ (env-ctx-time-⟨⟩ Γ'' ∘ᵗ (split-env p ∘ᵗ fstᵗ))
   ≡⟨ ∘ᵗ-congʳ {h = ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} q}
        (∘ᵗ-congʳ {h = env-ctx-time-⟨⟩ Γ''}

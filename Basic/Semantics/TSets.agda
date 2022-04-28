@@ -80,14 +80,15 @@ infix 5 _≡ᵗ_
 
 -- Reflexivity, symmetry, transitivity
 
-≡ᵗ-refl : ∀ {A B} {f : A →ᵗ B} → f ≡ᵗ f
-≡ᵗ-refl = eqᵗ (λ x → refl)
- 
-≡ᵗ-sym : ∀ {A B} {f g : A →ᵗ B} → f ≡ᵗ g → g ≡ᵗ f
-≡ᵗ-sym p = eqᵗ (λ x → sym (prf p x))
- 
-≡ᵗ-trans : ∀ {A B} {f g h : A →ᵗ B} → f ≡ᵗ g → g ≡ᵗ h → f ≡ᵗ h
-≡ᵗ-trans p q = eqᵗ (λ x → trans (prf p x) (prf q x))
+abstract
+  ≡ᵗ-refl : ∀ {A B} {f : A →ᵗ B} → f ≡ᵗ f
+  ≡ᵗ-refl = eqᵗ (λ x → refl)
+   
+  ≡ᵗ-sym : ∀ {A B} {f g : A →ᵗ B} → f ≡ᵗ g → g ≡ᵗ f
+  ≡ᵗ-sym p = eqᵗ (λ x → sym (prf p x))
+   
+  ≡ᵗ-trans : ∀ {A B} {f g h : A →ᵗ B} → f ≡ᵗ g → g ≡ᵗ h → f ≡ᵗ h
+  ≡ᵗ-trans p q = eqᵗ (λ x → trans (prf p x) (prf q x))
 
 -- Begin-qed style reasoning for ≡ᵗ
 
@@ -111,227 +112,246 @@ syntax step-≡ f g≡h f≡g = f ≡⟨ f≡g ⟩ g≡h
 
 -- Identity and composition of maps
 
-idᵗ : ∀ {A} → A →ᵗ A
-idᵗ = tset-map id (λ p x → refl)
+abstract
+  idᵗ : ∀ {A} → A →ᵗ A
+  idᵗ = tset-map id (λ p x → refl)
+   
+  _∘ᵗ_ : ∀ {A B C} → B →ᵗ C → A →ᵗ B → A →ᵗ C
+  g ∘ᵗ f =
+    tset-map
+      (map-carrier g ∘ map-carrier f)
+      (λ p x →
+        trans
+          (cong (λ y → map-carrier g y) (map-nat f p x))
+          (map-nat g p (map-carrier f x)))
 
-_∘ᵗ_ : ∀ {A B C} → B →ᵗ C → A →ᵗ B → A →ᵗ C
-g ∘ᵗ f =
-  tset-map
-    (map-carrier g ∘ map-carrier f)
-    (λ p x →
-      trans
-        (cong (λ y → map-carrier g y) (map-nat f p x))
-        (map-nat g p (map-carrier f x)))
+  idᵗ-reveal : ∀ {A}
+             → ∀ {t} → (x : carrier A t) → map-carrier (idᵗ {A}) x ≡ x
+  idᵗ-reveal x = refl
+
+  ∘ᵗ-reveal : ∀ {A B C} → (g : B →ᵗ C) → (f : A →ᵗ B)
+            → ∀ {t} → (x : carrier A t) → map-carrier (g ∘ᵗ f) x ≡ map-carrier g (map-carrier f x)
+  ∘ᵗ-reveal g f x = refl
 
 infixr 9 _∘ᵗ_
 
 -- Identity, associativity, and congruence laws
 
-∘ᵗ-identityˡ : ∀ {A B}
-             → (f : A →ᵗ B)
-             → idᵗ ∘ᵗ f ≡ᵗ f
-∘ᵗ-identityˡ f = eqᵗ (λ x → refl)
-
-∘ᵗ-identityʳ : ∀ {A B}
-             → (f : A →ᵗ B)
-             → f ∘ᵗ idᵗ ≡ᵗ f
-∘ᵗ-identityʳ f = eqᵗ (λ x → refl)
-
-∘ᵗ-assoc : ∀ {A B C D}
-         → (h : C →ᵗ D)
-         → (g : B →ᵗ C)
-         → (f : A →ᵗ B)
-         → (h ∘ᵗ g) ∘ᵗ f ≡ᵗ h ∘ᵗ (g ∘ᵗ f)
-∘ᵗ-assoc h g f = eqᵗ (λ x → refl)
-
-∘ᵗ-congˡ : ∀ {A B C}
-         → {f : A →ᵗ B}
-         → {g h : B →ᵗ C}
-         → g ≡ᵗ h
-         → g ∘ᵗ f ≡ᵗ h ∘ᵗ f
-∘ᵗ-congˡ {f = f} p =
-  eqᵗ (λ x → cong-app (fun-ext (prf p)) (map-carrier f x))
-
-∘ᵗ-congʳ : ∀ {A B C}
-         → {f g : A →ᵗ B}
-         → {h : B →ᵗ C}
-         → f ≡ᵗ g
-         → h ∘ᵗ f ≡ᵗ h ∘ᵗ g
-∘ᵗ-congʳ {h = h} p = eqᵗ (λ x → cong (map-carrier h) (prf p x))
+abstract
+  ∘ᵗ-identityˡ : ∀ {A B}
+               → (f : A →ᵗ B)
+               → idᵗ ∘ᵗ f ≡ᵗ f
+  ∘ᵗ-identityˡ f = eqᵗ (λ x → refl)
+   
+  ∘ᵗ-identityʳ : ∀ {A B}
+               → (f : A →ᵗ B)
+               → f ∘ᵗ idᵗ ≡ᵗ f
+  ∘ᵗ-identityʳ f = eqᵗ (λ x → refl)
+   
+  ∘ᵗ-assoc : ∀ {A B C D}
+           → (h : C →ᵗ D)
+           → (g : B →ᵗ C)
+           → (f : A →ᵗ B)
+           → (h ∘ᵗ g) ∘ᵗ f ≡ᵗ h ∘ᵗ (g ∘ᵗ f)
+  ∘ᵗ-assoc h g f = eqᵗ (λ x → refl)
+   
+  ∘ᵗ-congˡ : ∀ {A B C}
+           → {f : A →ᵗ B}
+           → {g h : B →ᵗ C}
+           → g ≡ᵗ h
+           → g ∘ᵗ f ≡ᵗ h ∘ᵗ f
+  ∘ᵗ-congˡ {f = f} p =
+    eqᵗ (λ x → cong-app (fun-ext (prf p)) (map-carrier f x))
+   
+  ∘ᵗ-congʳ : ∀ {A B C}
+           → {f g : A →ᵗ B}
+           → {h : B →ᵗ C}
+           → f ≡ᵗ g
+           → h ∘ᵗ f ≡ᵗ h ∘ᵗ g
+  ∘ᵗ-congʳ {h = h} p =
+    eqᵗ (λ x → cong (map-carrier h) (prf p x))
 
 -- Product, sum, exponent, etc structures
 
 ---- terminal object
 
-𝟙ᵗ : TSet
-𝟙ᵗ = tset (λ _ → ⊤) (λ _ → id) (λ _ → refl) (λ _ _ _ → refl)
-
-terminalᵗ : ∀ {A} → A →ᵗ 𝟙ᵗ
-terminalᵗ = tset-map (λ _ → tt) (λ p x → refl)
+abstract
+  𝟙ᵗ : TSet
+  𝟙ᵗ = tset (λ _ → ⊤) (λ _ → id) (λ _ → refl) (λ _ _ _ → refl)
+   
+  terminalᵗ : ∀ {A} → A →ᵗ 𝟙ᵗ
+  terminalᵗ = tset-map (λ _ → tt) (λ p x → refl)
 
 ---- initial object
 
-𝟘ᵗ : TSet
-𝟘ᵗ = tset (λ _ → ⊥) (λ _ → id) (λ _ → refl) (λ _ _ _ → refl)
-
-initialᵗ : ∀ {A} → 𝟘ᵗ →ᵗ A
-initialᵗ = tset-map (λ ()) (λ { p () })
+abstract
+  𝟘ᵗ : TSet
+  𝟘ᵗ = tset (λ _ → ⊥) (λ _ → id) (λ _ → refl) (λ _ _ _ → refl)
+   
+  initialᵗ : ∀ {A} → 𝟘ᵗ →ᵗ A
+  initialᵗ = tset-map (λ ()) (λ { p () })
 
 ---- binary products
-
-_×ᵗ_ : TSet → TSet → TSet
-A ×ᵗ B =
-  tset
-    (λ t → carrier A t × carrier B t)
-    (λ p → mapˣ (monotone A p) (monotone B p))
-    (λ x → cong₂ _,_ (monotone-refl A (proj₁ x)) (monotone-refl B (proj₂ x)))
-    (λ p q x → cong₂ _,_ (monotone-trans A p q (proj₁ x)) (monotone-trans B p q (proj₂ x)))
+abstract
+  _×ᵗ_ : TSet → TSet → TSet
+  A ×ᵗ B =
+    tset
+      (λ t → carrier A t × carrier B t)
+      (λ p → mapˣ (monotone A p) (monotone B p))
+      (λ x → cong₂ _,_ (monotone-refl A (proj₁ x)) (monotone-refl B (proj₂ x)))
+      (λ p q x → cong₂ _,_ (monotone-trans A p q (proj₁ x)) (monotone-trans B p q (proj₂ x)))
 
 infixr 23 _×ᵗ_
 
-fstᵗ : ∀ {A B} → A ×ᵗ B →ᵗ A
-fstᵗ = tset-map proj₁ (λ { p (x , y) → refl })
-
-sndᵗ : ∀ {A B} → A ×ᵗ B →ᵗ B
-sndᵗ = tset-map proj₂ (λ { p (x , y) → refl })
-
-⟨_,_⟩ᵗ : ∀ {A B C} → A →ᵗ B → A →ᵗ C → A →ᵗ B ×ᵗ C
-⟨ f , g ⟩ᵗ =
-  tset-map
-    < map-carrier f , map-carrier g >
-    (λ p x → cong₂ _,_ (map-nat f p x) (map-nat g p x))
-
+abstract
+  fstᵗ : ∀ {A B} → A ×ᵗ B →ᵗ A
+  fstᵗ = tset-map proj₁ (λ { p (x , y) → refl })
+   
+  sndᵗ : ∀ {A B} → A ×ᵗ B →ᵗ B
+  sndᵗ = tset-map proj₂ (λ { p (x , y) → refl })
+   
+  ⟨_,_⟩ᵗ : ∀ {A B C} → A →ᵗ B → A →ᵗ C → A →ᵗ B ×ᵗ C
+  ⟨ f , g ⟩ᵗ =
+    tset-map
+      < map-carrier f , map-carrier g >
+      (λ p x → cong₂ _,_ (map-nat f p x) (map-nat g p x))
+   
 mapˣᵗ : ∀ {A B C D} → A →ᵗ C → B →ᵗ D → A ×ᵗ B →ᵗ C ×ᵗ D
 mapˣᵗ f g = ⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ
-
+ 
 ×-assocᵗ : ∀ {A B C} → A ×ᵗ (B ×ᵗ C) →ᵗ (A ×ᵗ B) ×ᵗ C
 ×-assocᵗ = ⟨ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ , sndᵗ ∘ᵗ sndᵗ ⟩ᵗ
-
+ 
 ×-assocᵗ⁻¹ : ∀ {A B C} → (A ×ᵗ B) ×ᵗ C →ᵗ A ×ᵗ (B ×ᵗ C)
 ×-assocᵗ⁻¹ = ⟨ fstᵗ ∘ᵗ fstᵗ , ⟨ sndᵗ ∘ᵗ fstᵗ , sndᵗ ⟩ᵗ ⟩ᵗ
 
-⟨⟩ᵗ-fstᵗ : ∀ {A B C}
-         → (f : A →ᵗ B)
-         → (g : A →ᵗ C)
-         → fstᵗ ∘ᵗ ⟨ f , g ⟩ᵗ ≡ᵗ f
-⟨⟩ᵗ-fstᵗ f g = eqᵗ (λ x → refl)
-
-⟨⟩ᵗ-sndᵗ : ∀ {A B C}
-         → (f : A →ᵗ B)
-         → (g : A →ᵗ C)
-         → sndᵗ ∘ᵗ ⟨ f , g ⟩ᵗ ≡ᵗ g
-⟨⟩ᵗ-sndᵗ f g = eqᵗ (λ x → refl)
+abstract
+  ⟨⟩ᵗ-fstᵗ : ∀ {A B C}
+           → (f : A →ᵗ B)
+           → (g : A →ᵗ C)
+           → fstᵗ ∘ᵗ ⟨ f , g ⟩ᵗ ≡ᵗ f
+  ⟨⟩ᵗ-fstᵗ f g = eqᵗ (λ x → refl)
+   
+  ⟨⟩ᵗ-sndᵗ : ∀ {A B C}
+           → (f : A →ᵗ B)
+           → (g : A →ᵗ C)
+           → sndᵗ ∘ᵗ ⟨ f , g ⟩ᵗ ≡ᵗ g
+  ⟨⟩ᵗ-sndᵗ f g = eqᵗ (λ x → refl)
 
 ---- Set-indexed products
 
-Π : (I : Set) → (I → TSet) → TSet
-Π I A =
-  tset
-    (λ τ → (i : I) → carrier (A i) τ)
-    (λ p f i → monotone (A i) p (f i))
-    (λ f → fun-ext (λ i → monotone-refl (A i) (f i)))
-    (λ p q f → fun-ext (λ i → monotone-trans (A i) p q (f i)))
-
-projᵗ : ∀ {I A} → (i : I) → Π I A →ᵗ A i
-projᵗ i =
-  tset-map
-    (λ f → f i)
-    (λ p f → refl)
-    
-⟨_⟩ᵢᵗ : ∀ {A I B} → ((i : I) → A →ᵗ B i) → A →ᵗ Π I B
-⟨ fs ⟩ᵢᵗ =
-  tset-map
-    (λ x i → map-carrier (fs i) x)
-    (λ p x → fun-ext (λ i → map-nat (fs i) p x))
-
+abstract
+  Π : (I : Set) → (I → TSet) → TSet
+  Π I A =
+    tset
+      (λ τ → (i : I) → carrier (A i) τ)
+      (λ p f i → monotone (A i) p (f i))
+      (λ f → fun-ext (λ i → monotone-refl (A i) (f i)))
+      (λ p q f → fun-ext (λ i → monotone-trans (A i) p q (f i)))
+   
+  projᵗ : ∀ {I A} → (i : I) → Π I A →ᵗ A i
+  projᵗ i =
+    tset-map
+      (λ f → f i)
+      (λ p f → refl)
+      
+  ⟨_⟩ᵢᵗ : ∀ {A I B} → ((i : I) → A →ᵗ B i) → A →ᵗ Π I B
+  ⟨ fs ⟩ᵢᵗ =
+    tset-map
+      (λ x i → map-carrier (fs i) x)
+      (λ p x → fun-ext (λ i → map-nat (fs i) p x))
+   
 mapⁱˣᵗ : ∀ {I A B} → ((i : I) → A i →ᵗ B i) → Π I A →ᵗ Π I B
 mapⁱˣᵗ fs = ⟨ (λ i → fs i ∘ᵗ projᵗ i) ⟩ᵢᵗ
 
 ---- covariant hom-functor
 
-homᵒ : Time → TSet
-homᵒ t =
-  tset
-    (λ t' → t ≤ t')
-    (λ p q → ≤-trans q p)
-    (λ p → ≤-irrelevant _ _)
-    (λ p q r → ≤-irrelevant _ _)
-
-homᶠ : ∀ {t t'} → t ≤ t' → homᵒ t' →ᵗ homᵒ t
-homᶠ p =
-  tset-map
-    (λ q → ≤-trans p q)
-    (λ p q → ≤-irrelevant _ _)
-
-homᶠ-refl : ∀ {t} → homᶠ (≤-refl {t}) ≡ᵗ idᵗ
-homᶠ-refl = eqᵗ λ p → ≤-irrelevant _ _
-
-homᶠ-trans : ∀ {t t' t''}
-           → (p : t ≤ t') → (q : t' ≤ t'')
-           → homᶠ p ∘ᵗ homᶠ q ≡ᵗ homᶠ (≤-trans p q)
-homᶠ-trans p q = eqᵗ (λ r → ≤-irrelevant _ _)
-
-hom-iso-map : ∀ {A t} → carrier A t → homᵒ t →ᵗ A
-hom-iso-map {A} x =
-  tset-map
-    (λ p → monotone A p x)
-    (λ p q → sym (monotone-trans A q p x))
-
-hom-iso-map⁻¹ : ∀ {A t} → homᵒ t →ᵗ A → carrier A t
-hom-iso-map⁻¹ {A} f = map-carrier f ≤-refl
+abstract
+  homᵒ : Time → TSet
+  homᵒ t =
+    tset
+      (λ t' → t ≤ t')
+      (λ p q → ≤-trans q p)
+      (λ p → ≤-irrelevant _ _)
+      (λ p q r → ≤-irrelevant _ _)
+   
+  homᶠ : ∀ {t t'} → t ≤ t' → homᵒ t' →ᵗ homᵒ t
+  homᶠ p =
+    tset-map
+      (λ q → ≤-trans p q)
+      (λ p q → ≤-irrelevant _ _)
+   
+  homᶠ-refl : ∀ {t} → homᶠ (≤-refl {t}) ≡ᵗ idᵗ
+  homᶠ-refl = eqᵗ λ p → ≤-irrelevant _ _
+   
+  homᶠ-trans : ∀ {t t' t''}
+             → (p : t ≤ t') → (q : t' ≤ t'')
+             → homᶠ p ∘ᵗ homᶠ q ≡ᵗ homᶠ (≤-trans p q)
+  homᶠ-trans p q = eqᵗ (λ r → ≤-irrelevant _ _)
+   
+  hom-iso-map : ∀ {A t} → carrier A t → homᵒ t →ᵗ A
+  hom-iso-map {A} x =
+    tset-map
+      (λ p → monotone A p x)
+      (λ p q → sym (monotone-trans A q p x))
+   
+  hom-iso-map⁻¹ : ∀ {A t} → homᵒ t →ᵗ A → carrier A t
+  hom-iso-map⁻¹ {A} f = map-carrier f ≤-refl
 
 ---- exponentials
 
-_⇒ᵗ_ : TSet → TSet → TSet
-A ⇒ᵗ B =
-  tset
-    (λ t → homᵒ t ×ᵗ A →ᵗ B)
-    (λ p f → f ∘ᵗ mapˣᵗ (homᶠ p) idᵗ)
-    (λ {t} f →
-      ≡ᵗ-≡ (eqᵗ (λ { (p , x) →
-        cong (λ q → map-carrier f (q , x)) (≤-irrelevant _ _) })))
-    (λ p q f →
-      ≡ᵗ-≡ (eqᵗ (λ { (r , x) →
-        cong (λ s → map-carrier f (s , x)) (≤-irrelevant _ _) })))
+abstract
+  _⇒ᵗ_ : TSet → TSet → TSet
+  A ⇒ᵗ B =
+    tset
+      (λ t → homᵒ t ×ᵗ A →ᵗ B)
+      (λ p f → f ∘ᵗ mapˣᵗ (homᶠ p) idᵗ)
+      (λ {t} f →
+        ≡ᵗ-≡ (eqᵗ (λ { (p , x) →
+          cong (λ q → map-carrier f (q , x)) (≤-irrelevant _ _) })))
+      (λ p q f →
+        ≡ᵗ-≡ (eqᵗ (λ { (r , x) →
+          cong (λ s → map-carrier f (s , x)) (≤-irrelevant _ _) })))
 
 infixr 22 _⇒ᵗ_
 
-appᵗ : ∀ {A B} → (A ⇒ᵗ B) ×ᵗ A →ᵗ B
-appᵗ {A} {B} =
-  tset-map
-    (λ { (f , x) → map-carrier f (≤-refl , x) })
-    (λ { p (f , x) →
-      trans
-        (cong (λ q → map-carrier f (q , monotone A p x)) (≤-irrelevant _ _))
-        (map-nat f p (≤-reflexive refl , x)) })
-
-map⇒ᵗ : ∀ {A B C D} → (A →ᵗ B) → (C →ᵗ D) → B ⇒ᵗ C →ᵗ A ⇒ᵗ D
-map⇒ᵗ f g =
-  tset-map
-    (λ h → g ∘ᵗ h ∘ᵗ mapˣᵗ idᵗ f)
-    (λ p h → ≡ᵗ-≡ (eqᵗ (λ { (q , x) → refl })))
-
-curryᵗ : ∀ {A B C} → A ×ᵗ B →ᵗ C → A →ᵗ B ⇒ᵗ C
-curryᵗ {A} f =
-  tset-map
-    (λ x → f ∘ᵗ mapˣᵗ (hom-iso-map x) idᵗ)
-    (λ p x →
-      ≡ᵗ-≡ (eqᵗ (λ { (q , y) →
-        cong
-          (map-carrier f)
-          (cong (_, y) (monotone-trans A p q x)) })))
-
-uncurryᵗ : ∀ {A B C} → A →ᵗ B ⇒ᵗ C → A ×ᵗ B →ᵗ C
-uncurryᵗ {A} {B} {C} f =
-  tset-map
-    (λ { (x , y) → map-carrier (map-carrier f x) (≤-refl , y) })
-    (λ { p (x , y) →
-      trans
-        (cong
-          (λ z → map-carrier z (≤-reflexive refl , monotone B p y))
-          (map-nat f p x))
-        (trans
+abstract
+  appᵗ : ∀ {A B} → (A ⇒ᵗ B) ×ᵗ A →ᵗ B
+  appᵗ {A} {B} =
+    tset-map
+      (λ { (f , x) → map-carrier f (≤-refl , x) })
+      (λ { p (f , x) →
+        trans
+          (cong (λ q → map-carrier f (q , monotone A p x)) (≤-irrelevant _ _))
+          (map-nat f p (≤-reflexive refl , x)) })
+   
+  map⇒ᵗ : ∀ {A B C D} → (A →ᵗ B) → (C →ᵗ D) → B ⇒ᵗ C →ᵗ A ⇒ᵗ D
+  map⇒ᵗ f g =
+    tset-map
+      (λ h → g ∘ᵗ h ∘ᵗ mapˣᵗ idᵗ f)
+      (λ p h → ≡ᵗ-≡ (eqᵗ (λ { (q , x) → refl })))
+   
+  curryᵗ : ∀ {A B C} → A ×ᵗ B →ᵗ C → A →ᵗ B ⇒ᵗ C
+  curryᵗ {A} f =
+    tset-map
+      (λ x → f ∘ᵗ mapˣᵗ (hom-iso-map x) idᵗ)
+      (λ p x →
+        ≡ᵗ-≡ (eqᵗ (λ { (q , y) →
+          cong
+            (map-carrier f)
+            (cong (_, y) (monotone-trans A p q x)) })))
+   
+  uncurryᵗ : ∀ {A B C} → A →ᵗ B ⇒ᵗ C → A ×ᵗ B →ᵗ C
+  uncurryᵗ {A} {B} {C} f =
+    tset-map
+      (λ { (x , y) → map-carrier (map-carrier f x) (≤-refl , y) })
+      (λ { p (x , y) →
+        trans
           (cong
-            (λ q → map-carrier (map-carrier f x) (q , monotone B p y))
-            (≤-irrelevant _ _))
-          (map-nat (map-carrier f x) p (≤-reflexive refl , y))) })
+            (λ z → map-carrier z (≤-reflexive refl , monotone B p y))
+            (map-nat f p x))
+          (trans
+            (cong
+              (λ q → map-carrier (map-carrier f x) (q , monotone B p y))
+              (≤-irrelevant _ _))
+            (map-nat (map-carrier f x) p (≤-reflexive refl , y))) })

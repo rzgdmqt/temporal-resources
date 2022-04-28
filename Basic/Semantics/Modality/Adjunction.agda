@@ -61,53 +61,82 @@ module Semantics.Modality.Adjunction where
 
 -- η-⊣ is natural
 
-⊣-η-nat : ∀ {A B τ} → (f : A →ᵗ B)
-         → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵗ η-⊣ ≡ᵗ η-⊣ ∘ᵗ f
-⊣-η-nat f = eqᵗ (λ {t} x → cong₂ _,_ refl (map-nat f _ _))
+abstract
+  ⊣-η-nat : ∀ {A B τ} → (f : A →ᵗ B)
+           → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵗ η-⊣ ≡ᵗ η-⊣ ∘ᵗ f
+  ⊣-η-nat f = eqᵗ (λ {t} x →
+    trans
+      (∘ᵗ-reveal _ _ _)
+      (trans
+        (cong₂ _,_ refl (map-nat f _ _))
+        (sym (∘ᵗ-reveal _ _ _))) )
 
 -- ε-⊣ is natural
 
-⊣-ε-nat : ∀ {A B τ} → (f : A →ᵗ B)
-         → f ∘ᵗ ε-⊣ ≡ᵗ ε-⊣ ∘ᵗ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
-⊣-ε-nat f = eqᵗ (λ { {t} (p , x) → map-nat f _ _ })
+abstract
+  ⊣-ε-nat : ∀ {A B τ} → (f : A →ᵗ B)
+           → f ∘ᵗ ε-⊣ ≡ᵗ ε-⊣ ∘ᵗ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
+  ⊣-ε-nat f = eqᵗ (λ { {t} (p , x) →
+    trans
+      (∘ᵗ-reveal _ _ _)
+      (trans
+        (map-nat f _ _)
+        (sym (∘ᵗ-reveal _ _ _))) })
 
 -- Triangle equations of the adjunction
 
-⊣-ε∘Fη≡id : ∀ {A τ} → ε-⊣ {⟨ τ ⟩ᵒ A} ∘ᵗ ⟨ τ ⟩ᶠ (η-⊣ {A}) ≡ᵗ idᵗ
-⊣-ε∘Fη≡id {A} {τ} =
-  eqᵗ (λ {t} x →
-    cong₂ _,_
-      (≤-irrelevant _ _)
-      (trans
-        (monotone-trans A _ _ _)
+abstract
+  ⊣-ε∘Fη≡id : ∀ {A τ} → ε-⊣ {⟨ τ ⟩ᵒ A} ∘ᵗ ⟨ τ ⟩ᶠ (η-⊣ {A}) ≡ᵗ idᵗ
+  ⊣-ε∘Fη≡id {A} {τ} =
+    eqᵗ (λ {t} x →
+      trans
+        (∘ᵗ-reveal _ _ _)
         (trans
-          (cong (λ p → monotone A p (proj₂ x)) (≤-irrelevant _ _))
-          (monotone-refl A (proj₂ x)))))
+          (cong₂ _,_
+            (≤-irrelevant _ _)
+            (trans
+              (monotone-trans A _ _ _)
+              (trans
+                (cong (λ p → monotone A p (proj₂ x)) (≤-irrelevant _ _))
+                (monotone-refl A (proj₂ x)))))
+          (sym (idᵗ-reveal _))))
 
-⊣-Gε∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε-⊣ {A}) ∘ᵗ η-⊣ {[ τ ]ᵒ A} ≡ᵗ idᵗ
-⊣-Gε∘η≡id {A} {τ} =
-  eqᵗ (λ {t} x →
-    trans
-      (monotone-trans A _ _ _)
-      (trans
-        (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-        (monotone-refl A x)))
+  ⊣-Gε∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε-⊣ {A}) ∘ᵗ η-⊣ {[ τ ]ᵒ A} ≡ᵗ idᵗ
+  ⊣-Gε∘η≡id {A} {τ} =
+    eqᵗ (λ {t} x →
+      trans
+        (∘ᵗ-reveal _ _ _)
+        (trans
+          (trans
+            (monotone-trans A _ _ _)
+            (trans
+              (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+              (monotone-refl A x)))
+          (sym (idᵗ-reveal _))))
 
 -- Interaction between η-⊣/ε-⊣ of the adjunction and η/ε of the modalities
 
-⊣-η⊣≡ε⁻¹∘η : ∀ {A} → η-⊣ {A} ≡ᵗ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵗ η {A}
-⊣-η⊣≡ε⁻¹∘η {A} =
-  eqᵗ (λ {t} x →
-    cong₂ _,_
-      (≤-irrelevant _ _)
-      (cong (λ p → monotone A p x) (≤-irrelevant _ _)))
+abstract
+  ⊣-η⊣≡ε⁻¹∘η : ∀ {A} → η-⊣ {A} ≡ᵗ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵗ η {A}
+  ⊣-η⊣≡ε⁻¹∘η {A} =
+    eqᵗ (λ {t} x →
+      trans
+        (cong₂ _,_
+          (≤-irrelevant _ _)
+          (cong (λ p → monotone A p x) (≤-irrelevant _ _)))
+        (sym (∘ᵗ-reveal _ _ _)))
 
-⊣-ε⊣≡ε∘η⁻¹ : ∀ {A} → ε-⊣ {A} ≡ᵗ ε {A} ∘ᵗ η⁻¹ {[ 0 ]ᵒ A}
-⊣-ε⊣≡ε∘η⁻¹ {A} =
-  eqᵗ (λ { {t} (p , x) →
-    cong (λ q → monotone A q x) (≤-irrelevant _ _) })
-
+  ⊣-ε⊣≡ε∘η⁻¹ : ∀ {A} → ε-⊣ {A} ≡ᵗ ε {A} ∘ᵗ η⁻¹ {[ 0 ]ᵒ A}
+  ⊣-ε⊣≡ε∘η⁻¹ {A} =
+    eqᵗ (λ { {t} (p , x) →
+      trans
+        (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+        (sym (∘ᵗ-reveal _ _ _)) })
+      
 -- ...
+
+
+
 
 
 
