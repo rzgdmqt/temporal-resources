@@ -28,33 +28,35 @@ module Semantics.Modality.Adjunction where
 
 -- Unit of the adjunction
 
-η-⊣ : ∀ {A τ} → A →ᵗ [ τ ]ᵒ (⟨ τ ⟩ᵒ A)
-η-⊣ {A} {τ} =
-  tset-map
-    (λ {t'} a →
-      m≤n+m τ t' ,
-      monotone A (≤-reflexive (sym (m+n∸n≡m t' τ))) a)
-    (λ p x →
-      cong₂ _,_
-        (≤-irrelevant _ _)
-        (trans
-          (monotone-trans A _ _ x)
+abstract
+  η-⊣ : ∀ {A τ} → A →ᵗ [ τ ]ᵒ (⟨ τ ⟩ᵒ A)
+  η-⊣ {A} {τ} =
+    tset-map
+      (λ {t'} a →
+        m≤n+m τ t' ,
+        monotone A (≤-reflexive (sym (m+n∸n≡m t' τ))) a)
+      (λ p x →
+        cong₂ _,_
+          (≤-irrelevant _ _)
           (trans
-            (cong (λ s → monotone A s x) (≤-irrelevant _ _))
-            (sym (monotone-trans A _ _ x)))))
+            (monotone-trans A _ _ x)
+            (trans
+              (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+              (sym (monotone-trans A _ _ x)))))
 
 -- Counit of the adjunction
 
-ε-⊣ : ∀ {A τ} → ⟨ τ ⟩ᵒ ([ τ ]ᵒ A) →ᵗ A
-ε-⊣ {A} {τ} =
-  tset-map
-    (λ { {t'} (p , a) → monotone A (n≤m⇒m∸n+n≤m τ t' p) a })
-    (λ { p (q , x) →
-      trans
-        (monotone-trans A _ _ x)
-        (trans
-          (cong (λ s → monotone A s x) (≤-irrelevant _ _))
-          (sym (monotone-trans A _ _ x))) })
+abstract
+  ε-⊣ : ∀ {A τ} → ⟨ τ ⟩ᵒ ([ τ ]ᵒ A) →ᵗ A
+  ε-⊣ {A} {τ} =
+    tset-map
+      (λ { {t'} (p , a) → monotone A (n≤m⇒m∸n+n≤m τ t' p) a })
+      (λ { p (q , x) →
+        trans
+          (monotone-trans A _ _ x)
+          (trans
+            (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+            (sym (monotone-trans A _ _ x))) })
 
 
 -- PROPERTIES
@@ -121,18 +123,29 @@ abstract
   ⊣-η⊣≡ε⁻¹∘η {A} =
     eqᵗ (λ {t} x →
       trans
-        (cong₂ _,_
-          (≤-irrelevant _ _)
-          (cong (λ p → monotone A p x) (≤-irrelevant _ _)))
+        (trans
+          (cong₂ _,_
+            (≤-irrelevant _ _)
+            (trans
+              (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+              (sym (cong (λ (y : carrier (⟨ 0 ⟩ᵒ A) t) →
+                monotone A
+                  (∸-mono {t} {t + 0} {0} (≤-reflexive (sym (+-identityʳ t))) ≤-refl)
+                  (proj₂ y)) (η-reveal _)))))
+          (sym (ε⁻¹-reveal _)))
         (sym (∘ᵗ-reveal _ _ _)))
 
   ⊣-ε⊣≡ε∘η⁻¹ : ∀ {A} → ε-⊣ {A} ≡ᵗ ε {A} ∘ᵗ η⁻¹ {[ 0 ]ᵒ A}
   ⊣-ε⊣≡ε∘η⁻¹ {A} =
     eqᵗ (λ { {t} (p , x) →
       trans
-        (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+        (trans
+          (cong₂ (monotone A)
+            (≤-irrelevant _ _)
+            (sym (η⁻¹-reveal _)))
+          (sym (ε-reveal _)))
         (sym (∘ᵗ-reveal _ _ _)) })
-      
+
 -- ...
 
 

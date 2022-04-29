@@ -71,12 +71,13 @@ infix 5 _≡ᵗ_
 
 -- ≡ᵗ implies ≡
 
-≡ᵗ-≡ : ∀ {A B} → {f : A →ᵗ B} {g : A →ᵗ B} → f ≡ᵗ g → f ≡ g
-≡ᵗ-≡ p =
-  dcong₂
-    tset-map
-      (ifun-ext (fun-ext (prf p)))
-      (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ x → uip)))))
+abstract
+  ≡ᵗ-≡ : ∀ {A B} → {f : A →ᵗ B} {g : A →ᵗ B} → f ≡ᵗ g → f ≡ g
+  ≡ᵗ-≡ p =
+    dcong₂
+      tset-map
+        (ifun-ext (fun-ext (prf p)))
+        (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ x → uip)))))
 
 -- Reflexivity, symmetry, transitivity
 

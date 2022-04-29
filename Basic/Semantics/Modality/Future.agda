@@ -65,40 +65,54 @@ module Semantics.Modality.Future where
 
 -- Counit
 
-ε : ∀ {A} → [ 0 ]ᵒ A →ᵗ A
-ε {A} =
-  tset-map
-    (λ {t} x → monotone A (≤-reflexive (+-identityʳ t)) x)
-    (λ p x →
-      trans
-        (monotone-trans A _ _ x)
-        (trans
-          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
-          (sym (monotone-trans A _ _ x))))
+abstract
+  ε : ∀ {A} → [ 0 ]ᵒ A →ᵗ A
+  ε {A} =
+    tset-map
+      (λ {t} x → monotone A (≤-reflexive (+-identityʳ t)) x)
+      (λ p x →
+        trans
+          (monotone-trans A _ _ x)
+          (trans
+            (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+            (sym (monotone-trans A _ _ x))))
+   
+  ε⁻¹ : ∀ {A} → A →ᵗ [ 0 ]ᵒ A
+  ε⁻¹ {A} =
+    tset-map
+      (λ {t} x → monotone A (≤-reflexive (sym (+-identityʳ t))) x)
+      (λ p x →
+        trans
+          (monotone-trans A _ _ x)
+          (trans
+            (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+            (sym (monotone-trans A _ _ x))))
 
-ε⁻¹ : ∀ {A} → A →ᵗ [ 0 ]ᵒ A
-ε⁻¹ {A} =
-  tset-map
-    (λ {t} x → monotone A (≤-reflexive (sym (+-identityʳ t))) x)
-    (λ p x →
-      trans
-        (monotone-trans A _ _ x)
-        (trans
-          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
-          (sym (monotone-trans A _ _ x))))
+  ε-reveal : ∀ {A t} → (x : carrier ([ 0 ]ᵒ A) t)
+           → map-carrier (ε {A}) x ≡ monotone A (≤-reflexive (+-identityʳ t)) x
+  ε-reveal x = refl
+
+  ε⁻¹-reveal : ∀ {A t} → (x : carrier A t)
+             → map-carrier (ε⁻¹ {A}) x ≡ monotone A (≤-reflexive (sym (+-identityʳ t))) x
+  ε⁻¹-reveal x = refl
 
 -- Comultiplication
 
-δ : ∀ {A τ₁ τ₂} → [ τ₁ + τ₂ ]ᵒ A →ᵗ [ τ₁ ]ᵒ ([ τ₂ ]ᵒ A)
-δ {A} {τ₁} {τ₂} =
-  tset-map
-    (λ {t} x → monotone A (≤-reflexive (sym (+-assoc t τ₁ τ₂))) x)
-    (λ p x →
-      trans
-        (monotone-trans A _ _ x)
-        (trans
-          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
-          (sym (monotone-trans A _ _ x))))
+abstract
+  δ : ∀ {A τ₁ τ₂} → [ τ₁ + τ₂ ]ᵒ A →ᵗ [ τ₁ ]ᵒ ([ τ₂ ]ᵒ A)
+  δ {A} {τ₁} {τ₂} =
+    tset-map
+      (λ {t} x → monotone A (≤-reflexive (sym (+-assoc t τ₁ τ₂))) x)
+      (λ p x →
+        trans
+          (monotone-trans A _ _ x)
+          (trans
+            (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+            (sym (monotone-trans A _ _ x))))
+
+  δ-reveal : ∀ {A τ₁ τ₂ t} → (x : carrier ([ τ₁ + τ₂ ]ᵒ A) t)
+           → map-carrier (δ {A} {τ₁} {τ₂}) x ≡ monotone A (≤-reflexive (sym (+-assoc t τ₁ τ₂))) x
+  δ-reveal x = refl
 
 -- Derived general unit map (a value now is
 -- also available in at most τ time steps)

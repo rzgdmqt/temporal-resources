@@ -66,34 +66,50 @@ module Semantics.Modality.Past where
 
 -- Unit (and its inverse)
 
-η : ∀ {A} → A →ᵗ ⟨ 0 ⟩ᵒ A
-η {A} =
-  tset-map
-    (λ x → z≤n , x)
-    (λ p x → cong (z≤n ,_) (cong (λ q → monotone A q x) (≤-irrelevant _ _)))
+abstract
+  η : ∀ {A} → A →ᵗ ⟨ 0 ⟩ᵒ A
+  η {A} =
+    tset-map
+      (λ x → z≤n , x)
+      (λ p x → cong (z≤n ,_) (cong (λ q → monotone A q x) (≤-irrelevant _ _)))
+   
+  η⁻¹ : ∀ {A} → ⟨ 0 ⟩ᵒ A →ᵗ A
+  η⁻¹ {A} =
+    tset-map
+      (λ { (p , x) → x })
+      (λ { p (q , x) → cong (λ r → monotone A r x) (≤-irrelevant _ _) })
 
-η⁻¹ : ∀ {A} → ⟨ 0 ⟩ᵒ A →ᵗ A
-η⁻¹ {A} =
-  tset-map
-    (λ { (p , x) → x })
-    (λ { p (q , x) → cong (λ r → monotone A r x) (≤-irrelevant _ _) })
+  η-reveal : ∀ {A t} → (x : carrier A t)
+           → map-carrier (η {A}) x ≡ (z≤n , x)
+  η-reveal x = refl
+
+  η⁻¹-reveal : ∀ {A t} → (x : carrier (⟨ 0 ⟩ᵒ A) t)
+             → map-carrier (η⁻¹ {A}) x ≡ proj₂ x
+  η⁻¹-reveal x = refl
 
 -- Multiplication
 
-μ : ∀ {A τ₁ τ₂} → ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A) →ᵗ ⟨ τ₁ + τ₂ ⟩ᵒ A
-μ {A} {τ₁} {τ₂} =
-  tset-map
-    (λ { {t} (p , q , x) → n≤k⇒m≤k∸n⇒n+m≤k τ₁ τ₂ t p q ,
-                           monotone A (≤-reflexive (n∸m∸k≡n∸m+k t τ₁ τ₂)) x })
-    (λ { p (q , r , x) →
-      cong₂ _,_
-        (≤-irrelevant _ _)
-        (trans
-          (monotone-trans A _ _ x)
+abstract
+  μ : ∀ {A τ₁ τ₂} → ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A) →ᵗ ⟨ τ₁ + τ₂ ⟩ᵒ A
+  μ {A} {τ₁} {τ₂} =
+    tset-map
+      (λ { {t} (p , q , x) → n≤k⇒m≤k∸n⇒n+m≤k τ₁ τ₂ t p q ,
+                             monotone A (≤-reflexive (n∸m∸k≡n∸m+k t τ₁ τ₂)) x })
+      (λ { p (q , r , x) →
+        cong₂ _,_
+          (≤-irrelevant _ _)
           (trans
-            (cong (λ s → monotone A s x) (≤-irrelevant _ _))
-            (sym (monotone-trans A _ _ x)))) })
-    
+            (monotone-trans A _ _ x)
+            (trans
+              (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+              (sym (monotone-trans A _ _ x)))) })
+
+  μ-reveal : ∀ {A τ₁ τ₂ t} → (x : carrier (⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A)) t)
+           → map-carrier (μ {A} {τ₁} {τ₂}) x
+           ≡ (n≤k⇒m≤k∸n⇒n+m≤k τ₁ τ₂ t (proj₁ x) (proj₁ (proj₂ x)) ,
+             monotone A (≤-reflexive (n∸m∸k≡n∸m+k t τ₁ τ₂)) (proj₂ (proj₂ x)))
+  μ-reveal x = refl
+
 -- Derived counit map (a value that was available
 -- τ time steps in the past is also available now)
 
