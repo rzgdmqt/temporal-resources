@@ -52,16 +52,17 @@ module Semantics.Modality.Future where
 
 -- Monotonicity for gradings
 
-[]-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → [ τ₁ ]ᵒ A →ᵗ [ τ₂ ]ᵒ A
-[]-≤ {A} p =
-  tset-map
-    (λ x → monotone A (+-mono-≤ ≤-refl p) x)
-    (λ p x →
-      trans
-        (monotone-trans A _ _ x)
-        (trans
-          (cong (λ q → monotone A q x) (≤-irrelevant _ _))
-          (sym (monotone-trans A _ _ x))))
+abstract
+  []-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → [ τ₁ ]ᵒ A →ᵗ [ τ₂ ]ᵒ A
+  []-≤ {A} p =
+    tset-map
+      (λ x → monotone A (+-mono-≤ ≤-refl p) x)
+      (λ p x →
+        trans
+          (monotone-trans A _ _ x)
+          (trans
+            (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+            (sym (monotone-trans A _ _ x))))
 
 -- Counit
 

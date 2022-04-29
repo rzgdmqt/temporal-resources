@@ -51,18 +51,19 @@ module Semantics.Modality.Past where
 
 -- (Contravariant) monotonicity for gradings
 
-⟨⟩-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → ⟨ τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ A
-⟨⟩-≤ {A} p =
-  tset-map
-    (λ { {t} (q , a) → ≤-trans p q , monotone A (∸-mono (≤-refl {t}) p) a })
-    (λ { q (r , x) →
-      cong₂ _,_
-        (≤-irrelevant _ _)
-        (trans
-          (monotone-trans A _ _ x)
+abstract
+  ⟨⟩-≤ : ∀ {A τ₁ τ₂} → τ₁ ≤ τ₂ → ⟨ τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ A
+  ⟨⟩-≤ {A} p =
+    tset-map
+      (λ { {t} (q , a) → ≤-trans p q , monotone A (∸-mono (≤-refl {t}) p) a })
+      (λ { q (r , x) →
+        cong₂ _,_
+          (≤-irrelevant _ _)
           (trans
-            (cong (λ s → monotone A s x) (≤-irrelevant _ _))
-            (sym (monotone-trans A _ _ x)))) })
+            (monotone-trans A _ _ x)
+            (trans
+              (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+              (sym (monotone-trans A _ _ x)))) })
 
 -- Unit (and its inverse)
 
