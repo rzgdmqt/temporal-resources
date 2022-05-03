@@ -50,11 +50,11 @@ abstract
       (λ { (p , x) → p , map-carrier f x })
       (λ { p (q , x) → cong (≤-trans q p ,_) (map-nat f _ x) })
 
-  ⟨⟩ᶠ-reveal : ∀ {A B} → (τ : Time) → (f : A →ᵗ B)
-             → ∀ {t} → (x : carrier (⟨ τ ⟩ᵒ A) t)
-             → map-carrier (⟨ τ ⟩ᶠ f) x
-             ≡ (proj₁ x , map-carrier f (proj₂ x))
-  ⟨⟩ᶠ-reveal τ f x = refl
+  ⟨⟩-reveal : ∀ {A B} → (τ : Time) → (f : A →ᵗ B)
+            → ∀ {t} → (x : carrier (⟨ τ ⟩ᵒ A) t)
+            → map-carrier (⟨ τ ⟩ᶠ f) x
+            ≡ (proj₁ x , map-carrier f (proj₂ x))
+  ⟨⟩-reveal τ f x = refl
 
 -- (Contravariant) monotonicity for gradings
 
@@ -247,6 +247,40 @@ abstract
                     (sym (monotone-trans A _ _ _)))
                   (sym (monotone-trans A _ _ _)))))
             (sym (cong (map-carrier (μ {A})) (∘ᵗ-reveal _ _ _))))
+          (sym (∘ᵗ-reveal _ _ _))) })
+
+  ⟨⟩-μ-≤₁ : ∀ {A τ₁ τ₂ τ₁'} → (p : τ₁ ≤ τ₁')
+          → ⟨⟩-≤ {A} (+-monoˡ-≤ τ₂ p) ∘ᵗ μ {A}
+          ≡ᵗ μ {A} ∘ᵗ ⟨⟩-≤ {⟨ τ₂ ⟩ᵒ A} p
+  ⟨⟩-μ-≤₁ {A} p =
+    eqᵗ (λ { {t} (r , s , x) →
+      trans
+        (∘ᵗ-reveal _ _ _)
+        (trans
+          (cong₂ _,_
+            (≤-irrelevant _ _)
+            (trans
+              (monotone-trans A _ _ _)
+              (trans
+                (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+                (sym (monotone-trans A _ _ _)))))
+          (sym (∘ᵗ-reveal _ _ _))) })
+
+  ⟨⟩-μ-≤₂ : ∀ {A τ₁ τ₂ τ₂'} → (q : τ₂ ≤ τ₂')
+          → ⟨⟩-≤ {A} (+-monoʳ-≤ τ₁ q) ∘ᵗ μ {A}
+          ≡ᵗ μ {A} ∘ᵗ ⟨ τ₁ ⟩ᶠ (⟨⟩-≤ {A} q)
+  ⟨⟩-μ-≤₂ {A} q =
+    eqᵗ (λ { {t} (r , s , x) →
+      trans
+        (∘ᵗ-reveal _ _ _)
+        (trans
+          (cong₂ _,_
+            (≤-irrelevant _ _)
+            (trans
+              (monotone-trans A _ _ _)
+              (trans
+                (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+                (sym (monotone-trans A _ _ _)))))
           (sym (∘ᵗ-reveal _ _ _))) })
 
 -- η is invertible

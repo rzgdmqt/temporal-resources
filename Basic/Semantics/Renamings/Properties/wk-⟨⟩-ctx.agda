@@ -135,11 +135,70 @@ wk-⟨⟩-ctx≡split-env-≤ {Γ' = Γ'} {Γ'' = Γ'' ⟨ τ ⟩} {τ = τ'} (s
           ∘ᵗ ⟨ τ ⟩ᶠ (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (∸-monoˡ-≤ τ q) (≤-reflexive (m+n∸n≡m (ctx-time Γ'') τ)))))
       ∘ᵗ (   ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ'')
           ∘ᵗ ⟨ τ ⟩ᶠ (split-env p))
-   ≡⟨ {!!}
+   ≡⟨ ∘ᵗ-congˡ
+        (∘ᵗ-congʳ {h = ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (n≤n∸m+m τ' τ) (≤-reflexive (+-comm (τ' ∸ τ) τ)))}
+          (∘ᵗ-congʳ {h = μ {⟦ Γ' ⟧ᵉ}}
+            (⟨⟩-cong (⟨⟩-≤-cong _ _))))
     ⟩
          (   ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (n≤n∸m+m τ' τ) (≤-reflexive (+-comm (τ' ∸ τ) τ)))
           ∘ᵗ μ {⟦ Γ' ⟧ᵉ}
-          ∘ᵗ ⟨ τ ⟩ᶠ (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (∸-monoˡ-≤ τ q) (≤-reflexive (m+n∸n≡m (ctx-time Γ'') τ)))))
+          ∘ᵗ ⟨ τ ⟩ᶠ
+               (⟨⟩-≤ {⟦ Γ' ⟧ᵉ}
+                 (≤-trans
+                   (≤-trans
+                     (∸-monoˡ-≤ τ q)
+                     (≤-trans
+                       (≤-reflexive (+-∸-assoc (ctx-time Γ'') (≤-refl {τ})))
+                       (+-monoʳ-≤ (ctx-time Γ'') (≤-reflexive (n∸n≡0 τ)))))
+                   (≤-reflexive (+-identityʳ (ctx-time Γ''))))))
+      ∘ᵗ (   ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ'')
+          ∘ᵗ ⟨ τ ⟩ᶠ (split-env p))
+   ≡⟨ ∘ᵗ-congˡ
+        (∘ᵗ-congʳ {h = ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (n≤n∸m+m τ' τ) (≤-reflexive (+-comm (τ' ∸ τ) τ)))}
+          (∘ᵗ-congʳ {h = μ {⟦ Γ' ⟧ᵉ}}
+            (⟨⟩-cong (≡ᵗ-sym (⟨⟩-≤-trans _ _)))))
+    ⟩
+         (   ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (n≤n∸m+m τ' τ) (≤-reflexive (+-comm (τ' ∸ τ) τ)))
+          ∘ᵗ μ {⟦ Γ' ⟧ᵉ}
+          ∘ᵗ ⟨ τ ⟩ᶠ
+               (   ⟨⟩-≤ {⟦ Γ' ⟧ᵉ}
+                     (≤-trans
+                       (∸-monoˡ-≤ τ q)
+                       (≤-trans
+                         (≤-reflexive (+-∸-assoc (ctx-time Γ'') (≤-refl {τ})))
+                         (+-monoʳ-≤ (ctx-time Γ'') (≤-reflexive (n∸n≡0 τ)))))
+                ∘ᵗ ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-reflexive (+-identityʳ (ctx-time Γ'')))))
+      ∘ᵗ (   ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ'')
+          ∘ᵗ ⟨ τ ⟩ᶠ (split-env p))
+   ≡⟨ ∘ᵗ-congˡ
+        (∘ᵗ-congʳ {h = ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (n≤n∸m+m τ' τ) (≤-reflexive (+-comm (τ' ∸ τ) τ)))}
+          (∘ᵗ-congʳ {h = μ {⟦ Γ' ⟧ᵉ}}
+            (⟨⟩-∘ _ _)))
+    ⟩
+         (   ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (n≤n∸m+m τ' τ) (≤-reflexive (+-comm (τ' ∸ τ) τ)))
+          ∘ᵗ μ {⟦ Γ' ⟧ᵉ}
+          ∘ᵗ ⟨ τ ⟩ᶠ (⟨⟩-≤ {⟦ Γ' ⟧ᵉ}
+                       (≤-trans
+                         (∸-monoˡ-≤ τ q)
+                         (≤-trans
+                           (≤-reflexive (+-∸-assoc (ctx-time Γ'') (≤-refl {τ})))
+                           (+-monoʳ-≤ (ctx-time Γ'') (≤-reflexive (n∸n≡0 τ))))))
+          ∘ᵗ ⟨ τ ⟩ᶠ (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-reflexive (+-identityʳ (ctx-time Γ'')))))
+      ∘ᵗ (   ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ'')
+          ∘ᵗ ⟨ τ ⟩ᶠ (split-env p))
+   ≡⟨ ∘ᵗ-congˡ
+        (∘ᵗ-congʳ {h = ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (n≤n∸m+m τ' τ) (≤-reflexive (+-comm (τ' ∸ τ) τ)))}
+          (≡ᵗ-sym (∘ᵗ-assoc _ _ _)))
+    ⟩
+         (   ⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-trans (n≤n∸m+m τ' τ) (≤-reflexive (+-comm (τ' ∸ τ) τ)))
+          ∘ᵗ (   μ {⟦ Γ' ⟧ᵉ}
+              ∘ᵗ ⟨ τ ⟩ᶠ (⟨⟩-≤ {⟦ Γ' ⟧ᵉ}
+                          (≤-trans
+                            (∸-monoˡ-≤ τ q)
+                            (≤-trans
+                              (≤-reflexive (+-∸-assoc (ctx-time Γ'') (≤-refl {τ})))
+                              (+-monoʳ-≤ (ctx-time Γ'') (≤-reflexive (n∸n≡0 τ)))))))
+          ∘ᵗ ⟨ τ ⟩ᶠ (⟨⟩-≤ {⟦ Γ' ⟧ᵉ} (≤-reflexive (+-identityʳ (ctx-time Γ'')))))
       ∘ᵗ (   ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ'')
           ∘ᵗ ⟨ τ ⟩ᶠ (split-env p))
    ≡⟨ {!!}

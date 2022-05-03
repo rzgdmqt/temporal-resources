@@ -71,9 +71,9 @@ abstract
       (∘ᵗ-reveal _ _ _)
       (trans
         (trans
-          ([]ᶠ-reveal _ _ _)
+          ([]-reveal _ _ _)
           (trans
-            (⟨⟩ᶠ-reveal _ _ _)
+            (⟨⟩-reveal _ _ _)
             (cong₂ _,_ refl (map-nat f _ _))))
         (sym (∘ᵗ-reveal _ _ _))) )
       
@@ -89,8 +89,8 @@ abstract
         (trans
           (trans
             (map-nat f _ _)
-            (cong (λ y → map-carrier (ε-⊣ {B}) (p , y)) (sym ([]ᶠ-reveal _ _ _))))
-          (cong (map-carrier (ε-⊣ {B})) (sym (⟨⟩ᶠ-reveal _ _ _))))
+            (cong (λ y → map-carrier (ε-⊣ {B}) (p , y)) (sym ([]-reveal _ _ _))))
+          (cong (map-carrier (ε-⊣ {B})) (sym (⟨⟩-reveal _ _ _))))
         (sym (∘ᵗ-reveal _ _ _))) })
 
 -- Triangle equations of the adjunction
@@ -103,7 +103,7 @@ abstract
         (∘ᵗ-reveal _ _ _)
         (trans
           (trans
-            (cong (map-carrier (ε-⊣ {⟨ τ ⟩ᵒ A})) (⟨⟩ᶠ-reveal _ _ _))
+            (cong (map-carrier (ε-⊣ {⟨ τ ⟩ᵒ A})) (⟨⟩-reveal _ _ _))
             (cong₂ _,_
               (≤-irrelevant _ _)
               (trans
@@ -120,7 +120,7 @@ abstract
         (∘ᵗ-reveal _ _ _)
         (trans
           (trans
-            ([]ᶠ-reveal _ _ _)
+            ([]-reveal _ _ _)
             (trans
               (monotone-trans A _ _ _)
               (trans

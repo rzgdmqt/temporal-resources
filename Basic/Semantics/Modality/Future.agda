@@ -51,10 +51,10 @@ abstract
       (map-carrier f)
       (λ p x → map-nat f (+-mono-≤ p ≤-refl) x)
 
-  []ᶠ-reveal : ∀ {A B} → (τ : Time) → (f : A →ᵗ B)
-             → ∀ {t} → (x : carrier ([ τ ]ᵒ A) t)
-             → map-carrier ([ τ ]ᶠ f) x ≡ map-carrier f x
-  []ᶠ-reveal τ f x = refl
+  []-reveal : ∀ {A B} → (τ : Time) → (f : A →ᵗ B)
+            → ∀ {t} → (x : carrier ([ τ ]ᵒ A) t)
+            → map-carrier ([ τ ]ᶠ f) x ≡ map-carrier f x
+  []-reveal τ f x = refl
 
 -- Monotonicity for gradings
 
