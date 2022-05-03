@@ -88,4 +88,5 @@ open import Semantics.Interpretation
 
 ---- Semantics of renamings
 
-open import Semantics.Renamings
+open import Semantics.Renamings.Core
+open import Semantics.Renamings.Properties.wk-⟨⟩-ctx
