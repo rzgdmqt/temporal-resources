@@ -1,5 +1,5 @@
 --------------------------------------------------------------------
--- Semantics of the future modality `[ t ] A` as a graded comonad --
+-- Semantics of the types modality `[ t ] A` as a graded comonad  --
 --                                                                --
 -- While `[ t ] A` is in fact a strong monoidal functor in this   --
 -- concrete semantics, then analogously to the context modality   --
@@ -24,7 +24,7 @@ open import Semantics.TSets
 
 open import Util.Time
 
-module Semantics.Modality.Future where
+module Semantics.Modality.TypeModality where
 
 -- STRUCTURE
 

@@ -228,10 +228,6 @@ abstract
       < map-carrier f , map-carrier g >
       (λ p x → cong₂ _,_ (map-nat f p x) (map-nat g p x))
 
-  ⟨⟩ᵗ-∘ᵗ : ∀ {A B C D} → (f : A →ᵗ B) → (g : B →ᵗ C) → (h : B →ᵗ D)
-         → ⟨ g ∘ᵗ f , h ∘ᵗ f ⟩ᵗ ≡ᵗ ⟨ g , h ⟩ᵗ ∘ᵗ f
-  ⟨⟩ᵗ-∘ᵗ f g h = eqᵗ (λ x → refl)
-
 mapˣᵗ : ∀ {A B C D} → A →ᵗ C → B →ᵗ D → A ×ᵗ B →ᵗ C ×ᵗ D
 mapˣᵗ f g = ⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ
  
@@ -253,6 +249,38 @@ abstract
            → (g : A →ᵗ C)
            → sndᵗ ∘ᵗ ⟨ f , g ⟩ᵗ ≡ᵗ g
   ⟨⟩ᵗ-sndᵗ f g = eqᵗ (λ x → refl)
+
+  ⟨⟩ᵗ-unique : ∀ {A B C} → (f : A →ᵗ B) → (g : A →ᵗ C) → (h : A →ᵗ B ×ᵗ C)
+             → fstᵗ ∘ᵗ h ≡ᵗ f → sndᵗ ∘ᵗ h ≡ᵗ g
+             → h ≡ᵗ ⟨ f , g ⟩ᵗ
+  ⟨⟩ᵗ-unique f g h (eqᵗ p) (eqᵗ q) =
+    eqᵗ (λ x → cong₂ _,_ (p x) (q x))
+
+  ⟨⟩ᵗ-∘ᵗ : ∀ {A B C D} → (f : A →ᵗ B) → (g : B →ᵗ C) → (h : B →ᵗ D)
+         → ⟨ g ∘ᵗ f , h ∘ᵗ f ⟩ᵗ ≡ᵗ ⟨ g , h ⟩ᵗ ∘ᵗ f
+  ⟨⟩ᵗ-∘ᵗ f g h = 
+    begin
+      ⟨ g ∘ᵗ f , h ∘ᵗ f ⟩ᵗ
+    ≡⟨ ≡ᵗ-sym
+         (⟨⟩ᵗ-unique
+           (g ∘ᵗ f) (h ∘ᵗ f) (⟨ g , h ⟩ᵗ ∘ᵗ f)
+           (begin
+              fstᵗ ∘ᵗ ⟨ g , h ⟩ᵗ ∘ᵗ f
+            ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc fstᵗ ⟨ g , h ⟩ᵗ f) ⟩
+              (fstᵗ ∘ᵗ ⟨ g , h ⟩ᵗ) ∘ᵗ f
+            ≡⟨ ∘ᵗ-congˡ (⟨⟩ᵗ-fstᵗ g h) ⟩
+              g ∘ᵗ f
+            ∎)
+           (begin
+              sndᵗ ∘ᵗ ⟨ g , h ⟩ᵗ ∘ᵗ f
+            ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc sndᵗ ⟨ g , h ⟩ᵗ f) ⟩
+              (sndᵗ ∘ᵗ ⟨ g , h ⟩ᵗ) ∘ᵗ f
+            ≡⟨ ∘ᵗ-congˡ (⟨⟩ᵗ-sndᵗ g h) ⟩
+              h ∘ᵗ f
+            ∎))
+     ⟩
+      ⟨ g , h ⟩ᵗ ∘ᵗ f
+    ∎
 
 ---- Set-indexed products
 
@@ -347,9 +375,6 @@ abstract
       (λ h → g ∘ᵗ h ∘ᵗ mapˣᵗ idᵗ f)
       (λ p h → ≡ᵗ-≡ (eqᵗ (λ { (q , x) → refl })))
 
-  map⇒ᵗ-id : ∀ {A B} → map⇒ᵗ {A} {A} {B} {B} idᵗ idᵗ ≡ᵗ idᵗ
-  map⇒ᵗ-id = eqᵗ (λ f → ≡ᵗ-≡ (eqᵗ (λ x → refl)))
-
   curryᵗ : ∀ {A B C} → A ×ᵗ B →ᵗ C → A →ᵗ B ⇒ᵗ C
   curryᵗ {A} f =
     tset-map
@@ -359,15 +384,6 @@ abstract
           cong
             (map-carrier f)
             (cong (_, y) (monotone-trans A p q x)) })))
-
-  curryᵗ-mapˣᵗ : ∀ {A B C D E}
-               → (f : C ×ᵗ D →ᵗ E) → (g : A →ᵗ C) → (h : B →ᵗ D)
-               → curryᵗ (f ∘ᵗ mapˣᵗ g h) ≡ᵗ map⇒ᵗ h idᵗ ∘ᵗ curryᵗ f ∘ᵗ g
-  curryᵗ-mapˣᵗ f g h =
-    eqᵗ (λ x →
-      ≡ᵗ-≡ (eqᵗ (λ y →
-        cong (map-carrier f)
-          (cong₂ _,_ (map-nat g _ x) refl))))
    
   uncurryᵗ : ∀ {A B C} → A →ᵗ B ⇒ᵗ C → A ×ᵗ B →ᵗ C
   uncurryᵗ {A} {B} {C} f =
@@ -383,3 +399,15 @@ abstract
               (λ q → map-carrier (map-carrier f x) (q , monotone B p y))
               (≤-irrelevant _ _))
             (map-nat (map-carrier f x) p (≤-reflexive refl , y))) })
+
+  map⇒ᵗ-id : ∀ {A B} → map⇒ᵗ {A} {A} {B} {B} idᵗ idᵗ ≡ᵗ idᵗ
+  map⇒ᵗ-id = eqᵗ (λ f → ≡ᵗ-≡ (eqᵗ (λ x → refl)))
+
+  curryᵗ-mapˣᵗ : ∀ {A B C D E}
+               → (f : C ×ᵗ D →ᵗ E) → (g : A →ᵗ C) → (h : B →ᵗ D)
+               → curryᵗ (f ∘ᵗ mapˣᵗ g h) ≡ᵗ map⇒ᵗ h idᵗ ∘ᵗ curryᵗ f ∘ᵗ g
+  curryᵗ-mapˣᵗ f g h =
+    eqᵗ (λ x →
+      ≡ᵗ-≡ (eqᵗ (λ y →
+        cong (map-carrier f)
+          (cong₂ _,_ (map-nat g _ x) refl))))
