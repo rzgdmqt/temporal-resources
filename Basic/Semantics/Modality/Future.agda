@@ -44,11 +44,17 @@ module Semantics.Modality.Future where
                    (λ r → monotone A r x)
                    (≤-irrelevant _ (+-mono-≤ (≤-trans p q) ≤-refl))))
 
-[_]ᶠ : ∀ {A B} → (τ : Time) → A →ᵗ B → [ τ ]ᵒ A →ᵗ [ τ ]ᵒ B
-[ τ ]ᶠ f =
-  tset-map
-    (map-carrier f)
-    (λ p x → map-nat f (+-mono-≤ p ≤-refl) x)
+abstract
+  [_]ᶠ : ∀ {A B} → (τ : Time) → A →ᵗ B → [ τ ]ᵒ A →ᵗ [ τ ]ᵒ B
+  [ τ ]ᶠ f =
+    tset-map
+      (map-carrier f)
+      (λ p x → map-nat f (+-mono-≤ p ≤-refl) x)
+
+  []ᶠ-reveal : ∀ {A B} → (τ : Time) → (f : A →ᵗ B)
+             → ∀ {t} → (x : carrier ([ τ ]ᵒ A) t)
+             → map-carrier ([ τ ]ᶠ f) x ≡ map-carrier f x
+  []ᶠ-reveal τ f x = refl
 
 -- Monotonicity for gradings
 
@@ -63,6 +69,12 @@ abstract
           (trans
             (cong (λ q → monotone A q x) (≤-irrelevant _ _))
             (sym (monotone-trans A _ _ x))))
+
+  []-≤-reveal : ∀ {A τ₁ τ₂} → (p : τ₁ ≤ τ₂)
+              → ∀ {t} → (x : carrier ([ τ₁ ]ᵒ A) t)
+              → map-carrier ([]-≤ {A} p) x
+              ≡ monotone A (+-mono-≤ ≤-refl p) x
+  []-≤-reveal p x = refl
 
 -- Counit
 

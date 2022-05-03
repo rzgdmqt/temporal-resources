@@ -65,24 +65,32 @@ abstract
 
 abstract
   ⊣-η-nat : ∀ {A B τ} → (f : A →ᵗ B)
-           → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵗ η-⊣ ≡ᵗ η-⊣ ∘ᵗ f
+          → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵗ η-⊣ ≡ᵗ η-⊣ ∘ᵗ f
   ⊣-η-nat f = eqᵗ (λ {t} x →
     trans
       (∘ᵗ-reveal _ _ _)
       (trans
-        (cong₂ _,_ refl (map-nat f _ _))
+        (trans
+          ([]ᶠ-reveal _ _ _)
+          (trans
+            (⟨⟩ᶠ-reveal _ _ _)
+            (cong₂ _,_ refl (map-nat f _ _))))
         (sym (∘ᵗ-reveal _ _ _))) )
-
+      
 -- ε-⊣ is natural
 
 abstract
   ⊣-ε-nat : ∀ {A B τ} → (f : A →ᵗ B)
-           → f ∘ᵗ ε-⊣ ≡ᵗ ε-⊣ ∘ᵗ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
-  ⊣-ε-nat f = eqᵗ (λ { {t} (p , x) →
+          → f ∘ᵗ ε-⊣ ≡ᵗ ε-⊣ ∘ᵗ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
+  ⊣-ε-nat {A} {B} {τ} f = eqᵗ (λ { {t} (p , x) →
     trans
       (∘ᵗ-reveal _ _ _)
       (trans
-        (map-nat f _ _)
+        (trans
+          (trans
+            (map-nat f _ _)
+            (cong (λ y → map-carrier (ε-⊣ {B}) (p , y)) (sym ([]ᶠ-reveal _ _ _))))
+          (cong (map-carrier (ε-⊣ {B})) (sym (⟨⟩ᶠ-reveal _ _ _))))
         (sym (∘ᵗ-reveal _ _ _))) })
 
 -- Triangle equations of the adjunction
@@ -94,15 +102,17 @@ abstract
       trans
         (∘ᵗ-reveal _ _ _)
         (trans
-          (cong₂ _,_
-            (≤-irrelevant _ _)
-            (trans
-              (monotone-trans A _ _ _)
+          (trans
+            (cong (map-carrier (ε-⊣ {⟨ τ ⟩ᵒ A})) (⟨⟩ᶠ-reveal _ _ _))
+            (cong₂ _,_
+              (≤-irrelevant _ _)
               (trans
-                (cong (λ p → monotone A p (proj₂ x)) (≤-irrelevant _ _))
-                (monotone-refl A (proj₂ x)))))
+                (monotone-trans A _ _ _)
+                (trans
+                  (cong (λ p → monotone A p (proj₂ x)) (≤-irrelevant _ _))
+                  (monotone-refl A (proj₂ x))))))
           (sym (idᵗ-reveal _))))
-
+          
   ⊣-Gε∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε-⊣ {A}) ∘ᵗ η-⊣ {[ τ ]ᵒ A} ≡ᵗ idᵗ
   ⊣-Gε∘η≡id {A} {τ} =
     eqᵗ (λ {t} x →
@@ -110,10 +120,12 @@ abstract
         (∘ᵗ-reveal _ _ _)
         (trans
           (trans
-            (monotone-trans A _ _ _)
+            ([]ᶠ-reveal _ _ _)
             (trans
-              (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-              (monotone-refl A x)))
+              (monotone-trans A _ _ _)
+              (trans
+                (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+                (monotone-refl A x))))
           (sym (idᵗ-reveal _))))
 
 -- Interaction between η-⊣/ε-⊣ of the adjunction and η/ε of the modalities
@@ -147,6 +159,9 @@ abstract
         (sym (∘ᵗ-reveal _ _ _)) })
 
 -- ...
+
+
+
 
 
 

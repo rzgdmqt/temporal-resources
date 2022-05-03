@@ -43,11 +43,18 @@ module Semantics.Modality.Past where
                    (monotone-trans A _ _ (proj₂ x))
                    (cong (λ r → monotone A r (proj₂ x)) (≤-irrelevant _ _))))
 
-⟨_⟩ᶠ : ∀ {A B} → (τ : Time) → A →ᵗ B → ⟨ τ ⟩ᵒ A →ᵗ ⟨ τ ⟩ᵒ B
-⟨ τ ⟩ᶠ f =
-  tset-map
-    (λ { (p , x) → p , map-carrier f x })
-    (λ { p (q , x) → cong (≤-trans q p ,_) (map-nat f _ x) })
+abstract
+  ⟨_⟩ᶠ : ∀ {A B} → (τ : Time) → A →ᵗ B → ⟨ τ ⟩ᵒ A →ᵗ ⟨ τ ⟩ᵒ B
+  ⟨ τ ⟩ᶠ f =
+    tset-map
+      (λ { (p , x) → p , map-carrier f x })
+      (λ { p (q , x) → cong (≤-trans q p ,_) (map-nat f _ x) })
+
+  ⟨⟩ᶠ-reveal : ∀ {A B} → (τ : Time) → (f : A →ᵗ B)
+             → ∀ {t} → (x : carrier (⟨ τ ⟩ᵒ A) t)
+             → map-carrier (⟨ τ ⟩ᶠ f) x
+             ≡ (proj₁ x , map-carrier f (proj₂ x))
+  ⟨⟩ᶠ-reveal τ f x = refl
 
 -- (Contravariant) monotonicity for gradings
 
@@ -64,6 +71,12 @@ abstract
             (trans
               (cong (λ s → monotone A s x) (≤-irrelevant _ _))
               (sym (monotone-trans A _ _ x)))) })
+
+  ⟨⟩-≤-reveal : ∀ {A τ₁ τ₂} → (p : τ₁ ≤ τ₂)
+              → ∀ {t} → (x : carrier (⟨ τ₂ ⟩ᵒ A) t)
+              → map-carrier (⟨⟩-≤ {A} p) x
+              ≡ (≤-trans p (proj₁ x) , monotone A (∸-mono (≤-refl {t}) p) (proj₂ x))
+  ⟨⟩-≤-reveal p x = refl
 
 -- Unit (and its inverse)
 
