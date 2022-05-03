@@ -149,10 +149,10 @@ abstract
       (cong (proj₁ x ,_) (∘ᵗ-reveal _ _ _))
       (sym (∘ᵗ-reveal _ _ _)))
 
-  ⟨⟩-≡ : ∀ {A B τ} {f g : A →ᵗ B}
-       → f ≡ᵗ g
-       → ⟨ τ ⟩ᶠ f ≡ᵗ ⟨ τ ⟩ᶠ g
-  ⟨⟩-≡ p = eqᵗ (λ x →
+  ⟨⟩-cong : ∀ {A B τ} {f g : A →ᵗ B}
+          → f ≡ᵗ g
+          → ⟨ τ ⟩ᶠ f ≡ᵗ ⟨ τ ⟩ᶠ g
+  ⟨⟩-cong p = eqᵗ (λ x →
     cong₂ _,_
       refl
       (cong-app (fun-ext (prf p)) (proj₂ x)))
@@ -196,9 +196,9 @@ abstract
              (≤-irrelevant _ _)
              (cong (λ q → monotone A q x) (≤-irrelevant _ _)))) })
    
-  ⟨⟩-≤-≡ : ∀ {A τ τ'} → (p q : τ ≤ τ')
-         → ⟨⟩-≤ {A} p ≡ᵗ ⟨⟩-≤ {A} q
-  ⟨⟩-≤-≡ {A} p q =
+  ⟨⟩-≤-cong : ∀ {A τ τ'} → (p q : τ ≤ τ')
+            → ⟨⟩-≤ {A} p ≡ᵗ ⟨⟩-≤ {A} q
+  ⟨⟩-≤-cong {A} p q =
     eqᵗ (λ { (r , x) →
       cong₂ _,_
         (≤-irrelevant _ _)
