@@ -69,16 +69,6 @@ open _≡ᵗ_ public
 
 infix 5 _≡ᵗ_
 
--- ≡ᵗ implies ≡
-
-abstract
-  ≡ᵗ-≡ : ∀ {A B} → {f : A →ᵗ B} {g : A →ᵗ B} → f ≡ᵗ g → f ≡ g
-  ≡ᵗ-≡ p =
-    dcong₂
-      tset-map
-        (ifun-ext (fun-ext (prf p)))
-        (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ x → uip)))))
-
 -- Reflexivity, symmetry, transitivity
 
 abstract
@@ -110,6 +100,19 @@ _∎ : ∀ {A B} (f : A →ᵗ B) → f ≡ᵗ f
 _∎ _ = ≡ᵗ-refl
 
 syntax step-≡ f g≡h f≡g = f ≡⟨ f≡g ⟩ g≡h
+
+-- ≡ᵗ implies ≡ and vice versa
+
+abstract
+  ≡ᵗ-≡ : ∀ {A B} → {f g : A →ᵗ B} → f ≡ᵗ g → f ≡ g
+  ≡ᵗ-≡ p =
+    dcong₂
+      tset-map
+        (ifun-ext (fun-ext (prf p)))
+        (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ x → uip)))))
+
+  ≡-≡ᵗ : ∀ {A B} → {f g : A →ᵗ B} → f ≡ g → f ≡ᵗ g
+  ≡-≡ᵗ refl = ≡ᵗ-refl
 
 -- Identity and composition of maps
 
@@ -183,6 +186,10 @@ abstract
   terminalᵗ : ∀ {A} → A →ᵗ 𝟙ᵗ
   terminalᵗ = tset-map (λ _ → tt) (λ p x → refl)
 
+  terminalᵗ-unique : ∀ {A} {f : A →ᵗ 𝟙ᵗ}
+                   → f ≡ᵗ terminalᵗ
+  terminalᵗ-unique = eqᵗ (λ x → refl)
+
 ---- initial object
 
 abstract
@@ -191,6 +198,10 @@ abstract
    
   initialᵗ : ∀ {A} → 𝟘ᵗ →ᵗ A
   initialᵗ = tset-map (λ ()) (λ { p () })
+
+  initialᵗ-unique : ∀ {A} {f : 𝟘ᵗ →ᵗ A}
+                  → f ≡ᵗ initialᵗ
+  initialᵗ-unique = eqᵗ (λ ())
 
 ---- binary products
 abstract
@@ -216,7 +227,11 @@ abstract
     tset-map
       < map-carrier f , map-carrier g >
       (λ p x → cong₂ _,_ (map-nat f p x) (map-nat g p x))
-   
+
+  ⟨⟩ᵗ-∘ᵗ : ∀ {A B C D} → (f : A →ᵗ B) → (g : B →ᵗ C) → (h : B →ᵗ D)
+         → ⟨ g ∘ᵗ f , h ∘ᵗ f ⟩ᵗ ≡ᵗ ⟨ g , h ⟩ᵗ ∘ᵗ f
+  ⟨⟩ᵗ-∘ᵗ f g h = eqᵗ (λ x → refl)
+
 mapˣᵗ : ∀ {A B C D} → A →ᵗ C → B →ᵗ D → A ×ᵗ B →ᵗ C ×ᵗ D
 mapˣᵗ f g = ⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ
  
@@ -331,7 +346,10 @@ abstract
     tset-map
       (λ h → g ∘ᵗ h ∘ᵗ mapˣᵗ idᵗ f)
       (λ p h → ≡ᵗ-≡ (eqᵗ (λ { (q , x) → refl })))
-   
+
+  map⇒ᵗ-id : ∀ {A B} → map⇒ᵗ {A} {A} {B} {B} idᵗ idᵗ ≡ᵗ idᵗ
+  map⇒ᵗ-id = eqᵗ (λ f → ≡ᵗ-≡ (eqᵗ (λ x → refl)))
+
   curryᵗ : ∀ {A B C} → A ×ᵗ B →ᵗ C → A →ᵗ B ⇒ᵗ C
   curryᵗ {A} f =
     tset-map
@@ -341,6 +359,15 @@ abstract
           cong
             (map-carrier f)
             (cong (_, y) (monotone-trans A p q x)) })))
+
+  curryᵗ-mapˣᵗ : ∀ {A B C D E}
+               → (f : C ×ᵗ D →ᵗ E) → (g : A →ᵗ C) → (h : B →ᵗ D)
+               → curryᵗ (f ∘ᵗ mapˣᵗ g h) ≡ᵗ map⇒ᵗ h idᵗ ∘ᵗ curryᵗ f ∘ᵗ g
+  curryᵗ-mapˣᵗ f g h =
+    eqᵗ (λ x →
+      ≡ᵗ-≡ (eqᵗ (λ y →
+        cong (map-carrier f)
+          (cong₂ _,_ (map-nat g _ x) refl))))
    
   uncurryᵗ : ∀ {A B C} → A →ᵗ B ⇒ᵗ C → A ×ᵗ B →ᵗ C
   uncurryᵗ {A} {B} {C} f =

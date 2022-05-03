@@ -1,6 +1,6 @@
--------------------------------------
--- Semantics of variable renamings --
--------------------------------------
+----------------------------------------------------------------------------------------------------
+-- Relating syntactic wk-⟨⟩-ctx-ren and the semantic composition of env-ctx-time-⟨⟩ and split-env --
+----------------------------------------------------------------------------------------------------
 
 open import Function
 
@@ -21,8 +21,6 @@ open import Util.Operations
 open import Util.Time
 
 module Semantics.Renamings.Properties.wk-⟨⟩-ctx where
-
--- Relating syntactic wk-⟨⟩-ctx-ren and the semantic composition of env-ctx-time-⟨⟩ and split-env
 
 wk-⟨⟩-ctx≡split-env-≤ : ∀ {Γ Γ' Γ'' τ}
                       → (p : Γ' , Γ'' split Γ)
