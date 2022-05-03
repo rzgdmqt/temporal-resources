@@ -1,5 +1,5 @@
 -------------------------------------------------------------------
--- Semantics of the context modality `Γ ⟨ t ⟩` as a graded monad --
+-- Semantics of the past modality `Γ ⟨ t ⟩` as a graded monad    --
 --                                                               --
 -- While `Γ ⟨ t ⟩` is in fact a strong monoidal functor in this  --
 -- concrete presheaf semantics, then for renamings/substitutions --
@@ -21,7 +21,7 @@ open import Semantics.TSets
 open import Util.Equality
 open import Util.Time
 
-module Semantics.Modality.ContextModality where
+module Semantics.Modality.Past where
 
 -- STRUCTURE
 
