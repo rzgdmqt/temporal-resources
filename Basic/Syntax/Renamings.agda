@@ -40,8 +40,6 @@ data Ren : Ctx → Ctx → Set where
   ⟨⟩-μ-ren    : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ + τ' ⟩) (Γ ⟨ τ ⟩ ⟨ τ' ⟩)
   ⟨⟩-μ⁻¹-ren  : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ + τ' ⟩)
   ⟨⟩-≤-ren    : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
-  -- strengthening empty context with ⟨_⟩ modality
-  ⟨⟩-str-[]   : ∀ {τ} → Ren ([] ⟨ τ ⟩) []
   -- congruence renamings
   cong-∷-ren  : ∀ {Γ Γ' A} → Ren Γ Γ' → Ren (Γ ∷ A) (Γ' ∷ A)
   cong-⟨⟩-ren : ∀ {Γ Γ' τ} → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
@@ -129,25 +127,52 @@ contract-ren = var-ren Hd
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren refl = id-ren
 
+-- Renamings preserve time-passage modelled by contexts
+
+ren-pres-ctx-time : ∀ {Γ Γ' τ}
+                  → Ren Γ Γ'
+                  → τ ≤ ctx-time Γ
+                  → τ ≤ ctx-time Γ'
+ren-pres-ctx-time id-ren p =
+  p
+ren-pres-ctx-time (ρ' ∘ʳ ρ) p =
+  ren-pres-ctx-time ρ' (ren-pres-ctx-time ρ p)
+ren-pres-ctx-time wk-ren p =
+  p
+ren-pres-ctx-time (var-ren x) p =
+  p
+ren-pres-ctx-time ⟨⟩-η-ren p =
+  ≤-trans p (≤-reflexive (+-identityʳ _))
+ren-pres-ctx-time ⟨⟩-η⁻¹-ren p =
+  ≤-trans p (≤-reflexive (sym (+-identityʳ _)))
+ren-pres-ctx-time (⟨⟩-μ-ren {Γ} {τ} {τ'}) p =
+  ≤-trans p (≤-reflexive (sym (+-assoc (ctx-time Γ) τ τ')))
+ren-pres-ctx-time (⟨⟩-μ⁻¹-ren {Γ} {τ} {τ'}) p =
+  ≤-trans p (≤-reflexive (+-assoc (ctx-time Γ) τ τ'))
+ren-pres-ctx-time (⟨⟩-≤-ren {Γ} q) p =
+  ≤-trans p (+-monoʳ-≤ (ctx-time Γ) q)
+ren-pres-ctx-time (cong-∷-ren ρ) p =
+  ren-pres-ctx-time ρ p
+ren-pres-ctx-time (cong-⟨⟩-ren {Γ} {Γ'} {τ} ρ) p =
+  ≤-trans p (+-monoˡ-≤ τ (ren-pres-ctx-time ρ ≤-refl))
+
 -- Interaction between the time-travelling operation on contexts and the ⟨_⟩ modality
 
--ᶜ-⟨⟩-ren : ∀ {Γ} → (τ : Time) → Ren ((Γ -ᶜ τ) ⟨ τ ⟩) Γ
--ᶜ-⟨⟩-ren {Γ} zero =
+-ᶜ-⟨⟩-ren : ∀ {Γ} → (τ : Time) → (τ ≤ ctx-time Γ) → Ren ((Γ -ᶜ τ) ⟨ τ ⟩) Γ
+-ᶜ-⟨⟩-ren {Γ} zero p =
   ⟨⟩-η-ren
--ᶜ-⟨⟩-ren {[]} (suc τ) =
-  ⟨⟩-str-[]
--ᶜ-⟨⟩-ren {Γ ∷ A} (suc τ) =
+-ᶜ-⟨⟩-ren {Γ ∷ A} (suc τ) p =
      wk-ren
-  ∘ʳ -ᶜ-⟨⟩-ren {Γ} (suc τ)
--ᶜ-⟨⟩-ren {Γ ⟨ τ' ⟩} (suc τ) with suc τ ≤? τ'
-... | yes p =
-  ⟨⟩-≤-ren (≤-reflexive (m∸n+n≡m p)) ∘ʳ ⟨⟩-μ⁻¹-ren
-... | no ¬p =
-     cong-⟨⟩-ren (-ᶜ-⟨⟩-ren {Γ} (suc τ ∸ τ'))
+  ∘ʳ -ᶜ-⟨⟩-ren (suc τ) p
+-ᶜ-⟨⟩-ren {Γ ⟨ τ' ⟩} (suc τ) p with suc τ ≤? τ'
+... | yes q =
+     ⟨⟩-≤-ren (≤-reflexive (m∸n+n≡m q))
+  ∘ʳ ⟨⟩-μ⁻¹-ren
+... | no ¬q =
+     cong-⟨⟩-ren (-ᶜ-⟨⟩-ren {Γ} (suc τ ∸ τ')
+                   (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m _ τ'))))
   ∘ʳ ⟨⟩-μ-ren
-  ∘ʳ ⟨⟩-≤-ren (≤-reflexive (sym (m∸n+n≡m {suc τ} {τ'} (≰⇒≥ ¬p))))
-
--- -ᶜ-⟨⟩-ren {Γ} (suc τ ∸ τ')
+  ∘ʳ ⟨⟩-≤-ren (≤-reflexive (sym (m∸n+n≡m {suc τ} {τ'} (≰⇒≥ ¬q))))
 
 -- Weakening renaming for the time-travelling operation on contexts
 
@@ -245,10 +270,6 @@ var-ren x     -ʳ suc τ = id-ren
 ... | no ¬q | no ¬r =
   -ᶜ-≤-ren {τ₁ = suc τ ∸ τ₂} {τ₂ = suc τ ∸ τ₁} (∸-monoʳ-≤ (suc τ) p)
 
-⟨⟩-str-[] {τ = τ'} -ʳ suc τ with suc τ ≤? τ'
-... | yes p = ⟨⟩-str-[]
-... | no ¬p = eq-ren (-ᶜ-[]-id {suc τ ∸ τ'})
-
 cong-∷-ren ρ  -ʳ suc τ = ρ -ʳ suc τ
 
 cong-⟨⟩-ren {τ = τ'} ρ  -ʳ suc τ with suc τ ≤? τ'
@@ -305,8 +326,6 @@ var-rename (⟨⟩-μ⁻¹-ren {τ = τ} {τ' = τ'}) (Tl-⟨⟩ (Tl-⟨⟩ {τ'
 
 var-rename (⟨⟩-≤-ren p) (Tl-⟨⟩ x) =
   _ , +-monoˡ-≤ _ p , Tl-⟨⟩ x
-
-var-rename ⟨⟩-str-[] (Tl-⟨⟩ ())
 
 var-rename (cong-∷-ren ρ) Hd =
   _ , z≤n , Hd
@@ -377,9 +396,11 @@ mutual
     handle C-rename ρ M
     `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'') )
     `in (C-rename (cong-ren ρ) N)
-  C-rename ρ (unbox {τ = τ} V M) =
-    unbox (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
+  C-rename ρ (unbox {τ = τ} p V M) =
+    unbox (ren-pres-ctx-time ρ p) (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
   C-rename ρ (delay τ q M)    = delay τ q (C-rename (cong-ren ρ) M)
+
+
 
 
 

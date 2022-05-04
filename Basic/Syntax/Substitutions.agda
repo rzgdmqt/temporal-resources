@@ -133,14 +133,18 @@ mutual
     handle M [ x ↦ W ]c
     `with (λ op τ'' → (H op τ'') [ Tl-∷ (Tl-∷ x) ↦ W ]c)
     `in (N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c)
-  _[_↦_]c {τ = τ} (unbox {τ = τ'} V M) x W with τ' ≤? τ
-  _[_↦_]c {τ = τ} (unbox {τ = τ'} V M) x W | yes p with var-in-ctx-after-ᶜ x p
+  _[_↦_]c {τ = τ} (unbox {τ = τ'} s V M) x W with τ' ≤? τ
+  _[_↦_]c {τ = τ} (unbox {τ = τ'} s V M) x W | yes p with var-in-ctx-after-ᶜ x p
   ... | y , q , r =
     unbox
+      (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) s)
       (V-rename (eq-ren r) (V [ y ↦ V-rename (eq-ren q) W ]v))
       (M [ Tl-∷ x ↦ W ]c)
-  _[_↦_]c {τ = τ} (unbox {τ = τ'} V M) x W | no ¬p =
-    unbox (V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬p)) V) (M [ Tl-∷ x ↦ W ]c)
+  _[_↦_]c {τ = τ} (unbox {τ = τ'} s V M) x W | no ¬p =
+    unbox
+      (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) s)
+      (V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬p)) V)
+      (M [ Tl-∷ x ↦ W ]c)
   delay τ p M [ x ↦ W ]c =
     delay τ p (M [ Tl-⟨⟩ x ↦ W ]c)
 

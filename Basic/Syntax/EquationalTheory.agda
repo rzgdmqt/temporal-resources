@@ -169,10 +169,11 @@ mutual
     unbox-cong : ∀ {A C τ}
                → {V W : Γ -ᶜ τ ⊢V⦂ [ τ ] A}
                → {M N : Γ ∷ A  ⊢C⦂ C}
+               → {p q : τ ≤ ctx-time Γ}
                → Γ -ᶜ τ ⊢V⦂ V == W
                → Γ ∷ A ⊢C⦂ M == N
-               ------------------------------
-               → Γ ⊢C⦂ unbox V M == unbox W N
+               ----------------------------------
+               → Γ ⊢C⦂ unbox p V M == unbox q W N
     
     delay-cong  : ∀ {A τ τ' τ''}
                 → {p q : τ'' ≡ τ + τ'}                      -- proof-irrelevant, no need for p ≡ q assumption
@@ -266,11 +267,12 @@ mutual
     -- computational/beta equation for unboxing
 
     unbox-box : ∀ {A B τ τ'}
+              → (p : τ ≤ ctx-time Γ)
               → (V : (Γ -ᶜ τ) ⟨ τ ⟩ ⊢V⦂ A)
               → (N : Γ ∷ A ⊢C⦂ B ‼ τ')
               ---------------------------------------------
-              → Γ ⊢C⦂ unbox (box V) N
-                  == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ) V ]c)
+              → Γ ⊢C⦂ unbox p (box V) N
+                  == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ p) V ]c)
 
     -- eta equations
 
@@ -287,15 +289,16 @@ mutual
                → Γ ⊢C⦂ absurd V == M
 
     box-unbox-eta : ∀ {A C τ}
+                  → (p : τ ≤ ctx-time Γ)
                   → (V : Γ -ᶜ τ ⊢V⦂ [ τ ] A)
                   → (M : (Γ -ᶜ τ) ∷ [ τ ] A ⊢C⦂ C)
-                  -------------------------------------------------
-                  → Γ ⊢C⦂ C-rename (-ᶜ-wk-ren τ) (M [ Hd ↦ V ]c)           -- M[V/y]
-                      == unbox V                                           -- unbox V to x in M[box x/y]
+                  -----------------------------------------------
+                  → Γ ⊢C⦂ C-rename (-ᶜ-wk-ren τ) (M [ Hd ↦ V ]c)             -- M[V/y]
+                      == unbox p V                                           -- unbox V to x in M[box x/y]
                            (C-rename
                              (cong-∷-ren (-ᶜ-wk-ren τ))
                              ((C-rename (exch-ren ∘ʳ wk-ren) M)
-                                 [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c) )
+                                 [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c))
                                  
     -- delay equations
     

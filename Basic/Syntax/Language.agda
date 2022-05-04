@@ -120,6 +120,7 @@ mutual
     unbox   : {A : VType}
             → {C : CType}
             → {τ : Time}
+            → τ ≤ ctx-time Γ
             → Γ -ᶜ τ ⊢V⦂ [ τ ] A
             → Γ ∷ A  ⊢C⦂ C
             --------------------
