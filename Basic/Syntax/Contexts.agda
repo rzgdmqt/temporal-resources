@@ -5,6 +5,8 @@
 open import Data.Product
 open import Data.Sum
 
+open import Relation.Nullary
+
 import Relation.Binary.PropositionalEquality as Eq
 open Eq hiding ([_])
 open Eq.≡-Reasoning
@@ -209,3 +211,15 @@ tctx-ctx (τs ⟨ τ ⟩) = (tctx-ctx τs) ⟨ τ ⟩
   refl
 ++ᵗᶜ-tctx-ctx τs (τs' ⟨ τ ⟩) =
   cong _⟨ τ ⟩ (++ᵗᶜ-tctx-ctx τs τs')
+
+-- Time-travelling operation on contexts
+
+_-ᶜ_ : Ctx → Time → Ctx
+Γ        -ᶜ zero  = Γ
+[]       -ᶜ suc τ = []
+Γ ∷ A    -ᶜ suc τ = Γ -ᶜ suc τ
+Γ ⟨ τ' ⟩ -ᶜ suc τ with suc τ ≤? τ'
+... | yes p = Γ ⟨ τ' ∸ suc τ ⟩
+... | no ¬p = Γ -ᶜ (suc τ ∸ τ')
+
+infixl 30 _-ᶜ_

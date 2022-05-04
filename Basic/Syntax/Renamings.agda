@@ -5,6 +5,7 @@
 open import Function hiding (const)
 
 open import Data.Bool hiding (_≤_;_≤?_)
+open import Data.Empty
 open import Data.Product
 open import Data.Sum
 
@@ -125,6 +126,44 @@ contract-ren = var-ren Hd
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren refl = id-ren
 
+-- Time-travelling operation on renamings
+
+_-ʳ_ : ∀ {Γ Γ'} → Ren Γ Γ' → (τ : Time) → Ren (Γ -ᶜ τ) (Γ' -ᶜ τ)
+ρ             -ʳ zero  = ρ
+id-ren        -ʳ suc τ = id-ren
+(ρ' ∘ʳ ρ)     -ʳ suc τ = (ρ' -ʳ suc τ) ∘ʳ (ρ -ʳ suc τ)
+wk-ren        -ʳ suc τ = id-ren
+var-ren x     -ʳ suc τ = id-ren
+⟨⟩-η-ren      -ʳ suc τ = id-ren
+⟨⟩-η⁻¹-ren    -ʳ suc τ = id-ren
+
+⟨⟩-μ-ren {Γ} {τ₁} {τ₂} -ʳ suc τ with suc τ ≤? τ₁ + τ₂ | suc τ ≤? τ₂
+⟨⟩-μ-ren {Γ} {τ₁} {τ₂} -ʳ suc τ | yes p | yes q = ⟨⟩-μ-ren ∘ʳ ⟨⟩-≤-ren (≤-reflexive (+-∸-assoc τ₁ q))
+⟨⟩-μ-ren {Γ} {τ₁} {τ₂} -ʳ suc τ | yes p | no ¬q with suc τ ∸ τ₂ | inspect (λ (τ , τ₂) → suc τ ∸ τ₂) (τ , τ₂)
+... | zero  | [| eq |] = ⊥-elim (¬q (m∸n≡0⇒m≤n eq))
+... | suc r | [| eq |] with suc r ≤? τ₁
+... | yes s rewrite sym eq = ⟨⟩-≤-ren (≤-reflexive (¬k≤m⇒k∸m≤n⇒n+m∸k≤n∸k∸m ¬q s))
+... | no ¬s rewrite sym eq = {!!}
+⟨⟩-μ-ren {Γ} {τ₁} {τ₂} -ʳ suc τ | no ¬p | yes q = ⊥-elim (n≤k-¬n≤m+k-contradiction q ¬p)
+⟨⟩-μ-ren {Γ} {τ₁} {τ₂} -ʳ suc τ | no ¬p | no ¬q with suc τ ∸ τ₂ | inspect (λ (τ , τ₂) → suc τ ∸ τ₂) (τ , τ₂)
+... | zero  | [| eq |] = ⊥-elim (¬q (m∸n≡0⇒m≤n eq))
+... | suc r | [| eq |] with suc r ≤? τ₁
+... | yes s = {!!}
+... | no ¬s rewrite sym eq =
+  eq-ren (cong (Γ -ᶜ_)  (trans (cong (suc τ ∸_) (+-comm τ₁ τ₂)) (sym (∸-+-assoc (suc τ) τ₂ τ₁))))
+
+⟨⟩-≤-ren p    -ʳ suc τ = {!!}
+
+cong-∷-ren ρ  -ʳ suc τ = ρ -ʳ suc τ
+
+cong-⟨⟩-ren ρ -ʳ suc τ = {!!}
+
+infixl 30 _-ʳ_
+
+
+
+
+{-
 -- Splitting a renaming
 
 split-ren : ∀ {Γ Γ' Γ₁ Γ₂ τ}
@@ -302,3 +341,4 @@ mutual
     unbox p' q' (V-rename ρ' V) (C-rename (cong-ren ρ) M)
   C-rename ρ (delay τs q M)      = delay τs q (C-rename (cong-ren ρ) M)
 
+-}
