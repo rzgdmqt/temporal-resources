@@ -4,6 +4,7 @@
 
 open import Function hiding (const)
 
+open import Data.Empty
 open import Data.Product
 open import Data.Sum
 
@@ -21,6 +22,8 @@ module Syntax.Substitutions where
 
 -- Deciding whether a variable is in the context after time travelling
 
+---- When the variable is in the resulting context
+
 var-in-ctx-after-ᶜ : ∀ {Γ A τ τ'}
                    → (x : A ∈[ τ ] Γ)
                    → τ' ≤ τ
@@ -28,39 +31,49 @@ var-in-ctx-after-ᶜ : ∀ {Γ A τ τ'}
                        (  proj₁ (var-split x) ≡ proj₁ (var-split y)
                         × proj₁ (var-split y) ++ᶜ proj₁ (proj₂ (var-split y))
                           ≡ (proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) -ᶜ τ'))
+                          
 var-in-ctx-after-ᶜ {Γ} {A} {τ} {zero} x p = x , refl , refl
 var-in-ctx-after-ᶜ {Γ ∷ B} {A} {τ} {suc τ'} (Tl-∷ x) p with var-in-ctx-after-ᶜ x p
 ... | y , q , r = y , q , r
 var-in-ctx-after-ᶜ {Γ ⟨ τ'' ⟩} {A} {.(τ'' + _)} {suc τ'} (Tl-⟨⟩ x) p with suc τ' ≤? τ''
 var-in-ctx-after-ᶜ {Γ ⟨ τ'' ⟩} {A} {.(τ'' + _)} {suc τ'} (Tl-⟨⟩ {τ' = τ'''} x) p | yes q
-  with var-split x | inspect var-split x
-... | Γ₁ , Γ₂ , r , s | [| eq |]
   rewrite trans                                              -- : τ'' + τ''' ∸ suc τ' ≡ (τ'' ∸ suc τ') + τ'''
             (cong (_∸ suc τ') (+-comm τ'' τ'''))
             (trans
               (+-∸-assoc τ''' q)
               (+-comm τ''' (τ'' ∸ suc τ'))) =
-  Tl-⟨⟩ x ,
-  sym (cong proj₁ eq) ,
-  cong (_⟨ τ'' ∸ suc τ' ⟩)
-    (cong₂ _++ᶜ_ (cong proj₁ eq) (cong (proj₁ ∘ proj₂) eq))
+  Tl-⟨⟩ x , refl , refl
 var-in-ctx-after-ᶜ {Γ ⟨ τ'' ⟩} {A} {.(τ'' + _)} {suc τ'} (Tl-⟨⟩ {τ' = τ'''} x) p | no ¬q
-  with var-in-ctx-after-ᶜ {Γ} {τ' = suc τ' ∸ τ''} x
-         (≤-trans
-           (∸-monoˡ-≤ τ'' p)
-           (≤-reflexive (m+n∸m≡n τ'' τ''')))
-... | y , r , s
   rewrite trans                                              -- : τ'' + τ''' ∸ suc τ' ≡ τ''' ∸ (suc τ' ∸ τ'')
             (cong (_∸ suc τ') (+-comm τ'' τ'''))
             (¬k≤m⇒k∸m≤n⇒n+m∸k≤n∸k∸m {τ'''} {τ''} {suc τ'} ¬q
               (≤-trans (∸-monoˡ-≤ τ'' p) (≤-reflexive (m+n∸m≡n τ'' τ''')))) =
-  y , r , s
+  var-in-ctx-after-ᶜ {Γ} {τ' = suc τ' ∸ τ''} x
+    (≤-trans
+      (∸-monoˡ-≤ τ'' p)
+      (≤-reflexive (m+n∸m≡n τ'' τ''')))
+
+---- When the variable is not in the resulting context
 
 var-not-in-ctx-after-ᶜ : ∀ {Γ A τ τ'}
                        → (x : A ∈[ τ ] Γ)
                        → τ' > τ
-                       → Ren (Γ -ᶜ τ') (proj₁ (var-split x))
-var-not-in-ctx-after-ᶜ = {!!}
+                       → Ren (Γ -ᶜ τ') (proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) -ᶜ τ')
+
+var-not-in-ctx-after-ᶜ {Γ ∷ B} {.B} {.0} {suc τ'} Hd p =
+  id-ren
+var-not-in-ctx-after-ᶜ {Γ ∷ B} {A} {τ} {suc τ'} (Tl-∷ x) p =
+  var-not-in-ctx-after-ᶜ {Γ} {τ' = suc τ'} x p
+var-not-in-ctx-after-ᶜ {Γ ⟨ τ'' ⟩} {A} {.(τ'' + _)} {suc τ'} (Tl-⟨⟩ {τ' = τ'''} x) (s≤s p) with suc τ' ≤? τ''
+... | yes q =
+  ⊥-elim (sucn≤m⇒m+k≤n-contradiction q p)
+... | no ¬q =
+  var-not-in-ctx-after-ᶜ {Γ} {τ' = suc τ' ∸ τ''} x
+    (≤-trans
+      (≤-trans
+        (+-monoʳ-≤ 1 (≤-reflexive (sym (m+n∸m≡n τ'' τ'''))))
+        (≤-reflexive (sym (+-∸-assoc 1 {τ'' + τ'''} {τ''} (≤-stepsʳ τ''' ≤-refl)))))
+      (∸-monoˡ-≤ τ'' (+-monoʳ-≤ 1 p)))
 
 -- Substituting a value for a variable in context
 
@@ -68,7 +81,7 @@ _[_↦_]var : ∀ {Γ A B τ τ'}
           → B ∈[ τ' ] Γ
           → (x : A ∈[ τ ] Γ)
           → proj₁ (var-split x) ⊢V⦂ A
-          ---------------------------
+          -----------------------------------------------------------
           → proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) ⊢V⦂ B
  
 Hd [ Hd ↦ W ]var = W
@@ -127,10 +140,7 @@ mutual
       (V-rename (eq-ren r) (V [ y ↦ V-rename (eq-ren q) W ]v))
       (M [ Tl-∷ x ↦ W ]c)
   _[_↦_]c {τ = τ} (unbox {τ = τ'} V M) x W | no ¬p =
-    {!!}
-  --with τ'
-  --... | zero = unbox (V [ x ↦ W ]v) (M [ Tl-∷ x ↦ W ]c)
-  --... | suc τ'' = {!!}
+    unbox (V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬p)) V) (M [ Tl-∷ x ↦ W ]c)
   delay τs p M [ x ↦ W ]c =
     delay τs p
       (C-rename
@@ -161,6 +171,8 @@ mutual
 
 
 {-
+-- TODO: old stuff, delete at some point
+
 -- Substituting a value for a variable in a well-typed term
 
 mutual

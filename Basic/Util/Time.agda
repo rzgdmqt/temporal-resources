@@ -101,6 +101,13 @@ n≤k⇒¬n≤m+k-contradiction {.(suc _)} {suc m} {.(suc _)} (s≤s p) q =
     (λ r → q (+-monoʳ-≤ 1 (≤-trans (≤-step r) (≤-reflexive (sym (+-suc m _))))))
 
 
+sucn≤m⇒m+k≤n-contradiction : ∀ {n m k} → suc n ≤ m → m + k ≤ n → ⊥
+sucn≤m⇒m+k≤n-contradiction {suc n} {suc m} {zero} (s≤s p) (s≤s q) =
+  ≤⇒≯ p (+-monoʳ-≤ 1 (≤-trans (≤-reflexive (sym (+-identityʳ m))) q))
+sucn≤m⇒m+k≤n-contradiction {suc n} {suc m} {suc k} (s≤s p) (s≤s q) =
+  ≤⇒≯ p (+-monoʳ-≤ 1 (m+n≤o⇒m≤o m q))
+
+
 n∸m≤zero⇒n∸m≡0 : ∀ {n m}
                → n ∸ m ≤ zero
                → n ∸ m ≡ 0
