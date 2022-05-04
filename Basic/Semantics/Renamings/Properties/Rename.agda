@@ -105,5 +105,5 @@ mutual
     ∎
   C-rename≡∘ᵗ ρ (perform op V M) = {!!}
   C-rename≡∘ᵗ ρ (handle M `with H `in N) = {!!}
-  C-rename≡∘ᵗ ρ (unbox p q V M) = {!!}
+  C-rename≡∘ᵗ ρ (unbox p V M) = {!!}
   C-rename≡∘ᵗ ρ (delay τs refl M) = {!!}

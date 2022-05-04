@@ -6,6 +6,8 @@ open import Function
 
 open import Data.Product
 
+open import Relation.Nullary
+
 open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Language
@@ -75,29 +77,48 @@ infix 25 ⟦_⟧ᵉ
 
 -- Splitting an environment according to context splitting
 
-split-env : ∀ {Γ Γ' Γ''} → Γ' , Γ'' split Γ → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵗ ⟦ Γ'' ⟧ᵉᵒ (⟦ Γ' ⟧ᵉᵒ A)
+split-env : ∀ {Γ Γ' Γ''}
+          → Γ' , Γ'' split Γ
+          → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵗ ⟦ Γ'' ⟧ᵉᵒ (⟦ Γ' ⟧ᵉᵒ A)
+          
 split-env split-[]             = idᵗ
 split-env (split-∷ p)          = mapˣᵗ (split-env p) idᵗ
 split-env (split-⟨⟩ {τ = τ} p) = ⟨ τ ⟩ᶠ (split-env p)
 
 -- Total time-passage of an environment as a single ⟨_⟩ modality
 
-env-ctx-time-⟨⟩ : (Γ : Ctx) → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵗ ⟨ ctx-time Γ ⟩ᵒ A
+env-ctx-time-⟨⟩ : (Γ : Ctx)
+                → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵗ ⟨ ctx-time Γ ⟩ᵒ A
+
 env-ctx-time-⟨⟩ []        = η
 env-ctx-time-⟨⟩ (Γ ∷ A)   = env-ctx-time-⟨⟩ Γ ∘ᵗ fstᵗ
 env-ctx-time-⟨⟩ (Γ ⟨ τ ⟩) {A} =
-     ⟨⟩-≤ {A = A} (≤-reflexive (+-comm (ctx-time Γ) τ))
-  ∘ᵗ μ {A = A}
+     ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ))
+  ∘ᵗ μ {A}
   ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
 
---
+-- Interaction of ⟨_⟩ modality and the time-travelling operation on contexts
 
-env-⟨⟩-ᶜ : ∀ {Γ} → (τ : Time)
-         → ⟦ Γ ⟧ᵉ →ᵗ ⟨ τ ⟩ᵒ ⟦ Γ -ᶜ τ ⟧ᵉ
-env-⟨⟩-ᶜ {Γ} zero = η
-env-⟨⟩-ᶜ {[]} (suc τ) = {!!}
-env-⟨⟩-ᶜ {Γ ∷ A} (suc τ) = {!!}
-env-⟨⟩-ᶜ {Γ ⟨ τ' ⟩} (suc τ) = {!!}
+env-⟨⟩-ᶜ : ∀ {Γ}
+         → (τ : Time) → τ ≤ ctx-time Γ
+         → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵗ ⟨ τ ⟩ᵒ (⟦ Γ -ᶜ τ ⟧ᵉᵒ A)
+         
+env-⟨⟩-ᶜ {Γ} zero p =
+  η
+env-⟨⟩-ᶜ {Γ ∷ B} (suc τ) p =
+     env-⟨⟩-ᶜ {Γ} (suc τ) p
+  ∘ᵗ fstᵗ
+env-⟨⟩-ᶜ {Γ ⟨ τ' ⟩} (suc τ) p {A} with suc τ ≤? τ'
+... | yes q =
+     μ⁻¹ {⟦ Γ ⟧ᵉᵒ A} {suc τ} {τ' ∸ suc τ}
+  ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉᵒ A} (≤-reflexive (m+[n∸m]≡n q))
+... | no ¬q =
+     ⟨⟩-≤ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉᵒ A} (m≤n+m∸n (suc τ) τ')
+  ∘ᵗ μ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉᵒ A} {τ'} {suc τ ∸ τ'}
+  ∘ᵗ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ {Γ} (suc τ ∸ τ')
+       (≤-trans
+         (∸-monoˡ-≤ τ' p)
+         (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
 
 -- Projecting a variable out of an environment
 
@@ -113,6 +134,7 @@ constᵗ c = tset-map (λ _ → c) (λ _ _ → refl)
 
 -- Interpretation of temporal contexts as functors in terms of [_] and ⟨_⟩ modalities
 
+{-
 [_]ᵗᵒ : (τs : TCtx) → TSet → TSet
 [ ⦉ τ ⦊ ]ᵗᵒ A = [ τ ]ᵒ A
 [ τs ⟨ τ ⟩ ]ᵗᵒ A = [ τs ]ᵗᵒ ([ τ ]ᵒ A)
@@ -143,6 +165,7 @@ T-[]-tctx-module {τs = τs ⟨ τ ⟩} =
 ⟨⟩-tctx-++ᶜ : ∀ {Γ} → (τs : TCtx) → ⟨ τs ⟩ᵗᵒ ⟦ Γ ⟧ᵉ →ᵗ ⟦ Γ ++ᶜ tctx-ctx τs ⟧ᵉ
 ⟨⟩-tctx-++ᶜ ⦉ τ ⦊ = idᵗ
 ⟨⟩-tctx-++ᶜ (τs ⟨ τ ⟩) = ⟨ τ ⟩ᶠ (⟨⟩-tctx-++ᶜ τs)
+-}
 
 -- Interpretation of well-typed value and computation terms
 
@@ -173,8 +196,8 @@ mutual
   ⟦_⟧ᶜᵗ {Γ} (_;_ {τ = τ} M N) =
        μᵀ
     ∘ᵗ Tᶠ ⟦ N ⟧ᶜᵗ
-    ∘ᵗ strᵀ {A = ⟨ τ ⟩ᵒ ⟦ Γ ⟧ᵉ} 
-    ∘ᵗ ⟨ η-⊣ {A = ⟦ Γ ⟧ᵉ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ
+    ∘ᵗ strᵀ {⟨ τ ⟩ᵒ ⟦ Γ ⟧ᵉ} 
+    ∘ᵗ ⟨ η-⊣ {⟦ Γ ⟧ᵉ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ
 
   ⟦ V · W ⟧ᶜᵗ = appᵗ ∘ᵗ ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵗ
   
@@ -185,7 +208,7 @@ mutual
         f = [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ) ∘ᵗ η-⊣ in
     let g : [ op-time op ]ᵒ (⟦ type-of-gtype (arity op) ⟧ᵛ ⇒ᵗ Tᵒ ⟦ A ⟧ᵛ τ)
          →ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ ⟦ A ⟧ᵛ τ)
-        g = [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) (idᵗ {A = Tᵒ ⟦ A ⟧ᵛ τ})) in
+        g = [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) (idᵗ {Tᵒ ⟦ A ⟧ᵛ τ})) in
     opᵀ op ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
                 g ∘ᵗ f ⟩ᵗ
 
@@ -201,32 +224,22 @@ mutual
                map⇒ᵗ
                  (mapˣᵗ
                    (⟦⟧ᵍ-⟦⟧ᵛ (param op))
-                   ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) (idᵗ {A = Tᵒ ⟦ B ⟧ᵛ τ''}))))
-                 (idᵗ {A = Tᵒ ⟦ B ⟧ᵛ (op-time op + τ'')}) in
+                   ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) (idᵗ {Tᵒ ⟦ B ⟧ᵛ τ''}))))
+                 (idᵗ {Tᵒ ⟦ B ⟧ᵛ (op-time op + τ'')}) in
        uncurryᵗ (
             alg-of-handler
          ∘ᵗ mapⁱˣᵗ (λ op → mapⁱˣᵗ (λ τ'' →
               g op τ'' ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×-assocᵗ)))
          ∘ᵗ f)
     ∘ᵗ mapˣᵗ idᵗ (Tᶠ ⟦ N ⟧ᶜᵗ)
-    ∘ᵗ mapˣᵗ idᵗ (strᵀ {A = ⟨ τ ⟩ᵒ ⟦ Γ ⟧ᵉ})
-    ∘ᵗ ⟨ idᵗ , ⟨ η-⊣ {A = ⟦ Γ ⟧ᵉ} {τ = τ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ
+    ∘ᵗ mapˣᵗ idᵗ (strᵀ {⟨ τ ⟩ᵒ ⟦ Γ ⟧ᵉ})
+    ∘ᵗ ⟨ idᵗ , ⟨ η-⊣ {⟦ Γ ⟧ᵉ} {τ = τ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ
 
   ⟦ unbox {τ = τ} p V M ⟧ᶜᵗ =
     ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
                     ε-⊣ {τ = τ}
                  ∘ᵗ (⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ)
-                 ∘ᵗ {!!} ⟩ᵗ
-
-{-
-  ⟦ unbox {Γ'} {Γ''} {τ = τ} p q V M ⟧ᶜᵗ =
-    ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
-                    ε-⊣
-                 ∘ᵗ (⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ)
-                 ∘ᵗ ⟨⟩-≤ {A = ⟦ Γ' ⟧ᵉ} q
-                 ∘ᵗ env-ctx-time-⟨⟩ Γ''
-                 ∘ᵗ split-env p ⟩ᵗ
--}
+                 ∘ᵗ env-⟨⟩-ᶜ τ p ⟩ᵗ
 
   ⟦ delay τ refl M ⟧ᶜᵗ =
        T-≤τ (≤-reflexive (+-comm τ _))

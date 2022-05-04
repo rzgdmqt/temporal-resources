@@ -39,10 +39,13 @@ module Semantics.Renamings.Core where
 ⟦ ⟨⟩-η⁻¹-ren ⟧ʳ =
   η⁻¹
 ⟦ ⟨⟩-μ-ren {Γ} {τ} {τ'} ⟧ʳ =
-     ⟨⟩-≤ {A = ⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ τ'))
+     ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ τ'))
   ∘ᵗ μ {A = ⟦ Γ ⟧ᵉ}
+⟦ ⟨⟩-μ⁻¹-ren {Γ} {τ} {τ'} ⟧ʳ =
+     μ⁻¹ {⟦ Γ ⟧ᵉ}
+  ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ' τ))
 ⟦ ⟨⟩-≤-ren {Γ} p ⟧ʳ =
-  ⟨⟩-≤ {A = ⟦ Γ ⟧ᵉ} p
+  ⟨⟩-≤ {⟦ Γ ⟧ᵉ} p
 ⟦ cong-∷-ren ρ ⟧ʳ =
   mapˣᵗ ⟦ ρ ⟧ʳ idᵗ
 ⟦ cong-⟨⟩-ren {Γ} {Γ'} {τ} ρ ⟧ʳ =
