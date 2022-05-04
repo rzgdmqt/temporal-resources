@@ -90,6 +90,15 @@ env-ctx-time-⟨⟩ (Γ ⟨ τ ⟩) {A} =
   ∘ᵗ μ {A = A}
   ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
 
+--
+
+env-⟨⟩-ᶜ : ∀ {Γ} → (τ : Time)
+         → ⟦ Γ ⟧ᵉ →ᵗ ⟨ τ ⟩ᵒ ⟦ Γ -ᶜ τ ⟧ᵉ
+env-⟨⟩-ᶜ {Γ} zero = η
+env-⟨⟩-ᶜ {[]} (suc τ) = {!!}
+env-⟨⟩-ᶜ {Γ ∷ A} (suc τ) = {!!}
+env-⟨⟩-ᶜ {Γ ⟨ τ' ⟩} (suc τ) = {!!}
+
 -- Projecting a variable out of an environment
 
 var-in-env : ∀ {Γ A τ} → (x : A ∈[ τ ] Γ) → ⟦ Γ ⟧ᵉ →ᵗ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᵒ ⟦ A ⟧ᵛ
@@ -202,7 +211,14 @@ mutual
     ∘ᵗ mapˣᵗ idᵗ (Tᶠ ⟦ N ⟧ᶜᵗ)
     ∘ᵗ mapˣᵗ idᵗ (strᵀ {A = ⟨ τ ⟩ᵒ ⟦ Γ ⟧ᵉ})
     ∘ᵗ ⟨ idᵗ , ⟨ η-⊣ {A = ⟦ Γ ⟧ᵉ} {τ = τ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ
-    
+
+  ⟦ unbox {τ = τ} V M ⟧ᶜᵗ =
+    ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
+                    ε-⊣ {τ = τ}
+                 ∘ᵗ (⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ)
+                 ∘ᵗ {!!} ⟩ᵗ
+
+{-
   ⟦ unbox {Γ'} {Γ''} {τ = τ} p q V M ⟧ᶜᵗ =
     ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ idᵗ ,
                     ε-⊣
@@ -210,13 +226,12 @@ mutual
                  ∘ᵗ ⟨⟩-≤ {A = ⟦ Γ' ⟧ᵉ} q
                  ∘ᵗ env-ctx-time-⟨⟩ Γ''
                  ∘ᵗ split-env p ⟩ᵗ
+-}
 
-  ⟦ delay τs refl M ⟧ᶜᵗ =
-       T-≤τ (≤-reflexive (+-comm (tctx-time τs) _))
-    ∘ᵗ T-[]-tctx-module {τs = τs}
-    ∘ᵗ [ τs ]ᵗᶠ ⟦ M ⟧ᶜᵗ
-    ∘ᵗ [ τs ]ᵗᶠ (⟨⟩-tctx-++ᶜ τs)
-    ∘ᵗ η-⊣-tctx {τs = τs}
+  ⟦ delay τ refl M ⟧ᶜᵗ =
+       T-≤τ (≤-reflexive (+-comm τ _))
+    ∘ᵗ T-[]-module ∘ᵗ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
+    ∘ᵗ η-⊣ 
     
   infix 25 ⟦_⟧ᶜᵗ
 
