@@ -119,15 +119,12 @@ mutual
 
     -- unboxing a boxed value/resource after enough time has passed for it to be ready
 
-    unbox   : {Γ' Γ'' : Ctx}
-            → {A : VType}
+    unbox   : {A : VType}
             → {C : CType}
             → {τ : Time}
-            → Γ' , Γ'' split Γ
-            → τ ≤ ctx-time Γ''
-            → Γ' ⊢V⦂ [ τ ] A
+            → Γ -ᶜ τ ⊢V⦂ [ τ ] A
             → Γ ∷ A  ⊢C⦂ C
-            ------------------
+            --------------------
             → Γ ⊢C⦂ C
 
     -- explicit delaying of a computation (a special case of this

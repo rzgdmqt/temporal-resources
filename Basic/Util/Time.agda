@@ -93,11 +93,11 @@ n≡m+k≤n' {n' = .(suc _)} {m = suc m} p (s≤s {n''} {n'''} q) with suc-injec
 ... | p' , q' , r' = suc p' , cong suc q' , +-mono-≤ (≤-refl {1}) r'
 
 
-n≤k-¬n≤m+k-contradiction : ∀ {n m k} → n ≤ k → ¬ (n ≤ m + k) → ⊥
-n≤k-¬n≤m+k-contradiction {n} {zero} {k} p q = q p
-n≤k-¬n≤m+k-contradiction {.zero} {suc m} {k} z≤n q = q z≤n
-n≤k-¬n≤m+k-contradiction {.(suc _)} {suc m} {.(suc _)} (s≤s p) q =
-  n≤k-¬n≤m+k-contradiction {_} {m} {_} p
+n≤k⇒¬n≤m+k-contradiction : ∀ {n m k} → n ≤ k → ¬ (n ≤ m + k) → ⊥
+n≤k⇒¬n≤m+k-contradiction {n} {zero} {k} p q = q p
+n≤k⇒¬n≤m+k-contradiction {.zero} {suc m} {k} z≤n q = q z≤n
+n≤k⇒¬n≤m+k-contradiction {.(suc _)} {suc m} {.(suc _)} (s≤s p) q =
+  n≤k⇒¬n≤m+k-contradiction {_} {m} {_} p
     (λ r → q (+-monoʳ-≤ 1 (≤-trans (≤-step r) (≤-reflexive (sym (+-suc m _))))))
 
 
