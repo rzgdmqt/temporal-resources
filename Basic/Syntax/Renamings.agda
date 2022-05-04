@@ -90,15 +90,6 @@ wk-⟨⟩-ctx-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
   ∘ʳ ⟨⟩-μ-ren
   ∘ʳ ⟨⟩-≤-ren (n≤n∸m+m τ τ')
 
--- Weakening a ⟨ tctx-time τs ⟩ modality into a temporal context
-
-wk-⟨⟩-tctx-ren : ∀ {Γ} (τs : TCtx) → Ren (Γ ⟨ tctx-time τs ⟩) (Γ ++ᶜ tctx-ctx τs)
-wk-⟨⟩-tctx-ren ⦉ τ ⦊ =
-  id-ren
-wk-⟨⟩-tctx-ren (τs ⟨ τ ⟩) =
-     cong-⟨⟩-ren (wk-⟨⟩-tctx-ren τs)
-  ∘ʳ ⟨⟩-μ-ren
-
 -- Exchange renamings
 
 exch-ren : ∀ {Γ A B} → Ren (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
@@ -108,14 +99,6 @@ exch-⟨⟩-var-ren : ∀ {Γ A τ} → Ren (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) �
 exch-⟨⟩-var-ren {A = A} {τ = τ} =
      var-ren (Tl-⟨⟩ Hd)
   ∘ʳ cong-ren {Γ'' = [] ⟨ _ ⟩ ∷ _} wk-ren
-
-exch-⟨⟩-tctx-var-ren : ∀ {Γ A} → (τs : TCtx)
-                     → Ren (Γ ++ᶜ tctx-ctx τs ∷ A) ((Γ ∷ A) ++ᶜ tctx-ctx τs)
-exch-⟨⟩-tctx-var-ren ⦉ τ ⦊ =
-  exch-⟨⟩-var-ren
-exch-⟨⟩-tctx-var-ren (τs ⟨ τ ⟩) =
-     cong-⟨⟩-ren (exch-⟨⟩-tctx-var-ren τs)
-  ∘ʳ exch-⟨⟩-var-ren
 
 -- Contraction renaming
 

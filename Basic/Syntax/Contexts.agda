@@ -191,42 +191,6 @@ var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A}
 ... | inj₂ (Γ' , Γ'' , q , r , s) =
   inj₂ (Γ' , Γ'' ⟨ τ ⟩ , split-⟨⟩ q , r , cong (_⟨ τ ⟩) s)
 
--- Temporal contexts (lists of τs, used
--- to type a generalised delay operation)
-
-data TCtx : Set where
-  ⦉_⦊  : Time → TCtx
-  _⟨_⟩ : TCtx → Time → TCtx
-
-_++ᵗᶜ_ : TCtx → TCtx → TCtx
-τs ++ᵗᶜ ⦉ τ ⦊ = τs ⟨ τ ⟩
-τs ++ᵗᶜ (τs' ⟨ τ ⟩) = (τs ++ᵗᶜ τs') ⟨ τ ⟩
-
-infixl 30 _++ᵗᶜ_
-
-tctx-time : TCtx → Time
-tctx-time ⦉ τ ⦊ = τ
-tctx-time (τs ⟨ τ ⟩) = tctx-time τs + τ
-
-++ᵗᶜ-tctx-time : (τs τs' : TCtx)
-              → tctx-time (τs ++ᵗᶜ τs') ≡ tctx-time τs + tctx-time τs'
-++ᵗᶜ-tctx-time τs ⦉ τ ⦊ = refl
-++ᵗᶜ-tctx-time τs (τs' ⟨ τ ⟩) =
-  trans
-    (cong (_+ τ) (++ᵗᶜ-tctx-time τs τs'))
-    (+-assoc (tctx-time τs) (tctx-time τs') τ)
-
-tctx-ctx : TCtx → Ctx
-tctx-ctx ⦉ τ ⦊ = [] ⟨ τ ⟩
-tctx-ctx (τs ⟨ τ ⟩) = (tctx-ctx τs) ⟨ τ ⟩
-
-++ᵗᶜ-tctx-ctx : (τs τs' : TCtx)
-             → tctx-ctx (τs ++ᵗᶜ τs') ≡ tctx-ctx τs ++ᶜ tctx-ctx τs'
-++ᵗᶜ-tctx-ctx τs ⦉ τ ⦊ =
-  refl
-++ᵗᶜ-tctx-ctx τs (τs' ⟨ τ ⟩) =
-  cong _⟨ τ ⟩ (++ᵗᶜ-tctx-ctx τs τs')
-
 -- Time-travelling operation on contexts
 
 _-ᶜ_ : Ctx → Time → Ctx
