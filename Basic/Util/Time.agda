@@ -12,9 +12,7 @@ open import Data.Product
 
 open import Relation.Nullary
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq hiding (Extensionality)
-open Eq.≡-Reasoning
+open import Util.Equality
 
 -- Time steps and annotations
 

@@ -4,16 +4,13 @@
 
 open import Data.Product
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq hiding ([_])
-open Eq.≡-Reasoning
-
 open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Renamings
 open import Syntax.Substitutions
 
+open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
@@ -271,9 +268,9 @@ mutual
     unbox-box : ∀ {A B τ τ'}
               → (V : (Γ -ᶜ τ) ⟨ τ ⟩ ⊢V⦂ A)
               → (N : Γ ∷ A ⊢C⦂ B ‼ τ')
-              ---------------------------------------------------
-              → Γ ⊢C⦂ unbox (box V) N --unbox p q (box V) N
-                  == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ) V ]c) --(N [ Hd ↦ V-rename (wk-⟨⟩-ctx-ren p q) V ]c)
+              ---------------------------------------------
+              → Γ ⊢C⦂ unbox (box V) N
+                  == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ) V ]c)
 
     -- eta equations
 

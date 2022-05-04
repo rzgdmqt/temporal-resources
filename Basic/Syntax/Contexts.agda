@@ -7,12 +7,9 @@ open import Data.Sum
 
 open import Relation.Nullary
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq hiding ([_])
-open Eq.≡-Reasoning
-
 open import Syntax.Types
 
+open import Util.Equality
 open import Util.Operations
 open import Util.Time
 

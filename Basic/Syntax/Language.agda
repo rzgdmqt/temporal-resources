@@ -2,12 +2,10 @@
 -- Well-typed syntax of the language --
 ---------------------------------------
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq hiding ([_])
-
 open import Syntax.Types
 open import Syntax.Contexts
 
+open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
