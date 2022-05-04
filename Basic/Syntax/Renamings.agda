@@ -127,6 +127,26 @@ contract-ren = var-ren Hd
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren refl = id-ren
 
+-- Interaction between the time-travelling operation on contexts and the ⟨_⟩ modality
+
+-ᶜ-⟨⟩-ren : ∀ {Γ} → (τ : Time) → Ren ((Γ -ᶜ τ) ⟨ τ ⟩) Γ
+-ᶜ-⟨⟩-ren {Γ} zero =
+  ⟨⟩-η-ren
+-ᶜ-⟨⟩-ren {[]} (suc τ) =
+  {!!}
+-ᶜ-⟨⟩-ren {Γ ∷ A} (suc τ) =
+     wk-ren
+  ∘ʳ -ᶜ-⟨⟩-ren {Γ} (suc τ)
+-ᶜ-⟨⟩-ren {Γ ⟨ τ' ⟩} (suc τ) with suc τ ≤? τ'
+... | yes p =
+  ⟨⟩-≤-ren (≤-reflexive (m∸n+n≡m p)) ∘ʳ ⟨⟩-μ⁻¹-ren
+... | no ¬p =
+     cong-⟨⟩-ren (-ᶜ-⟨⟩-ren {Γ} (suc τ ∸ τ'))
+  ∘ʳ ⟨⟩-μ-ren
+  ∘ʳ ⟨⟩-≤-ren (≤-reflexive (sym (m∸n+n≡m {suc τ} {τ'} (≰⇒≥ ¬p))))
+
+-- -ᶜ-⟨⟩-ren {Γ} (suc τ ∸ τ')
+
 -- Weakening renaming for the time-travelling operation on contexts
 
 -ᶜ-wk-ren : ∀ {Γ} → (τ : Time) → Ren (Γ -ᶜ τ) Γ
@@ -351,7 +371,7 @@ mutual
     `in (C-rename (cong-ren ρ) N)
   C-rename ρ (unbox {τ = τ} V M) =
     unbox (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
-  C-rename ρ (delay τs q M)   = delay τs q (C-rename (cong-ren ρ) M)
+  C-rename ρ (delay τ q M)    = delay τ q (C-rename (cong-ren ρ) M)
 
 
 
