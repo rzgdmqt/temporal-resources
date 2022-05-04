@@ -273,7 +273,7 @@ mutual
               → (N : Γ ∷ A ⊢C⦂ B ‼ τ')
               ---------------------------------------------------
               → Γ ⊢C⦂ unbox (box V) N --unbox p q (box V) N
-                  == (N [ Hd ↦ V-rename {!!} V ]c) --(N [ Hd ↦ V-rename (wk-⟨⟩-ctx-ren p q) V ]c)
+                  == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ) V ]c) --(N [ Hd ↦ V-rename (wk-⟨⟩-ctx-ren p q) V ]c)
 
     -- eta equations
 
@@ -289,22 +289,17 @@ mutual
                ---------------------
                → Γ ⊢C⦂ absurd V == M
 
-    box-unbox-eta : ∀ {Γ' A C τ}
-                  → (p : Γ' , [] ⟨ τ ⟩ split Γ )
-                  → (V : Γ' ⊢V⦂ [ τ ] A)
-                  → (M : Γ' ⟨ τ ⟩ ∷ [ τ ] A ⊢C⦂ C)
+    box-unbox-eta : ∀ {A C τ}
+                  → (V : Γ -ᶜ τ ⊢V⦂ [ τ ] A)
+                  → (M : (Γ -ᶜ τ) ∷ [ τ ] A ⊢C⦂ C)
                   -------------------------------------------------
-                  → Γ ⊢C⦂ {!!} == {!!}
-
-{-C-rename                                                     -- M[V/y]
-                            (eq-ren (split-≡ p))                                       
-                            (M [ Hd ↦ V-rename wk-⟨⟩-ren V ]c)                                          
-                      == unbox p ≤-refl V                                              -- unbox V to x in M[box x/y]                             
-                           (C-rename (eq-ren (split-≡ (split-∷ p)))
+                  → Γ ⊢C⦂ C-rename (-ᶜ-wk-ren τ) (M [ Hd ↦ V ]c)           -- M[V/y]
+                      == unbox V                                           -- unbox V to x in M[box x/y]
+                           (C-rename
+                             (cong-∷-ren (-ᶜ-wk-ren τ))
                              ((C-rename (exch-ren ∘ʳ wk-ren) M)
-                                [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c))
--}
-
+                                 [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c) )
+                                 
     -- delay equations
     
     delay-zero : ∀ {A τ}

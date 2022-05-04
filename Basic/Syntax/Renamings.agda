@@ -34,12 +34,14 @@ data Ren : Ctx → Ctx → Set where
   wk-ren      : ∀ {Γ A} → Ren Γ (Γ ∷ A)
   -- variable renaming
   var-ren     : ∀ {Γ A τ} → A ∈[ τ ] Γ → Ren (Γ ∷ A) Γ
-  -- graded monad renamings for ⟨⟩ modality
+  -- graded monad renamings for ⟨_⟩ modality
   ⟨⟩-η-ren    : ∀ {Γ} → Ren (Γ ⟨ 0 ⟩) Γ
   ⟨⟩-η⁻¹-ren  : ∀ {Γ} → Ren Γ (Γ ⟨ 0 ⟩)
   ⟨⟩-μ-ren    : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ + τ' ⟩) (Γ ⟨ τ ⟩ ⟨ τ' ⟩)
   ⟨⟩-μ⁻¹-ren  : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ + τ' ⟩)
   ⟨⟩-≤-ren    : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
+  -- strengthening empty context with ⟨_⟩ modality
+  ⟨⟩-str-[]   : ∀ {τ} → Ren ([] ⟨ τ ⟩) []
   -- congruence renamings
   cong-∷-ren  : ∀ {Γ Γ' A} → Ren Γ Γ' → Ren (Γ ∷ A) (Γ' ∷ A)
   cong-⟨⟩-ren : ∀ {Γ Γ' τ} → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
@@ -133,7 +135,7 @@ eq-ren refl = id-ren
 -ᶜ-⟨⟩-ren {Γ} zero =
   ⟨⟩-η-ren
 -ᶜ-⟨⟩-ren {[]} (suc τ) =
-  {!!}
+  ⟨⟩-str-[]
 -ᶜ-⟨⟩-ren {Γ ∷ A} (suc τ) =
      wk-ren
   ∘ʳ -ᶜ-⟨⟩-ren {Γ} (suc τ)
@@ -243,6 +245,10 @@ var-ren x     -ʳ suc τ = id-ren
 ... | no ¬q | no ¬r =
   -ᶜ-≤-ren {τ₁ = suc τ ∸ τ₂} {τ₂ = suc τ ∸ τ₁} (∸-monoʳ-≤ (suc τ) p)
 
+⟨⟩-str-[] {τ = τ'} -ʳ suc τ with suc τ ≤? τ'
+... | yes p = ⟨⟩-str-[]
+... | no ¬p = eq-ren (-ᶜ-[]-id {suc τ ∸ τ'})
+
 cong-∷-ren ρ  -ʳ suc τ = ρ -ʳ suc τ
 
 cong-⟨⟩-ren {τ = τ'} ρ  -ʳ suc τ with suc τ ≤? τ'
@@ -299,7 +305,9 @@ var-rename (⟨⟩-μ⁻¹-ren {τ = τ} {τ' = τ'}) (Tl-⟨⟩ (Tl-⟨⟩ {τ'
 
 var-rename (⟨⟩-≤-ren p) (Tl-⟨⟩ x) =
   _ , +-monoˡ-≤ _ p , Tl-⟨⟩ x
-  
+
+var-rename ⟨⟩-str-[] (Tl-⟨⟩ ())
+
 var-rename (cong-∷-ren ρ) Hd =
   _ , z≤n , Hd
   

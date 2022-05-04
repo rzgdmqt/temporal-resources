@@ -223,3 +223,7 @@ _-ᶜ_ : Ctx → Time → Ctx
 ... | no ¬p = Γ -ᶜ (suc τ ∸ τ')
 
 infixl 30 _-ᶜ_
+
+-ᶜ-[]-id : ∀ {τ} → [] -ᶜ τ ≡ []
+-ᶜ-[]-id {zero} = refl
+-ᶜ-[]-id {suc τ} = refl
