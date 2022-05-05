@@ -112,32 +112,32 @@ eq-ren refl = id-ren
 
 -- Renamings preserve time-passage modelled by contexts
 
-ren-pres-ctx-time : ∀ {Γ Γ' τ}
-                  → Ren Γ Γ'
-                  → τ ≤ ctx-time Γ
-                  → τ ≤ ctx-time Γ'
-ren-pres-ctx-time id-ren p =
-  p
-ren-pres-ctx-time (ρ' ∘ʳ ρ) p =
-  ren-pres-ctx-time ρ' (ren-pres-ctx-time ρ p)
-ren-pres-ctx-time wk-ren p =
-  p
-ren-pres-ctx-time (var-ren x) p =
-  p
-ren-pres-ctx-time ⟨⟩-η-ren p =
-  ≤-trans p (≤-reflexive (+-identityʳ _))
-ren-pres-ctx-time ⟨⟩-η⁻¹-ren p =
-  ≤-trans p (≤-reflexive (sym (+-identityʳ _)))
-ren-pres-ctx-time (⟨⟩-μ-ren {Γ} {τ} {τ'}) p =
-  ≤-trans p (≤-reflexive (sym (+-assoc (ctx-time Γ) τ τ')))
-ren-pres-ctx-time (⟨⟩-μ⁻¹-ren {Γ} {τ} {τ'}) p =
-  ≤-trans p (≤-reflexive (+-assoc (ctx-time Γ) τ τ'))
-ren-pres-ctx-time (⟨⟩-≤-ren {Γ} q) p =
-  ≤-trans p (+-monoʳ-≤ (ctx-time Γ) q)
-ren-pres-ctx-time (cong-∷-ren ρ) p =
-  ren-pres-ctx-time ρ p
-ren-pres-ctx-time (cong-⟨⟩-ren {Γ} {Γ'} {τ} ρ) p =
-  ≤-trans p (+-monoˡ-≤ τ (ren-pres-ctx-time ρ ≤-refl))
+ren-≤-ctx-time : ∀ {Γ Γ'}
+               → Ren Γ Γ'
+               → ctx-time Γ ≤ ctx-time Γ'
+
+ren-≤-ctx-time id-ren =
+  ≤-refl
+ren-≤-ctx-time (ρ' ∘ʳ ρ) =
+  ≤-trans (ren-≤-ctx-time ρ) (ren-≤-ctx-time ρ')
+ren-≤-ctx-time wk-ren =
+  ≤-refl
+ren-≤-ctx-time (var-ren x) =
+  ≤-refl
+ren-≤-ctx-time ⟨⟩-η-ren =
+  ≤-reflexive (+-identityʳ _)
+ren-≤-ctx-time ⟨⟩-η⁻¹-ren =
+  ≤-reflexive (sym (+-identityʳ _))
+ren-≤-ctx-time (⟨⟩-μ-ren {Γ} {τ} {τ'}) =
+  ≤-reflexive (sym (+-assoc (ctx-time Γ) τ τ'))
+ren-≤-ctx-time (⟨⟩-μ⁻¹-ren {Γ} {τ} {τ'}) =
+  ≤-reflexive (+-assoc (ctx-time Γ) τ τ')
+ren-≤-ctx-time (⟨⟩-≤-ren {Γ} p) =
+  +-monoʳ-≤ (ctx-time Γ) p
+ren-≤-ctx-time (cong-∷-ren ρ) =
+  ren-≤-ctx-time ρ
+ren-≤-ctx-time (cong-⟨⟩-ren {τ = τ} ρ) =
+  +-monoˡ-≤ τ (ren-≤-ctx-time ρ)
 
 -- Interaction between the time-travelling operation on contexts and the ⟨_⟩ modality
 
@@ -380,7 +380,7 @@ mutual
     `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'') )
     `in (C-rename (cong-ren ρ) N)
   C-rename ρ (unbox {τ = τ} p V M) =
-    unbox (ren-pres-ctx-time ρ p) (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
+    unbox (≤-trans p (ren-≤-ctx-time ρ)) (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
   C-rename ρ (delay τ q M)    = delay τ q (C-rename (cong-ren ρ) M)
 
 
