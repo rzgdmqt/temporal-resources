@@ -1,11 +1,11 @@
---------------------------------------------------------------------
--- Semantics of the future modality `[ t ] A` as a graded comonad --
---                                                                --
--- While `[ t ] A` is in fact a strong monoidal functor in this   --
--- concrete semantics, then analogously to the context modality   --
--- we only ever use the graded comonad (with invertible counit)   --
--- structure of it when interpreting the language in general.     --
---------------------------------------------------------------------
+------------------------------------------------------------------------
+-- Semantics of the future modality `[ t ] A` as a strong monoidal    --
+-- functor indexed by (ℕ,≤). It is the analogue of the comonadic      --
+-- □-modality on types/formulae in Fitch-style modal lambda calculi.  --
+--                                                                    --
+-- Note: While `[ t ] A` is a strong monoidal functor, then below we  --
+-- use the terminology (counit, comultiplication) of graded comonads. --
+------------------------------------------------------------------------
 
 open import Function
 
@@ -14,14 +14,11 @@ open import Data.Product renaming (map to mapˣ)
 open import Data.Sum renaming (map to map⁺)
 open import Data.Unit hiding (_≤_)
 
-import Relation.Binary.PropositionalEquality as Eq
-open Eq
-open Eq.≡-Reasoning
-
 open import Syntax.Language
 
 open import Semantics.TSets
 
+open import Util.Equality
 open import Util.Time
 
 module Semantics.Modality.Future where
@@ -76,7 +73,7 @@ abstract
               ≡ monotone A (+-mono-≤ ≤-refl p) x
   []-≤-reveal p x = refl
 
--- Counit
+-- Counit and its inverse
 
 abstract
   ε : ∀ {A} → [ 0 ]ᵒ A →ᵗ A
@@ -109,7 +106,7 @@ abstract
              → map-carrier (ε⁻¹ {A}) x ≡ monotone A (≤-reflexive (sym (+-identityʳ t))) x
   ε⁻¹-reveal x = refl
 
--- Comultiplication
+-- Comultiplication and its inverse
 
 abstract
   δ : ∀ {A τ₁ τ₂} → [ τ₁ + τ₂ ]ᵒ A →ᵗ [ τ₁ ]ᵒ ([ τ₂ ]ᵒ A)
@@ -126,6 +123,18 @@ abstract
   δ-reveal : ∀ {A τ₁ τ₂ t} → (x : carrier ([ τ₁ + τ₂ ]ᵒ A) t)
            → map-carrier (δ {A} {τ₁} {τ₂}) x ≡ monotone A (≤-reflexive (sym (+-assoc t τ₁ τ₂))) x
   δ-reveal x = refl
+
+  δ⁻¹ : ∀ {A τ₁ τ₂} → [ τ₁ ]ᵒ ([ τ₂ ]ᵒ A) →ᵗ [ τ₁ + τ₂ ]ᵒ A
+  δ⁻¹ {A} {τ₁} {τ₂} =
+    tset-map
+      (λ {t} x → monotone A (≤-reflexive (+-assoc t τ₁ τ₂)) x)
+      (λ p x →
+        trans
+          (monotone-trans A _ _ x)
+          (trans
+            (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+            (sym (monotone-trans A _ _ x))))
+
 
 -- Derived general unit map (a value now is
 -- also available in at most τ time steps)
@@ -207,7 +216,7 @@ abstract
           (map-nat f (≤-reflexive (sym (+-identityʳ t))) x)
           (sym (∘ᵗ-reveal _ _ _))))
 
--- δ is natural
+-- δ and δ⁻¹ is natural
 
 abstract
   []-δ-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
@@ -218,6 +227,16 @@ abstract
         (∘ᵗ-reveal _ _ _)
         (trans
           (map-nat f (≤-reflexive (sym (+-assoc t τ₁ τ₂))) x)
+          (sym (∘ᵗ-reveal _ _ _))))
+
+  []-δ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
+             → [ τ₁ + τ₂ ]ᶠ f ∘ᵗ δ⁻¹ {A} ≡ᵗ δ⁻¹ {B} ∘ᵗ [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f)
+  []-δ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f =
+    eqᵗ (λ {t} x →
+      trans
+        (∘ᵗ-reveal _ _ _)
+        (trans
+          (map-nat f (≤-reflexive (+-assoc t τ₁ τ₂)) x)
           (sym (∘ᵗ-reveal _ _ _))))
 
   []-δ-≤ : ∀ {A τ₁ τ₂ τ₁' τ₂'} → (p : τ₁ ≤ τ₁') → (q : τ₂ ≤ τ₂')
@@ -257,6 +276,34 @@ abstract
 
   []-ε⁻¹∘ε≡id : ∀ {A} → ε⁻¹ {A} ∘ᵗ ε ≡ᵗ idᵗ
   []-ε⁻¹∘ε≡id {A} =
+    eqᵗ (λ {t} x →
+      trans
+        (∘ᵗ-reveal _ _ _)
+        (trans
+          (trans
+            (monotone-trans A _ _ x)
+            (trans
+              (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+              (monotone-refl A x)))
+          (sym (idᵗ-reveal _))))
+
+-- δ is invertible
+
+  []-δ∘δ⁻¹≡id : ∀ {A τ₁ τ₂} → δ {A} {τ₁} {τ₂} ∘ᵗ δ⁻¹ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+  []-δ∘δ⁻¹≡id {A} {τ₁} {τ₂} =
+    eqᵗ (λ {t} x →
+      trans
+        (∘ᵗ-reveal _ _ _)
+        (trans
+          (trans
+            (monotone-trans A _ _ x)
+            (trans
+              (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+              (monotone-refl A x)))
+          (sym (idᵗ-reveal _))))
+
+  []-δ⁻¹∘δ≡id : ∀ {A τ₁ τ₂} → δ⁻¹ {A} {τ₁} {τ₂} ∘ᵗ δ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+  []-δ⁻¹∘δ≡id {A} {τ₁} {τ₂} =
     eqᵗ (λ {t} x →
       trans
         (∘ᵗ-reveal _ _ _)
@@ -314,53 +361,3 @@ abstract
                 (sym (monotone-trans A _ _ _))))
             (sym (cong (map-carrier ([ τ₁ ]ᶠ (δ {A} {τ₂} {τ₃}))) (∘ᵗ-reveal _ _ _))))
           (sym (∘ᵗ-reveal _ _ _))))
-
--- In this concrete semantics, ⟨_⟩ is in fact strong monoidal
-
-abstract
-  δ⁻¹ : ∀ {A τ₁ τ₂} → [ τ₁ ]ᵒ ([ τ₂ ]ᵒ A) →ᵗ [ τ₁ + τ₂ ]ᵒ A
-  δ⁻¹ {A} {τ₁} {τ₂} =
-    tset-map
-      (λ {t} x → monotone A (≤-reflexive (+-assoc t τ₁ τ₂)) x)
-      (λ p x →
-        trans
-          (monotone-trans A _ _ x)
-          (trans
-            (cong (λ q → monotone A q x) (≤-irrelevant _ _))
-            (sym (monotone-trans A _ _ x))))
-
-  []-δ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
-             → [ τ₁ + τ₂ ]ᶠ f ∘ᵗ δ⁻¹ {A} ≡ᵗ δ⁻¹ {B} ∘ᵗ [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f)
-  []-δ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f =
-    eqᵗ (λ {t} x →
-      trans
-        (∘ᵗ-reveal _ _ _)
-        (trans
-          (map-nat f (≤-reflexive (+-assoc t τ₁ τ₂)) x)
-          (sym (∘ᵗ-reveal _ _ _))))
-
-  []-δ∘δ⁻¹≡id : ∀ {A τ₁ τ₂} → δ {A} {τ₁} {τ₂} ∘ᵗ δ⁻¹ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
-  []-δ∘δ⁻¹≡id {A} {τ₁} {τ₂} =
-    eqᵗ (λ {t} x →
-      trans
-        (∘ᵗ-reveal _ _ _)
-        (trans
-          (trans
-            (monotone-trans A _ _ x)
-            (trans
-              (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-              (monotone-refl A x)))
-          (sym (idᵗ-reveal _))))
-
-  []-δ⁻¹∘δ≡id : ∀ {A τ₁ τ₂} → δ⁻¹ {A} {τ₁} {τ₂} ∘ᵗ δ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
-  []-δ⁻¹∘δ≡id {A} {τ₁} {τ₂} =
-    eqᵗ (λ {t} x →
-      trans
-        (∘ᵗ-reveal _ _ _)
-        (trans
-          (trans
-            (monotone-trans A _ _ x)
-            (trans
-              (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-              (monotone-refl A x)))
-          (sym (idᵗ-reveal _))))

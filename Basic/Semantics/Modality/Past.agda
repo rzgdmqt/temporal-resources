@@ -1,10 +1,10 @@
 -------------------------------------------------------------------
--- Semantics of the past modality `Γ ⟨ t ⟩` as a graded monad    --
+-- Semantics of the past modality `Γ ⟨ t ⟩` as a strong monoidal --
+-- functor indexed by (ℕ,≥). It is the analogue of the monadic   --
+-- ◆-modality on contexts in Fitch-style modal lambda calculi.   --
 --                                                               --
--- While `Γ ⟨ t ⟩` is in fact a strong monoidal functor in this  --
--- concrete presheaf semantics, then for renamings/substitutions --
--- to be admissible in the language, then the syntactic modality --
--- on contexts is only a graded monad with invertible unit.      --
+-- Note: While `Γ ⟨ t ⟩` is a strong monoidal functor, below we  --
+-- use the terminology (unit, multiplication) of graded monads.  --
 -------------------------------------------------------------------
 
 open import Function
@@ -101,7 +101,7 @@ abstract
              → map-carrier (η⁻¹ {A}) x ≡ proj₂ x
   η⁻¹-reveal x = refl
 
--- Multiplication
+-- Multiplication (and its inverse)
 
 abstract
   μ : ∀ {A τ₁ τ₂} → ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A) →ᵗ ⟨ τ₁ + τ₂ ⟩ᵒ A
@@ -123,6 +123,23 @@ abstract
            ≡ (n≤k⇒m≤k∸n⇒n+m≤k τ₁ τ₂ t (proj₁ x) (proj₁ (proj₂ x)) ,
              monotone A (≤-reflexive (n∸m∸k≡n∸m+k t τ₁ τ₂)) (proj₂ (proj₂ x)))
   μ-reveal x = refl
+
+  μ⁻¹ : ∀ {A τ₁ τ₂} → ⟨ τ₁ + τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A)
+  μ⁻¹ {A} {τ₁} {τ₂} =
+    tset-map
+      (λ { {t} (p , a) → m+n≤o⇒m≤o τ₁ p ,
+                         n+m≤k⇒m≤k∸n τ₁ τ₂ t p ,
+                         monotone A (≤-reflexive (sym (n∸m∸k≡n∸m+k t τ₁ τ₂))) a })
+      (λ { p (q , x) →
+        cong₂ _,_
+          (≤-irrelevant _ _)
+          (cong₂ _,_
+            (≤-irrelevant _ _)
+            (trans
+              (monotone-trans A _ _ x)
+              (trans
+                (cong (λ s → monotone A s x) (≤-irrelevant _ _))
+                (sym (monotone-trans A _ _ x))))) })
 
 -- Derived counit map (a value that was available
 -- τ time steps in the past is also available now)
@@ -215,7 +232,7 @@ abstract
              → f ∘ᵗ η⁻¹ ≡ᵗ η⁻¹ ∘ᵗ ⟨ 0 ⟩ᶠ f
   ⟨⟩-η⁻¹-nat f = eqᵗ (λ {t} x → trans (∘ᵗ-reveal _ _ _) (sym (∘ᵗ-reveal _ _ _)))
 
--- μ is natural
+-- μ and μ⁻¹ are natural
 
 abstract
   ⟨⟩-μ-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
@@ -227,6 +244,18 @@ abstract
         (trans
           (cong (_ ,_) (map-nat f _ _))
           (sym (∘ᵗ-reveal _ _ _))) })      
+
+  ⟨⟩-μ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
+           → ⟨ τ₁ ⟩ᶠ (⟨ τ₂ ⟩ᶠ f) ∘ᵗ μ⁻¹ {A} ≡ᵗ μ⁻¹ {B} ∘ᵗ ⟨ τ₁ + τ₂ ⟩ᶠ f
+  ⟨⟩-μ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f =
+    eqᵗ (λ { {t} (r , x) →
+      trans
+        (∘ᵗ-reveal _ _ _)
+        (trans
+          (cong (m+n≤o⇒m≤o τ₁ r ,_)
+            (cong (n+m≤k⇒m≤k∸n τ₁ τ₂ t r ,_)
+              (map-nat f _ _)))
+          (sym (∘ᵗ-reveal _ _ _))) })
 
   ⟨⟩-μ-≤ : ∀ {A τ₁ τ₂ τ₁' τ₂'} → (p : τ₁ ≤ τ₁') → (q : τ₂ ≤ τ₂')
          → ⟨⟩-≤ {A} (+-mono-≤ p q) ∘ᵗ μ {A}
@@ -299,6 +328,43 @@ abstract
   ⟨⟩-η⁻¹∘η≡id {A} =
     eqᵗ (λ {t} x → trans (∘ᵗ-reveal _ _ _) (sym (idᵗ-reveal _)))
 
+-- μ is invertible
+
+abstract
+  ⟨⟩-μ∘μ⁻¹≡id : ∀ {A τ₁ τ₂}
+              → μ {A} {τ₁} {τ₂} ∘ᵗ μ⁻¹ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+  ⟨⟩-μ∘μ⁻¹≡id {A} {τ₁} {τ₂} =
+    eqᵗ (λ { {t} (p , x) →
+      trans
+        (∘ᵗ-reveal _ _ _)
+        (trans
+          (cong₂ _,_
+            (≤-irrelevant _ _)
+            (trans
+              (monotone-trans A _ _ _)
+              (trans
+                (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+                (monotone-refl A _))))
+          (sym (idᵗ-reveal _))) })
+
+  ⟨⟩-μ⁻¹∘μ≡id : ∀ {A τ₁ τ₂}
+              → μ⁻¹ {A} {τ₁} {τ₂} ∘ᵗ μ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
+  ⟨⟩-μ⁻¹∘μ≡id {A} {τ₁} {τ₂} =
+    eqᵗ (λ { {t} (p , q , x) →
+      trans
+        (∘ᵗ-reveal _ _ _)
+        (trans
+          (cong₂ _,_
+            (≤-irrelevant _ _)
+            (cong₂ _,_
+              (≤-irrelevant _ _)
+              (trans
+                (monotone-trans A _ _ _)
+                (trans
+                  (cong (λ q → monotone A q x) (≤-irrelevant _ _))
+                  (monotone-refl A _)))))
+          (sym (idᵗ-reveal _))) })
+
 -- Graded monad laws
 
 abstract
@@ -346,70 +412,3 @@ abstract
                   (sym (monotone-trans A _ _ _)))))
             (sym (cong (map-carrier (⟨⟩-≤ {A} (≤-reflexive (+-assoc τ₁ τ₂ τ₃)))) (∘ᵗ-reveal _ _ _)))  )
           (sym (∘ᵗ-reveal _ _ _))) })
-
--- In this concrete semantics, [_] is in fact strong monoidal
-
-abstract
-  μ⁻¹ : ∀ {A τ₁ τ₂} → ⟨ τ₁ + τ₂ ⟩ᵒ A →ᵗ ⟨ τ₁ ⟩ᵒ (⟨ τ₂ ⟩ᵒ A)
-  μ⁻¹ {A} {τ₁} {τ₂} =
-    tset-map
-      (λ { {t} (p , a) → m+n≤o⇒m≤o τ₁ p ,
-                         n+m≤k⇒m≤k∸n τ₁ τ₂ t p ,
-                         monotone A (≤-reflexive (sym (n∸m∸k≡n∸m+k t τ₁ τ₂))) a })
-      (λ { p (q , x) →
-        cong₂ _,_
-          (≤-irrelevant _ _)
-          (cong₂ _,_
-            (≤-irrelevant _ _)
-            (trans
-              (monotone-trans A _ _ x)
-              (trans
-                (cong (λ s → monotone A s x) (≤-irrelevant _ _))
-                (sym (monotone-trans A _ _ x))))) })
-
-
-  ⟨⟩-μ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵗ B)
-           → ⟨ τ₁ ⟩ᶠ (⟨ τ₂ ⟩ᶠ f) ∘ᵗ μ⁻¹ {A} ≡ᵗ μ⁻¹ {B} ∘ᵗ ⟨ τ₁ + τ₂ ⟩ᶠ f
-  ⟨⟩-μ⁻¹-nat {τ₁ = τ₁} {τ₂ = τ₂} f =
-    eqᵗ (λ { {t} (r , x) →
-      trans
-        (∘ᵗ-reveal _ _ _)
-        (trans
-          (cong (m+n≤o⇒m≤o τ₁ r ,_)
-            (cong (n+m≤k⇒m≤k∸n τ₁ τ₂ t r ,_)
-              (map-nat f _ _)))
-          (sym (∘ᵗ-reveal _ _ _))) })
-
-  ⟨⟩-μ∘μ⁻¹≡id : ∀ {A τ₁ τ₂}
-              → μ {A} {τ₁} {τ₂} ∘ᵗ μ⁻¹ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
-  ⟨⟩-μ∘μ⁻¹≡id {A} {τ₁} {τ₂} =
-    eqᵗ (λ { {t} (p , x) →
-      trans
-        (∘ᵗ-reveal _ _ _)
-        (trans
-          (cong₂ _,_
-            (≤-irrelevant _ _)
-            (trans
-              (monotone-trans A _ _ _)
-              (trans
-                (cong (λ q → monotone A q x) (≤-irrelevant _ _))
-                (monotone-refl A _))))
-          (sym (idᵗ-reveal _))) })
-
-  ⟨⟩-μ⁻¹∘μ≡id : ∀ {A τ₁ τ₂}
-              → μ⁻¹ {A} {τ₁} {τ₂} ∘ᵗ μ {A} {τ₁} {τ₂} ≡ᵗ idᵗ
-  ⟨⟩-μ⁻¹∘μ≡id {A} {τ₁} {τ₂} =
-    eqᵗ (λ { {t} (p , q , x) →
-      trans
-        (∘ᵗ-reveal _ _ _)
-        (trans
-          (cong₂ _,_
-            (≤-irrelevant _ _)
-            (cong₂ _,_
-              (≤-irrelevant _ _)
-              (trans
-                (monotone-trans A _ _ _)
-                (trans
-                  (cong (λ q → monotone A q x) (≤-irrelevant _ _))
-                  (monotone-refl A _)))))
-          (sym (idᵗ-reveal _))) })
