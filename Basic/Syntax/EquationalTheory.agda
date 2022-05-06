@@ -266,10 +266,10 @@ mutual
                                                 
     -- computational/beta equation for unboxing
 
-    unbox-box : ∀ {A B τ τ'}
+    unbox-box : ∀ {A C τ}
               → (p : τ ≤ ctx-time Γ)
               → (V : (Γ -ᶜ τ) ⟨ τ ⟩ ⊢V⦂ A)
-              → (N : Γ ∷ A ⊢C⦂ B ‼ τ')
+              → (N : Γ ∷ A ⊢C⦂ C)
               ---------------------------------------------
               → Γ ⊢C⦂ unbox p (box V) N
                   == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ p) V ]c)
