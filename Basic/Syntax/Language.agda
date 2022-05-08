@@ -131,7 +131,7 @@ mutual
     delay   : {A : VType}
             → {τ' τ'' : Time}
             → (τ : Time)
-            → τ'' ≡ τ + τ'               -- abstracting τ + τ' into a separate variable for inductive
-            → Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ'          -- proofs, and to support equational rewriting the time gradings
+            → τ'' ≡ τ + τ'               -- abstracting τ + τ' into a separate variable for more 
+            → Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ'          -- convenient equational rewriting for the time gradings
             --------------------
             → Γ ⊢C⦂ A ‼ τ''

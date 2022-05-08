@@ -207,8 +207,8 @@ mutual
                  ∘ᵗ env-⟨⟩-ᶜ τ p ⟩ᵗ
 
   ⟦ delay τ refl M ⟧ᶜᵗ =
-       T-≤τ (≤-reflexive (+-comm τ _))
-    ∘ᵗ T-delay ∘ᵗ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
+       T-delay
+    ∘ᵗ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
     ∘ᵗ η-⊣ 
     
   infix 25 ⟦_⟧ᶜᵗ
