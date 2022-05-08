@@ -208,7 +208,7 @@ mutual
 
   ⟦ delay τ refl M ⟧ᶜᵗ =
        T-≤τ (≤-reflexive (+-comm τ _))
-    ∘ᵗ T-[]-module ∘ᵗ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
+    ∘ᵗ T-delay ∘ᵗ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
     ∘ᵗ η-⊣ 
     
   infix 25 ⟦_⟧ᶜᵗ

@@ -126,16 +126,12 @@ mutual
             --------------------
             → Γ ⊢C⦂ C
 
-    -- explicit delaying of a computation (a special case of this
-    -- construct is the explicit sub-effecting subsumption rule)
-
-    -- note: the delay in the context is needed to type equations
-    -- such as (delay p M) ; N == delay (p + id) (M ; N)
+    -- explicit delaying of a computation
 
     delay   : {A : VType}
-            → {τ τ'' : Time}
-            → (τ' : Time)
-            → τ'' ≡ τ + τ'               -- abstracting τ + τ' into a separate variable for inductive proofs
-            → Γ ⟨ τ' ⟩ ⊢C⦂ A ‼ τ
+            → {τ' τ'' : Time}
+            → (τ : Time)
+            → τ'' ≡ τ + τ'               -- abstracting τ + τ' into a separate variable for inductive
+            → Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ'          -- proofs, and to support equational rewriting the time gradings
             --------------------
             → Γ ⊢C⦂ A ‼ τ''
