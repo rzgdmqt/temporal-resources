@@ -282,22 +282,19 @@ mutual
     box-unbox-eta : ∀ {A C τ}
                   → (p : τ ≤ ctx-time Γ)
                   → (V : Γ -ᶜ τ ⊢V⦂ [ τ ] A)
-                  → (M : (Γ -ᶜ τ) ∷ [ τ ] A ⊢C⦂ C)
-                  -----------------------------------------------
-                  → Γ ⊢C⦂ C-rename (-ᶜ-wk-ren τ) (M [ Hd ↦ V ]c)             -- M[V/y]
-                      == unbox p V                                           -- unbox V to x in M[box x/y]
-                           (C-rename
-                             (cong-∷-ren (-ᶜ-wk-ren τ))
-                             ((C-rename (exch-ren ∘ʳ wk-ren) M)
-                                 [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c))
-                                 
+                  → (M : Γ ∷ [ τ ] A ⊢C⦂ C)
+                  --------------------------------------------
+                  → Γ ⊢C⦂ M [ Hd ↦ V-rename (-ᶜ-wk-ren τ) V ]c                   -- M[V/y]
+                      == unbox p V (                                             -- unbox V to x in M[box x/y]
+                           (C-rename (exch-ren ∘ʳ wk-ren) M)
+                              [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c)   
+
     -- delay equations
     
     delay-zero : ∀ {A τ}
-               → (p : τ ≡ 0 + τ)
                → (M : Γ ⟨ 0 ⟩ ⊢C⦂ A ‼ τ)
                ------------------------------------------
-               → Γ ⊢C⦂ delay 0 p M == C-rename ⟨⟩-η-ren M
+               → Γ ⊢C⦂ delay 0 refl M == C-rename ⟨⟩-η-ren M
 
     delay-delay : ∀ {A τ τ₁ τ₂ τ' τ''}
                 → (q : τ' ≡ τ₂ + τ)
