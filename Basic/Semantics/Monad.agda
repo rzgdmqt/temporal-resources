@@ -47,7 +47,20 @@ postulate
 
   -- Monotonicity wrt. gradings
 
-  T-≤τ : ∀ {A τ τ'} → τ ≤ τ' → Tᵒ A τ →ᵗ Tᵒ A τ'
+  -- Note: This would correspond to syntactic sub-effecting,
+  -- but the current language doesn't seem to readily support
+  -- it. For example, consider the equation/reduction
+  --
+  --   coerce (p : 0 ≤ τ') (return V) ; N ~> coerce ... N[V/x]
+  --
+  -- where if the LHS is typed according to the obvious
+  -- rule, N would be typed in a context `Γ ⟨ τ' ⟩ ∷ A`
+  -- but this cannot be turned into a context `Γ ∷ A` as
+  -- needed in the RHS of the equation/reduction. Instead
+  -- it seems to remain the case that one needs to use the
+  -- explicit delays instead of sub-effecting coercions.
+
+  -- T-≤τ : ∀ {A τ τ'} → τ ≤ τ' → Tᵒ A τ →ᵗ Tᵒ A τ'
 
   -- Unit
 
