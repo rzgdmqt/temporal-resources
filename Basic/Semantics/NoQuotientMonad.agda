@@ -274,6 +274,30 @@ strᵀ {A} {B} =
 -- Effect handling / free algebras
 
 handleˢ : ∀ {A B τ τ' t}
+        → ((op : Op) → (τ'' : Time) →
+             ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')) →ᵗ Tᵒ B (op-time op + τ''))
+        → A →ᵗ Tᵒ B τ'
+        → Tˢ A τ t
+        → Tˢ B (τ + τ') t
+handleˢ h f (leaf v) =
+  map-carrier f v
+handleˢ {A} {B} {t = t} h f (node op v k) =
+  τ-subst
+    (sym (+-assoc (op-time op) _ _))
+    (map-carrier (h op _)
+      (v ,
+       subst id (sym (reveal-⇒ᵗ (⟦ arity op ⟧ᵍ) (Tᵒ B _) _))
+         (tset-map
+           (λ { (q , y) → handleˢ h f (k (subst id (reveal-homᵒ (t + op-time op) _) q) y) })
+           (λ { p (q , y) → {!!} }))))                                                              -- if the handler is assumed to be monotone, then we need to
+handleˢ h f (delay τ k) =                                                                           -- prove here (simultaneously) that handleˢ is monotone as well
+  τ-subst
+    (sym (+-assoc τ _ _))
+    (delay τ (handleˢ h f k))
+
+
+{-
+handleˢ : ∀ {A B τ τ' t}
         → ((op : Op) → (τ'' : Time) → {t' : Time} →
              carrier ⟦ param op ⟧ᵍ t' →
              ({t'' : Time} → t' + op-time op ≤ t'' → carrier ⟦ arity op ⟧ᵍ t'' → Tˢ B τ'' t'') →
@@ -342,6 +366,10 @@ handleᵀ {A} {B} h f =
     {!!}                                                                                        -- Do we need to separately restrict to only trees whos continuations are monotone?
                                                                                                 -- Because if we simply strengthen the h argument of handleˢ when we cannot do
                                                                                                 -- recursive calls there any more
+
+-}
+
+
 
 {-
 
