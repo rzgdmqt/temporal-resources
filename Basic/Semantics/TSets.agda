@@ -203,7 +203,7 @@ abstract
                   → f ≡ᵗ initialᵗ
   initialᵗ-unique = eqᵗ (λ ())
 
----- binary products
+---- binary products (TODO: (temporarily) made non-abstract when working on the monad defs.)
 _×ᵗ_ : TSet → TSet → TSet
 A ×ᵗ B =
   tset
@@ -211,6 +211,10 @@ A ×ᵗ B =
     (λ p → mapˣ (monotone A p) (monotone B p))
     (λ x → cong₂ _,_ (monotone-refl A (proj₁ x)) (monotone-refl B (proj₂ x)))
     (λ p q x → cong₂ _,_ (monotone-trans A p q (proj₁ x)) (monotone-trans B p q (proj₂ x)))
+
+--  reveal-×ᵗ : (A B : TSet) (t : Time)
+--            → carrier (A ×ᵗ B) t ≡ (carrier A t × carrier B t)
+--  reveal-×ᵗ A B t = refl
 
 infixr 23 _×ᵗ_
 
@@ -317,7 +321,11 @@ abstract
       (λ p q → ≤-trans q p)
       (λ p → ≤-irrelevant _ _)
       (λ p q r → ≤-irrelevant _ _)
-   
+
+  reveal-homᵒ : (t t' : Time)
+              → carrier (homᵒ t) t' ≡ (t ≤ t')
+  reveal-homᵒ t t' = refl
+
   homᶠ : ∀ {t t'} → t ≤ t' → homᵒ t' →ᵗ homᵒ t
   homᶠ p =
     tset-map
@@ -355,6 +363,10 @@ abstract
       (λ p q f →
         ≡ᵗ-≡ (eqᵗ (λ { (r , x) →
           cong (λ s → map-carrier f (s , x)) (≤-irrelevant _ _) })))
+
+  reveal-⇒ᵗ : (A B : TSet) (t : Time)
+            → carrier (A ⇒ᵗ B) t ≡ homᵒ t ×ᵗ A →ᵗ B
+  reveal-⇒ᵗ A B t = refl
 
 infixr 22 _⇒ᵗ_
 

@@ -149,7 +149,7 @@ Tᶠ : ∀ {A B τ} → A →ᵗ B → Tᵒ A τ →ᵗ Tᵒ B τ
 Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-≤t-nat f)
 
 
--- Unit (TODO: prove naturality)
+-- Unit (TODO: prove naturality and laws)
 
 ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
 ηᵀ =
@@ -158,7 +158,7 @@ Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-≤t-nat f)
     (λ p v → refl)
 
 
--- Multiplication (TODO: prove naturality)
+-- Multiplication (TODO: prove naturality and laws)
 
 μˢ : ∀ {A τ τ'} → {t : Time}
    → Tˢ (Tᵒ A τ') τ t → Tˢ A (τ + τ') t
@@ -193,18 +193,182 @@ Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-≤t-nat f)
 μᵀ = tset-map μˢ μˢ-≤t-nat
 
 
--- Strength
+-- Strength (TODO: prove naturality and laws)
 
 strˢ : ∀ {A B τ τ' t}
      → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t
      → Tˢ B τ t
      → Tˢ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ t
-
 strˢ {A} {τ' = τ'} v (leaf w) =
   leaf ((≤-trans (proj₁ v) (≤-reflexive (+-identityʳ _)) ,
          monotone A
            (≤-reflexive (cong (_∸ τ') (+-identityʳ _)))
            (proj₂ v)) ,
         w)
-strˢ v (node op w k) = {!!}
-strˢ v (delay τ k) = {!!}
+strˢ {A} {B} {_} {τ'} {t} v (node op w k) =
+  node op w (λ p y →
+    strˢ
+      {A} {B}
+      (monotone (⟨ τ' ⟩ᵒ A)
+        (≤-trans
+          (≤-reflexive (sym (+-assoc t _ _)))
+          (+-monoˡ-≤ _ p))
+        v)
+      (k p y))
+strˢ {A} {B} {_} {τ'} {t} v (delay τ k) =
+  delay τ
+    (strˢ {A} {B}
+      (monotone (⟨ τ' ⟩ᵒ A) (≤-reflexive (sym (+-assoc t _ _))) v)
+      k)
+
+strˢ-≤t-nat : ∀ {A B τ τ'} → {t t' : ℕ} → (p : t ≤ t')
+            → (v : carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t)
+            → (c : Tˢ B τ t)
+            → strˢ {A = A} {B = B}
+                (monotone ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) p v)
+                (Tˢ-≤t p c)
+            ≡ Tˢ-≤t p (strˢ {A = A} {B = B} v c)
+strˢ-≤t-nat {A} {B} {_} {τ'} {t} {t'} p v (leaf w) =
+  cong leaf
+    (cong (_, monotone B p w)
+      (cong₂ _,_
+        (≤-irrelevant _ _)
+        (trans
+          (trans
+            (monotone-trans A _ _ (proj₂ v))
+            (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _)))
+          (sym (monotone-trans A _ _ (proj₂ v))))))
+strˢ-≤t-nat {A} {B} p v (node op w k) =
+  cong (node op (monotone ⟦ param op ⟧ᵍ p w))
+    (ifun-ext (fun-ext (λ q → fun-ext (λ y →
+      cong (λ v → strˢ {A} {B} v (k (≤-trans (+-monoˡ-≤ (op-time op) p) q) y))
+        (cong₂ _,_
+          (≤-irrelevant _ _)
+          (trans
+            (monotone-trans A _ _ (proj₂ v))
+            (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _)))))))) 
+strˢ-≤t-nat {A} {B} {_} {τ'} {t} {t'} p v (delay τ k) =
+  cong (delay τ)
+    (trans
+      (cong (λ v → strˢ {A} {B} v (Tˢ-≤t (+-monoˡ-≤ _ p) k))
+        (cong₂ _,_
+          (≤-irrelevant _ _)
+          (trans
+            (monotone-trans A _ _ (proj₂ v))
+            (trans
+              (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _))
+              (sym (monotone-trans A _ _ (proj₂ v)))))))
+      (strˢ-≤t-nat
+        (+-monoˡ-≤ τ p)
+        (monotone (⟨ τ' ⟩ᵒ A) (≤-reflexive (sym (+-assoc t _ _))) v)
+        k))
+
+strᵀ : ∀ {A B τ τ'}
+     → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
+strᵀ {A} {B} =
+  tset-map
+    (λ { (v , c) → strˢ {A} {B} v c })
+    (λ { p (v , c) → strˢ-≤t-nat p v c })
+
+
+-- Effect handling / free algebras
+
+handleˢ : ∀ {A B τ τ' t}
+        → ((op : Op) → (τ'' : Time) → {t' : Time} →
+             carrier ⟦ param op ⟧ᵍ t' →
+             ({t'' : Time} → t' + op-time op ≤ t'' → carrier ⟦ arity op ⟧ᵍ t'' → Tˢ B τ'' t'') →
+             Tˢ B (op-time op + τ'') t')
+        → A →ᵗ Tᵒ B τ'
+        → Tˢ A τ t
+        → Tˢ B (τ + τ') t
+handleˢ h f (leaf v) =
+  map-carrier f v
+handleˢ h f (node op v k) =
+  τ-subst
+    (sym (+-assoc (op-time op) _ _))
+    (h op _ v (λ p y → handleˢ h f (k p y)))
+handleˢ h f (delay τ k) =
+  τ-subst
+    (sym (+-assoc τ _ _))
+    (delay τ (handleˢ h f k))
+
+handleˢ-≤t-nat : ∀ {A B τ τ'} → {t t' : ℕ} → (p : t ≤ t')
+               → (h : (op : Op) → (τ'' : Time) → {t' : Time} →
+                        carrier ⟦ param op ⟧ᵍ t' →
+                        ({t'' : Time} → t' + op-time op ≤ t'' → carrier ⟦ arity op ⟧ᵍ t'' → Tˢ B τ'' t'') →
+                        Tˢ B (op-time op + τ'') t')
+               → (h-nat : (op : Op) → (τ'' : Time) → {t t' : Time} → (p : t ≤ t') →
+                    (v : carrier ⟦ param op ⟧ᵍ t) →
+                    (k : {t'' : Time} → t + op-time op ≤ t'' → carrier ⟦ arity op ⟧ᵍ t'' → Tˢ B τ'' t'') →
+                      h op _ (monotone (⟦ param op ⟧ᵍ) p v) (λ q y → k (≤-trans (+-monoˡ-≤ (op-time op) p) q) y)
+                    ≡ Tˢ-≤t p (h op _ v k))
+               → (f : A →ᵗ Tᵒ B τ')
+               → (c : Tˢ A τ t)
+               → handleˢ h f (Tˢ-≤t p c)
+               ≡ Tˢ-≤t p (handleˢ h f c)
+handleˢ-≤t-nat p h h-nat f (leaf v) =
+  map-nat f p v
+handleˢ-≤t-nat p h h-nat f (node op v k) =
+  trans
+    (cong (τ-subst (sym (+-assoc (op-time op) _ _)))
+      (h-nat op _ p v (λ p y → handleˢ h f (k p y))))
+    (sym (τ-subst-≤t (sym (+-assoc (op-time op) _ _)) p
+           (h op _ v (λ p y → handleˢ h f (k p y)))))
+handleˢ-≤t-nat p h h-nat f (delay τ k) =
+  trans
+    (cong (τ-subst (sym (+-assoc τ _ _)))
+      (cong (delay τ)
+        (handleˢ-≤t-nat (+-monoˡ-≤ τ p) h h-nat f k)))
+    (sym (τ-subst-≤t (sym (+-assoc τ _ _)) p
+           (delay τ (handleˢ h f k))))
+
+
+handleᵀ : ∀ {A B τ τ'}
+        → ((op : Op) → (τ'' : Time) →
+             ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')) →ᵗ Tᵒ B (op-time op + τ''))
+        → A →ᵗ Tᵒ B τ'
+        → Tᵒ A τ →ᵗ Tᵒ B (τ + τ')
+handleᵀ {A} {B} h f =
+  tset-map
+    (λ c → handleˢ
+             (λ op τ'' {t'} v k →
+               map-carrier (h op τ'')
+                 (v ,
+                  subst id (sym (reveal-⇒ᵗ (⟦ arity op ⟧ᵍ) (Tᵒ B τ'') (t' + op-time op)))
+                    (tset-map
+                      (λ { (q , y) → k (subst id (reveal-homᵒ (t' + op-time op) _) q) y })
+                      (λ { q (r , y) → {!!} }))))                                               -- Need the continuation k to be monotone
+             f c)                                                                               -- This does not follow from the raw inductive tree definition of Tˢ
+    {!!}                                                                                        -- Do we need to separately restrict to only trees whos continuations are monotone?
+                                                                                                -- Because if we simply strengthen the h argument of handleˢ when we cannot do
+                                                                                                -- recursive calls there any more
+
+{-
+
+(tset-map
+                   (λ { (q , y) → k (≤-trans {!!} (subst id (reveal-homᵒ t' _) q)) y })
+                   {!!})
+
+-}
+
+
+{-
+handleᵀ : ∀ {A B τ τ'}
+        → ((op : Op) → (τ'' : Time) → {t' : Time} →
+             carrier ⟦ param op ⟧ᵍ t' →
+             ({t'' : Time} → t' + op-time op ≤ t'' → carrier ⟦ arity op ⟧ᵍ t'' → Tˢ B τ'' t'') →
+             Tˢ B (op-time op + τ'') t')
+        → A →ᵗ Tᵒ B τ'
+        → Tᵒ A τ →ᵗ Tᵒ B (τ + τ')
+handleᵀ h f =
+  tset-map (handleˢ h f) (λ p c → handleˢ-≤t-nat p h f c)
+-}
+
+
+{-
+               Tˢ B (op-time op + τ'') t')
+               → strˢ {A = A} {B = B}
+                   (monotone ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) p v)
+                   (Tˢ-≤t p c)
+               ≡ Tˢ-≤t p (strˢ {A = A} {B = B} v c)
+-}
