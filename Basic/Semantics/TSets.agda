@@ -204,14 +204,13 @@ abstract
   initialᵗ-unique = eqᵗ (λ ())
 
 ---- binary products
-abstract
-  _×ᵗ_ : TSet → TSet → TSet
-  A ×ᵗ B =
-    tset
-      (λ t → carrier A t × carrier B t)
-      (λ p → mapˣ (monotone A p) (monotone B p))
-      (λ x → cong₂ _,_ (monotone-refl A (proj₁ x)) (monotone-refl B (proj₂ x)))
-      (λ p q x → cong₂ _,_ (monotone-trans A p q (proj₁ x)) (monotone-trans B p q (proj₂ x)))
+_×ᵗ_ : TSet → TSet → TSet
+A ×ᵗ B =
+  tset
+    (λ t → carrier A t × carrier B t)
+    (λ p → mapˣ (monotone A p) (monotone B p))
+    (λ x → cong₂ _,_ (monotone-refl A (proj₁ x)) (monotone-refl B (proj₂ x)))
+    (λ p q x → cong₂ _,_ (monotone-trans A p q (proj₁ x)) (monotone-trans B p q (proj₂ x)))
 
 infixr 23 _×ᵗ_
 
