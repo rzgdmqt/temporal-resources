@@ -214,34 +214,6 @@ abstract
       (λ x → cong₂ _,_ (monotone-refl A (proj₁ x)) (monotone-refl B (proj₂ x)))
       (λ p q x → cong₂ _,_ (monotone-trans A p q (proj₁ x)) (monotone-trans B p q (proj₂ x)))
 
-abstract
-  pack-×ᵗ : ∀ {A B t}
-          → carrier A t × carrier B t
-          → carrier (A ×ᵗ B) t
-  pack-×ᵗ xy = xy
-
-  unpack-×ᵗ : ∀ {A B t}
-            → carrier (A ×ᵗ B) t
-            → carrier A t × carrier B t
-  unpack-×ᵗ xy = xy
-
-  pack-unpack-×ᵗ : ∀ {A B t}
-                 → (xy : carrier A t × carrier B t)
-                 → unpack-×ᵗ {A} {B} {t} (pack-×ᵗ xy) ≡ xy
-  pack-unpack-×ᵗ xy = refl
-
-  unpack-pack-×ᵗ : ∀ {A B t}
-                 → (xy : carrier (A ×ᵗ B) t)
-                 → pack-×ᵗ {A} {B} {t} (unpack-×ᵗ xy) ≡ xy
-  unpack-pack-×ᵗ xy = refl
-
-  pack-×ᵗ-monotone : ∀ {A B t t'}
-                   → (p : t ≤ t')
-                   → (xy : carrier A t × carrier B t)
-                   → monotone (A ×ᵗ B) p (pack-×ᵗ xy)
-                   ≡ pack-×ᵗ (monotone A p (proj₁ xy) , monotone B p (proj₂ xy))
-  pack-×ᵗ-monotone p xy = refl
-
 infixr 23 _×ᵗ_
 
 abstract
@@ -311,6 +283,43 @@ abstract
       ⟨ g , h ⟩ᵗ ∘ᵗ f
     ∎
 
+------ packing and unpacking the abstract definitions
+
+abstract
+  pack-×ᵗ : ∀ {A B t}
+          → carrier A t × carrier B t
+          → carrier (A ×ᵗ B) t
+  pack-×ᵗ xy = xy
+
+  unpack-×ᵗ : ∀ {A B t}
+            → carrier (A ×ᵗ B) t
+            → carrier A t × carrier B t
+  unpack-×ᵗ xy = xy
+
+  pack-unpack-×ᵗ : ∀ {A B t}
+                 → (xy : carrier A t × carrier B t)
+                 → unpack-×ᵗ {A} {B} {t} (pack-×ᵗ xy) ≡ xy
+  pack-unpack-×ᵗ xy = refl
+
+  unpack-pack-×ᵗ : ∀ {A B t}
+                 → (xy : carrier (A ×ᵗ B) t)
+                 → pack-×ᵗ {A} {B} {t} (unpack-×ᵗ xy) ≡ xy
+  unpack-pack-×ᵗ xy = refl
+
+  pack-×ᵗ-monotone : ∀ {A B t t'}
+                   → (p : t ≤ t')
+                   → (xy : carrier A t × carrier B t)
+                   → monotone (A ×ᵗ B) p (pack-×ᵗ xy)
+                   ≡ pack-×ᵗ (monotone A p (proj₁ xy) , monotone B p (proj₂ xy))
+  pack-×ᵗ-monotone p xy = refl
+
+  unpack-×ᵗ-monotone : ∀ {A B t t'}
+                     → (p : t ≤ t')
+                     → (xy : carrier (A ×ᵗ B) t)
+                     → (monotone A p (proj₁ (unpack-×ᵗ xy)) , monotone B p (proj₂ (unpack-×ᵗ xy)))
+                     ≡ unpack-×ᵗ (monotone (A ×ᵗ B) p xy)
+  unpack-×ᵗ-monotone p xy = refl
+
 ---- Set-indexed products
 
 abstract
@@ -348,10 +357,6 @@ abstract
       (λ p → ≤-irrelevant _ _)
       (λ p q r → ≤-irrelevant _ _)
 
-  reveal-homᵒ : (t t' : Time)
-              → carrier (homᵒ t) t' ≡ (t ≤ t')
-  reveal-homᵒ t t' = refl
-
   homᶠ : ∀ {t t'} → t ≤ t' → homᵒ t' →ᵗ homᵒ t
   homᶠ p =
     tset-map
@@ -375,6 +380,19 @@ abstract
   hom-iso-map⁻¹ : ∀ {A t} → homᵒ t →ᵗ A → carrier A t
   hom-iso-map⁻¹ {A} f = map-carrier f ≤-refl
 
+------ packing and unpacking the abstract definitions
+
+abstract
+  pack-homᵒ : ∀ {t'} (t : Time)
+            → t ≤ t'
+            → carrier (homᵒ t) t'
+  pack-homᵒ t p = p
+
+  unpack-homᵒ : ∀ {t'} (t : Time)
+              → carrier (homᵒ t) t'
+              → t ≤ t'
+  unpack-homᵒ t p = p
+
 ---- exponentials
 
 abstract
@@ -389,10 +407,6 @@ abstract
       (λ p q f →
         ≡ᵗ-≡ (eqᵗ (λ { (r , x) →
           cong (λ s → map-carrier f (s , x)) (≤-irrelevant _ _) })))
-
-  reveal-⇒ᵗ : (A B : TSet) (t : Time)
-            → carrier (A ⇒ᵗ B) t ≡ homᵒ t ×ᵗ A →ᵗ B
-  reveal-⇒ᵗ A B t = refl
 
 infixr 22 _⇒ᵗ_
 
@@ -448,3 +462,16 @@ abstract
       ≡ᵗ-≡ (eqᵗ (λ y →
         cong (map-carrier f)
           (cong₂ _,_ (map-nat g _ x) refl))))
+
+------ packing and unpacking the abstract definitions
+
+abstract
+  pack-⇒ᵗ : ∀ {A B t}
+          → homᵒ t ×ᵗ A →ᵗ B
+          → carrier (A ⇒ᵗ B) t
+  pack-⇒ᵗ f = f
+
+  unpack-⇒ᵗ : ∀ {A B t}
+            → carrier (A ⇒ᵗ B) t
+            → homᵒ t ×ᵗ A →ᵗ B
+  unpack-⇒ᵗ f = f

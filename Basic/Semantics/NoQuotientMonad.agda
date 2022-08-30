@@ -255,6 +255,7 @@ mutual
 μᵀ = tset-map μˢ μˢ-≤t-nat
 
 
+{-
 -- Strength (TODO: prove naturality and laws)
 
 mutual
@@ -332,7 +333,7 @@ mutual
             (trans
               (monotone-trans A _ _ (proj₂ v))
               (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _))))))))
-      {!!}
+      (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ r → fun-ext (λ y → uip))))))
   strˢ-≤t-nat {A} {B} {_} {τ'} {t} {t'} p v (delay τ k) =
     cong (delay τ)
       (trans
@@ -349,62 +350,114 @@ mutual
           (monotone (⟨ τ' ⟩ᵒ A) (≤-reflexive (sym (+-assoc t _ _))) v)
           k))
 
+strᵀ : ∀ {A B τ τ'}
+     → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
+strᵀ {A} {B} {τ} {τ'} =
+  tset-map
+    (λ vc → strˢ {A} {B} (proj₁ (unpack-×ᵗ vc)) (proj₂ (unpack-×ᵗ vc)))
+    (λ p vc → trans
+      (cong₂ strˢ
+        (sym (cong proj₁ (unpack-×ᵗ-monotone {[ τ ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ} p vc)))
+        (sym (cong proj₂ (unpack-×ᵗ-monotone {[ τ ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ} p vc))))
+      (strˢ-≤t-nat p _ _))
+-}
+
+
+
+-- Effect handling / free algebras
+
+mutual
+
+  {-# TERMINATING #-}
+
+  handleˢ : ∀ {A B τ τ' t}
+          → ((op : Op) → (τ'' : Time) →
+               ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')) →ᵗ Tᵒ B (op-time op + τ''))
+          → A →ᵗ Tᵒ B τ'
+          → Tˢ A τ t
+          → Tˢ B (τ + τ') t
+  handleˢ h f (leaf v) =
+    map-carrier f v
+  handleˢ {A} {B} {t = t} h f (node op v k k-nat) =
+    τ-subst
+      (sym (+-assoc (op-time op) _ _))
+      (map-carrier (h op _)
+        (pack-×ᵗ (v ,
+          pack-⇒ᵗ
+            (tset-map
+              (λ py →
+                handleˢ h f
+                  (k (unpack-homᵒ (t + op-time op) (proj₁ (unpack-×ᵗ py)))
+                     (proj₂ (unpack-×ᵗ py))))
+              (λ p qy → trans
+                (cong
+                  (handleˢ {A} {B} h f)
+                  {k (unpack-homᵒ (t + op-time op)
+                       (proj₁ (unpack-×ᵗ (monotone (homᵒ (t + op-time op) ×ᵗ ⟦ arity op ⟧ᵍ) p qy))))
+                     (proj₂ (unpack-×ᵗ (monotone (homᵒ (t + op-time op) ×ᵗ ⟦ arity op ⟧ᵍ) p qy)))}
+                  {Tˢ-≤t p (k (unpack-homᵒ (t + op-time op) (proj₁ (unpack-×ᵗ qy))) (proj₂ (unpack-×ᵗ qy)))}
+                  (trans
+                    (cong₂ k
+                      (≤-irrelevant _ _)
+                      (sym (cong proj₂ (unpack-×ᵗ-monotone {homᵒ (t + op-time op)} {⟦ arity op ⟧ᵍ} p qy))))
+                    (k-nat p (unpack-homᵒ (t + op-time op) (proj₁ (unpack-×ᵗ qy))) (proj₂ (unpack-×ᵗ qy)))))
+                (handleˢ-≤t-nat p h f (k (unpack-homᵒ (t + op-time op) (proj₁ (unpack-×ᵗ qy))) (proj₂ (unpack-×ᵗ qy)))))))))
+  handleˢ h f (delay τ k) =
+    τ-subst
+      (sym (+-assoc τ _ _))
+      (delay τ (handleˢ h f k))
+
+  handleˢ-≤t-nat : ∀ {A B τ τ'} → {t t' : ℕ} → (p : t ≤ t')
+                 → (h : (op : Op) → (τ'' : Time) →
+                          ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')) →ᵗ Tᵒ B (op-time op + τ''))
+                 → (f : A →ᵗ Tᵒ B τ')
+                 → (c : Tˢ A τ t)
+                 → handleˢ h f (Tˢ-≤t p c)
+                 ≡ Tˢ-≤t p (handleˢ h f c)
+  handleˢ-≤t-nat p h f (leaf v) =
+    map-nat f p v
+  handleˢ-≤t-nat p h f (node op v k k-nat) =
+    {!!}
+  handleˢ-≤t-nat p h f (delay τ k) =
+    trans
+      (cong (τ-subst (sym (+-assoc τ _ _)))
+        (cong (delay τ)
+          (handleˢ-≤t-nat (+-monoˡ-≤ τ p) h f k)))
+      (sym (τ-subst-≤t (sym (+-assoc τ _ _)) p
+             (delay τ (handleˢ h f k))))
+
+
 
 
 {-
 
-strˢ-≤t-nat : ∀ {A B τ τ'} → {t t' : ℕ} → (p : t ≤ t')
-            → (v : carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t)
-            → (c : Tˢ B τ t)
-            → strˢ {A = A} {B = B}
-                (monotone ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) p v)
-                (Tˢ-≤t p c)
-            ≡ Tˢ-≤t p (strˢ {A = A} {B = B} v c)
-strˢ-≤t-nat {A} {B} {_} {τ'} {t} {t'} p v (leaf w) =
-  cong leaf
-    (cong (_, monotone B p w)
-      (cong₂ _,_
-        (≤-irrelevant _ _)
-        (trans
-          (trans
-            (monotone-trans A _ _ (proj₂ v))
-            (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _)))
-          (sym (monotone-trans A _ _ (proj₂ v))))))
-strˢ-≤t-nat {A} {B} p v (node op w k) =
-  cong (node op (monotone ⟦ param op ⟧ᵍ p w))
-    (ifun-ext (fun-ext (λ q → fun-ext (λ y →
-      cong (λ v → strˢ {A} {B} v (k (≤-trans (+-monoˡ-≤ (op-time op) p) q) y))
-        (cong₂ _,_
-          (≤-irrelevant _ _)
-          (trans
-            (monotone-trans A _ _ (proj₂ v))
-            (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _)))))))) 
-strˢ-≤t-nat {A} {B} {_} {τ'} {t} {t'} p v (delay τ k) =
-  cong (delay τ)
-    (trans
-      (cong (λ v → strˢ {A} {B} v (Tˢ-≤t (+-monoˡ-≤ _ p) k))
-        (cong₂ _,_
-          (≤-irrelevant _ _)
-          (trans
-            (monotone-trans A _ _ (proj₂ v))
-            (trans
-              (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _))
-              (sym (monotone-trans A _ _ (proj₂ v)))))))
-      (strˢ-≤t-nat
-        (+-monoˡ-≤ τ p)
-        (monotone (⟨ τ' ⟩ᵒ A) (≤-reflexive (sym (+-assoc t _ _))) v)
-        k))
-
-strᵀ : ∀ {A B τ τ'}
-     → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
-strᵀ {A} {B} =
-  tset-map
-    (λ { (v , c) → strˢ {A} {B} v c })
-    (λ { p (v , c) → strˢ-≤t-nat p v c })
-
+handleˢ-≤t-nat p h h-nat f (leaf v) =
+  map-nat f p v
+handleˢ-≤t-nat p h h-nat f (node op v k) =
+  trans
+    (cong (τ-subst (sym (+-assoc (op-time op) _ _)))
+      (h-nat op _ p v (λ p y → handleˢ h f (k p y))))
+    (sym (τ-subst-≤t (sym (+-assoc (op-time op) _ _)) p
+           (h op _ v (λ p y → handleˢ h f (k p y)))))
+handleˢ-≤t-nat p h h-nat f (delay τ k) =
+  trans
+    (cong (τ-subst (sym (+-assoc τ _ _)))
+      (cong (delay τ)
+        (handleˢ-≤t-nat (+-monoˡ-≤ τ p) h h-nat f k)))
+    (sym (τ-subst-≤t (sym (+-assoc τ _ _)) p
+           (delay τ (handleˢ h f k))))
 
 -}
 
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
 
 
 
