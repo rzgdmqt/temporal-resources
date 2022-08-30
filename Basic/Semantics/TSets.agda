@@ -204,17 +204,43 @@ abstract
   initialᵗ-unique = eqᵗ (λ ())
 
 ---- binary products (TODO: (temporarily) made non-abstract when working on the monad defs.)
-_×ᵗ_ : TSet → TSet → TSet
-A ×ᵗ B =
-  tset
-    (λ t → carrier A t × carrier B t)
-    (λ p → mapˣ (monotone A p) (monotone B p))
-    (λ x → cong₂ _,_ (monotone-refl A (proj₁ x)) (monotone-refl B (proj₂ x)))
-    (λ p q x → cong₂ _,_ (monotone-trans A p q (proj₁ x)) (monotone-trans B p q (proj₂ x)))
 
---  reveal-×ᵗ : (A B : TSet) (t : Time)
---            → carrier (A ×ᵗ B) t ≡ (carrier A t × carrier B t)
---  reveal-×ᵗ A B t = refl
+abstract
+  _×ᵗ_ : TSet → TSet → TSet
+  A ×ᵗ B =
+    tset
+      (λ t → carrier A t × carrier B t)
+      (λ p → mapˣ (monotone A p) (monotone B p))
+      (λ x → cong₂ _,_ (monotone-refl A (proj₁ x)) (monotone-refl B (proj₂ x)))
+      (λ p q x → cong₂ _,_ (monotone-trans A p q (proj₁ x)) (monotone-trans B p q (proj₂ x)))
+
+abstract
+  pack-×ᵗ : ∀ {A B t}
+          → carrier A t × carrier B t
+          → carrier (A ×ᵗ B) t
+  pack-×ᵗ xy = xy
+
+  unpack-×ᵗ : ∀ {A B t}
+            → carrier (A ×ᵗ B) t
+            → carrier A t × carrier B t
+  unpack-×ᵗ xy = xy
+
+  pack-unpack-×ᵗ : ∀ {A B t}
+                 → (xy : carrier A t × carrier B t)
+                 → unpack-×ᵗ {A} {B} {t} (pack-×ᵗ xy) ≡ xy
+  pack-unpack-×ᵗ xy = refl
+
+  unpack-pack-×ᵗ : ∀ {A B t}
+                 → (xy : carrier (A ×ᵗ B) t)
+                 → pack-×ᵗ {A} {B} {t} (unpack-×ᵗ xy) ≡ xy
+  unpack-pack-×ᵗ xy = refl
+
+  pack-×ᵗ-monotone : ∀ {A B t t'}
+                   → (p : t ≤ t')
+                   → (xy : carrier A t × carrier B t)
+                   → monotone (A ×ᵗ B) p (pack-×ᵗ xy)
+                   ≡ pack-×ᵗ (monotone A p (proj₁ xy) , monotone B p (proj₂ xy))
+  pack-×ᵗ-monotone p xy = refl
 
 infixr 23 _×ᵗ_
 

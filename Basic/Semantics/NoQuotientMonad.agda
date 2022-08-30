@@ -127,13 +127,32 @@ Tˢ-≤t-trans p q (delay τ k) =
       (cong (λ p → Tˢ-≤t p k) (≤-irrelevant _ _)))
 
 
+-- "subst" for time-gradings
+
+τ-subst : ∀ {A τ τ' t}
+        → τ ≡ τ'
+        → Tˢ A τ t
+        → Tˢ A τ' t
+τ-subst refl c = c
+
+τ-subst-≤t : ∀ {A τ τ' t t'}
+           → (p : τ ≡ τ')
+           → (q : t ≤ t')
+           → (c : Tˢ A τ t)
+           → Tˢ-≤t q (τ-subst p c) ≡ τ-subst p (Tˢ-≤t q c)
+τ-subst-≤t refl q c = refl
+
+
 -- Functorial action (TODO: prove identity and composition laws)
 
 mutual
 
   -- TODO: investigate how to convince Agda's termination checker;
-  --       the "suspicious" recursive occurrences are in proofs
-  --       when mentioning `Tˢᶠ` in types
+  --       the "suspicious" recursive occurrences of `Tˢᶠ` are in 
+  --       types (but still applied to the continuation `k`);
+  --       so maybe it is enough to index the trees by their height
+  --
+  --       same also applies for definitions below
 
   {-# TERMINATING #-}
 
@@ -162,6 +181,235 @@ mutual
       (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ q → fun-ext (λ y → uip))))))
   Tˢᶠ-≤t-nat f p (delay τ k) =
     cong (delay τ) (Tˢᶠ-≤t-nat f (+-monoˡ-≤ τ p) k)
+
+
+-- Packaging it all up into a functor on TSet
+
+Tᵒ : TSet → Time → TSet
+Tᵒ A τ = tset (Tˢ A τ) Tˢ-≤t Tˢ-≤t-refl Tˢ-≤t-trans
+
+Tᶠ : ∀ {A B τ} → A →ᵗ B → Tᵒ A τ →ᵗ Tᵒ B τ
+Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-≤t-nat f)
+
+
+-- Unit (TODO: prove naturality and laws)
+
+ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
+ηᵀ =
+  tset-map
+    (λ v → leaf v)
+    (λ p v → refl)
+
+
+-- Multiplication (TODO: prove naturality and laws)
+
+mutual
+
+  {-# TERMINATING #-}
+
+  μˢ : ∀ {A τ τ'} → {t : Time}
+     → Tˢ (Tᵒ A τ') τ t → Tˢ A (τ + τ') t
+  μˢ (leaf c) =
+    c
+  μˢ (node op v k k-nat) =
+    τ-subst
+      (sym (+-assoc (op-time op) _ _))
+      (node op v
+        (λ p y → μˢ (k p y))
+        (λ p q y →
+          trans
+            (cong μˢ (k-nat p q y))
+            (μˢ-≤t-nat p (k q y))))
+  μˢ (delay τ k) =
+    τ-subst (sym (+-assoc τ _ _)) (delay τ (μˢ k))
+
+  μˢ-≤t-nat : ∀ {A τ τ'} → {t t' : ℕ}
+          → (p : t ≤ t')
+          → (c : Tˢ (Tᵒ A τ') τ t)
+          → μˢ (Tˢ-≤t p c) ≡ Tˢ-≤t p (μˢ c)
+  μˢ-≤t-nat p (leaf v) =
+    refl
+  μˢ-≤t-nat p (node op v k k-nat) =
+    trans
+      (cong (τ-subst (sym (+-assoc (op-time op) _ _)))
+        (dcong₂ (node op (monotone ⟦ param op ⟧ᵍ p v))
+          refl
+          (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ r → fun-ext (λ y → uip))))))))
+      (sym (τ-subst-≤t
+             (sym (+-assoc (op-time op) _ _)) p
+             (node op v
+               (λ q y → μˢ (k q y))
+               (λ q r y →
+                 trans
+                   (cong μˢ (k-nat q r y))
+                   (μˢ-≤t-nat q (k r y))))))
+  μˢ-≤t-nat p (delay τ k) =
+    trans
+      (cong
+        (τ-subst (sym (+-assoc τ _ _)))
+        (cong (delay τ) (μˢ-≤t-nat (+-monoˡ-≤ τ p) k)))
+      (sym (τ-subst-≤t (sym (+-assoc τ _ _)) p (delay τ (μˢ k))))
+
+μᵀ : ∀ {A τ τ'}
+   → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
+μᵀ = tset-map μˢ μˢ-≤t-nat
+
+
+-- Strength (TODO: prove naturality and laws)
+
+mutual
+
+  {-# TERMINATING #-}
+
+  strˢ : ∀ {A B τ τ' t}
+       → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t
+       → Tˢ B τ t
+       → Tˢ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ t
+  strˢ {A} {B} {τ' = τ'} {t} v (leaf w) =
+    leaf
+      (pack-×ᵗ
+        ((≤-trans (proj₁ v) (≤-reflexive (+-identityʳ _)) ,
+           monotone A
+             (≤-reflexive (cong (_∸ τ') (+-identityʳ _)))
+             (proj₂ v)) ,
+         w))
+  strˢ {A} {B} {_} {τ'} {t} v (node op w k k-nat) =
+    node op w
+      (λ p y →
+        strˢ {A} {B}
+          ((monotone (⟨ τ' ⟩ᵒ A)
+             (≤-trans
+               (≤-reflexive (sym (+-assoc t _ _)))
+               (+-monoˡ-≤ _ p))
+             v))
+          (k p y))
+      (λ p q y →
+        trans
+          (cong₂ strˢ
+            (cong₂ _,_
+              (≤-irrelevant _ _)
+              (trans
+                (cong (λ p → monotone A p (proj₂ v))
+                  (≤-irrelevant _ _))
+                (sym
+                  (monotone-trans A _
+                    (∸-monoˡ-≤ τ' (+-monoˡ-≤ _ p))
+                    (proj₂ v)))))
+            (k-nat p q y))
+          (strˢ-≤t-nat p _ (k q y)))
+  strˢ {A} {B} {_} {τ'} {t} v (delay τ k) =
+    delay τ
+      (strˢ {A} {B}
+        (monotone (⟨ τ' ⟩ᵒ A) (≤-reflexive (sym (+-assoc t _ _))) v)
+        k)
+     
+  strˢ-≤t-nat : ∀ {A B τ τ'} → {t t' : ℕ} → (p : t ≤ t')
+              → (v : carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t)
+              → (c : Tˢ B τ t)
+              → strˢ {A = A} {B = B}
+                  (monotone ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) p v)
+                  (Tˢ-≤t p c)
+              ≡ Tˢ-≤t p (strˢ {A = A} {B = B} v c)
+  strˢ-≤t-nat {A} {B} p v (leaf w) =
+    cong leaf
+      (trans
+        (cong pack-×ᵗ
+          (cong (_, monotone B p w)
+            (cong₂ _,_
+              (≤-irrelevant _ _)
+              (trans
+                (trans
+                  (monotone-trans A _ _ (proj₂ v))
+                  (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _)))
+                (sym (monotone-trans A _ _ (proj₂ v)))))))
+        (sym (pack-×ᵗ-monotone p _)))
+  strˢ-≤t-nat {A} {B} p v (node op w k k-nat) =
+    dcong₂ (node op (monotone ⟦ param op ⟧ᵍ p w))
+      (ifun-ext (fun-ext (λ q → fun-ext (λ y →
+        cong (λ v → strˢ {A} {B} v (k (≤-trans (+-monoˡ-≤ (op-time op) p) q) y))
+          (cong₂ _,_
+            (≤-irrelevant _ _)
+            (trans
+              (monotone-trans A _ _ (proj₂ v))
+              (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _))))))))
+      {!!}
+  strˢ-≤t-nat {A} {B} {_} {τ'} {t} {t'} p v (delay τ k) =
+    cong (delay τ)
+      (trans
+        (cong (λ v → strˢ {A} {B} v (Tˢ-≤t (+-monoˡ-≤ _ p) k))
+          (cong₂ _,_
+            (≤-irrelevant _ _)
+            (trans
+              (monotone-trans A _ _ (proj₂ v))
+              (trans
+                (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _))
+                (sym (monotone-trans A _ _ (proj₂ v)))))))
+        (strˢ-≤t-nat
+          (+-monoˡ-≤ τ p)
+          (monotone (⟨ τ' ⟩ᵒ A) (≤-reflexive (sym (+-assoc t _ _))) v)
+          k))
+
+
+
+{-
+
+strˢ-≤t-nat : ∀ {A B τ τ'} → {t t' : ℕ} → (p : t ≤ t')
+            → (v : carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t)
+            → (c : Tˢ B τ t)
+            → strˢ {A = A} {B = B}
+                (monotone ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) p v)
+                (Tˢ-≤t p c)
+            ≡ Tˢ-≤t p (strˢ {A = A} {B = B} v c)
+strˢ-≤t-nat {A} {B} {_} {τ'} {t} {t'} p v (leaf w) =
+  cong leaf
+    (cong (_, monotone B p w)
+      (cong₂ _,_
+        (≤-irrelevant _ _)
+        (trans
+          (trans
+            (monotone-trans A _ _ (proj₂ v))
+            (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _)))
+          (sym (monotone-trans A _ _ (proj₂ v))))))
+strˢ-≤t-nat {A} {B} p v (node op w k) =
+  cong (node op (monotone ⟦ param op ⟧ᵍ p w))
+    (ifun-ext (fun-ext (λ q → fun-ext (λ y →
+      cong (λ v → strˢ {A} {B} v (k (≤-trans (+-monoˡ-≤ (op-time op) p) q) y))
+        (cong₂ _,_
+          (≤-irrelevant _ _)
+          (trans
+            (monotone-trans A _ _ (proj₂ v))
+            (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _)))))))) 
+strˢ-≤t-nat {A} {B} {_} {τ'} {t} {t'} p v (delay τ k) =
+  cong (delay τ)
+    (trans
+      (cong (λ v → strˢ {A} {B} v (Tˢ-≤t (+-monoˡ-≤ _ p) k))
+        (cong₂ _,_
+          (≤-irrelevant _ _)
+          (trans
+            (monotone-trans A _ _ (proj₂ v))
+            (trans
+              (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _))
+              (sym (monotone-trans A _ _ (proj₂ v)))))))
+      (strˢ-≤t-nat
+        (+-monoˡ-≤ τ p)
+        (monotone (⟨ τ' ⟩ᵒ A) (≤-reflexive (sym (+-assoc t _ _))) v)
+        k))
+
+strᵀ : ∀ {A B τ τ'}
+     → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
+strᵀ {A} {B} =
+  tset-map
+    (λ { (v , c) → strˢ {A} {B} v c })
+    (λ { p (v , c) → strˢ-≤t-nat p v c })
+
+
+-}
+
+
+
+
+
+
 
 
 
