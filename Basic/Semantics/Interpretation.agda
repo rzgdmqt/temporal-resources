@@ -159,11 +159,11 @@ mutual
   ⟦ return V ⟧ᶜᵗ = ηᵀ ∘ᵗ ⟦ V ⟧ᵛᵗ
   
   ⟦_⟧ᶜᵗ {Γ} (_;_ {τ = τ} M N) =
-       μᵀ
+    μᵀ
     ∘ᵗ Tᶠ ⟦ N ⟧ᶜᵗ
-    ∘ᵗ strᵀ {⟨ τ ⟩ᵒ ⟦ Γ ⟧ᵉ} 
+    ∘ᵗ strᵀ {⟦ Γ ⟧ᵉ}
     ∘ᵗ ⟨ η-⊣ {⟦ Γ ⟧ᵉ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ
-
+        
   ⟦ V · W ⟧ᶜᵗ = appᵗ ∘ᵗ ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵗ
   
   ⟦ absurd V ⟧ᶜᵗ = initialᵗ ∘ᵗ ⟦ V ⟧ᵛᵗ
@@ -178,6 +178,18 @@ mutual
                 g ∘ᵗ f ⟩ᵗ
 
   ⟦_⟧ᶜᵗ {Γ} (handle_`with_`in {A} {B} {τ} {τ'} M H N) =
+    {-
+    handleᵀ
+      (λ op τ'' →
+           ⟦ H op τ'' ⟧ᶜᵗ
+        ∘ᵗ mapˣᵗ
+             (mapˣᵗ idᵗ (⟦⟧ᵍ-⟦⟧ᵛ (param op)))
+             ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) (idᵗ {Tᵒ ⟦ B ⟧ᵛ τ''})))
+        ∘ᵗ ×-assocᵗ)
+      ⟦ N ⟧ᶜᵗ
+    ∘ᵗ ⟨ idᵗ , ⟦ M ⟧ᶜᵗ ⟩ᵗ
+    -}
+
     let f : ⟦ Γ ⟧ᵉ →ᵗ Π Op (λ op → Π Time (λ τ'' → ⟦ Γ ⟧ᵉ))
         f = ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ᵢᵗ) ⟩ᵢᵗ in
     let g : (op : Op) → (τ'' : Time)
@@ -192,12 +204,12 @@ mutual
                    ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) (idᵗ {Tᵒ ⟦ B ⟧ᵛ τ''}))))
                  (idᵗ {Tᵒ ⟦ B ⟧ᵛ (op-time op + τ'')}) in
        uncurryᵗ (
-            alg-of-handler
+            T-alg-of-handler
          ∘ᵗ mapⁱˣᵗ (λ op → mapⁱˣᵗ (λ τ'' →
               g op τ'' ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×-assocᵗ)))
          ∘ᵗ f)
     ∘ᵗ mapˣᵗ idᵗ (Tᶠ ⟦ N ⟧ᶜᵗ)
-    ∘ᵗ mapˣᵗ idᵗ (strᵀ {⟨ τ ⟩ᵒ ⟦ Γ ⟧ᵉ})
+    ∘ᵗ mapˣᵗ idᵗ (strᵀ {⟦ Γ ⟧ᵉ})
     ∘ᵗ ⟨ idᵗ , ⟨ η-⊣ {⟦ Γ ⟧ᵉ} {τ = τ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ
 
   ⟦ unbox {τ = τ} p V M ⟧ᶜᵗ =
@@ -207,7 +219,7 @@ mutual
                  ∘ᵗ env-⟨⟩-ᶜ τ p ⟩ᵗ
 
   ⟦ delay τ refl M ⟧ᶜᵗ =
-       T-delay
+       delayᵀ τ
     ∘ᵗ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
     ∘ᵗ η-⊣ 
     

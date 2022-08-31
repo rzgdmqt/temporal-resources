@@ -251,6 +251,7 @@ abstract
   μᵀ = tset-map μˢ μˢ-≤t-nat
 
 
+{-
 -- Strength (TODO: prove naturality and laws)
 
 mutual
@@ -356,7 +357,7 @@ abstract
           (sym (cong proj₁ (unpack-×ᵗ-monotone {[ τ ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ} p vc)))
           (sym (cong proj₂ (unpack-×ᵗ-monotone {[ τ ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ} p vc))))
         (strˢ-≤t-nat p _ _))
-
+-}
 
 -- Delay operation (T is a kind of a [_]-module)
 
@@ -502,11 +503,138 @@ abstract
 
 
 
+-- T-algebra induced by an effect handler
+
+mutual abstract
+
+  {-# TERMINATING #-}
+
+  T-alg-of-handlerˢ : ∀ {A τ τ' t}
+                    → carrier (Π Op (λ op → Π Time (λ τ'' →
+                        ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ A τ'')))
+                          ⇒ᵗ Tᵒ A (op-time op + τ'')))) t
+                    → {t' : Time}
+                    → t ≤ t'
+                    → Tˢ (Tᵒ A τ') τ t'
+                    → Tˢ A (τ + τ') t'
+
+  T-alg-of-handlerˢ h p (leaf c) =
+    c
+  T-alg-of-handlerˢ h p (node op v k k-nat) =
+    τ-subst
+      (sym (+-assoc (op-time op) _ _))
+      (node op v
+        (λ q y → T-alg-of-handlerˢ h (≤-trans p (m+n≤o⇒m≤o _ q)) (k q y))
+        (λ q r y →
+          trans
+            (cong₂ (T-alg-of-handlerˢ h) (≤-irrelevant _ _) (k-nat q r y))
+            (T-alg-of-handlerˢ-≤t-nat _ h q (k r y))))
+  T-alg-of-handlerˢ h p (delay τ k) =
+    τ-subst
+      (sym (+-assoc τ _ _))
+      (delay τ
+        (T-alg-of-handlerˢ h (≤-stepsʳ τ p) k))
+
+  T-alg-of-handlerˢ-≤t-nat : ∀ {A τ τ'} → {t t' : ℕ} → (p : t ≤ t')
+                           → (h : carrier (Π Op (λ op → Π Time (λ τ'' →
+                                    ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ A τ'')))
+                                      ⇒ᵗ Tᵒ A (op-time op + τ'')))) t)
+                           → {t'' : Time}
+                           → (q : t' ≤ t'')
+                           → (c : Tˢ (Tᵒ A τ') τ t')
+                           → T-alg-of-handlerˢ h (≤-trans p q) (Tˢ-≤t q c)
+                           ≡ Tˢ-≤t q (T-alg-of-handlerˢ h p c)
+                           
+  T-alg-of-handlerˢ-≤t-nat p h q c = {!!}
+
+
+abstract
+  T-alg-of-handler : ∀ {A τ τ'}
+                   → Π Op (λ op → Π Time (λ τ'' →
+                      ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ A τ'')))
+                        ⇒ᵗ Tᵒ A (op-time op + τ'')))
+                   →ᵗ Tᵒ (Tᵒ A τ') τ ⇒ᵗ Tᵒ A (τ + τ')
+  T-alg-of-handler = {!!}
 
 
 
 
+{-
 
+-- Context-parameterised effect handling
+
+  phandleᵀ : ∀ {Γ A B τ τ'}
+           → ((op : Op) → (τ'' : Time) →
+                Γ ×ᵗ ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')) →ᵗ Tᵒ B (op-time op + τ''))
+           → ⟨ τ ⟩ᵒ Γ ×ᵗ A →ᵗ Tᵒ B τ'
+           → Γ ×ᵗ Tᵒ A τ →ᵗ Tᵒ B (τ + τ')
+  phandleᵀ h f =
+    tset-map
+      (λ γc →
+        map-carrier
+          (handleᵀ
+            {!!}
+            (tset-map
+              (λ c → map-carrier f (pack-×ᵗ ({!!} , c)))
+              {!!}))
+          (proj₂ (unpack-×ᵗ γc)))
+      {!!}
+
+
+mutual abstract
+
+  {-# TERMINATING #-}
+
+  handleˢ : ∀ {Γ A B τ τ' t}
+          → ((op : Op) → (τ'' : Time) →
+               Γ ×ᵗ ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')) →ᵗ Tᵒ B (op-time op + τ''))
+          → ⟨ τ ⟩ᵒ Γ ×ᵗ A →ᵗ Tᵒ B τ'
+          → carrier Γ t
+          → Tˢ A τ t
+          → Tˢ B (τ + τ') t
+  handleˢ {Γ} h f γ (leaf v) =
+    map-carrier f (pack-×ᵗ (map-carrier (η {Γ}) γ , v))
+  handleˢ {Γ} {A} {B} {t = t} h f γ  (node op v k k-nat) =
+    {!!}
+  handleˢ {Γ} h f γ  (delay τ k) =
+    τ-subst
+      (sym (+-assoc τ _ _))
+      (delay τ
+        (handleˢ {!!} {!f!} {!!} {!!}))
+
+{-
+
+(handleˢ h
+          {!!}
+          (monotone Γ (m≤m+n _ _) γ)
+          k)
+
+-}
+
+  handleˢ-≤t-nat : ∀ {Γ A B τ τ'} → {t t' : ℕ} → (p : t ≤ t')
+                 → (h : (op : Op) → (τ'' : Time) →
+                          Γ ×ᵗ ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')) →ᵗ Tᵒ B (op-time op + τ''))
+                 → (f : ⟨ τ ⟩ᵒ Γ ×ᵗ A →ᵗ Tᵒ B τ')
+                 → (γ : carrier Γ t)
+                 → (c : Tˢ A τ t)
+                 → handleˢ h f (monotone Γ p γ) (Tˢ-≤t p c)
+                 ≡ Tˢ-≤t p (handleˢ h f γ c)
+  handleˢ-≤t-nat p h f γ c = {!!}
+  
+
+abstract
+  handleᵀ : ∀ {Γ A B τ τ'}
+          → ((op : Op) → (τ'' : Time) →
+               Γ ×ᵗ ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')) →ᵗ Tᵒ B (op-time op + τ''))
+          → ⟨ τ ⟩ᵒ Γ ×ᵗ A →ᵗ Tᵒ B τ'
+          → Γ ×ᵗ Tᵒ A τ →ᵗ Tᵒ B (τ + τ')
+  handleᵀ h f =
+    tset-map
+      (λ γc → handleˢ h f (proj₁ (unpack-×ᵗ γc)) (proj₂ (unpack-×ᵗ γc)))
+      {!!}
+
+
+-}
 
 
 
