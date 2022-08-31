@@ -373,7 +373,7 @@ abstract
 abstract
   opᵀ : ∀ {A τ} → (op : Op)
       → ⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ) →ᵗ Tᵒ A (op-time op + τ)
-  opᵀ {A} op =
+  opᵀ {A} {τ} op =
     tset-map
       (λ {t} vk →
         node op
@@ -391,14 +391,14 @@ abstract
                       (sym (pack-homᵒ-monotone _ _))))
                   (sym (pack-×ᵗ-monotone _ _))))
               (map-nat (unpack-⇒ᵗ (proj₂ (unpack-×ᵗ vk))) _ _)))
-      (λ p k →
+      (λ {t} {t'} p k →
         dcong₃ (node op)
           (sym (cong proj₁ (unpack-×ᵗ-monotone _ k)))
           (ifun-ext (fun-ext (λ q → fun-ext (λ y →
             trans
               (cong (λ (k : {t' : Time} → _ + op-time op ≤ t' → carrier ⟦ arity op ⟧ᵍ t' → Tˢ A _ t') → k q y)
                 (subst-const _ (sym (cong proj₁ (unpack-×ᵗ-monotone p k))) _))
-              {!trans!}))))
+              {!!}))))
           (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ r → fun-ext (λ y → uip)))))))
 
 
