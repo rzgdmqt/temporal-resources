@@ -13,11 +13,12 @@ open import Syntax.Contexts
 open import Syntax.Language
 
 open import Semantics.TSets
-open import Semantics.Monad
 
 open import Semantics.Modality.Future
 open import Semantics.Modality.Past
 open import Semantics.Modality.Adjunction
+
+open import Semantics.Monad
 
 open import Util.Equality
 open import Util.Operations
