@@ -518,3 +518,11 @@ abstract
   pack-⇒ᵗ-monotone p f =
     cong (tset-map _) (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ rv → uip)))))
 
+  unpack-⇒ᵗ-map-carrier : ∀ {A B t t' t''}
+                        → (f : carrier (A ⇒ᵗ B) t)
+                        → (p : t ≤ t')
+                        → (q : t' ≤ t'')
+                        → (x : carrier A t'')
+                        → map-carrier (unpack-⇒ᵗ (monotone (A ⇒ᵗ B) p f)) (pack-×ᵗ (pack-homᵒ t' q , x))
+                        ≡ map-carrier (unpack-⇒ᵗ f) (pack-×ᵗ (pack-homᵒ t (≤-trans p q) , x))
+  unpack-⇒ᵗ-map-carrier f p q x = refl

@@ -398,11 +398,13 @@ abstract
             trans
               (cong (λ (k : {t' : Time} → _ + op-time op ≤ t' → carrier ⟦ arity op ⟧ᵍ t' → Tˢ A _ t') → k q y)
                 (subst-const _ (sym (cong proj₁ (unpack-×ᵗ-monotone p k))) _))
-              {!!}))))
+              (trans
+                (cong (λ (f : homᵒ (t' + op-time op) ×ᵗ ⟦ arity op ⟧ᵍ →ᵗ Tᵒ A τ) → map-carrier f (pack-×ᵗ (pack-homᵒ (t' + op-time op) q , y)))
+                  {(unpack-⇒ᵗ (proj₂ (unpack-×ᵗ (monotone (⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)) p k))))}
+                  {(unpack-⇒ᵗ (monotone (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ) (+-mono-≤ p ≤-refl) (proj₂ (unpack-×ᵗ k))))}
+                  (cong unpack-⇒ᵗ (sym (cong proj₂ (unpack-×ᵗ-monotone _ _)))))
+                (unpack-⇒ᵗ-map-carrier (proj₂ (unpack-×ᵗ k)) _ _ y))))))
           (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ r → fun-ext (λ y → uip)))))))
-
-
--- {(λ p₁ y₁ → map-carrier (unpack-⇒ᵗ (proj₂ (unpack-×ᵗ (monotone (⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A _)) p k)))) (pack-×ᵗ (pack-homᵒ (_ + op-time op) p₁ , y₁)))}
 
 
 -- Effect handling / free algebras
