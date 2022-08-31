@@ -80,6 +80,9 @@ open import Semantics.Modality.Adjunction
 
 ---- Free monad on algebraic operations
 
+open import Semantics.Monad.Core
+open import Semantics.Monad.Strength
+open import Semantics.Monad.Effects
 open import Semantics.Monad
 
 ---- Interpretation of types and terms

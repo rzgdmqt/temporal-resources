@@ -12,10 +12,8 @@ open import Data.Product
 open import Data.Unit hiding (_≤_)
 
 open import Semantics.TSets
-
 open import Semantics.Modality.Future
 open import Semantics.Modality.Past
-
 open import Semantics.Monad.Core renaming (⟦_⟧ᵍ to ⟦_⟧ᵍ'; Tᵒ to Tᵒ'; Tᶠ to Tᶠ'; ηᵀ to ηᵀ'; μᵀ to μᵀ')
 open import Semantics.Monad.Strength renaming (strᵀ to strᵀ')
 open import Semantics.Monad.Effects renaming (delayᵀ to delayᵀ'; opᵀ to opᵀ'; T-alg-of-handlerᵀ to T-alg-of-handlerᵀ')

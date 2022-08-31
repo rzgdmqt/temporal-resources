@@ -12,13 +12,10 @@ open import Data.Product
 open import Data.Unit hiding (_≤_)
 
 open import Semantics.TSets
-
 open import Semantics.Modality.Future
 open import Semantics.Modality.Past
-
 open import Semantics.Monad.Core
 
-open import Util.HProp
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
