@@ -393,6 +393,20 @@ abstract
               → t ≤ t'
   unpack-homᵒ t p = p
 
+  pack-homᵒ-monotone : ∀ {t t' t''}
+                     → (p : t' ≤ t'')
+                     → (q : t ≤ t')
+                     → monotone (homᵒ t) p (pack-homᵒ t q)
+                     ≡ pack-homᵒ t (≤-trans q p)
+  pack-homᵒ-monotone p q = refl
+
+  unpack-homᵒ-monotone : ∀ {t t' t''}
+                       → (p : t' ≤ t'')
+                       → (q : carrier (homᵒ t) t')
+                       → ≤-trans (unpack-homᵒ t q) p
+                       ≡ unpack-homᵒ t (monotone (homᵒ t) p q)
+  unpack-homᵒ-monotone p q = refl
+
 ---- exponentials
 
 abstract
@@ -475,3 +489,32 @@ abstract
             → carrier (A ⇒ᵗ B) t
             → homᵒ t ×ᵗ A →ᵗ B
   unpack-⇒ᵗ f = f
+
+  pack-⇒ᵗ-monotone : ∀ {A B t t'}
+                   → (p : t ≤ t')
+                   → (f : homᵒ t ×ᵗ A →ᵗ B)
+                   → monotone (A ⇒ᵗ B) p (pack-⇒ᵗ f)
+                   ≡ pack-⇒ᵗ {A} {B} {t'}
+                       (tset-map
+                         (λ qv →
+                           map-carrier f
+                             (pack-×ᵗ
+                               (pack-homᵒ t (≤-trans p (unpack-homᵒ t' (proj₁ (unpack-×ᵗ qv)))) ,
+                                proj₂ (unpack-×ᵗ qv))))
+                         (λ q rv →
+                           trans
+                             (cong (map-carrier f)
+                               (trans
+                                 (cong pack-×ᵗ
+                                   (cong₂ _,_
+                                     (trans
+                                       (cong (pack-homᵒ t)
+                                         (≤-irrelevant _ _))
+                                       (sym
+                                         (pack-homᵒ-monotone _ _)))
+                                     (sym (cong proj₂ (unpack-×ᵗ-monotone q rv)))))
+                                 (sym (pack-×ᵗ-monotone _ _))))
+                             (map-nat f _ _)))
+  pack-⇒ᵗ-monotone p f =
+    cong (tset-map _) (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ rv → uip)))))
+

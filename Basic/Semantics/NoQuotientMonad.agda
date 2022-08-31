@@ -185,25 +185,27 @@ mutual
 
 -- Packaging it all up into a functor on TSet
 
-Tᵒ : TSet → Time → TSet
-Tᵒ A τ = tset (Tˢ A τ) Tˢ-≤t Tˢ-≤t-refl Tˢ-≤t-trans
+abstract 
+  Tᵒ : TSet → Time → TSet
+  Tᵒ A τ = tset (Tˢ A τ) Tˢ-≤t Tˢ-≤t-refl Tˢ-≤t-trans
 
-Tᶠ : ∀ {A B τ} → A →ᵗ B → Tᵒ A τ →ᵗ Tᵒ B τ
-Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-≤t-nat f)
+  Tᶠ : ∀ {A B τ} → A →ᵗ B → Tᵒ A τ →ᵗ Tᵒ B τ
+  Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-≤t-nat f)
 
 
 -- Unit (TODO: prove naturality and laws)
 
-ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
-ηᵀ =
-  tset-map
-    (λ v → leaf v)
-    (λ p v → refl)
+abstract
+  ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
+  ηᵀ =
+    tset-map
+      (λ v → leaf v)
+      (λ p v → refl)
 
 
 -- Multiplication (TODO: prove naturality and laws)
 
-mutual
+mutual abstract
 
   {-# TERMINATING #-}
 
@@ -235,14 +237,7 @@ mutual
         (dcong₂ (node op (monotone ⟦ param op ⟧ᵍ p v))
           refl
           (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ r → fun-ext (λ y → uip))))))))
-      (sym (τ-subst-≤t
-             (sym (+-assoc (op-time op) _ _)) p
-             (node op v
-               (λ q y → μˢ (k q y))
-               (λ q r y →
-                 trans
-                   (cong μˢ (k-nat q r y))
-                   (μˢ-≤t-nat q (k r y))))))
+      (sym (τ-subst-≤t (sym (+-assoc (op-time op) _ _)) p _))
   μˢ-≤t-nat p (delay τ k) =
     trans
       (cong
@@ -250,12 +245,12 @@ mutual
         (cong (delay τ) (μˢ-≤t-nat (+-monoˡ-≤ τ p) k)))
       (sym (τ-subst-≤t (sym (+-assoc τ _ _)) p (delay τ (μˢ k))))
 
-μᵀ : ∀ {A τ τ'}
-   → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
-μᵀ = tset-map μˢ μˢ-≤t-nat
+abstract
+  μᵀ : ∀ {A τ τ'}
+     → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
+  μᵀ = tset-map μˢ μˢ-≤t-nat
 
 
-{-
 -- Strength (TODO: prove naturality and laws)
 
 mutual
@@ -350,23 +345,22 @@ mutual
           (monotone (⟨ τ' ⟩ᵒ A) (≤-reflexive (sym (+-assoc t _ _))) v)
           k))
 
-strᵀ : ∀ {A B τ τ'}
-     → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
-strᵀ {A} {B} {τ} {τ'} =
-  tset-map
-    (λ vc → strˢ {A} {B} (proj₁ (unpack-×ᵗ vc)) (proj₂ (unpack-×ᵗ vc)))
-    (λ p vc → trans
-      (cong₂ strˢ
-        (sym (cong proj₁ (unpack-×ᵗ-monotone {[ τ ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ} p vc)))
-        (sym (cong proj₂ (unpack-×ᵗ-monotone {[ τ ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ} p vc))))
-      (strˢ-≤t-nat p _ _))
--}
-
+abstract
+  strᵀ : ∀ {A B τ τ'}
+       → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
+  strᵀ {A} {B} {τ} {τ'} =
+    tset-map
+      (λ vc → strˢ {A} {B} (proj₁ (unpack-×ᵗ vc)) (proj₂ (unpack-×ᵗ vc)))
+      (λ p vc → trans
+        (cong₂ strˢ
+          (sym (cong proj₁ (unpack-×ᵗ-monotone {[ τ ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ} p vc)))
+          (sym (cong proj₂ (unpack-×ᵗ-monotone {[ τ ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ} p vc))))
+        (strˢ-≤t-nat p _ _))
 
 
 -- Effect handling / free algebras
 
-mutual
+mutual abstract
 
   {-# TERMINATING #-}
 
@@ -416,8 +410,30 @@ mutual
                  ≡ Tˢ-≤t p (handleˢ h f c)
   handleˢ-≤t-nat p h f (leaf v) =
     map-nat f p v
-  handleˢ-≤t-nat p h f (node op v k k-nat) =
-    {!!}
+  handleˢ-≤t-nat {A} {B} {τ' = τ'} p h f (node {τ = τ} op v k k-nat) =
+    trans
+      (cong (τ-subst (sym (+-assoc (op-time op) τ τ')))
+        (trans
+          (cong (map-carrier (h op (τ + τ')))
+            (trans
+              (cong pack-×ᵗ
+                (cong (monotone ⟦ param op ⟧ᵍ p v ,_)
+                  (trans
+                    (cong pack-⇒ᵗ
+                      (dcong₂ tset-map
+                        (ifun-ext (fun-ext (λ qy →
+                          cong₂ (λ q y → handleˢ h f (k q y))
+                            (≤-irrelevant _ _)
+                            (sym (cong proj₂ (pack-unpack-×ᵗ _))))))
+                        (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ ry → uip)))))))
+                    (sym (pack-⇒ᵗ-monotone _ _)))))
+              (sym
+                (pack-×ᵗ-monotone
+                  {⟦ param op ⟧ᵍ}
+                  {[ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B (τ + τ'))}
+                  p _))))
+          (map-nat (h op (τ + τ')) p _)))
+      (sym (τ-subst-≤t (sym (+-assoc (op-time op) τ τ')) p _))
   handleˢ-≤t-nat p h f (delay τ k) =
     trans
       (cong (τ-subst (sym (+-assoc τ _ _)))
@@ -426,28 +442,37 @@ mutual
       (sym (τ-subst-≤t (sym (+-assoc τ _ _)) p
              (delay τ (handleˢ h f k))))
 
+abstract
+  handleᵀ : ∀ {A B τ τ'}
+          → ((op : Op) → (τ'' : Time) →
+               ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')) →ᵗ Tᵒ B (op-time op + τ''))
+          → A →ᵗ Tᵒ B τ'
+          → Tᵒ A τ →ᵗ Tᵒ B (τ + τ')
+  handleᵀ h f =
+    tset-map (handleˢ h f) (λ p → handleˢ-≤t-nat p h f)
 
 
 
-{-
 
-handleˢ-≤t-nat p h h-nat f (leaf v) =
-  map-nat f p v
-handleˢ-≤t-nat p h h-nat f (node op v k) =
-  trans
-    (cong (τ-subst (sym (+-assoc (op-time op) _ _)))
-      (h-nat op _ p v (λ p y → handleˢ h f (k p y))))
-    (sym (τ-subst-≤t (sym (+-assoc (op-time op) _ _)) p
-           (h op _ v (λ p y → handleˢ h f (k p y)))))
-handleˢ-≤t-nat p h h-nat f (delay τ k) =
-  trans
-    (cong (τ-subst (sym (+-assoc τ _ _)))
-      (cong (delay τ)
-        (handleˢ-≤t-nat (+-monoˡ-≤ τ p) h h-nat f k)))
-    (sym (τ-subst-≤t (sym (+-assoc τ _ _)) p
-           (delay τ (handleˢ h f k))))
 
--}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
