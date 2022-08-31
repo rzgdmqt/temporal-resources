@@ -290,7 +290,10 @@ mutual
                               [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c)   
 
     -- delay equations
-    
+
+    {-
+    -- NOTE: this version does not quotient by delay-zero and delay-delay equations
+
     delay-zero : ∀ {A τ}
                → (M : Γ ⟨ 0 ⟩ ⊢C⦂ A ‼ τ)
                ------------------------------------------
@@ -306,6 +309,7 @@ mutual
                          (τ₁ + τ₂)
                          (trans p (trans (cong (τ₁ +_) q) (sym (+-assoc τ₁ τ₂ τ))))
                          (C-rename ⟨⟩-μ⁻¹-ren M)
+    -}
 
     delay-; : ∀ {A B τ τ' τ'' τ'''}
             → (p : τ'' ≡ τ + τ')
