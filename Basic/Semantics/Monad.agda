@@ -358,6 +358,53 @@ abstract
         (strˢ-≤t-nat p _ _))
 
 
+-- Delay operation (T is a kind of a [_]-module)
+
+abstract
+  delayᵀ : ∀ {A} (τ : Time) {τ'} → [ τ ]ᵒ (Tᵒ A τ') →ᵗ Tᵒ A (τ + τ')
+  delayᵀ τ =
+    tset-map
+      (delay τ)
+      (λ p c → refl)
+
+
+-- Algebraic operations
+
+abstract
+  opᵀ : ∀ {A τ} → (op : Op)
+      → ⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ) →ᵗ Tᵒ A (op-time op + τ)
+  opᵀ {A} op =
+    tset-map
+      (λ {t} vk →
+        node op
+          (proj₁ (unpack-×ᵗ vk))
+          (λ p y →
+            map-carrier
+              (unpack-⇒ᵗ (proj₂ (unpack-×ᵗ vk)))
+              (pack-×ᵗ (pack-homᵒ (t + op-time op) p , y)))
+          (λ p q y →
+            trans
+              (cong (map-carrier (unpack-⇒ᵗ (proj₂ (unpack-×ᵗ vk))))
+                (trans
+                  (cong pack-×ᵗ
+                    (cong (_, monotone ⟦ arity op ⟧ᵍ p y)
+                      (sym (pack-homᵒ-monotone _ _))))
+                  (sym (pack-×ᵗ-monotone _ _))))
+              (map-nat (unpack-⇒ᵗ (proj₂ (unpack-×ᵗ vk))) _ _)))
+      (λ p k →
+        dcong₃ (node op)
+          (sym (cong proj₁ (unpack-×ᵗ-monotone _ k)))
+          (ifun-ext (fun-ext (λ q → fun-ext (λ y →
+            trans
+              (cong (λ (k : {t' : Time} → _ + op-time op ≤ t' → carrier ⟦ arity op ⟧ᵍ t' → Tˢ A _ t') → k q y)
+                (subst-const _ (sym (cong proj₁ (unpack-×ᵗ-monotone p k))) _))
+              {!trans!}))))
+          (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ r → fun-ext (λ y → uip)))))))
+
+
+-- {(λ p₁ y₁ → map-carrier (unpack-⇒ᵗ (proj₂ (unpack-×ᵗ (monotone (⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A _)) p k)))) (pack-×ᵗ (pack-homᵒ (_ + op-time op) p₁ , y₁)))}
+
+
 -- Effect handling / free algebras
 
 mutual abstract
@@ -485,380 +532,37 @@ abstract
 ---------------------------------------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
-
 {-
--- Skeletal object mapping
 
-data Tˢ (A : TSet) : (τ : Time) → (t : Time) → Set where  -- 1st time index (τ) is the duration of the computation (its time-grading)
-                                                          -- 2nd time index (t) is the corresponding TSets' time-index (presheaf index)
-  leaf  : ∀ {t}
-        → carrier A t
-        → Tˢ A 0 t
+
+-- Candidate for object-mapping of the underlying functor to support quotienting by delay equations
+-- NOTE: quick sketch, does not include naturality condition for operation nodes
+
+
+mutual
+  
+  data Tˢ (A : TSet) : (τ : Time) → (t : Time) → Set where  -- 1st time index (τ) is the duration of the computation (its time-grading)
+                                                            -- 2nd time index (t) is the corresponding TSets' time-index (presheaf index)
+    delay : ∀ {τ' t}
+          → (τ : Time)
+          → 0 < τ
+          → Tᶜˢ A τ' (t + τ)
+          → Tˢ A (τ + τ') t
+    comp  : ∀ {τ t}
+          → Tᶜˢ A τ t
+          → Tˢ A τ t
+  data Tᶜˢ (A : TSet) : (τ : Time) → (t : Time) → Set where  -- 1st time index (τ) is the duration of the computation (its time-grading)
+                                                             -- 2nd time index (t) is the corresponding TSets' time-index (presheaf index)
+    leaf  : ∀ {t}
+          → carrier A t
+          → Tᶜˢ A 0 t
      
-  node  : ∀ {τ t}
-        → (op : Op)
-        → carrier ⟦ param op ⟧ᵍ t
-        → ({t' : Time} → t + op-time op ≤ t'
-                       → carrier ⟦ arity op ⟧ᵍ t'
-                       → Tˢ A τ t')
-        → Tˢ A (op-time op + τ) t
+    node  : ∀ {τ t}
+          → (op : Op)
+          → carrier ⟦ param op ⟧ᵍ t
+          → ({t' : Time} → t + op-time op ≤ t'
+                         → carrier ⟦ arity op ⟧ᵍ t'
+                         → Tˢ A τ t')
+          → Tᶜˢ A (op-time op + τ) t
 
-  delay : ∀ {τ' t}
-        → (τ : Time)
-        → Tˢ A τ' (t + τ)
-        → Tˢ A (τ + τ') t
-
-
--- Monotonicity with respect to the (presheaf) time indices
-
-Tˢ-≤t : ∀ {A τ t t'} → t ≤ t' → Tˢ A τ t → Tˢ A τ t'
-Tˢ-≤t {A} p (leaf v) =
-  leaf (monotone A p v)
-Tˢ-≤t p (node op v k) =
-  node op
-    (monotone (⟦ param op ⟧ᵍ) p v)
-    (λ q y → k (≤-trans (+-monoˡ-≤ (op-time op) p) q) y)
-Tˢ-≤t p (delay τ k) =
-  delay τ (Tˢ-≤t (+-monoˡ-≤ τ p) k)
-
-Tˢ-≤t-refl : ∀ {A τ t} → (c : Tˢ A τ t) → Tˢ-≤t ≤-refl c ≡ c
-Tˢ-≤t-refl {A} (leaf v) =
-  cong leaf (monotone-refl A v)
-Tˢ-≤t-refl (node op v k) =
-  cong₂ (node op)
-    (monotone-refl ⟦ param op ⟧ᵍ v)
-    (ifun-ext (fun-ext (λ p → fun-ext (λ y → cong (λ p → k p y) (≤-irrelevant _ _)))))
-Tˢ-≤t-refl (delay τ k) =
-  cong (delay τ)
-    (trans
-      (cong (λ p → Tˢ-≤t p k) (≤-irrelevant _ _))
-      (Tˢ-≤t-refl k))
-
-Tˢ-≤t-trans : ∀ {A τ t t' t''}
-            → (p : t ≤ t') → (q : t' ≤ t'') → (c : Tˢ A τ t)
-            → Tˢ-≤t q (Tˢ-≤t p c) ≡ Tˢ-≤t (≤-trans p q) c
-Tˢ-≤t-trans {A} p q (leaf v) =
-  cong leaf (monotone-trans A p q v)
-Tˢ-≤t-trans p q (node op v k) =
-  cong₂ (node op)
-    (monotone-trans (⟦ param op ⟧ᵍ) p q v)
-    (ifun-ext (fun-ext (λ r → fun-ext (λ y → cong (λ p → k p y) (≤-irrelevant _ _)))))
-Tˢ-≤t-trans p q (delay τ k) =
-  cong (delay τ)
-    (trans
-      (Tˢ-≤t-trans (+-monoˡ-≤ τ p) (+-monoˡ-≤ τ q) k)
-      (cong (λ p → Tˢ-≤t p k) (≤-irrelevant _ _)))
-
-
--- "subst" for time-gradings
-
-τ-subst : ∀ {A τ τ' t}
-        → τ ≡ τ'
-        → Tˢ A τ t
-        → Tˢ A τ' t
-τ-subst refl c = c
-
-τ-subst-≤t : ∀ {A τ τ' t t'}
-           → (p : τ ≡ τ')
-           → (q : t ≤ t')
-           → (c : Tˢ A τ t)
-           → Tˢ-≤t q (τ-subst p c) ≡ τ-subst p (Tˢ-≤t q c)
-τ-subst-≤t refl q c = refl
-
-τ-subst-delay : ∀ {A τ τ' τ'' t}
-              → (p : τ' ≡ τ'')
-              → (c : Tˢ A τ' (t + τ))
-              → τ-subst (cong (τ +_) p) (delay τ c) ≡ delay τ (τ-subst p c)
-τ-subst-delay refl c = refl
-
-
--- Functorial action (TODO: prove identity and composition laws)
-
-Tˢᶠ : ∀ {A B τ} → A →ᵗ B → {t : Time} → Tˢ A τ t → Tˢ B τ t
-Tˢᶠ f (leaf v) =
-  leaf (map-carrier f v)
-Tˢᶠ f (node op v k) =
-  node op v λ p y → Tˢᶠ f (k p y)
-Tˢᶠ f (delay τ k) =
-  delay τ (Tˢᶠ f k)
-
-Tˢᶠ-≤t-nat : ∀ {A B τ} → (f : A →ᵗ B) → {t t' : ℕ}
-           → (p : t ≤ t') → (c : Tˢ A τ t)
-           → Tˢᶠ f (Tˢ-≤t p c) ≡ Tˢ-≤t p (Tˢᶠ f c)
-Tˢᶠ-≤t-nat f p (leaf v) =
-  cong leaf (map-nat f p v)
-Tˢᶠ-≤t-nat f p (node op v k) =
-  cong₂ (node op) refl refl
-Tˢᶠ-≤t-nat f p (delay τ k) =
-  cong (delay τ) (Tˢᶠ-≤t-nat f (+-monoˡ-≤ τ p) k)
-
-
--- Packaging it all up into a functor on TSet
-
-Tᵒ : TSet → Time → TSet
-Tᵒ A τ = tset (Tˢ A τ) Tˢ-≤t Tˢ-≤t-refl Tˢ-≤t-trans
-
-Tᶠ : ∀ {A B τ} → A →ᵗ B → Tᵒ A τ →ᵗ Tᵒ B τ
-Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-≤t-nat f)
-
-
--- Unit (TODO: prove naturality and laws)
-
-ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
-ηᵀ =
-  tset-map
-    (λ v → leaf v)
-    (λ p v → refl)
-
-
--- Multiplication (TODO: prove naturality and laws)
-
-μˢ : ∀ {A τ τ'} → {t : Time}
-   → Tˢ (Tᵒ A τ') τ t → Tˢ A (τ + τ') t
-μˢ (leaf c) =
-  c
-μˢ {A = A} {t = t} (node op v k) =
-  τ-subst
-    (sym (+-assoc (op-time op) _ _))
-    (node op v (λ p y → μˢ (k p y)))
-μˢ {A = A} {t = t} (delay τ k) =
-  τ-subst (sym (+-assoc τ _ _)) (delay τ (μˢ k))
-
-μˢ-≤t-nat : ∀ {A τ τ'} → {t t' : ℕ}
-          → (p : t ≤ t')
-          → (c : Tˢ (Tᵒ A τ') τ t)
-          → μˢ (Tˢ-≤t p c) ≡ Tˢ-≤t p (μˢ c)
-μˢ-≤t-nat p (leaf v) =
-  refl
-μˢ-≤t-nat p (node op v k) =
-  (sym (τ-subst-≤t
-    (sym (+-assoc (op-time op) _ _)) p
-    (node op v (λ q y → μˢ (k q y)))))
-μˢ-≤t-nat p (delay τ k) =
-  trans
-    (cong
-      (τ-subst (sym (+-assoc τ _ _)))
-      (cong (delay τ) (μˢ-≤t-nat (+-monoˡ-≤ τ p) k)))
-    (sym (τ-subst-≤t (sym (+-assoc τ _ _)) p (delay τ (μˢ k))))
-
-μᵀ : ∀ {A τ τ'}
-   → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
-μᵀ = tset-map μˢ μˢ-≤t-nat
-
-
--- Strength (TODO: prove naturality and laws)
-
-strˢ : ∀ {A B τ τ' t}
-     → carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t
-     → Tˢ B τ t
-     → Tˢ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ t
-strˢ {A} {τ' = τ'} v (leaf w) =
-  leaf ((≤-trans (proj₁ v) (≤-reflexive (+-identityʳ _)) ,
-         monotone A
-           (≤-reflexive (cong (_∸ τ') (+-identityʳ _)))
-           (proj₂ v)) ,
-        w)
-strˢ {A} {B} {_} {τ'} {t} v (node op w k) =
-  node op w (λ p y →
-    strˢ
-      {A} {B}
-      (monotone (⟨ τ' ⟩ᵒ A)
-        (≤-trans
-          (≤-reflexive (sym (+-assoc t _ _)))
-          (+-monoˡ-≤ _ p))
-        v)
-      (k p y))
-strˢ {A} {B} {_} {τ'} {t} v (delay τ k) =
-  delay τ
-    (strˢ {A} {B}
-      (monotone (⟨ τ' ⟩ᵒ A) (≤-reflexive (sym (+-assoc t _ _))) v)
-      k)
-
-strˢ-≤t-nat : ∀ {A B τ τ'} → {t t' : ℕ} → (p : t ≤ t')
-            → (v : carrier ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) t)
-            → (c : Tˢ B τ t)
-            → strˢ {A = A} {B = B}
-                (monotone ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) p v)
-                (Tˢ-≤t p c)
-            ≡ Tˢ-≤t p (strˢ {A = A} {B = B} v c)
-strˢ-≤t-nat {A} {B} {_} {τ'} {t} {t'} p v (leaf w) =
-  cong leaf
-    (cong (_, monotone B p w)
-      (cong₂ _,_
-        (≤-irrelevant _ _)
-        (trans
-          (trans
-            (monotone-trans A _ _ (proj₂ v))
-            (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _)))
-          (sym (monotone-trans A _ _ (proj₂ v))))))
-strˢ-≤t-nat {A} {B} p v (node op w k) =
-  cong (node op (monotone ⟦ param op ⟧ᵍ p w))
-    (ifun-ext (fun-ext (λ q → fun-ext (λ y →
-      cong (λ v → strˢ {A} {B} v (k (≤-trans (+-monoˡ-≤ (op-time op) p) q) y))
-        (cong₂ _,_
-          (≤-irrelevant _ _)
-          (trans
-            (monotone-trans A _ _ (proj₂ v))
-            (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _)))))))) 
-strˢ-≤t-nat {A} {B} {_} {τ'} {t} {t'} p v (delay τ k) =
-  cong (delay τ)
-    (trans
-      (cong (λ v → strˢ {A} {B} v (Tˢ-≤t (+-monoˡ-≤ _ p) k))
-        (cong₂ _,_
-          (≤-irrelevant _ _)
-          (trans
-            (monotone-trans A _ _ (proj₂ v))
-            (trans
-              (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _))
-              (sym (monotone-trans A _ _ (proj₂ v)))))))
-      (strˢ-≤t-nat
-        (+-monoˡ-≤ τ p)
-        (monotone (⟨ τ' ⟩ᵒ A) (≤-reflexive (sym (+-assoc t _ _))) v)
-        k))
-
-strᵀ : ∀ {A B τ τ'}
-     → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
-strᵀ {A} {B} =
-  tset-map
-    (λ { (v , c) → strˢ {A} {B} v c })
-    (λ { p (v , c) → strˢ-≤t-nat p v c })
-
-
--- Effect handling / free algebras
-
-handleˢ : ∀ {A B τ τ' t}
-        → ((op : Op) → (τ'' : Time) →
-             ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')) →ᵗ Tᵒ B (op-time op + τ''))
-        → A →ᵗ Tᵒ B τ'
-        → Tˢ A τ t
-        → Tˢ B (τ + τ') t
-handleˢ h f (leaf v) =
-  map-carrier f v
-handleˢ {A} {B} {t = t} h f (node op v k) =
-  τ-subst
-    (sym (+-assoc (op-time op) _ _))
-    (map-carrier (h op _)
-      (v ,
-       subst id (sym (reveal-⇒ᵗ (⟦ arity op ⟧ᵍ) (Tᵒ B _) _))
-         (tset-map
-           (λ { (q , y) → handleˢ h f (k (subst id (reveal-homᵒ (t + op-time op) _) q) y) })
-           (λ { p (q , y) → {!!} }))))                                                              -- if the handler is assumed to be monotone, then we need to
-handleˢ h f (delay τ k) =                                                                           -- prove here (simultaneously) that handleˢ is monotone as well
-  τ-subst
-    (sym (+-assoc τ _ _))
-    (delay τ (handleˢ h f k))
--}
-
-{-
-handleˢ : ∀ {A B τ τ' t}
-        → ((op : Op) → (τ'' : Time) → {t' : Time} →
-             carrier ⟦ param op ⟧ᵍ t' →
-             ({t'' : Time} → t' + op-time op ≤ t'' → carrier ⟦ arity op ⟧ᵍ t'' → Tˢ B τ'' t'') →
-             Tˢ B (op-time op + τ'') t')
-        → A →ᵗ Tᵒ B τ'
-        → Tˢ A τ t
-        → Tˢ B (τ + τ') t
-handleˢ h f (leaf v) =
-  map-carrier f v
-handleˢ h f (node op v k) =
-  τ-subst
-    (sym (+-assoc (op-time op) _ _))
-    (h op _ v (λ p y → handleˢ h f (k p y)))
-handleˢ h f (delay τ k) =
-  τ-subst
-    (sym (+-assoc τ _ _))
-    (delay τ (handleˢ h f k))
-
-handleˢ-≤t-nat : ∀ {A B τ τ'} → {t t' : ℕ} → (p : t ≤ t')
-               → (h : (op : Op) → (τ'' : Time) → {t' : Time} →
-                        carrier ⟦ param op ⟧ᵍ t' →
-                        ({t'' : Time} → t' + op-time op ≤ t'' → carrier ⟦ arity op ⟧ᵍ t'' → Tˢ B τ'' t'') →
-                        Tˢ B (op-time op + τ'') t')
-               → (h-nat : (op : Op) → (τ'' : Time) → {t t' : Time} → (p : t ≤ t') →
-                    (v : carrier ⟦ param op ⟧ᵍ t) →
-                    (k : {t'' : Time} → t + op-time op ≤ t'' → carrier ⟦ arity op ⟧ᵍ t'' → Tˢ B τ'' t'') →
-                      h op _ (monotone (⟦ param op ⟧ᵍ) p v) (λ q y → k (≤-trans (+-monoˡ-≤ (op-time op) p) q) y)
-                    ≡ Tˢ-≤t p (h op _ v k))
-               → (f : A →ᵗ Tᵒ B τ')
-               → (c : Tˢ A τ t)
-               → handleˢ h f (Tˢ-≤t p c)
-               ≡ Tˢ-≤t p (handleˢ h f c)
-handleˢ-≤t-nat p h h-nat f (leaf v) =
-  map-nat f p v
-handleˢ-≤t-nat p h h-nat f (node op v k) =
-  trans
-    (cong (τ-subst (sym (+-assoc (op-time op) _ _)))
-      (h-nat op _ p v (λ p y → handleˢ h f (k p y))))
-    (sym (τ-subst-≤t (sym (+-assoc (op-time op) _ _)) p
-           (h op _ v (λ p y → handleˢ h f (k p y)))))
-handleˢ-≤t-nat p h h-nat f (delay τ k) =
-  trans
-    (cong (τ-subst (sym (+-assoc τ _ _)))
-      (cong (delay τ)
-        (handleˢ-≤t-nat (+-monoˡ-≤ τ p) h h-nat f k)))
-    (sym (τ-subst-≤t (sym (+-assoc τ _ _)) p
-           (delay τ (handleˢ h f k))))
-
-
-handleᵀ : ∀ {A B τ τ'}
-        → ((op : Op) → (τ'' : Time) →
-             ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ'')) →ᵗ Tᵒ B (op-time op + τ''))
-        → A →ᵗ Tᵒ B τ'
-        → Tᵒ A τ →ᵗ Tᵒ B (τ + τ')
-handleᵀ {A} {B} h f =
-  tset-map
-    (λ c → handleˢ
-             (λ op τ'' {t'} v k →
-               map-carrier (h op τ'')
-                 (v ,
-                  subst id (sym (reveal-⇒ᵗ (⟦ arity op ⟧ᵍ) (Tᵒ B τ'') (t' + op-time op)))
-                    (tset-map
-                      (λ { (q , y) → k (subst id (reveal-homᵒ (t' + op-time op) _) q) y })
-                      (λ { q (r , y) → {!!} }))))                                               -- Need the continuation k to be monotone
-             f c)                                                                               -- This does not follow from the raw inductive tree definition of Tˢ
-    {!!}                                                                                        -- Do we need to separately restrict to only trees whos continuations are monotone?
-                                                                                                -- Because if we simply strengthen the h argument of handleˢ when we cannot do
-                                                                                                -- recursive calls there any more
-
--}
-
-
-
-{-
-
-(tset-map
-                   (λ { (q , y) → k (≤-trans {!!} (subst id (reveal-homᵒ t' _) q)) y })
-                   {!!})
-
--}
-
-
-{-
-handleᵀ : ∀ {A B τ τ'}
-        → ((op : Op) → (τ'' : Time) → {t' : Time} →
-             carrier ⟦ param op ⟧ᵍ t' →
-             ({t'' : Time} → t' + op-time op ≤ t'' → carrier ⟦ arity op ⟧ᵍ t'' → Tˢ B τ'' t'') →
-             Tˢ B (op-time op + τ'') t')
-        → A →ᵗ Tᵒ B τ'
-        → Tᵒ A τ →ᵗ Tᵒ B (τ + τ')
-handleᵀ h f =
-  tset-map (handleˢ h f) (λ p c → handleˢ-≤t-nat p h f c)
--}
-
-
-{-
-               Tˢ B (op-time op + τ'') t')
-               → strˢ {A = A} {B = B}
-                   (monotone ([ τ ]ᵒ (⟨ τ' ⟩ᵒ A)) p v)
-                   (Tˢ-≤t p c)
-               ≡ Tˢ-≤t p (strˢ {A = A} {B = B} v c)
 -}
