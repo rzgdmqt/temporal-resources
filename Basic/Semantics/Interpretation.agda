@@ -178,18 +178,6 @@ mutual
                 g ∘ᵗ f ⟩ᵗ
 
   ⟦_⟧ᶜᵗ {Γ} (handle_`with_`in {A} {B} {τ} {τ'} M H N) =
-    {-
-    handleᵀ
-      (λ op τ'' →
-           ⟦ H op τ'' ⟧ᶜᵗ
-        ∘ᵗ mapˣᵗ
-             (mapˣᵗ idᵗ (⟦⟧ᵍ-⟦⟧ᵛ (param op)))
-             ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) (idᵗ {Tᵒ ⟦ B ⟧ᵛ τ''})))
-        ∘ᵗ ×-assocᵗ)
-      ⟦ N ⟧ᶜᵗ
-    ∘ᵗ ⟨ idᵗ , ⟦ M ⟧ᶜᵗ ⟩ᵗ
-    -}
-
     let f : ⟦ Γ ⟧ᵉ →ᵗ Π Op (λ op → Π Time (λ τ'' → ⟦ Γ ⟧ᵉ))
         f = ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ᵢᵗ) ⟩ᵢᵗ in
     let g : (op : Op) → (τ'' : Time)
@@ -204,7 +192,7 @@ mutual
                    ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) (idᵗ {Tᵒ ⟦ B ⟧ᵛ τ''}))))
                  (idᵗ {Tᵒ ⟦ B ⟧ᵛ (op-time op + τ'')}) in
        uncurryᵗ (
-            T-alg-of-handler
+            T-alg-of-handlerᵀ
          ∘ᵗ mapⁱˣᵗ (λ op → mapⁱˣᵗ (λ τ'' →
               g op τ'' ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×-assocᵗ)))
          ∘ᵗ f)
