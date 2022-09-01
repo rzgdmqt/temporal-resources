@@ -14,7 +14,11 @@ open import Data.Unit hiding (_≤_)
 open import Semantics.TSets
 open import Semantics.Modality.Future
 open import Semantics.Modality.Past
-open import Semantics.Monad.Core renaming (⟦_⟧ᵍ to ⟦_⟧ᵍ'; Tᵒ to Tᵒ'; Tᶠ to Tᶠ'; ηᵀ to ηᵀ'; μᵀ to μᵀ')
+open import Semantics.Monad.Core renaming (⟦_⟧ᵍ to ⟦_⟧ᵍ'; Tᵒ to Tᵒ'; Tᶠ to Tᶠ'; ηᵀ to ηᵀ'; μᵀ to μᵀ';
+                                           Tᶠ-idᵗ to Tᶠ-idᵗ'; Tᶠ-∘ᵗ to Tᶠ-∘ᵗ'; τ-substᵀ to τ-substᵀ';
+                                           ηᵀ-nat to ηᵀ-nat'; μᵀ-nat to μᵀ-nat';
+                                           μᵀ-identity₁ to μᵀ-identity₁'; μᵀ-identity₂ to μᵀ-identity₂';
+                                           μᵀ-assoc to μᵀ-assoc')
 open import Semantics.Monad.Strength renaming (strᵀ to strᵀ')
 open import Semantics.Monad.Effects renaming (delayᵀ to delayᵀ'; opᵀ to opᵀ'; T-alg-of-handlerᵀ to T-alg-of-handlerᵀ')
 
@@ -52,6 +56,45 @@ abstract
 
   μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
   μᵀ = μᵀ'
+
+  Tᶠ-idᵗ : ∀ {A τ}
+         → Tᶠ {A} {A} {τ} idᵗ ≡ᵗ idᵗ
+  Tᶠ-idᵗ = Tᶠ-idᵗ'
+
+  Tᶠ-∘ᵗ : ∀ {A B C τ}
+        → (g : B →ᵗ C)
+        → (f : A →ᵗ B)
+        → Tᶠ {A} {C} {τ} (g ∘ᵗ f) ≡ᵗ Tᶠ g ∘ᵗ Tᶠ f
+  Tᶠ-∘ᵗ = Tᶠ-∘ᵗ'
+
+  τ-substᵀ : ∀ {A τ τ'}
+           → τ ≡ τ'
+           → Tᵒ A τ →ᵗ Tᵒ A τ'
+  τ-substᵀ = τ-substᵀ'
+
+  ηᵀ-nat : ∀ {A B}
+         → (f : A →ᵗ B)
+         → ηᵀ ∘ᵗ f ≡ᵗ Tᶠ f ∘ᵗ ηᵀ
+  ηᵀ-nat = ηᵀ-nat'
+
+  μᵀ-nat : ∀ {A B τ τ'}
+         → (f : A →ᵗ B)
+         → μᵀ {τ = τ} {τ' = τ'} ∘ᵗ Tᶠ (Tᶠ f) ≡ᵗ Tᶠ f ∘ᵗ μᵀ
+  μᵀ-nat = μᵀ-nat'
+
+  μᵀ-identity₁ : ∀ {A τ}
+               →  μᵀ {τ = 0} {τ' = τ} ∘ᵗ ηᵀ {Tᵒ A τ} ≡ᵗ idᵗ
+  μᵀ-identity₁ = μᵀ-identity₁'
+
+  μᵀ-identity₂ : ∀ {A τ}
+               →  μᵀ {τ = τ} {τ' = 0} ∘ᵗ Tᶠ (ηᵀ {A})
+               ≡ᵗ τ-substᵀ (sym (+-identityʳ τ))
+  μᵀ-identity₂ = μᵀ-identity₂'
+
+  μᵀ-assoc : ∀ {A τ τ' τ''}
+           →  μᵀ {A} {τ} {τ' + τ''} ∘ᵗ Tᶠ μᵀ
+           ≡ᵗ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵗ (μᵀ ∘ᵗ μᵀ)
+  μᵀ-assoc = μᵀ-assoc'
 
 
 ---- Strength

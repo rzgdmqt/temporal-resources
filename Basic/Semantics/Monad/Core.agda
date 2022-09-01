@@ -365,6 +365,10 @@ mutual
         (cong (delay τ) (μˢ-≤t-nat (+-monoˡ-≤ τ p) k)))
       (τ-subst-≤t (sym (+-assoc τ _ _)) p (delay τ (μˢ k)))
 
+μᵀ : ∀ {A τ τ'}
+   → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
+μᵀ = tset-map μˢ μˢ-≤t-nat
+
 μˢ-nat : ∀ {A B τ τ'}
        → (f : A →ᵗ B)
        → {t : Time}
@@ -385,10 +389,6 @@ mutual
       (cong (delay τ)
         (μˢ-nat f k)))
     (τ-subst-Tˢᶠ (sym (+-assoc τ _ _)) f (delay τ (μˢ k)))
-
-μᵀ : ∀ {A τ τ'}
-   → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
-μᵀ = tset-map μˢ μˢ-≤t-nat
 
 μᵀ-nat : ∀ {A B τ τ'}
        → (f : A →ᵗ B)
@@ -414,8 +414,7 @@ mutual
 ---- First identity law
 
 μᵀ-identity₁ : ∀ {A τ}
-             →  μᵀ {τ = 0} {τ' = τ} ∘ᵗ ηᵀ {Tᵒ A τ}
-             ≡ᵗ idᵗ
+             →  μᵀ {τ = 0} {τ' = τ} ∘ᵗ ηᵀ {Tᵒ A τ} ≡ᵗ idᵗ
 μᵀ-identity₁ =
   eqᵗ (λ c →
     trans (∘ᵗ-reveal μᵀ ηᵀ c) (sym (idᵗ-reveal c)))
