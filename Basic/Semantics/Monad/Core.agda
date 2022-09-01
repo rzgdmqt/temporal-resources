@@ -281,6 +281,29 @@ Tᶠ-∘ᵗ g f =
               ≡ delay τ (τ-subst p c)
 τ-subst-delay τ refl c = refl
 
+τ-subst-node : ∀ {A τ τ' t}
+             → (p : τ ≡ τ')
+             → (op : Op)
+             → (v : carrier ⟦ param op ⟧ᵍ t)
+             → (k : {t' : Time} → t + op-time op ≤ t' → carrier ⟦ arity op ⟧ᵍ t' → Tˢ A τ t')
+             → (k-nat : {t' t'' : Time} (q : t' ≤ t'') (r : t + op-time op ≤ t')
+                        (y : carrier ⟦ arity op ⟧ᵍ t') →
+                        k (≤-trans r q) (monotone ⟦ arity op ⟧ᵍ q y) ≡ Tˢ-≤t q (k r y))
+             → τ-subst
+                 (cong (op-time op +_) p)
+                 (node op v k k-nat)
+             ≡ node op v
+                 (λ q y →
+                   τ-subst p (k q y))
+                 (λ q r y →
+                   trans
+                     (cong (τ-subst p) (k-nat q r y))
+                     (τ-subst-≤t p q (k r y)))
+τ-subst-node refl op v k k-nat =
+  dcong₂ (node op v)
+    refl
+    (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ r → fun-ext (λ y → uip))))))
+
 
 -- Unit
 
@@ -395,8 +418,23 @@ mutual
              ≡ τ-subst (sym (+-identityʳ τ)) c
 μˢ-identity₂ (leaf v) =
   refl
-μˢ-identity₂ (node op v k k-nat) =
-  {!!}
+μˢ-identity₂ (node {τ} op v k k-nat) =
+  trans
+    (cong (τ-subst (sym (+-assoc (op-time op) τ 0)))
+      (dcong₂ (node op v)
+        {y₂ = λ p q y →
+          trans
+            (cong (τ-subst (sym (+-identityʳ τ)))
+              (k-nat p q y))
+            (τ-subst-≤t _ _ (k q y))}
+        (ifun-ext (fun-ext (λ p → fun-ext (λ y → μˢ-identity₂ (k p y)))))
+        (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ q → fun-ext (λ y → uip))))))))
+    (trans
+      (cong (τ-subst (sym (+-assoc (op-time op) τ 0)))
+        (sym (τ-subst-node _ op v k k-nat)))
+      (trans
+        (τ-subst-trans _ (sym (+-assoc (op-time op) τ 0)) (node op v k k-nat))
+        (cong (λ p → τ-subst p (node op v k k-nat)) uip)))
 μˢ-identity₂ (delay {τ'} τ k) =
   trans
     (cong (τ-subst (sym (+-assoc τ τ' 0)))
@@ -413,7 +451,10 @@ mutual
              →  μᵀ {τ = τ} {τ' = 0} ∘ᵗ Tᶠ (ηᵀ {A})
              ≡ᵗ τ-substᵀ (sym (+-identityʳ τ))
 μᵀ-identity₂ =
-  eqᵗ (λ c → {!!})
+  eqᵗ (λ c →
+    trans
+      (∘ᵗ-reveal μᵀ (Tᶠ ηᵀ) c)
+      (μˢ-identity₂ c))
 
 
 
