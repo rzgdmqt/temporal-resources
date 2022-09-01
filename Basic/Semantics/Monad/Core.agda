@@ -251,6 +251,13 @@ Tᶠ-∘ᵗ g f =
            → τ-subst p (Tˢ-≤t q c) ≡ Tˢ-≤t q (τ-subst p c)
 τ-subst-≤t refl q c = refl
 
+τ-subst-trans : ∀ {A τ τ' τ'' t}
+              → (p : τ ≡ τ')
+              → (q : τ' ≡ τ'')
+              → (c : Tˢ A τ t)
+              → τ-subst q (τ-subst p c) ≡ τ-subst (trans p q) c
+τ-subst-trans refl refl c = refl
+
 τ-substᵀ : ∀ {A τ τ'}
          → τ ≡ τ'
          → Tᵒ A τ →ᵗ Tᵒ A τ'
@@ -265,7 +272,15 @@ Tᶠ-∘ᵗ g f =
             → (c : Tˢ A τ t)
             → τ-subst p (Tˢᶠ f c) ≡ Tˢᶠ f (τ-subst p c)
 τ-subst-Tˢᶠ refl f c = refl
-      
+
+τ-subst-delay : ∀ {A τ' τ'' t}
+              → (τ : Time)
+              → (p : τ' ≡ τ'')
+              → (c : Tˢ A τ' (t + τ))
+              → τ-subst (cong (τ +_) p) (delay τ c)
+              ≡ delay τ (τ-subst p c)
+τ-subst-delay τ refl c = refl
+
 
 -- Unit
 
@@ -372,6 +387,27 @@ mutual
 μᵀ-identity₁ =
   eqᵗ (λ c →
     trans (∘ᵗ-reveal μᵀ ηᵀ c) (sym (idᵗ-reveal c)))
+
+μˢ-identity₂ : ∀ {A τ}
+             → {t : Time}
+             → (c : Tˢ A τ t)
+             → μˢ {τ = τ} {τ' = 0} (Tˢᶠ (ηᵀ {A}) c)
+             ≡ τ-subst (sym (+-identityʳ τ)) c
+μˢ-identity₂ (leaf v) =
+  refl
+μˢ-identity₂ (node op v k k-nat) =
+  {!!}
+μˢ-identity₂ (delay {τ'} τ k) =
+  trans
+    (cong (τ-subst (sym (+-assoc τ τ' 0)))
+      (cong (delay τ)
+        (μˢ-identity₂ k)))
+    (trans
+      (cong (τ-subst (sym (+-assoc τ τ' 0)))
+        (sym (τ-subst-delay τ _ k)))
+      (trans
+        (τ-subst-trans _ (sym (+-assoc τ τ' 0)) (delay τ k))
+        (cong (λ p → τ-subst p (delay τ k)) uip)))
 
 μᵀ-identity₂ : ∀ {A τ}
              →  μᵀ {τ = τ} {τ' = 0} ∘ᵗ Tᶠ (ηᵀ {A})
