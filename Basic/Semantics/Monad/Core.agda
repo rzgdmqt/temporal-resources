@@ -142,7 +142,7 @@ Tˢ-≤t-trans p q (delay τ k) =
 τ-subst-≤t refl q c = refl
 
 
--- Functorial action (TODO: prove identity and composition laws)
+-- Functorial action
 
 mutual
 
@@ -196,6 +196,33 @@ mutual
   Tˢᶠ-≤t-nat f p (delay τ k) =
     cong (delay τ) (Tˢᶠ-≤t-nat f (+-monoˡ-≤ τ p) k)
 
+Tˢᶠ-idᵗ : ∀ {A τ} → {t : Time}
+        → (c : Tˢ A τ t)
+        → Tˢᶠ idᵗ c ≡ c
+Tˢᶠ-idᵗ (leaf v) =
+  cong leaf (idᵗ-reveal v)
+Tˢᶠ-idᵗ (node op v k k-nat) =
+  dcong₂ (node op v)
+    (ifun-ext (fun-ext (λ p → fun-ext (λ y → Tˢᶠ-idᵗ (k p y)))))
+    (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ q → fun-ext (λ y → uip))))))
+Tˢᶠ-idᵗ (delay τ k) =
+  cong (delay τ) (Tˢᶠ-idᵗ k)
+
+Tˢᶠ-∘ᵗ : ∀ {A B C τ}
+       → (g : B →ᵗ C)
+       → (f : A →ᵗ B)
+       → {t : Time}
+       → (c : Tˢ A τ t)
+       → Tˢᶠ (g ∘ᵗ f) c ≡ Tˢᶠ g (Tˢᶠ f c)
+Tˢᶠ-∘ᵗ g f (leaf v) =
+  cong leaf (∘ᵗ-reveal g f v)
+Tˢᶠ-∘ᵗ g f (node op v k k-nat) =
+  dcong₂ (node op v)
+    (ifun-ext (fun-ext (λ p → (fun-ext (λ y → Tˢᶠ-∘ᵗ g f (k p y))))))
+    (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ q → fun-ext (λ y → uip))))))
+Tˢᶠ-∘ᵗ g f (delay τ k) =
+  cong (delay τ) (Tˢᶠ-∘ᵗ g f k)
+
 
 -- Packaging it all up into a functor on TSet
 
@@ -204,6 +231,18 @@ Tᵒ A τ = tset (Tˢ A τ) Tˢ-≤t Tˢ-≤t-refl Tˢ-≤t-trans
  
 Tᶠ : ∀ {A B τ} → A →ᵗ B → Tᵒ A τ →ᵗ Tᵒ B τ
 Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-≤t-nat f)
+
+Tᶠ-idᵗ : ∀ {A τ}
+       → Tᶠ {A} {A} {τ} idᵗ ≡ᵗ idᵗ
+Tᶠ-idᵗ =
+  eqᵗ (λ c → trans (Tˢᶠ-idᵗ c) (sym (idᵗ-reveal c)))
+
+Tᶠ-∘ᵗ : ∀ {A B C τ}
+      → (g : B →ᵗ C)
+      → (f : A →ᵗ B)
+      → Tᶠ {A} {C} {τ} (g ∘ᵗ f) ≡ᵗ Tᶠ g ∘ᵗ Tᶠ f
+Tᶠ-∘ᵗ g f =
+  eqᵗ (λ c → trans (Tˢᶠ-∘ᵗ g f c) (sym (∘ᵗ-reveal (Tᶠ g) (Tᶠ f) c)))
 
 
 -- Unit (TODO: prove naturality and laws)
