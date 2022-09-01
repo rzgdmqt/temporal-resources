@@ -401,8 +401,17 @@ mutual
         (μˢ-nat f c)
         (sym (∘ᵗ-reveal (Tᶠ f) μᵀ c))))
 
+τ-subst-μˢ : ∀ {A τ τ' τ'' t}
+           → (p : τ ≡ τ'')
+           → (c : Tˢ (Tᵒ A τ') τ t)
+           → τ-subst (cong (_+ τ') p) (μˢ c)
+           ≡ μˢ (τ-subst p c)
+τ-subst-μˢ refl c = refl
 
--- Monad laws (TODO)
+
+-- Monad laws
+
+---- First identity law
 
 μᵀ-identity₁ : ∀ {A τ}
              →  μᵀ {τ = 0} {τ' = τ} ∘ᵗ ηᵀ {Tᵒ A τ}
@@ -410,6 +419,8 @@ mutual
 μᵀ-identity₁ =
   eqᵗ (λ c →
     trans (∘ᵗ-reveal μᵀ ηᵀ c) (sym (idᵗ-reveal c)))
+
+---- Second identity law
 
 μˢ-identity₂ : ∀ {A τ}
              → {t : Time}
@@ -456,8 +467,53 @@ mutual
       (∘ᵗ-reveal μᵀ (Tᶠ ηᵀ) c)
       (μˢ-identity₂ c))
 
+---- Associativity law
 
+μˢ-assoc : ∀ {A τ τ' τ'' t}
+         → (c : carrier (Tᵒ (Tᵒ (Tᵒ A τ'') τ') τ) t)
+         → μˢ {A} {τ} {τ' + τ''} (Tˢᶠ μᵀ c)
+         ≡ τ-subst (+-assoc τ τ' τ'') (μˢ (μˢ c))
+μˢ-assoc (leaf v) =
+  refl
+μˢ-assoc (node op v k k-nat) =
+  {!!}
+μˢ-assoc {A} {τ' = τ'} {τ'' = τ''} (delay {τ' = τ'''} τ k) =
+  trans
+    (cong (τ-subst (sym (+-assoc τ τ''' (τ' + τ''))))
+      (cong (delay τ)
+        (μˢ-assoc k)))
+    (trans
+      (cong (τ-subst (sym (+-assoc τ τ''' (τ' + τ''))))
+        (sym (τ-subst-delay τ _ (μˢ (μˢ k)))))
+      (trans
+        (τ-subst-trans _ (sym (+-assoc τ τ''' (τ' + τ''))) (delay τ (μˢ (μˢ k))))
+        (trans
+          {j =
+            τ-subst
+              (+-assoc (τ + τ''') τ' τ'')
+                (τ-subst {τ = τ + (τ''' + τ') + τ''} {τ' = τ + τ''' + τ' + τ''}
+                  (cong (_+ τ'') (sym (+-assoc τ τ''' τ')))
+                  (μˢ (delay τ (μˢ k))))}
+          (trans
+            (trans
+              (cong (λ p → τ-subst p (delay τ (μˢ (μˢ k)))) uip)
+              (sym (τ-subst-trans _ (+-assoc (τ + τ''') τ' τ'') (delay τ (μˢ (μˢ k))))))
+            (cong (τ-subst (+-assoc (τ + τ''') τ' τ''))
+              (sym (τ-subst-trans _ (cong (_+ τ'') (sym (+-assoc τ τ''' τ'))) (delay τ (μˢ (μˢ k)))))))
+          (cong (τ-subst (+-assoc (τ + τ''') τ' τ''))
+            (trans
+              (trans
+                (τ-subst-trans _ (cong (_+ τ'') (sym (+-assoc τ τ''' τ'))) (delay τ (μˢ (μˢ k))))
+                (trans
+                  (cong (λ p → τ-subst p (delay τ (μˢ (μˢ k)))) uip)
+                  (sym (τ-subst-trans _ (cong (_+ τ'') (sym (+-assoc τ τ''' τ'))) (delay τ (μˢ (μˢ k)))))))
+              (τ-subst-μˢ (sym (+-assoc τ τ''' τ')) (delay τ (μˢ k))))))))
 
+μᵀ-assoc : ∀ {A τ τ' τ''}
+         →  μᵀ {A} {τ} {τ' + τ''} ∘ᵗ Tᶠ μᵀ
+         ≡ᵗ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵗ (μᵀ ∘ᵗ μᵀ)
+μᵀ-assoc =
+  eqᵗ (λ c → {!!})
 
 
 
