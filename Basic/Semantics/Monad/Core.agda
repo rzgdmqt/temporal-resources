@@ -146,14 +146,29 @@ Tˢ-≤t-trans p q (delay τ k) =
 
 mutual
 
-  -- TODO: investigate how to convince Agda's termination checker;
-  --       the "suspicious" recursive occurrences of `Tˢᶠ` are in 
-  --       types (but still applied to the continuation `k`);
-  --       so maybe it is enough to index the trees by their height
-  --
-  --       same also applies for definitions below
-
   {-# TERMINATING #-}
+
+  -- For now, telling Agda manually that the definitions below are
+  -- terminating. The problem lies in Agda not seeing that uses of
+  -- `Tˢᶠ` in the types involved in the `node op ...` case are indeed
+  -- applied to smaller arguments when calling the simultaneously
+  -- defined function `Tˢᶠ-≤t-nat` to fill a hole of type
+  --
+  --   `Tˢᶠ f (Tˢ-≤t p (k q y)) ≡ Tˢ-≤t p (Tˢᶠ f (k q y))`
+  --
+  -- Here `Tˢ-≤t` is masking that `k q y` and thus `Tˢ-≤t p (k q y)` 
+  -- are in fact smaller trees.
+  --
+  -- Possible solutions include additionally indexing the trees by
+  -- their heights, using sized types (when they become consistent),
+  -- or moving the `k-nat` condition into a separate extrinsic
+  -- predicate. The latter involves duplicating all definitions.
+  --
+  -- For now not implementing any of those workarounds to keep the
+  -- presheaf model clean and not polluted by formalisation artefacts.
+  -- 
+  -- The other uses of {-# TERMINATING #-} in this and related `Monad`
+  -- modules are included because of analogous reasons.
 
   Tˢᶠ : ∀ {A B τ} → A →ᵗ B → {t : Time} → Tˢ A τ t → Tˢ B τ t
   Tˢᶠ f (leaf v) =
