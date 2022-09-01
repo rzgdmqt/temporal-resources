@@ -475,8 +475,72 @@ mutual
          ≡ τ-subst (+-assoc τ τ' τ'') (μˢ (μˢ c))
 μˢ-assoc (leaf v) =
   refl
-μˢ-assoc (node op v k k-nat) =
-  {!!}
+μˢ-assoc {A} {τ' = τ'} {τ'' = τ''} (node {τ = τ} op v k k-nat) =
+  trans
+    (cong (τ-subst (sym (+-assoc (op-time op) τ (τ' + τ''))))
+      (dcong₂ (node op v)
+        {y₂ = λ p q y →
+          trans
+            (cong (τ-subst (+-assoc τ τ' τ''))
+              (trans
+                (cong (λ c → μˢ (μˢ c))
+                  (k-nat p q y))
+                (trans
+                  (cong μˢ (μˢ-≤t-nat _ (k q y)))
+                  (μˢ-≤t-nat _ (μˢ (k q y))))))
+            (τ-subst-≤t _ _ (μˢ (μˢ (k q y))))}
+        (ifun-ext (fun-ext (λ p → fun-ext (λ y → μˢ-assoc (k p y)))))
+        (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ q → fun-ext (λ y → uip))))))))
+    (trans
+      (trans
+        (sym
+          (cong (τ-subst (sym (+-assoc (op-time op) τ (τ' + τ''))))
+            (τ-subst-node
+              (+-assoc τ τ' τ'')
+              op
+              v
+              (λ p y → μˢ (μˢ (k p y)))
+              (λ p q y →
+                trans
+                  (cong (λ c → μˢ (μˢ c))
+                    (k-nat p q y))
+                  (trans
+                    (cong μˢ (μˢ-≤t-nat _ (k q y)))
+                    (μˢ-≤t-nat _ (μˢ (k q y))))))))
+        (trans
+          (τ-subst-trans
+            (cong (_+_ (op-time op)) (+-assoc τ τ' τ''))
+            (sym (+-assoc (op-time op) τ (τ' + τ''))) _)
+          (trans
+            (trans
+              (cong₂
+                (λ p c → τ-subst
+                  {τ = op-time op + (τ + τ' + τ'')}
+                  {τ' = op-time op + τ + (τ' + τ'')} p c)
+                {trans (cong (_+_ (op-time op)) (+-assoc τ τ' τ''))
+                  (sym (+-assoc (op-time op) τ (τ' + τ'')))}
+                {trans (sym (+-assoc (op-time op) (τ + τ') τ''))
+                  (trans (cong (_+ τ'') (sym (+-assoc (op-time op) τ τ')))
+                    (+-assoc (op-time op + τ) τ' τ''))}
+                uip
+                (cong (node op v (λ p y → μˢ (μˢ (k p y))))
+                  (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ q → fun-ext (λ y → uip))))))))
+              (sym
+                (τ-subst-trans
+                  (sym (+-assoc (op-time op) (τ + τ') τ''))
+                  (trans (cong (_+ τ'') (sym (+-assoc (op-time op) τ τ')))
+                    (+-assoc (op-time op + τ) τ' τ''))
+                  _)))
+            (sym
+              (τ-subst-trans
+                (cong (_+ τ'') (sym (+-assoc (op-time op) τ τ')))
+                (+-assoc (op-time op + τ) τ' τ'') _)))))
+      (cong (τ-subst (+-assoc (op-time op + τ) τ' τ''))
+        (τ-subst-μˢ
+          (sym (+-assoc (op-time op) τ τ'))
+          (node op v
+            (λ p y → μˢ (k p y))
+            (λ p q y → trans (cong μˢ (k-nat p q y)) (μˢ-≤t-nat p (k q y)))))))
 μˢ-assoc {A} {τ' = τ'} {τ'' = τ''} (delay {τ' = τ'''} τ k) =
   trans
     (cong (τ-subst (sym (+-assoc τ τ''' (τ' + τ''))))
@@ -512,8 +576,18 @@ mutual
 μᵀ-assoc : ∀ {A τ τ' τ''}
          →  μᵀ {A} {τ} {τ' + τ''} ∘ᵗ Tᶠ μᵀ
          ≡ᵗ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵗ (μᵀ ∘ᵗ μᵀ)
-μᵀ-assoc =
-  eqᵗ (λ c → {!!})
+μᵀ-assoc {A} {τ} {τ'} {τ''} =
+  eqᵗ (λ c →
+    trans
+      (∘ᵗ-reveal μᵀ (Tᶠ μᵀ) c)
+      (trans
+        (trans
+          (μˢ-assoc c)
+          (sym
+            (cong (map-carrier (τ-substᵀ (+-assoc τ τ' τ'')))
+              (∘ᵗ-reveal _ _ c))))
+        (sym
+          (∘ᵗ-reveal _ _ c))))
 
 
 
