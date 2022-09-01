@@ -123,7 +123,7 @@ mutual
           (ifun-ext (fun-ext (λ r → fun-ext (λ y →
             cong (λ p → T-alg-of-handlerˢ h p (k (≤-trans (+-monoˡ-≤ (op-time op) q) r) y)) (≤-irrelevant _ _)))))
           (ifun-ext (ifun-ext (fun-ext (λ r → fun-ext (λ s → fun-ext (λ y → uip))))))))
-      (sym (τ-subst-≤t (sym (+-assoc (op-time op) _ _)) _ _))
+      (τ-subst-≤t (sym (+-assoc (op-time op) _ _)) _ _)
   T-alg-of-handlerˢ-≤t-cod-nat p h q (delay τ k) =
     trans
       (cong (τ-subst (sym (+-assoc τ _ _)))
@@ -131,7 +131,7 @@ mutual
           (trans
             (cong (λ p → T-alg-of-handlerˢ h p (Tˢ-≤t (+-monoˡ-≤ τ q) k)) (≤-irrelevant _ _))
             (T-alg-of-handlerˢ-≤t-cod-nat (≤-stepsʳ τ p) h (+-monoˡ-≤ τ q) k))))
-      (sym (τ-subst-≤t (sym (+-assoc τ _ _)) q _))
+      (τ-subst-≤t (sym (+-assoc τ _ _)) q _)
 
   T-alg-of-handlerˢ-≤t-nat : ∀ {A τ τ'} → {t t' : ℕ} → (p : t ≤ t')
                            → (h : carrier (Π Op (λ op → Π Time (λ τ'' →

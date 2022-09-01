@@ -126,22 +126,6 @@ Tˢ-≤t-trans p q (delay τ k) =
       (cong (λ p → Tˢ-≤t p k) (≤-irrelevant _ _)))
 
 
--- "subst" for time-gradings
-
-τ-subst : ∀ {A τ τ' t}
-        → τ ≡ τ'
-        → Tˢ A τ t
-        → Tˢ A τ' t
-τ-subst refl c = c
-
-τ-subst-≤t : ∀ {A τ τ' t t'}
-           → (p : τ ≡ τ')
-           → (q : t ≤ t')
-           → (c : Tˢ A τ t)
-           → Tˢ-≤t q (τ-subst p c) ≡ τ-subst p (Tˢ-≤t q c)
-τ-subst-≤t refl q c = refl
-
-
 -- Functorial action
 
 mutual
@@ -235,17 +219,55 @@ Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-≤t-nat f)
 Tᶠ-idᵗ : ∀ {A τ}
        → Tᶠ {A} {A} {τ} idᵗ ≡ᵗ idᵗ
 Tᶠ-idᵗ =
-  eqᵗ (λ c → trans (Tˢᶠ-idᵗ c) (sym (idᵗ-reveal c)))
+  eqᵗ (λ c →
+    trans
+      (Tˢᶠ-idᵗ c)
+      (sym (idᵗ-reveal c)))
 
 Tᶠ-∘ᵗ : ∀ {A B C τ}
       → (g : B →ᵗ C)
       → (f : A →ᵗ B)
       → Tᶠ {A} {C} {τ} (g ∘ᵗ f) ≡ᵗ Tᶠ g ∘ᵗ Tᶠ f
 Tᶠ-∘ᵗ g f =
-  eqᵗ (λ c → trans (Tˢᶠ-∘ᵗ g f c) (sym (∘ᵗ-reveal (Tᶠ g) (Tᶠ f) c)))
+  eqᵗ (λ c →
+    trans
+      (Tˢᶠ-∘ᵗ g f c)
+      (sym (∘ᵗ-reveal (Tᶠ g) (Tᶠ f) c)))
 
 
--- Unit (TODO: prove naturality and laws)
+-- "subst" for time-gradings
+
+τ-subst : ∀ {A τ τ'}
+        → τ ≡ τ'
+        → {t : Time}
+        → Tˢ A τ t
+        → Tˢ A τ' t
+τ-subst refl c = c
+
+τ-subst-≤t : ∀ {A τ τ' t t'}
+           → (p : τ ≡ τ')
+           → (q : t ≤ t')
+           → (c : Tˢ A τ t)
+           → τ-subst p (Tˢ-≤t q c) ≡ Tˢ-≤t q (τ-subst p c)
+τ-subst-≤t refl q c = refl
+
+τ-substᵀ : ∀ {A τ τ'}
+         → τ ≡ τ'
+         → Tᵒ A τ →ᵗ Tᵒ A τ'
+τ-substᵀ p =
+  tset-map
+    (τ-subst p)
+    (τ-subst-≤t p)
+
+τ-subst-Tˢᶠ : ∀ {A B τ τ' t}
+            → (p : τ ≡ τ')
+            → (f : A →ᵗ B)
+            → (c : Tˢ A τ t)
+            → τ-subst p (Tˢᶠ f c) ≡ Tˢᶠ f (τ-subst p c)
+τ-subst-Tˢᶠ refl f c = refl
+      
+
+-- Unit
 
 ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
 ηᵀ =
@@ -253,8 +275,17 @@ Tᶠ-∘ᵗ g f =
     (λ v → leaf v)
     (λ p v → refl)
 
+ηᵀ-nat : ∀ {A B}
+       → (f : A →ᵗ B)
+       → ηᵀ ∘ᵗ f ≡ᵗ Tᶠ f ∘ᵗ ηᵀ
+ηᵀ-nat f =
+  eqᵗ (λ c →
+    trans
+      (∘ᵗ-reveal ηᵀ f c)
+      (sym (∘ᵗ-reveal (Tᶠ f) ηᵀ c)))
 
--- Multiplication (TODO: prove naturality and laws)
+
+-- Multiplication
 
 mutual
 
@@ -288,25 +319,65 @@ mutual
         (dcong₂ (node op (monotone ⟦ param op ⟧ᵍ p v))
           refl
           (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ r → fun-ext (λ y → uip))))))))
-      (sym (τ-subst-≤t (sym (+-assoc (op-time op) _ _)) p _))
+      (τ-subst-≤t (sym (+-assoc (op-time op) _ _)) p _)
   μˢ-≤t-nat p (delay τ k) =
     trans
       (cong
         (τ-subst (sym (+-assoc τ _ _)))
         (cong (delay τ) (μˢ-≤t-nat (+-monoˡ-≤ τ p) k)))
-      (sym (τ-subst-≤t (sym (+-assoc τ _ _)) p (delay τ (μˢ k))))
+      (τ-subst-≤t (sym (+-assoc τ _ _)) p (delay τ (μˢ k)))
+
+μˢ-nat : ∀ {A B τ τ'}
+       → (f : A →ᵗ B)
+       → {t : Time}
+       → (c : Tˢ (Tᵒ A τ') τ t)
+       → μˢ (Tˢᶠ (Tᶠ f) c) ≡ Tˢᶠ f (μˢ c)
+μˢ-nat f (leaf v) =
+  refl
+μˢ-nat f (node op v k k-nat) =
+  trans
+    (cong (τ-subst (sym (+-assoc (op-time op) _ _)))
+      (dcong₂ (node op v)
+        (ifun-ext (fun-ext (λ p → fun-ext (λ y → μˢ-nat f (k p y)))))
+        (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ q → fun-ext (λ y → uip))))))))
+    (τ-subst-Tˢᶠ (sym (+-assoc (op-time op) _ _)) f _)
+μˢ-nat f (delay τ k) =
+  trans
+    (cong (τ-subst (sym (+-assoc τ _ _)))
+      (cong (delay τ)
+        (μˢ-nat f k)))
+    (τ-subst-Tˢᶠ (sym (+-assoc τ _ _)) f (delay τ (μˢ k)))
 
 μᵀ : ∀ {A τ τ'}
    → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
 μᵀ = tset-map μˢ μˢ-≤t-nat
 
+μᵀ-nat : ∀ {A B τ τ'}
+       → (f : A →ᵗ B)
+       → μᵀ {τ = τ} {τ' = τ'} ∘ᵗ Tᶠ (Tᶠ f) ≡ᵗ Tᶠ f ∘ᵗ μᵀ
+μᵀ-nat f =
+  eqᵗ (λ c →
+    trans
+      (∘ᵗ-reveal μᵀ (Tᶠ (Tᶠ f)) c)
+      (trans
+        (μˢ-nat f c)
+        (sym (∘ᵗ-reveal (Tᶠ f) μᵀ c))))
 
 
+-- Monad laws (TODO)
 
+μᵀ-identity₁ : ∀ {A τ}
+             →  μᵀ {τ = 0} {τ' = τ} ∘ᵗ ηᵀ {Tᵒ A τ}
+             ≡ᵗ idᵗ
+μᵀ-identity₁ =
+  eqᵗ (λ c →
+    trans (∘ᵗ-reveal μᵀ ηᵀ c) (sym (idᵗ-reveal c)))
 
-
-
-
+μᵀ-identity₂ : ∀ {A τ}
+             →  μᵀ {τ = τ} {τ' = 0} ∘ᵗ Tᶠ (ηᵀ {A})
+             ≡ᵗ τ-substᵀ (sym (+-identityʳ τ))
+μᵀ-identity₂ =
+  eqᵗ (λ c → {!!})
 
 
 
