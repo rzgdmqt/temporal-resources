@@ -283,27 +283,9 @@ strˢ-nat {A} {A'} {B} {B'} {_} {τ'} {t} f g v (delay {τ' = τ''} τ k) =
                                 (trans
                                   (cong (map-carrier f)
                                     (trans
-                                      {j = proj₂
-                                             {A = τ' ≤ t + τ + τ''}
-                                             {B = λ _ → carrier A (t + τ + τ'' ∸ τ')}
-                                             (proj₁ {B = λ _ → Tˢ B τ'' (t + τ)}
-                                               (unpack-×ᵗ {[ τ'' ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ''} {t = t + τ}
-                                                 (pack-×ᵗ
-                                                   ((≤-trans (proj₁ v) (≤-reflexive (sym (+-assoc t τ τ''))) ,
-                                                      monotone A (≤-reflexive (cong (_∸ τ') (sym (+-assoc t τ τ''))))
-                                                      (proj₂ v)) ,
-                                                   k))))}
                                       (cong proj₂
                                         (fstᵗ-reveal {[ τ'' ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ''} _))
                                       (trans
-                                        {j = proj₂
-                                             {A = τ' ≤ t + τ + τ''}
-                                             {B = λ _ → carrier A (t + τ + τ'' ∸ τ')}
-                                             (proj₁ {B = λ _ → Tˢ B τ'' (t + τ)}
-                                               ((≤-trans (proj₁ v) (≤-reflexive (sym (+-assoc t τ τ''))) ,
-                                                      monotone A (≤-reflexive (cong (_∸ τ') (sym (+-assoc t τ τ''))))
-                                                      (proj₂ v)) ,
-                                                   k))}
                                         (cong (λ xy → proj₂ (proj₁ xy))
                                           (pack-unpack-×ᵗ {[ τ'' ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ''} _))
                                         (trans
@@ -319,50 +301,19 @@ strˢ-nat {A} {A'} {B} {B'} {_} {τ'} {t} f g v (delay {τ' = τ''} τ k) =
                                                 {[ τ + τ'' ]ᵒ (⟨ τ' ⟩ᵒ A)}
                                                 (pack-×ᵗ (v , delay τ k))))))))))
                                   (map-nat f _ _))))))))
-                    {!!})))))))
+                    (trans
+                      (cong (λ xy → proj₂ (unpack-×ᵗ xy)) (⟨⟩ᵗ-reveal _ _ _))
+                      (trans
+                        (cong proj₂ (pack-unpack-×ᵗ _))
+                        (trans
+                          (∘ᵗ-reveal _ _ _)
+                          (trans
+                            (cong (map-carrier (Tᶠ g)) (sndᵗ-reveal _))
+                            (cong (λ xy → map-carrier (Tᶠ g) (proj₂ xy)) (pack-unpack-×ᵗ _)))))))))))))
       (sym
         (∘ᵗ-reveal _ _ _)))
 
 
-
-
-{-
-
-(cong (proj₂ {A = τ' ≤ t + τ + τ''} {B = λ _ → carrier A (t + τ + τ'' ∸ τ')})
-                                        {!fstᵗ-reveal (pack-×ᵗ
-         ((≤-trans (proj₁ v) (≤-reflexive (sym (+-assoc t τ τ''))) ,
-           monotone A (≤-reflexive (cong (_∸ τ') (sym (+-assoc t τ τ''))))
-           (proj₂ v))
-          , k))!})
-
--}
-
-
-{-
-         → strˢ {A'} {B'}
-             (map-carrier ([ τ ]ᶠ (⟨ τ' ⟩ᶠ f)) v)
-             (Tˢᶠ g c)
-         ≡ Tˢᶠ (mapˣᵗ (⟨ τ' ⟩ᶠ f) g) (strˢ {A} {B} v c)
--}
-
-
-
-{-
-strᵀ-nat : ∀ {A A' B B' τ τ'}
-         → (f : A →ᵗ A')
-         → (g : B →ᵗ B')
-         →  strᵀ {A'} {B'} ∘ᵗ mapˣᵗ ([ τ ]ᶠ (⟨ τ' ⟩ᶠ f)) (Tᶠ g)
-         ≡ᵗ Tᶠ (mapˣᵗ (⟨ τ' ⟩ᶠ f) g) ∘ᵗ strᵀ {A} {B}
-strᵀ-nat {A} {A'} {B} {B'} {τ} {τ'} f g =
-  eqᵗ (λ vc →
-    trans
-      (cong (map-carrier (strᵀ ∘ᵗ mapˣᵗ ([ τ ]ᶠ (⟨ τ' ⟩ᶠ f)) (Tᶠ g)))
-        (sym (unpack-pack-×ᵗ vc)))
-      (trans
-        (strˢ-nat f g (proj₁ (unpack-×ᵗ vc)) (proj₂ (unpack-×ᵗ vc)))
-        (cong (map-carrier (Tᶠ (mapˣᵗ (⟨ τ' ⟩ᶠ f) g) ∘ᵗ strᵀ {A} {B}))
-          (unpack-pack-×ᵗ vc))))
--}
 
 -- Laws (TODO)
 
