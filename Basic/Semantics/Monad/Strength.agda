@@ -204,7 +204,12 @@ strˢ-nat {A} {A'} {B} {B'} {_} {τ'} {t} f g v (leaf w) =
               (cong proj₂ (pack-unpack-×ᵗ (v , leaf w)))))))
       (sym (∘ᵗ-reveal (Tᶠ (mapˣᵗ (⟨ τ' ⟩ᶠ f) g)) (strᵀ {A} {B}) (pack-×ᵗ (v , leaf w)))))
 strˢ-nat f g v (node op w k k-nat) =
-  {!!}
+  trans
+    (∘ᵗ-reveal _ _ _)
+    (trans
+      {!!}
+      (sym
+        (∘ᵗ-reveal _ _ _)))
 strˢ-nat f g v (delay τ k) =
   {!!}
 
