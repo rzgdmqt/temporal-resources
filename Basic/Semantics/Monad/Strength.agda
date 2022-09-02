@@ -207,12 +207,135 @@ strˢ-nat f g v (node op w k k-nat) =
   trans
     (∘ᵗ-reveal _ _ _)
     (trans
-      {!!}
+      (trans
+        (trans
+          (cong₂ strˢ
+            (cong (λ xy → proj₁ (unpack-×ᵗ xy)) (⟨⟩ᵗ-reveal _ _ _))
+            (cong (λ xy → proj₂ (unpack-×ᵗ xy)) (⟨⟩ᵗ-reveal _ _ _)))
+          {!!})
+        {!!})
       (sym
         (∘ᵗ-reveal _ _ _)))
-strˢ-nat f g v (delay τ k) =
-  {!!}
+strˢ-nat {A} {A'} {B} {B'} {_} {τ'} {t} f g v (delay {τ' = τ''} τ k) =
+  trans
+    (∘ᵗ-reveal _ _ _)
+    (trans
+      (trans
+        (trans
+          (cong₂ strˢ
+            (cong (λ xy → proj₁ (unpack-×ᵗ xy)) (⟨⟩ᵗ-reveal _ _ _))
+            (cong (λ xy → proj₂ (unpack-×ᵗ xy)) (⟨⟩ᵗ-reveal _ _ _)))
+          (trans
+            (cong₂ strˢ
+              (cong proj₁ (pack-unpack-×ᵗ _))
+              (cong proj₂ (pack-unpack-×ᵗ _)))
+            (trans
+              (cong₂ strˢ
+                (∘ᵗ-reveal _ _ _)
+                (∘ᵗ-reveal _ _ _))
+              (trans
+                (cong₂ strˢ
+                  ([]-reveal _ _ _)
+                  (cong (Tˢᶠ g) (sndᵗ-reveal _)))
+                (cong₂ strˢ
+                  (⟨⟩-reveal _ _ _)
+                  (cong (λ xy → Tˢᶠ g (proj₂ xy)) (pack-unpack-×ᵗ _)))))))
+        (sym
+          (trans
+            (cong (Tˢᶠ ⟨ ⟨ τ' ⟩ᶠ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ)
+              (cong₂ strˢ
+                (cong proj₁ (pack-unpack-×ᵗ _))
+                (cong proj₂ (pack-unpack-×ᵗ _))))
+            (cong (delay τ)
+              (trans
+                (trans
+                  (trans
+                    (cong (Tˢᶠ ⟨ ⟨ τ' ⟩ᶠ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ)
+                      (cong₂ strˢ
+                        (trans
+                          (cong (≤-trans (proj₁ v) (≤-reflexive (sym (+-assoc t τ τ''))) ,_)
+                            (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _)))
+                          (sym (cong proj₁ (pack-unpack-×ᵗ _))))
+                        (sym
+                          (cong proj₂ (pack-unpack-×ᵗ _)))))
+                    (sym
+                      (∘ᵗ-reveal _ _ _)))
+                  (sym
+                    (strˢ-nat {A} {A'} {B} {B'} f g
+                      (≤-trans (proj₁ v) (≤-reflexive (sym (+-assoc t τ τ''))) ,
+                       monotone A (≤-reflexive (cong (_∸ τ') (sym (+-assoc t τ τ'')))) (proj₂ v))
+                      k)))
+                (trans
+                  (∘ᵗ-reveal _ _ _)
+                  (cong₂ strˢ
+                    (trans
+                      (cong (λ xy → proj₁ (unpack-×ᵗ xy)) (⟨⟩ᵗ-reveal _ _ _))
+                      (trans
+                        (cong proj₁ (pack-unpack-×ᵗ _))
+                        (trans
+                          (∘ᵗ-reveal _ _ _)
+                          (trans
+                            ([]-reveal _ _ _)
+                            (trans
+                              (⟨⟩-reveal _ _ _)
+                              (cong₂ _,_
+                                (≤-irrelevant _ _)
+                                (trans
+                                  (cong (map-carrier f)
+                                    (trans
+                                      {j = proj₂
+                                             {A = τ' ≤ t + τ + τ''}
+                                             {B = λ _ → carrier A (t + τ + τ'' ∸ τ')}
+                                             (proj₁ {B = λ _ → Tˢ B τ'' (t + τ)}
+                                               (unpack-×ᵗ {[ τ'' ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ''} {t = t + τ}
+                                                 (pack-×ᵗ
+                                                   ((≤-trans (proj₁ v) (≤-reflexive (sym (+-assoc t τ τ''))) ,
+                                                      monotone A (≤-reflexive (cong (_∸ τ') (sym (+-assoc t τ τ''))))
+                                                      (proj₂ v)) ,
+                                                   k))))}
+                                      (cong proj₂
+                                        (fstᵗ-reveal {[ τ'' ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ''} _))
+                                      (trans
+                                        {j = proj₂
+                                             {A = τ' ≤ t + τ + τ''}
+                                             {B = λ _ → carrier A (t + τ + τ'' ∸ τ')}
+                                             (proj₁ {B = λ _ → Tˢ B τ'' (t + τ)}
+                                               ((≤-trans (proj₁ v) (≤-reflexive (sym (+-assoc t τ τ''))) ,
+                                                      monotone A (≤-reflexive (cong (_∸ τ') (sym (+-assoc t τ τ''))))
+                                                      (proj₂ v)) ,
+                                                   k))}
+                                        (cong (λ xy → proj₂ (proj₁ xy))
+                                          (pack-unpack-×ᵗ {[ τ'' ]ᵒ (⟨ τ' ⟩ᵒ A)} {Tᵒ B τ''} _))
+                                        (trans
+                                          (trans
+                                            (cong (λ p → monotone A p (proj₂ v)) (≤-irrelevant _ _))
+                                            (cong (monotone A (∸-mono (≤-reflexive (sym (+-assoc t τ τ''))) ≤-refl))
+                                              (sym
+                                                (cong (λ xy → proj₂ (proj₁ xy)) (pack-unpack-×ᵗ {[ τ + τ'' ]ᵒ (⟨ τ' ⟩ᵒ A)} _)))))
+                                          (cong (monotone A (∸-mono (≤-reflexive (sym (+-assoc t τ τ''))) ≤-refl))
+                                            (sym
+                                              (cong proj₂
+                                              (fstᵗ-reveal
+                                                {[ τ + τ'' ]ᵒ (⟨ τ' ⟩ᵒ A)}
+                                                (pack-×ᵗ (v , delay τ k))))))))))
+                                  (map-nat f _ _))))))))
+                    {!!})))))))
+      (sym
+        (∘ᵗ-reveal _ _ _)))
 
+
+
+
+{-
+
+(cong (proj₂ {A = τ' ≤ t + τ + τ''} {B = λ _ → carrier A (t + τ + τ'' ∸ τ')})
+                                        {!fstᵗ-reveal (pack-×ᵗ
+         ((≤-trans (proj₁ v) (≤-reflexive (sym (+-assoc t τ τ''))) ,
+           monotone A (≤-reflexive (cong (_∸ τ') (sym (+-assoc t τ τ''))))
+           (proj₂ v))
+          , k))!})
+
+-}
 
 
 {-
