@@ -203,9 +203,6 @@ strˢ-nat {A} {A'} {B} {B'} {_} {τ'} {t} f g v (leaf w) =
               (cong proj₁ (pack-unpack-×ᵗ (v , leaf w)))
               (cong proj₂ (pack-unpack-×ᵗ (v , leaf w)))))))
       (sym (∘ᵗ-reveal (Tᶠ (mapˣᵗ (⟨ τ' ⟩ᶠ f) g)) (strᵀ {A} {B}) (pack-×ᵗ (v , leaf w)))))
-
-
-
 strˢ-nat {A} {A'} {B} {B'} {_} {τ'} {t} f g v (node {τ = τ} op w k k-nat) =
   trans
     (∘ᵗ-reveal _ _ _)
@@ -324,23 +321,19 @@ strˢ-nat {A} {A'} {B} {B'} {_} {τ'} {t} f g v (node {τ = τ} op w k k-nat) =
                                                 (cong (map-carrier f)
                                                   (cong proj₂ (fstᵗ-reveal {[ op-time op + τ ]ᵒ (⟨ τ' ⟩ᵒ A)} _)))))))))))))))
                         (trans
-                          {!cong proj₂ (pack-unpack-×ᵗ _)!}
-                          {!!}))))))))
+                          (cong (λ xy → proj₂ (unpack-×ᵗ xy)) (⟨⟩ᵗ-reveal _ _ _))
+                          (trans
+                            (cong proj₂ (pack-unpack-×ᵗ _))
+                            (trans
+                              (∘ᵗ-reveal _ _ _)
+                              (cong (Tˢᶠ g)
+                                (trans
+                                  (sndᵗ-reveal _)
+                                  (cong proj₂ (pack-unpack-×ᵗ _))))))))))))))
               (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ q → fun-ext (λ y → uip))))))))))
       (sym
         (∘ᵗ-reveal _ _ _)))
-
-{-
-Goal: (proj₁ (map-carrier fstᵗ (pack-×ᵗ (v , node op w k k-nat))) ,
-       map-carrier f
-       (proj₂ (map-carrier fstᵗ (pack-×ᵗ (v , node op w k k-nat)))))
-      ≡ _j_4521
--}
-
-
 strˢ-nat {A} {A'} {B} {B'} {_} {τ'} {t} f g v (delay {τ' = τ''} τ k) =
-  {!!}
-  {-
   trans
     (∘ᵗ-reveal _ _ _)
     (trans
@@ -436,7 +429,21 @@ strˢ-nat {A} {A'} {B} {B'} {_} {τ'} {t} f g v (delay {τ' = τ''} τ k) =
                             (cong (λ xy → map-carrier (Tᶠ g) (proj₂ xy)) (pack-unpack-×ᵗ _)))))))))))))
       (sym
         (∘ᵗ-reveal _ _ _)))
-  -}
+
+strᵀ-nat : ∀ {A A' B B' τ τ'}
+          → (f : A →ᵗ A')
+          → (g : B →ᵗ B')
+          →  strᵀ {A'} {B'} ∘ᵗ mapˣᵗ ([ τ ]ᶠ (⟨ τ' ⟩ᶠ f)) (Tᶠ g)
+          ≡ᵗ Tᶠ (mapˣᵗ (⟨ τ' ⟩ᶠ f) g) ∘ᵗ strᵀ {A} {B}
+strᵀ-nat {A} {A'} {B} {B'} {τ} {τ'} f g =
+  eqᵗ (λ vc →
+    trans
+      (cong (map-carrier (strᵀ ∘ᵗ mapˣᵗ ([ τ ]ᶠ (⟨ τ' ⟩ᶠ f)) (Tᶠ g)))
+        (sym (unpack-pack-×ᵗ vc)))
+      (trans
+        (strˢ-nat f g (proj₁ (unpack-×ᵗ vc)) (proj₂ (unpack-×ᵗ vc)))
+        (cong (map-carrier (Tᶠ (mapˣᵗ (⟨ τ' ⟩ᶠ f) g) ∘ᵗ strᵀ {A} {B}))
+          (unpack-pack-×ᵗ vc))))
 
 
 -- Laws (TODO)
