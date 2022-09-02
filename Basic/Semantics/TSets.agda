@@ -175,6 +175,7 @@ abstract
   ∘ᵗ-congʳ {h = h} p =
     eqᵗ (λ x → cong (map-carrier h) (prf p x))
 
+
 -- Product, sum, exponent, etc structures
 
 ---- terminal object
@@ -190,6 +191,7 @@ abstract
                    → f ≡ᵗ terminalᵗ
   terminalᵗ-unique = eqᵗ (λ x → refl)
 
+
 ---- initial object
 
 abstract
@@ -203,7 +205,8 @@ abstract
                   → f ≡ᵗ initialᵗ
   initialᵗ-unique = eqᵗ (λ ())
 
----- binary products (TODO: (temporarily) made non-abstract when working on the monad defs.)
+
+---- binary products
 
 abstract
   _×ᵗ_ : TSet → TSet → TSet
@@ -320,6 +323,27 @@ abstract
                      ≡ unpack-×ᵗ (monotone (A ×ᵗ B) p xy)
   unpack-×ᵗ-monotone p xy = refl
 
+  fstᵗ-reveal : ∀ {A B t}
+              → (xy : carrier (A ×ᵗ B) t)
+              → map-carrier fstᵗ xy
+              ≡ proj₁ (unpack-×ᵗ xy)
+  fstᵗ-reveal xy = refl
+
+  sndᵗ-reveal : ∀ {A B t}
+              → (xy : carrier (A ×ᵗ B) t)
+              → map-carrier sndᵗ xy
+              ≡ proj₂ (unpack-×ᵗ xy)
+  sndᵗ-reveal xy = refl
+
+  ⟨⟩ᵗ-reveal : ∀ {A B C t}
+             → (f : A →ᵗ B)
+             → (g : A →ᵗ C)
+             → (x : carrier A t)
+             → map-carrier ⟨ f , g ⟩ᵗ x
+             ≡ pack-×ᵗ (map-carrier f x , map-carrier g x)
+  ⟨⟩ᵗ-reveal f g x = refl
+
+
 ---- Set-indexed products
 
 abstract
@@ -345,6 +369,7 @@ abstract
    
 mapⁱˣᵗ : ∀ {I A B} → ((i : I) → A i →ᵗ B i) → Π I A →ᵗ Π I B
 mapⁱˣᵗ fs = ⟨ (λ i → fs i ∘ᵗ projᵗ i) ⟩ᵢᵗ
+
 
 ---- covariant hom-functor
 
@@ -406,6 +431,7 @@ abstract
                        → ≤-trans (unpack-homᵒ t q) p
                        ≡ unpack-homᵒ t (monotone (homᵒ t) p q)
   unpack-homᵒ-monotone p q = refl
+
 
 ---- exponentials
 
