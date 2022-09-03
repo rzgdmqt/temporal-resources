@@ -19,7 +19,7 @@ open import Semantics.Monad.Core renaming (⟦_⟧ᵍ to ⟦_⟧ᵍ'; Tᵒ to T�
                                            ηᵀ-nat to ηᵀ-nat'; μᵀ-nat to μᵀ-nat';
                                            μᵀ-identity₁ to μᵀ-identity₁'; μᵀ-identity₂ to μᵀ-identity₂';
                                            μᵀ-assoc to μᵀ-assoc')
-open import Semantics.Monad.Strength renaming (strᵀ to strᵀ')
+open import Semantics.Monad.Strength renaming (strᵀ to strᵀ'; strᵀ-nat to strᵀ-nat')
 open import Semantics.Monad.Effects renaming (delayᵀ to delayᵀ'; opᵀ to opᵀ'; T-alg-of-handlerᵀ to T-alg-of-handlerᵀ')
 
 open import Util.HProp
@@ -104,17 +104,30 @@ abstract
   strᵀ : ∀ {A B τ τ'} → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
   strᵀ {A} {B} {τ} {τ'} = strᵀ' {A} {B} {τ} {τ'}
 
+  strᵀ-nat : ∀ {A A' B B' τ τ'}
+            → (f : A →ᵗ A')
+            → (g : B →ᵗ B')
+            →  strᵀ {A'} {B'} ∘ᵗ mapˣᵗ ([ τ ]ᶠ (⟨ τ' ⟩ᶠ f)) (Tᶠ g)
+            ≡ᵗ Tᶠ (mapˣᵗ (⟨ τ' ⟩ᶠ f) g) ∘ᵗ strᵀ {A} {B}
+  strᵀ-nat = strᵀ-nat'
 
----- Effects (operations and handling)
+
+---- Effects
 
 abstract
 
-  delayᵀ : ∀ {A} (τ : Time) {τ'} → [ τ ]ᵒ (Tᵒ A τ') →ᵗ Tᵒ A (τ + τ')
+  delayᵀ : ∀ {A} (τ : Time) {τ'}
+         → [ τ ]ᵒ (Tᵒ A τ') →ᵗ Tᵒ A (τ + τ')
   delayᵀ = delayᵀ'
 
   opᵀ : ∀ {A τ} → (op : Op)
       → ⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ) →ᵗ Tᵒ A (op-time op + τ)
   opᵀ = opᵀ'
+
+
+---- Effect handling
+
+abstract
 
   T-alg-of-handlerᵀ : ∀ {A τ τ'}
                     → Π Op (λ op → Π Time (λ τ'' →
