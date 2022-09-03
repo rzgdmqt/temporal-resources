@@ -20,7 +20,8 @@ open import Semantics.Monad.Core renaming (⟦_⟧ᵍ to ⟦_⟧ᵍ'; Tᵒ to T�
                                            μᵀ-identity₁ to μᵀ-identity₁'; μᵀ-identity₂ to μᵀ-identity₂';
                                            μᵀ-assoc to μᵀ-assoc')
 open import Semantics.Monad.Strength renaming (strᵀ to strᵀ'; strᵀ-nat to strᵀ-nat')
-open import Semantics.Monad.Effects renaming (delayᵀ to delayᵀ'; opᵀ to opᵀ'; T-alg-of-handlerᵀ to T-alg-of-handlerᵀ')
+open import Semantics.Monad.Effects renaming (delayᵀ to delayᵀ'; opᵀ to opᵀ')
+open import Semantics.Monad.Handling renaming (T-alg-of-handlerᵀ to T-alg-of-handlerᵀ')
 
 open import Util.HProp
 open import Util.Equality
