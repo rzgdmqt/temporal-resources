@@ -94,3 +94,4 @@ open import Semantics.Interpretation
 open import Semantics.Renamings.Core
 open import Semantics.Renamings.Properties.wk-⟨⟩-ctx
 open import Semantics.Renamings.Properties.Rename
+open import Semantics.Renamings
