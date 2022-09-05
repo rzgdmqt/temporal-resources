@@ -361,3 +361,25 @@ abstract
                 (sym (monotone-trans A _ _ _))))
             (sym (cong (map-carrier ([ τ₁ ]ᶠ (δ {A} {τ₂} {τ₃}))) (∘ᵗ-reveal _ _ _))))
           (sym (∘ᵗ-reveal _ _ _))))
+
+-- [_]ᵒ is monoidal (with respect to ×ᵗ)
+
+abstract
+  []-monoidal : ∀ {A B τ}
+              → [ τ ]ᵒ A ×ᵗ [ τ ]ᵒ B →ᵗ [ τ ]ᵒ (A ×ᵗ B)
+  []-monoidal {A} {B} {τ} =
+    tset-map
+      (λ xy → pack-×ᵗ (unpack-×ᵗ xy))
+      (λ p xy →
+        sym
+          (trans
+            (pack-×ᵗ-monotone (+-monoˡ-≤ τ p) (unpack-×ᵗ xy))
+            (sym
+              (cong pack-×ᵗ
+                (sym (unpack-×ᵗ-monotone p xy))))))
+
+  []-monoidal-reveal : ∀ {A B τ t}
+                     → (xy : carrier ([ τ ]ᵒ A ×ᵗ [ τ ]ᵒ B) t)
+                     → map-carrier ([]-monoidal {A} {B} {τ}) xy
+                     ≡ pack-×ᵗ (unpack-×ᵗ xy)
+  []-monoidal-reveal xy = refl

@@ -23,6 +23,7 @@ open import Semantics.Monad.Core renaming (⟦_⟧ᵍ to ⟦_⟧ᵍ'; Tᵒ to T�
                                            
 open import Semantics.Monad.Strength renaming (strᵀ to strᵀ')
 open import Semantics.Monad.Strength.Naturality renaming (strᵀ-nat to strᵀ-nat')
+open import Semantics.Monad.Strength.Algebraicity renaming (strᵀ-delayᵀ-algebraicity to strᵀ-delayᵀ-algebraicity')
 
 open import Semantics.Monad.Effects renaming (delayᵀ to delayᵀ'; opᵀ to opᵀ')
 open import Semantics.Monad.Effects.Naturality renaming (delayᵀ-nat to delayᵀ-nat'; opᵀ-nat to opᵀ-nat')
@@ -106,21 +107,6 @@ abstract
   μᵀ-assoc = μᵀ-assoc'
 
 
----- Strength
-
-abstract
-
-  strᵀ : ∀ {A B τ τ'} → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
-  strᵀ {A} {B} {τ} {τ'} = strᵀ' {A} {B} {τ} {τ'}
-
-  strᵀ-nat : ∀ {A A' B B' τ τ'}
-            → (f : A →ᵗ A')
-            → (g : B →ᵗ B')
-            →  strᵀ {A'} {B'} ∘ᵗ mapˣᵗ ([ τ ]ᶠ (⟨ τ' ⟩ᶠ f)) (Tᶠ g)
-            ≡ᵗ Tᶠ (mapˣᵗ (⟨ τ' ⟩ᶠ f) g) ∘ᵗ strᵀ {A} {B}
-  strᵀ-nat = strᵀ-nat'
-
-
 ---- Effects
 
 abstract
@@ -160,7 +146,31 @@ abstract
                       ∘ᵗ opᵀ op
                       ∘ᵗ mapˣᵗ idᵗ ([ op-time op ]ᶠ (map⇒ᵗ idᵗ μᵀ))
   opᵀ-algebraicity = opᵀ-algebraicity'
-  
+
+
+---- Strength
+
+abstract
+
+  strᵀ : ∀ {A B τ τ'} → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
+  strᵀ {A} {B} {τ} {τ'} = strᵀ' {A} {B} {τ} {τ'}
+
+  strᵀ-nat : ∀ {A A' B B' τ τ'}
+            → (f : A →ᵗ A')
+            → (g : B →ᵗ B')
+            →  strᵀ {A'} {B'} ∘ᵗ mapˣᵗ ([ τ ]ᶠ (⟨ τ' ⟩ᶠ f)) (Tᶠ g)
+            ≡ᵗ Tᶠ (mapˣᵗ (⟨ τ' ⟩ᶠ f) g) ∘ᵗ strᵀ {A} {B}
+  strᵀ-nat = strᵀ-nat'
+
+  strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ' τ''}
+                           →     strᵀ {A} {B} {τ + τ'} {τ''}
+                              ∘ᵗ mapˣᵗ idᵗ (delayᵀ τ {τ'})
+                           ≡ᵗ    delayᵀ τ
+                              ∘ᵗ [ τ ]ᶠ (strᵀ {A} {B} {τ'} {τ''})
+                              ∘ᵗ []-monoidal
+                              ∘ᵗ mapˣᵗ (δ {⟨ τ'' ⟩ᵒ A} {τ} {τ'}) idᵗ
+  strᵀ-delayᵀ-algebraicity = strᵀ-delayᵀ-algebraicity'
+
 
 ---- Effect handling
 
