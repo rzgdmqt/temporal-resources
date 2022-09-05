@@ -193,7 +193,7 @@ mutual
        uncurryᵗ (
             T-alg-of-handlerᵀ
          ∘ᵗ mapⁱˣᵗ (λ op → mapⁱˣᵗ (λ τ'' →
-              g op τ'' ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×-assocᵗ)))
+              g op τ'' ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×ᵗ-assoc)))
          ∘ᵗ f)
     ∘ᵗ mapˣᵗ idᵗ (Tᶠ ⟦ N ⟧ᶜᵗ)
     ∘ᵗ mapˣᵗ idᵗ (strᵀ {⟦ Γ ⟧ᵉ})

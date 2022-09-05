@@ -23,7 +23,6 @@ module Semantics.Monad.Strength.Algebraicity where
 
 -- Algebraicity of the delay operation wrt strength
 
-{-
 strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ' τ''}
                          →     strᵀ {A} {B} {τ + τ'} {τ''}
                             ∘ᵗ mapˣᵗ idᵗ (delayᵀ τ {τ'})
@@ -102,7 +101,6 @@ strᵀ-delayᵀ-algebraicity {A} {B} {τ} {τ'} {τ''} =
                 (∘ᵗ-reveal _ _ _))))
           (sym (cong (map-carrier (delayᵀ τ)) (∘ᵗ-reveal _ _ _))))
         (sym (∘ᵗ-reveal _ _ _))))
--}
 
 
 
