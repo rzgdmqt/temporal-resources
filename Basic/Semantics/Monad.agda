@@ -26,6 +26,8 @@ open import Semantics.Monad.Strength.Naturality renaming (strᵀ-nat to strᵀ-n
 
 open import Semantics.Monad.Effects renaming (delayᵀ to delayᵀ'; opᵀ to opᵀ')
 open import Semantics.Monad.Effects.Naturality renaming (delayᵀ-nat to delayᵀ-nat'; opᵀ-nat to opᵀ-nat')
+open import Semantics.Monad.Effects.Algebraicity renaming (delayᵀ-algebraicity to delayᵀ-algebraicity';
+                                                           opᵀ-algebraicity to opᵀ-algebraicity')
 
 open import Semantics.Monad.Handling renaming (T-alg-of-handlerᵀ to T-alg-of-handlerᵀ')
 
@@ -143,6 +145,22 @@ abstract
           ≡ᵗ Tᶠ f ∘ᵗ opᵀ op
   opᵀ-nat = opᵀ-nat'
 
+  delayᵀ-algebraicity : ∀ {A} (τ : Time) {τ' τ''}
+                      →     μᵀ {A} {τ + τ'} {τ''}
+                         ∘ᵗ delayᵀ τ {τ'}
+                      ≡ᵗ    τ-substᵀ (sym (+-assoc τ τ' τ''))
+                         ∘ᵗ delayᵀ τ
+                         ∘ᵗ [ τ ]ᶠ (μᵀ {A} {τ'} {τ''})
+  delayᵀ-algebraicity = delayᵀ-algebraicity'
+
+  opᵀ-algebraicity : ∀ {A τ τ'} → (op : Op)
+                   →     μᵀ {A} {op-time op + τ} {τ'}
+                      ∘ᵗ opᵀ {τ = τ} op
+                   ≡ᵗ    τ-substᵀ (sym (+-assoc (op-time op) τ τ'))
+                      ∘ᵗ opᵀ op
+                      ∘ᵗ mapˣᵗ idᵗ ([ op-time op ]ᶠ (map⇒ᵗ idᵗ μᵀ))
+  opᵀ-algebraicity = opᵀ-algebraicity'
+  
 
 ---- Effect handling
 

@@ -51,8 +51,6 @@ record _→ᵗ_ (A B : TSet) : Set where
             → (x : carrier A t)
             → map-carrier (monotone A p x) ≡ monotone B p (map-carrier x)
 
-    -- TODO: also include naturality law
-
 infix 20 _→ᵗ_
 
 open _→ᵗ_ public
