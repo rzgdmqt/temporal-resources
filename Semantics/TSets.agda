@@ -3,6 +3,8 @@
 -- their morphisms, and basic categorical structures  --
 --------------------------------------------------------
 
+module Semantics.TSets where
+
 open import Function
 
 open import Data.Empty
@@ -12,8 +14,6 @@ open import Data.Unit hiding (_≤_)
 
 open import Util.Equality
 open import Util.Time
-
-module Semantics.TSets where
 
 -- Time-varying sets (covariant presheaves on (ℕ,≤))
 

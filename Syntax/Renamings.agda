@@ -2,6 +2,8 @@
 -- Context renamings and their action on well-typed terms --
 ------------------------------------------------------------
 
+module Syntax.Renamings where
+
 open import Function hiding (const)
 
 open import Data.Bool hiding (_≤_;_≤?_)
@@ -18,8 +20,6 @@ open import Syntax.Language
 
 open import Util.Equality
 open import Util.Time
-
-module Syntax.Renamings where
 
 -- Variable renamings (as the least relation closed under
 -- identities, composition, ordinary variable renamings,

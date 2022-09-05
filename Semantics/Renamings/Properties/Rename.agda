@@ -2,6 +2,8 @@
 -- Relating the syntactic actions of renamings to semantic morphism composition --
 ----------------------------------------------------------------------------------
 
+module Semantics.Renamings.Properties.Rename where
+
 open import Function
 
 open import Data.Product
@@ -22,8 +24,6 @@ open import Semantics.Renamings.Core
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
-
-module Semantics.Renamings.Properties.Rename where
 
 mutual
 

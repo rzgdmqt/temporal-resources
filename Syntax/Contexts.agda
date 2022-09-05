@@ -2,6 +2,8 @@
 -- Variables and contexts of the language --
 --------------------------------------------
 
+module Syntax.Contexts where
+
 open import Data.Product
 open import Data.Sum
 
@@ -12,8 +14,6 @@ open import Syntax.Types
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
-
-module Syntax.Contexts where
 
 -- Structured contexts
 

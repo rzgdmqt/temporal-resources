@@ -2,10 +2,10 @@
 -- Types of the language --
 ---------------------------
 
+module Syntax.Types where
+
 open import Util.Operations
 open import Util.Time
-
-module Syntax.Types where
 
 -- Value and computation types
 

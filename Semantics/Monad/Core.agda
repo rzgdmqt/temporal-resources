@@ -5,6 +5,8 @@
 -- Note: A version of the monad that is not quotioned by
 --       the delay equations (identity and composition)
 
+module Semantics.Monad.Core where
+
 open import Function
 
 open import Data.Empty
@@ -18,8 +20,6 @@ open import Semantics.Modality.Past
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
-
-module Semantics.Monad.Core where
 
 -- Interpretation of ground types
 ---------------------------------

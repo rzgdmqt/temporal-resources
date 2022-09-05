@@ -2,6 +2,8 @@
 -- Substitution of well-typed values for variables --
 -----------------------------------------------------
 
+module Syntax.Substitutions where
+
 open import Function hiding (const)
 
 open import Data.Empty
@@ -17,8 +19,6 @@ open import Syntax.Renamings
 
 open import Util.Equality
 open import Util.Time
-
-module Syntax.Substitutions where
 
 -- Deciding whether a variable is in the context after time travelling
 

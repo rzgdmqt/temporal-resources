@@ -2,14 +2,14 @@
 -- Well-typed syntax of the language --
 ---------------------------------------
 
+module Syntax.Language where
+
 open import Syntax.Types
 open import Syntax.Contexts
 
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
-
-module Syntax.Language where
 
 -- Well-typed terms (values and computations)
 

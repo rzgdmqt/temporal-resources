@@ -2,6 +2,8 @@
 -- Equational theory of the language --
 ---------------------------------------
 
+module Syntax.EquationalTheory where
+
 open import Data.Product
 
 open import Syntax.Types
@@ -13,8 +15,6 @@ open import Syntax.Substitutions
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
-
-module Syntax.EquationalTheory where
 
 -- Explicit equality coercion for time gradings
 

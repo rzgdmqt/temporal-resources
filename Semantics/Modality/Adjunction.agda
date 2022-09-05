@@ -2,6 +2,8 @@
 -- Adjunction between the `[ t ] A` and `Γ ⟨ t ⟩` modalities --
 ---------------------------------------------------------------
 
+module Semantics.Modality.Adjunction where
+
 open import Function
 
 open import Data.Empty
@@ -18,8 +20,6 @@ open import Semantics.Modality.Past
 
 open import Util.Equality
 open import Util.Time
-
-module Semantics.Modality.Adjunction where
 
 -- STRUCTURE
 

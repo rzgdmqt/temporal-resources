@@ -2,6 +2,8 @@
 -- Semantics of variable renamings --
 -------------------------------------
 
+module Semantics.Renamings.Core where
+
 open import Function
 
 open import Data.Product
@@ -18,8 +20,6 @@ open import Semantics.Interpretation
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
-
-module Semantics.Renamings.Core where
 
 -- Semantics of renamings as maps between environments
 

@@ -2,6 +2,8 @@
 -- Semantics of variable renamings --
 -------------------------------------
 
+module Semantics.Renamings where
+
 open import Function
 
 open import Data.Product
@@ -18,9 +20,6 @@ open import Semantics.Renamings.Core
 open import Semantics.Renamings.Properties.wk-⟨⟩-ctx
 open import Semantics.Renamings.Properties.Rename
 
-
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
-
-module Semantics.Renamings where

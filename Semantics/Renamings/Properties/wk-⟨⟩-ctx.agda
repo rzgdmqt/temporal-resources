@@ -2,6 +2,8 @@
 -- Relating syntactic wk-⟨⟩-ctx-ren and the semantic composition of env-ctx-time-⟨⟩ and split-env --
 ----------------------------------------------------------------------------------------------------
 
+module Semantics.Renamings.Properties.wk-⟨⟩-ctx where
+
 open import Function
 
 open import Data.Product
@@ -19,8 +21,6 @@ open import Semantics.Renamings.Core
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
-
-module Semantics.Renamings.Properties.wk-⟨⟩-ctx where
 
 wk-⟨⟩-ctx≡split-env-≤ : ∀ {Γ Γ' Γ'' τ}
                       → (p : Γ' , Γ'' split Γ)

@@ -7,6 +7,8 @@
 -- use the terminology (counit, comultiplication) of graded comonads. --
 ------------------------------------------------------------------------
 
+module Semantics.Modality.Future where
+
 open import Function
 
 open import Data.Empty
@@ -20,8 +22,6 @@ open import Semantics.TSets
 
 open import Util.Equality
 open import Util.Time
-
-module Semantics.Modality.Future where
 
 -- STRUCTURE
 
