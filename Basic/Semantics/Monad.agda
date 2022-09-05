@@ -14,13 +14,19 @@ open import Data.Unit hiding (_≤_)
 open import Semantics.TSets
 open import Semantics.Modality.Future
 open import Semantics.Modality.Past
+
 open import Semantics.Monad.Core renaming (⟦_⟧ᵍ to ⟦_⟧ᵍ'; Tᵒ to Tᵒ'; Tᶠ to Tᶠ'; ηᵀ to ηᵀ'; μᵀ to μᵀ';
                                            Tᶠ-idᵗ to Tᶠ-idᵗ'; Tᶠ-∘ᵗ to Tᶠ-∘ᵗ'; τ-substᵀ to τ-substᵀ';
                                            ηᵀ-nat to ηᵀ-nat'; μᵀ-nat to μᵀ-nat';
                                            μᵀ-identity₁ to μᵀ-identity₁'; μᵀ-identity₂ to μᵀ-identity₂';
                                            μᵀ-assoc to μᵀ-assoc')
-open import Semantics.Monad.Strength renaming (strᵀ to strᵀ'; strᵀ-nat to strᵀ-nat')
+                                           
+open import Semantics.Monad.Strength renaming (strᵀ to strᵀ')
+open import Semantics.Monad.Strength.Naturality renaming (strᵀ-nat to strᵀ-nat')
+
 open import Semantics.Monad.Effects renaming (delayᵀ to delayᵀ'; opᵀ to opᵀ')
+open import Semantics.Monad.Effects.Naturality renaming (delayᵀ-nat to delayᵀ-nat'; opᵀ-nat to opᵀ-nat')
+
 open import Semantics.Monad.Handling renaming (T-alg-of-handlerᵀ to T-alg-of-handlerᵀ')
 
 open import Util.HProp
@@ -124,6 +130,18 @@ abstract
   opᵀ : ∀ {A τ} → (op : Op)
       → ⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ) →ᵗ Tᵒ A (op-time op + τ)
   opᵀ = opᵀ'
+
+  delayᵀ-nat : ∀ {A B} (τ : Time) {τ'}
+             → (f : A →ᵗ B)
+             →  delayᵀ τ {τ' = τ'} ∘ᵗ [ τ ]ᶠ (Tᶠ f)
+             ≡ᵗ Tᶠ f ∘ᵗ delayᵀ τ
+  delayᵀ-nat = delayᵀ-nat'
+
+  opᵀ-nat : ∀ {A B τ} → (op : Op)
+          → (f : A →ᵗ B)
+          →  opᵀ {τ = τ} op ∘ᵗ mapˣᵗ idᵗ ([ op-time op ]ᶠ (map⇒ᵗ idᵗ (Tᶠ f)))
+          ≡ᵗ Tᶠ f ∘ᵗ opᵀ op
+  opᵀ-nat = opᵀ-nat'
 
 
 ---- Effect handling

@@ -57,7 +57,7 @@ mutual
       curryᵗ (⟦ M ⟧ᶜᵗ ∘ᵗ mapˣᵗ ⟦ ρ ⟧ʳ idᵗ)
     ≡⟨ curryᵗ-mapˣᵗ ⟦ M ⟧ᶜᵗ ⟦ ρ ⟧ʳ idᵗ ⟩
       map⇒ᵗ idᵗ idᵗ ∘ᵗ curryᵗ ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ
-    ≡⟨ ∘ᵗ-congˡ map⇒ᵗ-id ⟩
+    ≡⟨ ∘ᵗ-congˡ map⇒ᵗ-identity ⟩
       idᵗ ∘ᵗ curryᵗ ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ
     ≡⟨ ∘ᵗ-identityˡ _ ⟩
       curryᵗ ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ
