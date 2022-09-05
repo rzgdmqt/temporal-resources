@@ -491,8 +491,8 @@ abstract
               (≤-irrelevant _ _))
             (map-nat (map-carrier f x) p (≤-reflexive refl , y))) })
 
-  map⇒ᵗ-id : ∀ {A B} → map⇒ᵗ {A} {A} {B} {B} idᵗ idᵗ ≡ᵗ idᵗ
-  map⇒ᵗ-id = eqᵗ (λ f → ≡ᵗ-≡ (eqᵗ (λ x → refl)))
+  map⇒ᵗ-identity : ∀ {A B} → map⇒ᵗ {A} {A} {B} {B} idᵗ idᵗ ≡ᵗ idᵗ
+  map⇒ᵗ-identity = eqᵗ (λ f → ≡ᵗ-≡ (eqᵗ (λ x → refl)))
 
   curryᵗ-mapˣᵗ : ∀ {A B C D E}
                → (f : C ×ᵗ D →ᵗ E) → (g : A →ᵗ C) → (h : B →ᵗ D)
@@ -515,6 +515,11 @@ abstract
             → carrier (A ⇒ᵗ B) t
             → homᵒ t ×ᵗ A →ᵗ B
   unpack-⇒ᵗ f = f
+
+  pack-unpack-⇒ᵗ : ∀ {A B t}
+                 → (f : homᵒ t ×ᵗ A →ᵗ B)
+                 → unpack-⇒ᵗ {A} {B} {t} (pack-⇒ᵗ f) ≡ f
+  pack-unpack-⇒ᵗ xy = refl
 
   pack-⇒ᵗ-monotone : ∀ {A B t t'}
                    → (p : t ≤ t')
@@ -552,3 +557,12 @@ abstract
                         → map-carrier (unpack-⇒ᵗ (monotone (A ⇒ᵗ B) p f)) (pack-×ᵗ (pack-homᵒ t' q , x))
                         ≡ map-carrier (unpack-⇒ᵗ f) (pack-×ᵗ (pack-homᵒ t (≤-trans p q) , x))
   unpack-⇒ᵗ-map-carrier f p q x = refl
+
+  map⇒ᵗ-reveal : ∀ {A B C D t}
+               → (f : A →ᵗ B)
+               → (g : C →ᵗ D)
+               → (h : carrier (B ⇒ᵗ C) t)
+               → map-carrier (map⇒ᵗ f g) h
+               ≡ pack-⇒ᵗ
+                   (g ∘ᵗ unpack-⇒ᵗ h ∘ᵗ mapˣᵗ idᵗ f)
+  map⇒ᵗ-reveal f g h = refl
