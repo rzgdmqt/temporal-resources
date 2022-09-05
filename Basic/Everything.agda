@@ -84,6 +84,7 @@ open import Semantics.Monad.Core
 
 open import Semantics.Monad.Strength
 open import Semantics.Monad.Strength.Naturality
+open import Semantics.Monad.Strength.Algebraicity
 
 open import Semantics.Monad.Effects
 open import Semantics.Monad.Effects.Naturality
