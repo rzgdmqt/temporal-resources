@@ -23,6 +23,7 @@ module Semantics.Monad.Strength.Algebraicity where
 
 -- Algebraicity of the delay operation wrt strength
 
+{-
 strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ' τ''}
                          →     strᵀ {A} {B} {τ + τ'} {τ''}
                             ∘ᵗ mapˣᵗ idᵗ (delayᵀ τ {τ'})
@@ -101,8 +102,31 @@ strᵀ-delayᵀ-algebraicity {A} {B} {τ} {τ'} {τ''} =
                 (∘ᵗ-reveal _ _ _))))
           (sym (cong (map-carrier (delayᵀ τ)) (∘ᵗ-reveal _ _ _))))
         (sym (∘ᵗ-reveal _ _ _))))
+-}
+
 
 
 -- Algebraicity of algebraic operations wrt strength
 
--- TODO
+-- TODO: return to this once it is clear which form of the statement
+--       is going to appear in the soundness proofs
+
+{-
+strᵀ-opᵀ-algebraicity : ∀ {A B τ τ'} → (op : Op)
+                      →     strᵀ {A} {B} {op-time op + τ} {τ'}
+                         ∘ᵗ mapˣᵗ idᵗ (opᵀ {τ = τ} op)
+                      ≡ᵗ    opᵀ op
+                         ∘ᵗ mapˣᵗ
+                              idᵗ
+                              (   [_]ᶠ
+                                    {[ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ)}
+                                    {⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ}
+                                    (op-time op)
+                                    {!!}
+                               ∘ᵗ []-monoidal {[ τ ]ᵒ (⟨ τ' ⟩ᵒ A)} {⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ} {op-time op}
+                               ∘ᵗ mapˣᵗ (δ {⟨ τ' ⟩ᵒ A} {op-time op} {τ}) idᵗ)
+                         ∘ᵗ ×ᵗ-assoc⁻¹
+                         ∘ᵗ mapˣᵗ ×ᵗ-swap idᵗ
+                         ∘ᵗ ×ᵗ-assoc
+strᵀ-opᵀ-algebraicity = {!!}
+-}
