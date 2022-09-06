@@ -155,6 +155,26 @@ abstract
 
 ---- Strength
 
+  strᵀ : ∀ {A B τ} → [ τ ]ᵒ A ×ᵗ Tᵒ B τ →ᵗ Tᵒ (A ×ᵗ B) τ
+  strᵀ = strᵀ'
+
+  strᵀ-nat : ∀ {A A' B B' τ}
+            → (f : A →ᵗ A')
+            → (g : B →ᵗ B')
+            →  strᵀ {A'} {B'} ∘ᵗ mapˣᵗ ([ τ ]ᶠ f) (Tᶠ g)
+            ≡ᵗ Tᶠ (mapˣᵗ f g) ∘ᵗ strᵀ {A} {B}
+  strᵀ-nat = strᵀ-nat'
+
+  strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ'}
+                           →     strᵀ {A} {B} {τ + τ'}
+                              ∘ᵗ mapˣᵗ idᵗ ((delayᵀ τ {τ'}))
+                           ≡ᵗ    delayᵀ τ
+                              ∘ᵗ [ τ ]ᶠ (strᵀ {A} {B} {τ'})
+                              ∘ᵗ []-monoidal
+                              ∘ᵗ mapˣᵗ (δ {A} {τ} {τ'}) idᵗ
+  strᵀ-delayᵀ-algebraicity = strᵀ-delayᵀ-algebraicity'
+
+{-
 abstract
 
   strᵀ : ∀ {A B τ τ'} → [ τ ]ᵒ (⟨ τ' ⟩ᵒ A) ×ᵗ Tᵒ B τ →ᵗ Tᵒ (⟨ τ' ⟩ᵒ A ×ᵗ B) τ
@@ -175,7 +195,7 @@ abstract
                               ∘ᵗ []-monoidal
                               ∘ᵗ mapˣᵗ (δ {⟨ τ'' ⟩ᵒ A} {τ} {τ'}) idᵗ
   strᵀ-delayᵀ-algebraicity = strᵀ-delayᵀ-algebraicity'
-
+-}
 
 ---- Effect handling
 
