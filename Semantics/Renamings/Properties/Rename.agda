@@ -27,13 +27,33 @@ open import Util.Time
 
 mutual
 
+  {-
+  var-in-env∘ᵗ⟦⟧ʳ≡⟦⟧ʳ∘ᵗvar-in-env : ∀ {Γ Γ' A τ}
+                                  → (ρ : Ren Γ Γ')
+                                  → (x : A ∈[ τ ] Γ)
+                                  →    var-in-env x
+                                    ∘ᵗ ⟦ ρ ⟧ʳ
+                                 ≡ᵗ    {!⟦ ? ⟧ʳ!}
+                                    ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
+  var-in-env∘ᵗ⟦⟧ʳ≡⟦⟧ʳ∘ᵗvar-in-env ρ x = {!!}
+  -}
+
   V-rename≡∘ᵗ : ∀ {Γ Γ' A}
               → (ρ : Ren Γ Γ')
               → (V : Γ ⊢V⦂ A)
               → ⟦ V-rename ρ V ⟧ᵛᵗ
              ≡ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ
 
-  V-rename≡∘ᵗ ρ (var x) = {!!}
+  V-rename≡∘ᵗ {Γ} {Γ'} {A} ρ (var {τ = τ} x) =
+    begin
+         ε-⟨⟩
+      ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
+      ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
+    ≡⟨ {!!} ⟩
+         (   ε-⟨⟩
+          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))) ∘ᵗ var-in-env x)
+      ∘ᵗ ⟦ ρ ⟧ʳ
+    ∎
   V-rename≡∘ᵗ ρ (const c) =
     begin
       constᵗ c ∘ᵗ terminalᵗ
@@ -62,9 +82,25 @@ mutual
     ≡⟨ ∘ᵗ-identityˡ _ ⟩
       curryᵗ ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  V-rename≡∘ᵗ ρ (box V) = {!!}
-
--- curryᵗ-mapˣᵗ
+  V-rename≡∘ᵗ ρ (box {τ = τ} V) =
+    begin
+      [ τ ]ᶠ ⟦ V-rename (cong-⟨⟩-ren ρ) V ⟧ᵛᵗ ∘ᵗ η-⊣
+    ≡⟨ ∘ᵗ-congˡ
+         (≡-≡ᵗ
+           (cong [ τ ]ᶠ (≡ᵗ-≡ (V-rename≡∘ᵗ (cong-⟨⟩-ren ρ) V))))
+     ⟩
+      [ τ ]ᶠ (⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ cong-⟨⟩-ren ρ ⟧ʳ) ∘ᵗ η-⊣
+    ≡⟨ ∘ᵗ-congˡ ([]-∘ ⟦ cong-⟨⟩-ren ρ ⟧ʳ ⟦ V ⟧ᵛᵗ) ⟩
+      ([ τ ]ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ [ τ ]ᶠ ⟦ cong-⟨⟩-ren ρ ⟧ʳ) ∘ᵗ η-⊣
+    ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
+      [ τ ]ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ ([ τ ]ᶠ ⟦ cong-⟨⟩-ren ρ ⟧ʳ ∘ᵗ η-⊣)
+    ≡⟨⟩
+      [ τ ]ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ [ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) ∘ᵗ η-⊣
+    ≡⟨ ∘ᵗ-congʳ (⊣-η-nat _) ⟩
+      [ τ ]ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ η-⊣ ∘ᵗ ⟦ ρ ⟧ʳ
+    ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
+      ([ τ ]ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ η-⊣) ∘ᵗ ⟦ ρ ⟧ʳ
+    ∎
 
   C-rename≡∘ᵗ : ∀ {Γ Γ' C}
               → (ρ : Ren Γ Γ')
@@ -80,7 +116,19 @@ mutual
     ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
       (ηᵀ ∘ᵗ ⟦ V ⟧ᵛᵗ) ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  C-rename≡∘ᵗ ρ (M ; N) = {!!}
+  C-rename≡∘ᵗ {Γ} {Γ'} ρ (_;_ {A} {B} {τ} {τ'} M N) =
+    begin
+         μᵀ
+      ∘ᵗ Tᶠ ⟦ C-rename (cong-∷-ren (cong-⟨⟩-ren ρ)) N ⟧ᶜᵗ
+      ∘ᵗ strᵀ {⟦ Γ' ⟧ᵉ} {⟦ A ⟧ᵛ}
+      ∘ᵗ ⟨ η-⊣ {⟦ Γ' ⟧ᵉ} {τ} , ⟦ C-rename ρ M ⟧ᶜᵗ ⟩ᵗ
+    ≡⟨ {!!} ⟩
+         (   μᵀ
+          ∘ᵗ Tᶠ ⟦ N ⟧ᶜᵗ
+          ∘ᵗ strᵀ {⟦ Γ ⟧ᵉ} {⟦ A ⟧ᵛ}
+          ∘ᵗ ⟨ η-⊣ {⟦ Γ ⟧ᵉ} {τ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ)
+      ∘ᵗ ⟦ ρ ⟧ʳ
+    ∎
   C-rename≡∘ᵗ ρ (V · W) = 
     begin
       appᵗ ∘ᵗ ⟨ ⟦ V-rename ρ V ⟧ᵛᵗ , ⟦ V-rename ρ W ⟧ᵛᵗ ⟩ᵗ
