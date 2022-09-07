@@ -381,4 +381,4 @@ mutual
     `in (C-rename (cong-ren ρ) N)
   C-rename ρ (unbox {τ = τ} p V M) =
     unbox (≤-trans p (ren-≤-ctx-time ρ)) (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
-  C-rename ρ (delay τ M)    = delay τ (C-rename (cong-ren ρ) M)
+  C-rename ρ (delay τ M)      = delay τ (C-rename (cong-ren ρ) M)
