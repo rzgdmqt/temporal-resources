@@ -18,13 +18,13 @@ open import Util.Time
 
 -- Explicit equality coercion for time gradings
 
-coerce : ∀ {Γ A τ τ'}
-       → τ ≡ τ'
-       → Γ ⊢C⦂ A ‼ τ
-       ---------------
-       → Γ ⊢C⦂ A ‼ τ'
+τ-subst : ∀ {Γ A τ τ'}
+        → τ ≡ τ'
+        → Γ ⊢C⦂ A ‼ τ
+        ---------------
+        → Γ ⊢C⦂ A ‼ τ'
 
-coerce refl M = M
+τ-subst refl M = M
 
 -- Equations between well-typed values and computations
 
@@ -189,7 +189,7 @@ mutual
               → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
               --------------------------------------------------------------
               → Γ ⊢C⦂ (perform op V M) ; N
-                  == coerce (sym (+-assoc (op-time op) τ τ'))
+                  == τ-subst (sym (+-assoc (op-time op) τ τ'))
                        (perform op V
                           (M ;
                            C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
@@ -204,7 +204,7 @@ mutual
             → (P : Γ ⟨ τ + τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
             ---------------------------------------------------------------------
             → Γ ⊢C⦂ (M ; N) ; P
-                == coerce (sym (+-assoc τ τ' τ''))
+                == τ-subst (sym (+-assoc τ τ' τ''))
                      (M ; (N ; C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
                                  cong-ren {Γ'' = [] ∷ B} ⟨⟩-μ-ren ) P))
 
@@ -240,7 +240,7 @@ mutual
               → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
               ------------------------------------------------------------------------------------------
               → Γ ⊢C⦂ handle perform op V M `with H `in N
-                  == coerce
+                  == τ-subst
                        (sym (+-assoc (op-time op) τ τ'))
                        (H op (τ + τ')
                          [ Tl-∷ Hd ↦ V ]c
@@ -271,7 +271,7 @@ mutual
           → (M : Γ ⊢C⦂ A ‼ τ)
           ---------------------------------------------------
           → Γ ⊢C⦂ M
-              == coerce (+-identityʳ τ) (M ; return (var Hd))
+              == τ-subst (+-identityʳ τ) (M ; return (var Hd))
               
     absurd-eta : ∀ {C}
                → (V : Γ ⊢V⦂ Empty)
