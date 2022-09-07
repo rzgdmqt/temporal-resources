@@ -34,7 +34,7 @@ delayᵀ-nat τ f =
     trans
       (∘ᵗ-reveal _ _ _)
       (trans
-        (cong (delay τ) ([]-reveal _ _ _))
+        (cong (delay-node τ) ([]-reveal _ _ _))
         (sym (∘ᵗ-reveal _ _ _))))
 
 
@@ -49,7 +49,7 @@ opᵀ-nat {A} {B} {τ} op f =
     trans
       (∘ᵗ-reveal _ _ _)
       (trans
-        (dcong₃ (node op)
+        (dcong₃ (op-node op)
           (trans
             (cong (λ xy → proj₁ (unpack-×ᵗ {⟦ param op ⟧ᵍ} {[ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ B τ)} xy))
               (⟨⟩ᵗ-reveal _ _ _))

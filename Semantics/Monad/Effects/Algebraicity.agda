@@ -38,7 +38,7 @@ delayᵀ-algebraicity {A} τ {τ'} {τ''} =
       (trans
         (trans
           (cong (τ-substˢ (sym (+-assoc τ τ' τ'')))
-            (cong (delay τ) (sym ([]-reveal _ _ _))))
+            (cong (delay-node τ) (sym ([]-reveal _ _ _))))
           (cong (map-carrier (τ-substᵀ (sym (+-assoc τ τ' τ''))))
             (sym (∘ᵗ-reveal _ _ _))))
         (sym (∘ᵗ-reveal _ _ _))))
@@ -59,7 +59,7 @@ opᵀ-algebraicity {A} {τ} {τ'} op =
       (trans
         (trans
           (cong (τ-substˢ (sym (+-assoc (op-time op) τ τ')))
-            (dcong₃ (node op)
+            (dcong₃ (op-node op)
               (sym
                 (trans
                   (cong (λ xy → proj₁ (unpack-×ᵗ xy)) (⟨⟩ᵗ-reveal _ _ _))

@@ -25,7 +25,7 @@ open import Util.Time
 
 strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ'}
                          →     strᵀ {A} {B} {τ + τ'}
-                            ∘ᵗ mapˣᵗ idᵗ ((delayᵀ τ {τ'}))
+                            ∘ᵗ mapˣᵗ idᵗ (delayᵀ τ {τ'})
                          ≡ᵗ    delayᵀ τ
                             ∘ᵗ [ τ ]ᶠ (strᵀ {A} {B} {τ'})
                             ∘ᵗ []-monoidal
@@ -54,7 +54,7 @@ strᵀ-delayᵀ-algebraicity {A} {B} {τ} {τ'} =
                   (∘ᵗ-reveal _ _ _)
                   (cong (map-carrier (delayᵀ τ))
                     (sndᵗ-reveal _))))))
-          (cong (delay τ)
+          (cong (delay-node τ)
             (trans
               (cong₂ strˢ
                 (sym

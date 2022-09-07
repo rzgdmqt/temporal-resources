@@ -35,8 +35,8 @@ mutual
       (pack-×ᵗ
         (monotone A (≤-reflexive (+-identityʳ _)) v ,
          w))
-  strˢ {A} {B} {_} {t} v (node {τ = τ} op w k k-nat) =
-    node op w
+  strˢ {A} {B} {_} {t} v (op-node {τ = τ} op w k k-nat) =
+    op-node op w
       (λ p y →
         strˢ {A} {B}
           (monotone A
@@ -53,8 +53,8 @@ mutual
                 (monotone-trans A _ _ _)))
             (k-nat p q y))
           (strˢ-≤t-nat p _ (k q y)))
-  strˢ {A} {B} {_} {t} v (delay τ k) =
-    delay τ
+  strˢ {A} {B} {_} {t} v (delay-node τ k) =
+    delay-node τ
       (strˢ {A} {B}
         (monotone A (≤-reflexive (sym (+-assoc t τ _))) v)
         k)
@@ -77,16 +77,16 @@ mutual
                 (cong (λ p → monotone A p v) (≤-irrelevant _ _))
                 (sym (monotone-trans A _ _ v))))))
         (sym (pack-×ᵗ-monotone p _)))
-  strˢ-≤t-nat {A} {B} {_} {t} {t'} p v (node op w k k-nat) =
-    dcong₂ (node op (monotone ⟦ param op ⟧ᵍ p w))
+  strˢ-≤t-nat {A} {B} {_} {t} {t'} p v (op-node op w k k-nat) =
+    dcong₂ (op-node op (monotone ⟦ param op ⟧ᵍ p w))
       (ifun-ext (fun-ext (λ q → fun-ext (λ y →
         cong (λ x → strˢ x (k (≤-trans (+-monoˡ-≤ (op-time op) p) q) y))
           (trans
             (monotone-trans A _ _ v)
             (cong (λ p → monotone A p v) (≤-irrelevant _ _)))))))
       (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ r → fun-ext (λ y → uip))))))
-  strˢ-≤t-nat {A} {B} {_} {t} {t'} p v (delay τ k) =
-    cong (delay τ)
+  strˢ-≤t-nat {A} {B} {_} {t} {t'} p v (delay-node τ k) =
+    cong (delay-node τ)
       (trans
         (cong (λ x → strˢ x (Tˢ-≤t (+-monoˡ-≤ τ p) k))
           (trans

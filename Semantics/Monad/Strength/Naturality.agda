@@ -89,7 +89,7 @@ strˢ-nat {A} {A'} {B} {B'} {_} {t} f g v (leaf w) =
                 (cong proj₁ (pack-unpack-×ᵗ _))
                 (cong proj₂ (pack-unpack-×ᵗ _)))))))
       (sym (∘ᵗ-reveal _ _ _)))
-strˢ-nat {A} {A'} {B} {B'} {_} {t} f g v (node op w k k-nat) =
+strˢ-nat {A} {A'} {B} {B'} {_} {t} f g v (op-node op w k k-nat) =
   trans
     (∘ᵗ-reveal _ _ _)
     (trans
@@ -118,7 +118,7 @@ strˢ-nat {A} {A'} {B} {B'} {_} {t} f g v (node op w k k-nat) =
             (cong proj₁ (pack-unpack-×ᵗ _))
             (cong proj₂ (pack-unpack-×ᵗ _)))
           (trans
-            (dcong₂ (node op w)
+            (dcong₂ (op-node op w)
               (ifun-ext (fun-ext (λ p → fun-ext (λ y →
                 trans
                   (trans
@@ -172,7 +172,7 @@ strˢ-nat {A} {A'} {B} {B'} {_} {t} f g v (node op w k k-nat) =
                   (cong proj₁ (pack-unpack-×ᵗ _))
                   (cong proj₂ (pack-unpack-×ᵗ _))))))))
       (sym (∘ᵗ-reveal _ _ _)))
-strˢ-nat {A} {A'} {B} {B'} {_} {t} f g v (delay τ k) =
+strˢ-nat {A} {A'} {B} {B'} {_} {t} f g v (delay-node τ k) =
   trans
     (∘ᵗ-reveal _ _ _)
     (trans
@@ -201,7 +201,7 @@ strˢ-nat {A} {A'} {B} {B'} {_} {t} f g v (delay τ k) =
             (cong proj₁ (pack-unpack-×ᵗ _))
             (cong proj₂ (pack-unpack-×ᵗ _)))
           (trans
-            (cong (delay τ)
+            (cong (delay-node τ)
               (trans
                 (sym
                   (trans
