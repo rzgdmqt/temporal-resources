@@ -23,8 +23,8 @@ open import Semantics.Monad.Core renaming (⟦_⟧ᵍ to ⟦_⟧ᵍ'; Tᵒ to T�
                                            μᵀ-identity₁ to μᵀ-identity₁'; μᵀ-identity₂ to μᵀ-identity₂';
                                            μᵀ-assoc to μᵀ-assoc')
                                  hiding   (Tˢ; Tˢ-≤t; Tˢ-≤t-refl; Tˢ-≤t-trans; Tˢᶠ; Tˢᶠ-≤t-nat; Tˢᶠ-idᵗ; Tˢᶠ-∘ᵗ;
-                                           τ-subst; τ-subst-≤t; τ-subst-trans; τ-subst-Tˢᶠ; τ-subst-delay;
-                                           τ-subst-node; μˢ; μˢ-nat; τ-subst-μˢ; μˢ-identity₂; μˢ-assoc)
+                                           τ-substˢ; τ-substˢ-≤t; τ-substˢ-trans; τ-substˢ-Tˢᶠ; τ-substˢ-delay;
+                                           τ-substˢ-node; μˢ; μˢ-nat; τ-substˢ-μˢ; μˢ-identity₂; μˢ-assoc)
                                            
 open import Semantics.Monad.Strength renaming (strᵀ to strᵀ')
                                      hiding   (strˢ; strˢ-≤t-nat)
