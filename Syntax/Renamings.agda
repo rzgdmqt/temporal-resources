@@ -70,26 +70,6 @@ wk-ctx-ren {Γ' = []}       = id-ren
 wk-ctx-ren {Γ' = Γ' ∷ A}   = wk-ren ∘ʳ wk-ctx-ren
 wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} = wk-⟨⟩-ren ∘ʳ wk-ctx-ren
 
--- Weakening a ⟨ τ ⟩ modality into a context with at least τ time-passage
-
-wk-⟨⟩-ctx-ren : ∀ {Γ Γ' Γ'' τ}
-              → Γ' , Γ'' split Γ
-              → τ ≤ ctx-time Γ''
-              → Ren (Γ' ⟨ τ ⟩) Γ
-
-wk-⟨⟩-ctx-ren split-[] z≤n = ⟨⟩-η-ren
-wk-⟨⟩-ctx-ren (split-∷ p) q =
-     wk-ren
-  ∘ʳ (wk-⟨⟩-ctx-ren p q)
-wk-⟨⟩-ctx-ren {τ = τ} (split-⟨⟩ {Γ} {Γ'} {Γ''} {τ = τ'} p) q =
-     cong-ren {Γ'' = [] ⟨ τ' ⟩}
-       (wk-⟨⟩-ctx-ren {τ = τ ∸ τ'} p
-         (≤-trans
-           (∸-monoˡ-≤ τ' q)
-           (≤-reflexive (m+n∸n≡m (ctx-time Γ') τ'))))
-  ∘ʳ ⟨⟩-μ-ren
-  ∘ʳ ⟨⟩-≤-ren (n≤n∸m+m τ τ')
-
 -- Exchange renamings
 
 exch-ren : ∀ {Γ A B} → Ren (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
