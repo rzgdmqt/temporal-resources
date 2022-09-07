@@ -129,9 +129,8 @@ mutual
     -- explicit delaying of a computation
 
     delay   : {A : VType}
-            → {τ' τ'' : Time}
+            → {τ' : Time}
             → (τ : Time)
-            → τ'' ≡ τ + τ'               -- abstracting τ + τ' into a separate variable for more 
-            → Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ'          -- convenient equational rewriting for the time gradings
+            → Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ'
             --------------------
-            → Γ ⊢C⦂ A ‼ τ''
+            → Γ ⊢C⦂ A ‼ (τ + τ')

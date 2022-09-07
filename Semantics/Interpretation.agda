@@ -205,7 +205,7 @@ mutual
                  ∘ᵗ (⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ)
                  ∘ᵗ env-⟨⟩-ᶜ τ p ⟩ᵗ
 
-  ⟦ delay τ refl M ⟧ᶜᵗ =
+  ⟦ delay τ M ⟧ᶜᵗ =
        delayᵀ τ
     ∘ᵗ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
     ∘ᵗ η-⊣ 

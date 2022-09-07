@@ -145,8 +145,8 @@ mutual
       (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) s)
       (V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬p)) V)
       (M [ Tl-∷ x ↦ W ]c)
-  delay τ p M [ x ↦ W ]c =
-    delay τ p (M [ Tl-⟨⟩ x ↦ W ]c)
+  delay τ M [ x ↦ W ]c =
+    delay τ (M [ Tl-⟨⟩ x ↦ W ]c)
 
 
 
