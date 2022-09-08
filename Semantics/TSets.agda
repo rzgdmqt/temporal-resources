@@ -299,6 +299,13 @@ abstract
       ⟨ g , h ⟩ᵗ ∘ᵗ f
     ∎
 
+  mapˣᵗ-×ᵗ-assoc : ∀ {A B C A' B' C'}
+                 → (f : A →ᵗ A') (g : B →ᵗ B') (h : C →ᵗ C')
+                 → mapˣᵗ (mapˣᵗ f g) h ∘ᵗ ×ᵗ-assoc
+                ≡ᵗ ×ᵗ-assoc ∘ᵗ mapˣᵗ f (mapˣᵗ g h)
+  mapˣᵗ-×ᵗ-assoc f g h =
+    eqᵗ (λ xyz → refl)
+
 ------ packing and unpacking the abstract definitions
 
 abstract
@@ -579,3 +586,4 @@ abstract
                ≡ pack-⇒ᵗ
                    (g ∘ᵗ unpack-⇒ᵗ h ∘ᵗ mapˣᵗ idᵗ f)
   map⇒ᵗ-reveal f g h = refl
+

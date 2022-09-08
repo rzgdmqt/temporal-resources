@@ -231,7 +231,9 @@ mutual
     ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
       (initialᵗ ∘ᵗ ⟦ V ⟧ᵛᵗ) ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  C-rename≡∘ᵗ ρ (perform op V M) = 
+  C-rename≡∘ᵗ ρ (perform op V M) =
+    {!!}
+  {-
     begin
          opᵀ op
       ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V-rename ρ V ⟧ᵛᵗ ,
@@ -319,7 +321,149 @@ mutual
             ∘ᵗ η⊣ ⟩ᵗ)
       ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  C-rename≡∘ᵗ ρ (handle M `with H `in N) = {!!}
+  -}
+  C-rename≡∘ᵗ {Γ} {Γ'} ρ (handle_`with_`in {A} {B} {τ} {τ'} M H N) = 
+    begin
+      uncurryᵗ
+        (   T-alg-of-handlerᵀ
+         ∘ᵗ mapⁱˣᵗ
+              (λ op →
+                 mapⁱˣᵗ
+                 (λ τ'' →
+                    map⇒ᵗ
+                    (mapˣᵗ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
+                     ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵗ)))
+                    idᵗ
+                    ∘ᵗ
+                    curryᵗ
+                    (   ⟦ C-rename (cong-∷-ren (cong-∷-ren ρ)) (H op τ'') ⟧ᶜᵗ
+                     ∘ᵗ ×ᵗ-assoc)))
+         ∘ᵗ ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ᵢᵗ) ⟩ᵢᵗ)
+      ∘ᵗ mapˣᵗ idᵗ (Tᶠ ⟦ C-rename (cong-∷-ren (cong-⟨⟩-ren ρ)) N ⟧ᶜᵗ)
+      ∘ᵗ mapˣᵗ idᵗ strᵀ
+      ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ C-rename ρ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (≡ᵗ-cong₂ _∘ᵗ_
+         (≡ᵗ-cong (mapˣᵗ idᵗ) (≡ᵗ-cong Tᶠ (C-rename≡∘ᵗ ((cong-∷-ren (cong-⟨⟩-ren ρ))) N)))
+         (∘ᵗ-congʳ (≡ᵗ-cong ⟨ idᵗ ,_⟩ᵗ (≡ᵗ-cong ⟨ η⊣ ,_⟩ᵗ (C-rename≡∘ᵗ ρ M))))) ⟩
+      uncurryᵗ
+        (   T-alg-of-handlerᵀ
+         ∘ᵗ mapⁱˣᵗ
+              (λ op →
+                 mapⁱˣᵗ
+                 (λ τ'' →
+                    map⇒ᵗ
+                    (mapˣᵗ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
+                     ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵗ)))
+                    idᵗ
+                    ∘ᵗ
+                    curryᵗ
+                    (   ⟦ C-rename (cong-∷-ren (cong-∷-ren ρ)) (H op τ'') ⟧ᶜᵗ
+                     ∘ᵗ ×ᵗ-assoc)))
+         ∘ᵗ ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ᵢᵗ) ⟩ᵢᵗ)
+      ∘ᵗ mapˣᵗ idᵗ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵗ mapˣᵗ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵗ))
+      ∘ᵗ mapˣᵗ idᵗ strᵀ
+      ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ ⟩ᵗ
+    ≡⟨ ∘ᵗ-congˡ (≡ᵗ-cong uncurryᵗ (∘ᵗ-congʳ (∘ᵗ-congˡ
+         (≡-≡ᵗ (cong mapⁱˣᵗ (fun-ext (λ op → cong mapⁱˣᵗ (fun-ext (λ τ'' →
+           (≡ᵗ-≡
+             (∘ᵗ-congʳ (≡ᵗ-cong curryᵗ (∘ᵗ-congˡ
+                (C-rename≡∘ᵗ (cong-∷-ren (cong-∷-ren ρ)) (H op τ''))))))))))))))) ⟩
+      uncurryᵗ
+        (   T-alg-of-handlerᵀ
+         ∘ᵗ mapⁱˣᵗ
+              (λ op →
+                 mapⁱˣᵗ
+                   (λ τ'' →
+                     map⇒ᵗ
+                     (mapˣᵗ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
+                      ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵗ)))
+                     idᵗ
+                     ∘ᵗ
+                     curryᵗ
+                     (   (   ⟦ H op τ'' ⟧ᶜᵗ
+                          ∘ᵗ ⟦ (cong-∷-ren {A = [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')}
+                                 (cong-∷-ren {A = type-of-gtype (param op)} ρ)) ⟧ʳ)
+                      ∘ᵗ ×ᵗ-assoc)))
+         ∘ᵗ ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ᵢᵗ) ⟩ᵢᵗ)
+      ∘ᵗ mapˣᵗ idᵗ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵗ mapˣᵗ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵗ))
+      ∘ᵗ mapˣᵗ idᵗ strᵀ
+      ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ ⟩ᵗ
+    ≡⟨⟩
+      uncurryᵗ
+        (   T-alg-of-handlerᵀ
+         ∘ᵗ mapⁱˣᵗ
+              (λ op →
+                 mapⁱˣᵗ
+                   (λ τ'' →
+                        map⇒ᵗ
+                          (mapˣᵗ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
+                            ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵗ)))
+                          idᵗ
+                     ∘ᵗ curryᵗ
+                          (   (   ⟦ H op τ'' ⟧ᶜᵗ
+                               ∘ᵗ mapˣᵗ (mapˣᵗ ⟦ ρ ⟧ʳ idᵗ) idᵗ)
+                           ∘ᵗ ×ᵗ-assoc)))
+         ∘ᵗ ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ᵢᵗ) ⟩ᵢᵗ)
+      ∘ᵗ mapˣᵗ idᵗ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵗ mapˣᵗ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵗ))
+      ∘ᵗ mapˣᵗ idᵗ strᵀ
+      ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ ⟩ᵗ
+    ≡⟨ ∘ᵗ-congˡ (≡ᵗ-cong uncurryᵗ (∘ᵗ-congʳ (∘ᵗ-congˡ
+        (≡-≡ᵗ (cong mapⁱˣᵗ (fun-ext (λ op → cong mapⁱˣᵗ (fun-ext (λ τ'' →
+          ≡ᵗ-≡ (∘ᵗ-congʳ (
+            begin
+              curryᵗ ((⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ mapˣᵗ (mapˣᵗ ⟦ ρ ⟧ʳ idᵗ) idᵗ) ∘ᵗ ×ᵗ-assoc)
+            ≡⟨ ≡ᵗ-cong curryᵗ (∘ᵗ-assoc _ _ _) ⟩
+              curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ (mapˣᵗ (mapˣᵗ ⟦ ρ ⟧ʳ idᵗ) idᵗ ∘ᵗ ×ᵗ-assoc))
+            ≡⟨ ≡ᵗ-cong curryᵗ (∘ᵗ-congʳ (mapˣᵗ-×ᵗ-assoc _ _ _)) ⟩
+              curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ (×ᵗ-assoc ∘ᵗ mapˣᵗ ⟦ ρ ⟧ʳ (mapˣᵗ idᵗ idᵗ)))
+            ≡⟨ ≡ᵗ-cong curryᵗ (≡ᵗ-sym (∘ᵗ-assoc _ _ _)) ⟩
+              curryᵗ ((⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×ᵗ-assoc) ∘ᵗ mapˣᵗ ⟦ ρ ⟧ʳ (mapˣᵗ idᵗ idᵗ))
+            ≡⟨ curryᵗ-mapˣᵗ _ _ _ ⟩
+              map⇒ᵗ (mapˣᵗ idᵗ idᵗ) idᵗ ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×ᵗ-assoc) ∘ᵗ ⟦ ρ ⟧ʳ
+            ≡⟨ ∘ᵗ-congˡ (≡ᵗ-cong (λ f → map⇒ᵗ f idᵗ) (≡ᵗ-sym
+                 (⟨⟩ᵗ-unique _ _ _
+                   (≡ᵗ-trans (∘ᵗ-identityʳ _) (≡ᵗ-sym (∘ᵗ-identityˡ _)))
+                   (≡ᵗ-trans (∘ᵗ-identityʳ _) (≡ᵗ-sym (∘ᵗ-identityˡ _)))))) ⟩
+              map⇒ᵗ idᵗ idᵗ ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×ᵗ-assoc) ∘ᵗ ⟦ ρ ⟧ʳ
+            ≡⟨ ∘ᵗ-congˡ map⇒ᵗ-identity ⟩
+              idᵗ ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×ᵗ-assoc) ∘ᵗ ⟦ ρ ⟧ʳ
+            ≡⟨ ∘ᵗ-identityˡ _ ⟩
+              curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×ᵗ-assoc) ∘ᵗ ⟦ ρ ⟧ʳ
+            ∎))))))))))) ⟩
+      uncurryᵗ
+        (   T-alg-of-handlerᵀ
+         ∘ᵗ mapⁱˣᵗ
+              (λ op →
+                 mapⁱˣᵗ
+                   (λ τ'' →
+                        map⇒ᵗ
+                          (mapˣᵗ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
+                            ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵗ)))
+                          idᵗ
+                     ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×ᵗ-assoc)
+                     ∘ᵗ ⟦ ρ ⟧ʳ))
+         ∘ᵗ ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ᵢᵗ) ⟩ᵢᵗ)
+      ∘ᵗ mapˣᵗ idᵗ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵗ mapˣᵗ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵗ))
+      ∘ᵗ mapˣᵗ idᵗ strᵀ
+      ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ ⟩ᵗ
+    ≡⟨ {!!} ⟩
+      (uncurryᵗ
+       (   T-alg-of-handlerᵀ
+        ∘ᵗ mapⁱˣᵗ
+             (λ op →
+                mapⁱˣᵗ
+                  (λ τ'' →
+                       map⇒ᵗ
+                         (mapˣᵗ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
+                           ([ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵗ)))
+                         idᵗ
+                    ∘ᵗ curryᵗ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵗ ×ᵗ-assoc)))
+        ∘ᵗ ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ᵢᵗ) ⟩ᵢᵗ)
+       ∘ᵗ mapˣᵗ idᵗ (Tᶠ ⟦ N ⟧ᶜᵗ)
+       ∘ᵗ mapˣᵗ idᵗ strᵀ
+       ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ)
+      ∘ᵗ ⟦ ρ ⟧ʳ
+    ∎
   C-rename≡∘ᵗ ρ (unbox p V M) = {!!}
   C-rename≡∘ᵗ ρ (delay τs M) =
     {!!}
