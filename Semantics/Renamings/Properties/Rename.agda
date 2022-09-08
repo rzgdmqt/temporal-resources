@@ -654,7 +654,14 @@ mutual
       ∘ᵗ mapˣᵗ idᵗ (Tᶠ (mapˣᵗ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵗ))
       ∘ᵗ mapˣᵗ idᵗ strᵀ
       ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ ⟩ᵗ
-    ≡⟨ {!!} ⟩
+    ≡⟨ ∘ᵗ-congʳ
+        (≡ᵗ-sym
+          (≡ᵗ-trans
+            (∘ᵗ-assoc _ _ _)
+            (∘ᵗ-congʳ
+              (≡ᵗ-trans
+                (∘ᵗ-assoc _ _ _)
+                (∘ᵗ-congʳ (∘ᵗ-assoc _ _ _)))))) ⟩
       uncurryᵗ
          (    T-alg-of-handlerᵀ
           ∘ᵗ (mapⁱˣᵗ
@@ -677,17 +684,40 @@ mutual
            ∘ᵗ mapˣᵗ idᵗ (Tᶠ ⟦ N ⟧ᶜᵗ)
            ∘ᵗ mapˣᵗ idᵗ (Tᶠ (mapˣᵗ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵗ))
            ∘ᵗ mapˣᵗ idᵗ strᵀ
-         ≡⟨ {!!} ⟩
+         ≡⟨ ≡ᵗ-trans
+              (∘ᵗ-congʳ (∘ᵗ-congʳ (≡ᵗ-sym (mapˣᵗ-∘ᵗ _ _ _ _))))
+              (≡ᵗ-trans
+                (∘ᵗ-congʳ (≡ᵗ-sym (mapˣᵗ-∘ᵗ _ _ _ _)))
+                (≡ᵗ-sym (mapˣᵗ-∘ᵗ _ _ _ _))) ⟩
            mapˣᵗ
              (⟨ (λ op → ⟨ (λ τ'' → ⟦ ρ ⟧ʳ) ⟩ᵢᵗ) ⟩ᵢᵗ ∘ᵗ idᵗ ∘ᵗ idᵗ ∘ᵗ idᵗ)
              (idᵗ ∘ᵗ Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵗ Tᶠ (mapˣᵗ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵗ) ∘ᵗ strᵀ)
          ≡⟨ ≡ᵗ-cong₂ mapˣᵗ
-              {!!}
-              {!!} ⟩
+              (≡ᵗ-trans (∘ᵗ-congʳ (∘ᵗ-identityˡ _))
+                (≡ᵗ-trans (∘ᵗ-congʳ (∘ᵗ-identityˡ _))
+                  (≡ᵗ-trans (∘ᵗ-identityʳ _)
+                    (≡ᵗ-trans
+                      (≡ᵗ-trans
+                        (≡-≡ᵗ (cong ⟨_⟩ᵢᵗ (fun-ext (λ op → ≡ᵗ-≡
+                          (≡ᵗ-trans (≡-≡ᵗ (cong ⟨_⟩ᵢᵗ (fun-ext (λ τ'' → ≡ᵗ-≡ (≡ᵗ-sym (∘ᵗ-identityˡ _)))))) (⟨⟩ᵢᵗ-∘ᵗ _ _))))))
+                        (⟨⟩ᵢᵗ-∘ᵗ _ _))
+                      (≡ᵗ-sym (≡ᵗ-trans (∘ᵗ-congʳ (∘ᵗ-identityˡ _)) (∘ᵗ-congʳ (∘ᵗ-identityˡ _))))))))
+              (≡ᵗ-trans
+                (∘ᵗ-identityˡ _)
+                (≡ᵗ-trans
+                  (∘ᵗ-congʳ (≡ᵗ-sym
+                    (≡ᵗ-trans
+                      (∘ᵗ-congʳ (≡ᵗ-cong (mapˣᵗ ([ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ))) (≡ᵗ-sym Tᶠ-idᵗ)))
+                      (strᵀ-nat _ _))))
+                  (≡ᵗ-sym (∘ᵗ-identityˡ _)))) ⟩
            mapˣᵗ
              (⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ᵢᵗ) ⟩ᵢᵗ ∘ᵗ idᵗ ∘ᵗ idᵗ ∘ᵗ ⟦ ρ ⟧ʳ)
              (idᵗ ∘ᵗ Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵗ strᵀ ∘ᵗ (mapˣᵗ ([ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ)) idᵗ))
-         ≡⟨ {!!} ⟩
+         ≡⟨ ≡ᵗ-trans
+             (≡ᵗ-trans
+               (mapˣᵗ-∘ᵗ _ _ _ _)
+               (∘ᵗ-congʳ (mapˣᵗ-∘ᵗ _ _ _ _)))
+             (∘ᵗ-congʳ (∘ᵗ-congʳ (mapˣᵗ-∘ᵗ _ _ _ _))) ⟩
               mapˣᵗ ⟨ (λ op → ⟨ (λ τ'' → idᵗ) ⟩ᵢᵗ) ⟩ᵢᵗ idᵗ
            ∘ᵗ mapˣᵗ idᵗ (Tᶠ ⟦ N ⟧ᶜᵗ)
            ∘ᵗ mapˣᵗ idᵗ strᵀ
@@ -709,7 +739,14 @@ mutual
            ∘ᵗ mapˣᵗ idᵗ strᵀ
            ∘ᵗ mapˣᵗ ⟦ ρ ⟧ʳ (mapˣᵗ ([ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ)) idᵗ))
        ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ ⟩ᵗ
-    ≡⟨ {!!} ⟩
+    ≡⟨ ∘ᵗ-congʳ
+         (≡ᵗ-trans
+           (∘ᵗ-assoc _ _ _)
+           (∘ᵗ-congʳ
+             (≡ᵗ-trans
+               (∘ᵗ-assoc _ _ _)
+               (∘ᵗ-congʳ
+                 (∘ᵗ-assoc _ _ _))))) ⟩
       uncurryᵗ
        (   T-alg-of-handlerᵀ
         ∘ᵗ mapⁱˣᵗ
@@ -726,7 +763,13 @@ mutual
        ∘ᵗ mapˣᵗ idᵗ strᵀ
        ∘ᵗ mapˣᵗ ⟦ ρ ⟧ʳ (mapˣᵗ ([ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ)) idᵗ)
        ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ ⟩ᵗ
-    ≡⟨ {!TODO!} ⟩
+    ≡⟨ ≡ᵗ-sym
+        (≡ᵗ-trans
+          (∘ᵗ-assoc _ _ _)
+          (∘ᵗ-congʳ
+            (≡ᵗ-trans
+              (∘ᵗ-assoc _ _ _)
+              (∘ᵗ-congʳ (∘ᵗ-assoc _ _ _))))) ⟩
       (uncurryᵗ
        (   T-alg-of-handlerᵀ
         ∘ᵗ mapⁱˣᵗ
@@ -842,7 +885,16 @@ mutual
        ∘ᵗ mapˣᵗ idᵗ strᵀ)
        ∘ᵗ (   ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ
            ∘ᵗ ⟦ ρ ⟧ʳ)
-    ≡⟨ {!TODO!} ⟩
+    ≡⟨ ≡ᵗ-trans
+         (∘ᵗ-assoc _ _ _)
+         (≡ᵗ-trans
+           (∘ᵗ-congʳ
+             (≡ᵗ-trans
+               (∘ᵗ-assoc _ _ _)
+               (≡ᵗ-trans
+                 (∘ᵗ-congʳ (≡ᵗ-sym (∘ᵗ-assoc _ _ _)))
+                 (≡ᵗ-sym (∘ᵗ-assoc _ _ _)))))
+           (≡ᵗ-sym (∘ᵗ-assoc _ _ _))) ⟩
       (uncurryᵗ
        (   T-alg-of-handlerᵀ
         ∘ᵗ mapⁱˣᵗ
@@ -860,7 +912,8 @@ mutual
        ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ)
       ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  C-rename≡∘ᵗ ρ (unbox p V M) = {!!}
+  C-rename≡∘ᵗ ρ (unbox p V M) =
+    {!!}
   C-rename≡∘ᵗ ρ (delay τs M) =
     {!!}
   {-
