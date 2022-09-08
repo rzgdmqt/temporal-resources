@@ -26,8 +26,8 @@ open import Util.Time
 -- Unit of the adjunction
 
 abstract
-  η-⊣ : ∀ {A τ} → A →ᵗ [ τ ]ᵒ (⟨ τ ⟩ᵒ A)
-  η-⊣ {A} {τ} =
+  η⊣ : ∀ {A τ} → A →ᵗ [ τ ]ᵒ (⟨ τ ⟩ᵒ A)
+  η⊣ {A} {τ} =
     tset-map
       (λ {t'} a →
         m≤n+m τ t' ,
@@ -44,8 +44,8 @@ abstract
 -- Counit of the adjunction
 
 abstract
-  ε-⊣ : ∀ {A τ} → ⟨ τ ⟩ᵒ ([ τ ]ᵒ A) →ᵗ A
-  ε-⊣ {A} {τ} =
+  ε⊣ : ∀ {A τ} → ⟨ τ ⟩ᵒ ([ τ ]ᵒ A) →ᵗ A
+  ε⊣ {A} {τ} =
     tset-map
       (λ { {t'} (p , a) → monotone A (n≤m⇒m∸n+n≤m τ t' p) a })
       (λ { p (q , x) →
@@ -61,9 +61,9 @@ abstract
 -- η-⊣ is natural
 
 abstract
-  ⊣-η-nat : ∀ {A B τ} → (f : A →ᵗ B)
-          → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵗ η-⊣ ≡ᵗ η-⊣ ∘ᵗ f
-  ⊣-η-nat f = eqᵗ (λ {t} x →
+  η⊣-nat : ∀ {A B τ} → (f : A →ᵗ B)
+         → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵗ η⊣ ≡ᵗ η⊣ ∘ᵗ f
+  η⊣-nat f = eqᵗ (λ {t} x →
     trans
       (∘ᵗ-reveal _ _ _)
       (trans
@@ -77,30 +77,30 @@ abstract
 -- ε-⊣ is natural
 
 abstract
-  ⊣-ε-nat : ∀ {A B τ} → (f : A →ᵗ B)
-          → f ∘ᵗ ε-⊣ ≡ᵗ ε-⊣ ∘ᵗ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
-  ⊣-ε-nat {A} {B} {τ} f = eqᵗ (λ { {t} (p , x) →
+  ε⊣-nat : ∀ {A B τ} → (f : A →ᵗ B)
+         → f ∘ᵗ ε⊣ ≡ᵗ ε⊣ ∘ᵗ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
+  ε⊣-nat {A} {B} {τ} f = eqᵗ (λ { {t} (p , x) →
     trans
       (∘ᵗ-reveal _ _ _)
       (trans
         (trans
           (trans
             (map-nat f _ _)
-            (cong (λ y → map-carrier (ε-⊣ {B}) (p , y)) (sym ([]-reveal _ _ _))))
-          (cong (map-carrier (ε-⊣ {B})) (sym (⟨⟩-reveal _ _ _))))
+            (cong (λ y → map-carrier (ε⊣ {B}) (p , y)) (sym ([]-reveal _ _ _))))
+          (cong (map-carrier (ε⊣ {B})) (sym (⟨⟩-reveal _ _ _))))
         (sym (∘ᵗ-reveal _ _ _))) })
 
 -- Triangle equations of the adjunction
 
 abstract
-  ⊣-ε∘Fη≡id : ∀ {A τ} → ε-⊣ {⟨ τ ⟩ᵒ A} ∘ᵗ ⟨ τ ⟩ᶠ (η-⊣ {A}) ≡ᵗ idᵗ
-  ⊣-ε∘Fη≡id {A} {τ} =
+  ε⊣∘Fη≡id : ∀ {A τ} → ε⊣ {⟨ τ ⟩ᵒ A} ∘ᵗ ⟨ τ ⟩ᶠ (η⊣ {A}) ≡ᵗ idᵗ
+  ε⊣∘Fη≡id {A} {τ} =
     eqᵗ (λ {t} x →
       trans
         (∘ᵗ-reveal _ _ _)
         (trans
           (trans
-            (cong (map-carrier (ε-⊣ {⟨ τ ⟩ᵒ A})) (⟨⟩-reveal _ _ _))
+            (cong (map-carrier (ε⊣ {⟨ τ ⟩ᵒ A})) (⟨⟩-reveal _ _ _))
             (cong₂ _,_
               (≤-irrelevant _ _)
               (trans
@@ -110,8 +110,8 @@ abstract
                   (monotone-refl A (proj₂ x))))))
           (sym (idᵗ-reveal _))))
           
-  ⊣-Gε∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε-⊣ {A}) ∘ᵗ η-⊣ {[ τ ]ᵒ A} ≡ᵗ idᵗ
-  ⊣-Gε∘η≡id {A} {τ} =
+  Gε⊣∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε⊣ {A}) ∘ᵗ η⊣ {[ τ ]ᵒ A} ≡ᵗ idᵗ
+  Gε⊣∘η≡id {A} {τ} =
     eqᵗ (λ {t} x →
       trans
         (∘ᵗ-reveal _ _ _)
@@ -128,8 +128,8 @@ abstract
 -- Interaction between η-⊣/ε-⊣ of the adjunction and η/ε of the modalities
 
 abstract
-  ⊣-η⊣≡ε⁻¹∘η : ∀ {A} → η-⊣ {A} ≡ᵗ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵗ η {A}
-  ⊣-η⊣≡ε⁻¹∘η {A} =
+  η⊣≡ε⁻¹∘η : ∀ {A} → η⊣ {A} ≡ᵗ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵗ η {A}
+  η⊣≡ε⁻¹∘η {A} =
     eqᵗ (λ {t} x →
       trans
         (trans
@@ -144,8 +144,8 @@ abstract
           (sym (ε⁻¹-reveal _)))
         (sym (∘ᵗ-reveal _ _ _)))
 
-  ⊣-ε⊣≡ε∘η⁻¹ : ∀ {A} → ε-⊣ {A} ≡ᵗ ε {A} ∘ᵗ η⁻¹ {[ 0 ]ᵒ A}
-  ⊣-ε⊣≡ε∘η⁻¹ {A} =
+  ε⊣≡ε∘η⁻¹ : ∀ {A} → ε⊣ {A} ≡ᵗ ε {A} ∘ᵗ η⁻¹ {[ 0 ]ᵒ A}
+  ε⊣≡ε∘η⁻¹ {A} =
     eqᵗ (λ { {t} (p , x) →
       trans
         (trans
