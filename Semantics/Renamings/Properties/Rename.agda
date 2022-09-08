@@ -71,7 +71,7 @@ mutual
   V-rename≡∘ᵗ ρ (lam {A} M) =
     begin
       curryᵗ ⟦ C-rename (cong-∷-ren ρ) M ⟧ᶜᵗ
-    ≡⟨ ≡-≡ᵗ (cong curryᵗ (≡ᵗ-≡ (C-rename≡∘ᵗ (cong-∷-ren ρ) M))) ⟩
+    ≡⟨ ≡ᵗ-cong curryᵗ (C-rename≡∘ᵗ (cong-∷-ren ρ) M) ⟩
       curryᵗ (⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ cong-∷-ren {A = A} ρ ⟧ʳ)
     ≡⟨⟩
       curryᵗ (⟦ M ⟧ᶜᵗ ∘ᵗ mapˣᵗ ⟦ ρ ⟧ʳ idᵗ)
@@ -85,10 +85,7 @@ mutual
   V-rename≡∘ᵗ ρ (box {τ = τ} V) =
     begin
       [ τ ]ᶠ ⟦ V-rename (cong-⟨⟩-ren ρ) V ⟧ᵛᵗ ∘ᵗ η-⊣
-    ≡⟨ ∘ᵗ-congˡ
-         (≡-≡ᵗ
-           (cong [ τ ]ᶠ (≡ᵗ-≡ (V-rename≡∘ᵗ (cong-⟨⟩-ren ρ) V))))
-     ⟩
+    ≡⟨ ∘ᵗ-congˡ (≡ᵗ-cong [ τ ]ᶠ (V-rename≡∘ᵗ (cong-⟨⟩-ren ρ) V)) ⟩
       [ τ ]ᶠ (⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ cong-⟨⟩-ren ρ ⟧ʳ) ∘ᵗ η-⊣
     ≡⟨ ∘ᵗ-congˡ ([]-∘ ⟦ cong-⟨⟩-ren ρ ⟧ʳ ⟦ V ⟧ᵛᵗ) ⟩
       ([ τ ]ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ [ τ ]ᶠ ⟦ cong-⟨⟩-ren ρ ⟧ʳ) ∘ᵗ η-⊣
@@ -122,6 +119,11 @@ mutual
       ∘ᵗ Tᶠ ⟦ C-rename (cong-∷-ren (cong-⟨⟩-ren ρ)) N ⟧ᶜᵗ
       ∘ᵗ strᵀ {⟨ τ ⟩ᵒ ⟦ Γ' ⟧ᵉ} {⟦ A ⟧ᵛ}
       ∘ᵗ ⟨ η-⊣ {⟦ Γ' ⟧ᵉ} {τ} , ⟦ C-rename ρ M ⟧ᶜᵗ ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congʳ (∘ᵗ-congʳ (≡ᵗ-cong ⟨ η-⊣ ,_⟩ᵗ (C-rename≡∘ᵗ ρ M)))) ⟩
+         μᵀ
+      ∘ᵗ Tᶠ ⟦ C-rename (cong-∷-ren (cong-⟨⟩-ren ρ)) N ⟧ᶜᵗ
+      ∘ᵗ strᵀ {⟨ τ ⟩ᵒ ⟦ Γ' ⟧ᵉ} {⟦ A ⟧ᵛ}
+      ∘ᵗ ⟨ η-⊣ {⟦ Γ' ⟧ᵉ} {τ} , ⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ
     ≡⟨ {!!} ⟩
          (   μᵀ
           ∘ᵗ Tᶠ ⟦ N ⟧ᶜᵗ
@@ -132,10 +134,7 @@ mutual
   C-rename≡∘ᵗ ρ (V · W) = 
     begin
       appᵗ ∘ᵗ ⟨ ⟦ V-rename ρ V ⟧ᵛᵗ , ⟦ V-rename ρ W ⟧ᵛᵗ ⟩ᵗ
-    ≡⟨ ∘ᵗ-congʳ (≡-≡ᵗ
-         (cong₂ ⟨_,_⟩ᵗ
-           (≡ᵗ-≡ (V-rename≡∘ᵗ ρ V))
-           (≡ᵗ-≡ (V-rename≡∘ᵗ ρ W))))
+    ≡⟨ ∘ᵗ-congʳ (≡ᵗ-cong₂ ⟨_,_⟩ᵗ (V-rename≡∘ᵗ ρ V) (V-rename≡∘ᵗ ρ W))
      ⟩
       appᵗ ∘ᵗ ⟨ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ , ⟦ W ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ
     ≡⟨ ∘ᵗ-congʳ (⟨⟩ᵗ-∘ᵗ _ _ _) ⟩

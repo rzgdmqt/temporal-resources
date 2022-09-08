@@ -112,6 +112,18 @@ abstract
   ≡-≡ᵗ : ∀ {A B} → {f g : A →ᵗ B} → f ≡ g → f ≡ᵗ g
   ≡-≡ᵗ refl = ≡ᵗ-refl
 
+-- Congruence of ≡ᵗ
+
+abstract
+  ≡ᵗ-cong : ∀ {A B C D} (f : (A →ᵗ B) → (C →ᵗ D)) {x y : A →ᵗ B}
+          → x ≡ᵗ y → f x ≡ᵗ f y
+  ≡ᵗ-cong f p = ≡-≡ᵗ (cong f (≡ᵗ-≡ p))
+   
+  ≡ᵗ-cong₂ : ∀ {A B C D E F} (f : (A →ᵗ B) → (C →ᵗ D) → (E →ᵗ F))
+           → {x y : A →ᵗ B} {z w : C →ᵗ D}
+           → x ≡ᵗ y → z ≡ᵗ w → f x z ≡ᵗ f y w
+  ≡ᵗ-cong₂ f p q = ≡-≡ᵗ (cong₂ f (≡ᵗ-≡ p) (≡ᵗ-≡ q))
+
 -- Identity and composition of maps
 
 abstract
