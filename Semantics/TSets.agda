@@ -306,6 +306,13 @@ abstract
   mapˣᵗ-×ᵗ-assoc f g h =
     eqᵗ (λ xyz → refl)
 
+  mapˣᵗ-∘ᵗ : ∀ {A A' A'' B B' B''}
+           → (f : A →ᵗ A') (g : B →ᵗ B') (h : A' →ᵗ A'') (i : B' →ᵗ B'')
+           → mapˣᵗ (h ∘ᵗ f) (i ∘ᵗ g)
+          ≡ᵗ mapˣᵗ h i ∘ᵗ mapˣᵗ f g
+  mapˣᵗ-∘ᵗ f g h i =
+    eqᵗ (λ xy → refl)
+
 ------ packing and unpacking the abstract definitions
 
 abstract
@@ -381,7 +388,7 @@ abstract
       (λ f → f i)
       (λ p f → refl)
       
-  ⟨_⟩ᵢᵗ : ∀ {A I B} → ((i : I) → A →ᵗ B i) → A →ᵗ Π I B
+  ⟨_⟩ᵢᵗ : ∀ {I A B} → ((i : I) → A →ᵗ B i) → A →ᵗ Π I B
   ⟨ fs ⟩ᵢᵗ =
     tset-map
       (λ x i → map-carrier (fs i) x)
@@ -390,6 +397,33 @@ abstract
 mapⁱˣᵗ : ∀ {I A B} → ((i : I) → A i →ᵗ B i) → Π I A →ᵗ Π I B
 mapⁱˣᵗ fs = ⟨ (λ i → fs i ∘ᵗ projᵗ i) ⟩ᵢᵗ
 
+abstract
+  mapⁱˣᵗ-identity : ∀ {I A}
+                  → mapⁱˣᵗ {I} {A} {A} (λ i → idᵗ) ≡ᵗ idᵗ
+  mapⁱˣᵗ-identity =
+    eqᵗ (λ f → refl)
+
+  mapⁱˣᵗ-∘ᵗ : ∀ {I} {A B C : I → TSet}
+            → (f : ((i : I) → A i →ᵗ B i))
+            → (g : ((i : I) → B i →ᵗ C i))
+            → mapⁱˣᵗ (λ i → g i ∘ᵗ f i)
+           ≡ᵗ mapⁱˣᵗ g ∘ᵗ mapⁱˣᵗ f
+  mapⁱˣᵗ-∘ᵗ f g =
+    eqᵗ (λ h → refl)
+
+  ⟨⟩ᵢᵗ-projᵗ : ∀ {I} {A} {B : I → TSet}
+             → (f : ((i : I) → A →ᵗ B i))
+             → (i : I)
+             → projᵗ i ∘ᵗ ⟨ f ⟩ᵢᵗ ≡ᵗ f i
+  ⟨⟩ᵢᵗ-projᵗ f i = eqᵗ (λ x → refl)
+
+  ⟨⟩ᵢᵗ-∘ᵗ : ∀ {I} {A B} {C : I → TSet}
+          → (f : A →ᵗ B)
+          → (g : ((i : I) → B →ᵗ C i))
+          → ⟨ (λ i → g i ∘ᵗ f) ⟩ᵢᵗ
+         ≡ᵗ ⟨ g ⟩ᵢᵗ ∘ᵗ f
+  ⟨⟩ᵢᵗ-∘ᵗ f g =
+    eqᵗ (λ x → refl)
 
 ---- covariant hom-functor
 
@@ -522,6 +556,14 @@ abstract
       ≡ᵗ-≡ (eqᵗ (λ y →
         cong (map-carrier f)
           (cong₂ _,_ (map-nat g _ x) refl))))
+
+  uncurryᵗ-mapʳ : ∀ {A B C D}
+               → (f : A →ᵗ B)
+               → (g : B →ᵗ C ⇒ᵗ D)
+               → uncurryᵗ (g ∘ᵗ f)
+              ≡ᵗ uncurryᵗ g ∘ᵗ mapˣᵗ f idᵗ
+  uncurryᵗ-mapʳ f g =
+    eqᵗ (λ xy → refl)
 
 ------ packing and unpacking the abstract definitions
 
