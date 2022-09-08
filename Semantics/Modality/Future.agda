@@ -148,13 +148,13 @@ abstract
 -- [_] is functorial
 
 abstract
-  []-id : ∀ {A τ} → [ τ ]ᶠ (idᵗ {A = A}) ≡ᵗ idᵗ
-  []-id = eqᵗ (λ {t} x →
+  []-idᵗ : ∀ {A τ} → [ τ ]ᶠ (idᵗ {A = A}) ≡ᵗ idᵗ
+  []-idᵗ = eqᵗ (λ {t} x →
     trans (idᵗ-reveal _) (sym (idᵗ-reveal _)))
 
-  []-∘ : ∀ {A B C τ} → (f : A →ᵗ B) → (g : B →ᵗ C)
-       → [ τ ]ᶠ (g ∘ᵗ f) ≡ᵗ [ τ ]ᶠ g ∘ᵗ [ τ ]ᶠ f
-  []-∘ {τ = τ} f g = eqᵗ (λ {t} x →
+  []-∘ᵗ : ∀ {A B C τ} → (f : A →ᵗ B) → (g : B →ᵗ C)
+        → [ τ ]ᶠ (g ∘ᵗ f) ≡ᵗ [ τ ]ᶠ g ∘ᵗ [ τ ]ᶠ f
+  []-∘ᵗ {τ = τ} f g = eqᵗ (λ {t} x →
     trans
       (∘ᵗ-reveal _ _ _)
       (sym (∘ᵗ-reveal _ _ _)))

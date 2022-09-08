@@ -87,7 +87,7 @@ mutual
       [ τ ]ᶠ ⟦ V-rename (cong-⟨⟩-ren ρ) V ⟧ᵛᵗ ∘ᵗ η⊣
     ≡⟨ ∘ᵗ-congˡ (≡ᵗ-cong [ τ ]ᶠ (V-rename≡∘ᵗ (cong-⟨⟩-ren ρ) V)) ⟩
       [ τ ]ᶠ (⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ cong-⟨⟩-ren ρ ⟧ʳ) ∘ᵗ η⊣
-    ≡⟨ ∘ᵗ-congˡ ([]-∘ ⟦ cong-⟨⟩-ren ρ ⟧ʳ ⟦ V ⟧ᵛᵗ) ⟩
+    ≡⟨ ∘ᵗ-congˡ ([]-∘ᵗ ⟦ cong-⟨⟩-ren ρ ⟧ʳ ⟦ V ⟧ᵛᵗ) ⟩
       ([ τ ]ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ [ τ ]ᶠ ⟦ cong-⟨⟩-ren ρ ⟧ʳ) ∘ᵗ η⊣
     ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
       [ τ ]ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ ([ τ ]ᶠ ⟦ cong-⟨⟩-ren ρ ⟧ʳ ∘ᵗ η⊣)
@@ -231,4 +231,19 @@ mutual
   C-rename≡∘ᵗ ρ (perform op V M) = {!!}
   C-rename≡∘ᵗ ρ (handle M `with H `in N) = {!!}
   C-rename≡∘ᵗ ρ (unbox p V M) = {!!}
-  C-rename≡∘ᵗ ρ (delay τs M) = {!!}
+  C-rename≡∘ᵗ ρ (delay τs M) = 
+    begin
+      delayᵀ τs ∘ᵗ [ τs ]ᶠ ⟦ C-rename (cong-⟨⟩-ren ρ) M ⟧ᶜᵗ ∘ᵗ η⊣
+    ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congˡ (≡ᵗ-cong [ τs ]ᶠ (C-rename≡∘ᵗ (cong-⟨⟩-ren ρ) M))) ⟩
+      delayᵀ τs ∘ᵗ [ τs ]ᶠ (⟦ M ⟧ᶜᵗ ∘ᵗ ⟦ (cong-⟨⟩-ren ρ) ⟧ʳ) ∘ᵗ η⊣
+    ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congˡ ([]-∘ᵗ (⟨ τs ⟩ᶠ ⟦ ρ ⟧ʳ) ⟦ M ⟧ᶜᵗ)) ⟩
+      delayᵀ τs ∘ᵗ ([ τs ]ᶠ ⟦ M ⟧ᶜᵗ ∘ᵗ [ τs ]ᶠ (⟨ τs ⟩ᶠ ⟦ ρ ⟧ʳ)) ∘ᵗ η⊣
+    ≡⟨ ∘ᵗ-congʳ (∘ᵗ-assoc _ _ _) ⟩
+      delayᵀ τs ∘ᵗ [ τs ]ᶠ ⟦ M ⟧ᶜᵗ ∘ᵗ ([ τs ]ᶠ (⟨ τs ⟩ᶠ ⟦ ρ ⟧ʳ) ∘ᵗ η⊣)
+    ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congʳ (η⊣-nat _)) ⟩
+      delayᵀ τs ∘ᵗ [ τs ]ᶠ ⟦ M ⟧ᶜᵗ ∘ᵗ (η⊣ ∘ᵗ ⟦ ρ ⟧ʳ)
+    ≡⟨ ∘ᵗ-congʳ (≡ᵗ-sym (∘ᵗ-assoc _ _ _)) ⟩
+      delayᵀ τs ∘ᵗ ([ τs ]ᶠ ⟦ M ⟧ᶜᵗ ∘ᵗ η⊣) ∘ᵗ ⟦ ρ ⟧ʳ
+    ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
+      (delayᵀ τs ∘ᵗ [ τs ]ᶠ ⟦ M ⟧ᶜᵗ ∘ᵗ η⊣) ∘ᵗ ⟦ ρ ⟧ʳ
+    ∎
