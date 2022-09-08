@@ -114,6 +114,8 @@ mutual
       (ηᵀ ∘ᵗ ⟦ V ⟧ᵛᵗ) ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
   C-rename≡∘ᵗ {Γ} {Γ'} ρ (_;_ {A} {B} {τ} {τ'} M N) =
+    {!!}
+  {-
     begin
          μᵀ
       ∘ᵗ Tᶠ ⟦ C-rename (cong-∷-ren (cong-⟨⟩-ren ρ)) N ⟧ᶜᵗ
@@ -209,6 +211,7 @@ mutual
           ∘ᵗ ⟨ η⊣ {⟦ Γ ⟧ᵉ} {τ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ)
       ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
+  -}
   C-rename≡∘ᵗ ρ (V · W) = 
     begin
       appᵗ ∘ᵗ ⟨ ⟦ V-rename ρ V ⟧ᵛᵗ , ⟦ V-rename ρ W ⟧ᵛᵗ ⟩ᵗ
@@ -228,10 +231,99 @@ mutual
     ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
       (initialᵗ ∘ᵗ ⟦ V ⟧ᵛᵗ) ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  C-rename≡∘ᵗ ρ (perform op V M) = {!!}
+  C-rename≡∘ᵗ ρ (perform op V M) = 
+    begin
+         opᵀ op
+      ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V-rename ρ V ⟧ᵛᵗ ,
+              [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵗ)
+           ∘ᵗ [ op-time op ]ᶠ (curryᵗ ⟦ C-rename (cong-∷-ren (cong-⟨⟩-ren ρ)) M ⟧ᶜᵗ)
+           ∘ᵗ η⊣ ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (≡ᵗ-cong₂ ⟨_,_⟩ᵗ
+        (∘ᵗ-congʳ (V-rename≡∘ᵗ ρ V))
+        (∘ᵗ-congʳ (∘ᵗ-congˡ (≡ᵗ-cong
+                              (λ f → [ op-time op ]ᶠ (curryᵗ f))
+                              (C-rename≡∘ᵗ (cong-∷-ren (cong-⟨⟩-ren ρ)) M))))) ⟩
+         opᵀ op
+      ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,
+              [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵗ)
+           ∘ᵗ [ op-time op ]ᶠ
+                (curryᵗ (   ⟦ M ⟧ᶜᵗ
+                         ∘ᵗ ⟦ (cong-∷-ren {A = type-of-gtype (arity op)} (cong-⟨⟩-ren ρ)) ⟧ʳ) )
+           ∘ᵗ η⊣ ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (≡ᵗ-cong ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,_⟩ᵗ (∘ᵗ-congʳ (∘ᵗ-congˡ
+        (≡ᵗ-cong [ op-time op ]ᶠ (curryᵗ-mapˣᵗ _ _ _))))) ⟩
+         opᵀ op
+      ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,
+              [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵗ)
+           ∘ᵗ [ op-time op ]ᶠ (map⇒ᵗ idᵗ idᵗ ∘ᵗ curryᵗ ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ op-time op ⟩ᶠ ⟦ ρ ⟧ʳ)
+           ∘ᵗ η⊣ ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (≡ᵗ-cong ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,_⟩ᵗ (∘ᵗ-congʳ (∘ᵗ-congˡ
+        (≡ᵗ-cong [ op-time op ]ᶠ (≡ᵗ-trans (∘ᵗ-congˡ map⇒ᵗ-identity) (∘ᵗ-identityˡ _)))))) ⟩
+         opᵀ op
+      ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,
+              [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵗ)
+           ∘ᵗ [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ ∘ᵗ ⟨ op-time op ⟩ᶠ ⟦ ρ ⟧ʳ)
+           ∘ᵗ η⊣ ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (≡ᵗ-cong ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,_⟩ᵗ (∘ᵗ-congʳ (∘ᵗ-congˡ
+        ([]-∘ᵗ (⟨ op-time op ⟩ᶠ ⟦ ρ ⟧ʳ) (curryᵗ ⟦ M ⟧ᶜᵗ))))) ⟩
+         opᵀ op
+      ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,
+              [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵗ)
+           ∘ᵗ (   [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ)
+               ∘ᵗ [ op-time op ]ᶠ(⟨ op-time op ⟩ᶠ ⟦ ρ ⟧ʳ))
+           ∘ᵗ η⊣ ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (≡ᵗ-cong ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,_⟩ᵗ (∘ᵗ-congʳ (∘ᵗ-assoc _ _ _))) ⟩
+         opᵀ op
+      ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,
+              [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵗ)
+           ∘ᵗ [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ)
+           ∘ᵗ (   [ op-time op ]ᶠ(⟨ op-time op ⟩ᶠ ⟦ ρ ⟧ʳ)
+               ∘ᵗ η⊣) ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (≡ᵗ-cong ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,_⟩ᵗ (∘ᵗ-congʳ (∘ᵗ-congʳ (η⊣-nat _)))) ⟩
+         opᵀ op
+      ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,
+              [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵗ)
+           ∘ᵗ [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ)
+           ∘ᵗ (   η⊣ 
+               ∘ᵗ ⟦ ρ ⟧ʳ) ⟩ᵗ
+    ≡⟨⟩
+         opᵀ op
+      ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ ,
+              [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵗ)
+           ∘ᵗ [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ)
+           ∘ᵗ η⊣ 
+           ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (≡ᵗ-cong₂ ⟨_,_⟩ᵗ
+                  (≡ᵗ-sym (∘ᵗ-assoc _ _ _))
+                  (≡ᵗ-sym (≡ᵗ-trans (∘ᵗ-assoc _ _ _) (∘ᵗ-congʳ (∘ᵗ-assoc _ _ _))))) ⟩
+         opᵀ op
+      ∘ᵗ ⟨    (   ⟦⟧ᵛ-⟦⟧ᵍ (param op)
+               ∘ᵗ ⟦ V ⟧ᵛᵗ)
+           ∘ᵗ ⟦ ρ ⟧ʳ ,
+              (   [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵗ)
+               ∘ᵗ [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ)
+               ∘ᵗ η⊣)
+           ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (⟨⟩ᵗ-∘ᵗ _ _ _) ⟩
+         opᵀ op
+      ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
+              [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵗ)
+           ∘ᵗ [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ)
+           ∘ᵗ η⊣ ⟩ᵗ
+      ∘ᵗ ⟦ ρ ⟧ʳ
+    ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
+      (   opᵀ op
+       ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V ⟧ᵛᵗ ,
+               [ op-time op ]ᶠ (map⇒ᵗ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵗ)
+            ∘ᵗ [ op-time op ]ᶠ (curryᵗ ⟦ M ⟧ᶜᵗ)
+            ∘ᵗ η⊣ ⟩ᵗ)
+      ∘ᵗ ⟦ ρ ⟧ʳ
+    ∎
   C-rename≡∘ᵗ ρ (handle M `with H `in N) = {!!}
   C-rename≡∘ᵗ ρ (unbox p V M) = {!!}
-  C-rename≡∘ᵗ ρ (delay τs M) = 
+  C-rename≡∘ᵗ ρ (delay τs M) =
+    {!!}
+  {-
     begin
       delayᵀ τs ∘ᵗ [ τs ]ᶠ ⟦ C-rename (cong-⟨⟩-ren ρ) M ⟧ᶜᵗ ∘ᵗ η⊣
     ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congˡ (≡ᵗ-cong [ τs ]ᶠ (C-rename≡∘ᵗ (cong-⟨⟩-ren ρ) M))) ⟩
@@ -247,3 +339,4 @@ mutual
     ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
       (delayᵀ τs ∘ᵗ [ τs ]ᶠ ⟦ M ⟧ᶜᵗ ∘ᵗ η⊣) ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
+  -}
