@@ -322,7 +322,9 @@ mutual
       ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
   -}
-  C-rename≡∘ᵗ {Γ} {Γ'} ρ (handle_`with_`in {A} {B} {τ} {τ'} M H N) = 
+  C-rename≡∘ᵗ {Γ} {Γ'} ρ (handle_`with_`in {A} {B} {τ} {τ'} M H N) =
+    {!!}
+  {-
     begin
       uncurryᵗ
         (   T-alg-of-handlerᵀ
@@ -912,8 +914,81 @@ mutual
        ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ)
       ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  C-rename≡∘ᵗ ρ (unbox p V M) =
-    {!!}
+  -}
+  C-rename≡∘ᵗ ρ (unbox {A} {C} {τ} p V M) =
+    begin
+         ⟦ C-rename (cong-∷-ren ρ) M ⟧ᶜᵗ
+      ∘ᵗ ⟨ idᵗ ,
+              ε⊣
+           ∘ᵗ ⟨ τ ⟩ᶠ ⟦ V-rename (ρ -ʳ τ) V ⟧ᵛᵗ
+           ∘ᵗ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ)) ⟩ᵗ
+    ≡⟨ ∘ᵗ-congˡ (C-rename≡∘ᵗ (cong-∷-ren {A = A} ρ) M) ⟩
+         (⟦ M ⟧ᶜᵗ ∘ᵗ mapˣᵗ ⟦ ρ ⟧ʳ idᵗ)
+      ∘ᵗ ⟨ idᵗ ,
+              ε⊣
+           ∘ᵗ ⟨ τ ⟩ᶠ ⟦ V-rename (ρ -ʳ τ) V ⟧ᵛᵗ
+           ∘ᵗ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ)) ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (≡ᵗ-cong (⟨ idᵗ ,_⟩ᵗ) (∘ᵗ-congʳ (∘ᵗ-congˡ (≡ᵗ-cong ⟨ τ ⟩ᶠ (V-rename≡∘ᵗ (ρ -ʳ τ) V))))) ⟩
+         (⟦ M ⟧ᶜᵗ ∘ᵗ mapˣᵗ ⟦ ρ ⟧ʳ idᵗ)
+      ∘ᵗ ⟨ idᵗ ,
+              ε⊣
+           ∘ᵗ ⟨ τ ⟩ᶠ (⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ -ʳ τ ⟧ʳ)
+           ∘ᵗ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ)) ⟩ᵗ
+    ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵗ mapˣᵗ ⟦ ρ ⟧ʳ idᵗ
+      ∘ᵗ ⟨ idᵗ ,
+              ε⊣
+           ∘ᵗ ⟨ τ ⟩ᶠ (⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ -ʳ τ ⟧ʳ)
+           ∘ᵗ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ)) ⟩ᵗ
+    ≡⟨ ∘ᵗ-congʳ (
+        begin
+             ⟨ ⟦ ρ ⟧ʳ ∘ᵗ fstᵗ , idᵗ ∘ᵗ sndᵗ ⟩ᵗ
+          ∘ᵗ ⟨ idᵗ ,
+                  ε⊣
+               ∘ᵗ ⟨ τ ⟩ᶠ (⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ -ʳ τ ⟧ʳ)
+               ∘ᵗ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ)) ⟩ᵗ
+        ≡⟨ ≡ᵗ-sym (⟨⟩ᵗ-∘ᵗ _ _ _) ⟩
+             ⟨ (⟦ ρ ⟧ʳ ∘ᵗ fstᵗ) ∘ᵗ ⟨ idᵗ , ε⊣ ∘ᵗ ⟨ τ ⟩ᶠ (⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ -ʳ τ ⟧ʳ) ∘ᵗ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ)) ⟩ᵗ ,
+               (idᵗ ∘ᵗ sndᵗ) ∘ᵗ ⟨ idᵗ , ε⊣ ∘ᵗ ⟨ τ ⟩ᶠ (⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ -ʳ τ ⟧ʳ) ∘ᵗ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ)) ⟩ᵗ ⟩ᵗ
+        ≡⟨ ≡ᵗ-cong₂ ⟨_,_⟩ᵗ
+             (≡ᵗ-trans
+               (∘ᵗ-assoc _ _ _)
+               (≡ᵗ-trans
+                 (∘ᵗ-congʳ (⟨⟩ᵗ-fstᵗ _ _))
+                 (≡ᵗ-trans (∘ᵗ-identityʳ _) (≡ᵗ-sym (∘ᵗ-identityˡ _)))))
+             (≡ᵗ-trans
+               (∘ᵗ-assoc _ _ _)
+               (≡ᵗ-trans
+                 (∘ᵗ-identityˡ _)
+                 (≡ᵗ-trans
+                   (⟨⟩ᵗ-sndᵗ _ _)
+                   (≡ᵗ-trans
+                     (∘ᵗ-congʳ
+                       (≡ᵗ-trans
+                         (∘ᵗ-congˡ (⟨⟩-∘ᵗ _ _))
+                         (≡ᵗ-trans
+                           (∘ᵗ-assoc _ _ _)
+                           (≡ᵗ-trans
+                             (∘ᵗ-congʳ {!!})
+                             (≡ᵗ-sym (∘ᵗ-assoc _ _ _))))))
+                     (≡ᵗ-sym (∘ᵗ-assoc _ _ _)))))) ⟩
+          ⟨ idᵗ ∘ᵗ ⟦ ρ ⟧ʳ , (ε⊣ ∘ᵗ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ env-⟨⟩-ᶜ τ p) ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ
+        ≡⟨ ⟨⟩ᵗ-∘ᵗ _ _ _ ⟩
+          ⟨ idᵗ , ε⊣ ∘ᵗ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ env-⟨⟩-ᶜ τ p ⟩ᵗ ∘ᵗ ⟦ ρ ⟧ʳ
+        ∎) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵗ ⟨ idᵗ ,
+              ε⊣ ∘ᵗ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ
+           ∘ᵗ env-⟨⟩-ᶜ τ p ⟩ᵗ
+      ∘ᵗ ⟦ ρ ⟧ʳ
+    ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
+         (   ⟦ M ⟧ᶜᵗ
+          ∘ᵗ ⟨ idᵗ ,
+                  ε⊣ ∘ᵗ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ
+               ∘ᵗ env-⟨⟩-ᶜ τ p ⟩ᵗ)
+      ∘ᵗ ⟦ ρ ⟧ʳ
+    ∎
   C-rename≡∘ᵗ ρ (delay τs M) =
     {!!}
   {-
