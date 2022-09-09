@@ -81,21 +81,22 @@ abstract
 
 -- Begin-qed style reasoning for ≡ᵗ
 
+abstract
+  begin_ : ∀ {A B} {f g : A →ᵗ B} → f ≡ᵗ g → f ≡ᵗ g
+  begin_ f≡g = f≡g
+   
+  _≡⟨⟩_ : ∀ {A B} (f {g} : A →ᵗ B) → f ≡ᵗ g → f ≡ᵗ g
+  _ ≡⟨⟩ f≡g = f≡g
+   
+  step-≡ : ∀ {A B} (f {g h} : A →ᵗ B) → g ≡ᵗ h → f ≡ᵗ g → f ≡ᵗ h
+  step-≡ _ g≡h f≡g = ≡ᵗ-trans f≡g g≡h
+   
+  _∎ : ∀ {A B} (f : A →ᵗ B) → f ≡ᵗ f
+  _∎ _ = ≡ᵗ-refl
+
 infix  3 _∎
 infixr 2 _≡⟨⟩_ step-≡
 infix  1 begin_
-
-begin_ : ∀ {A B} {f g : A →ᵗ B} → f ≡ᵗ g → f ≡ᵗ g
-begin_ f≡g = f≡g
-
-_≡⟨⟩_ : ∀ {A B} (f {g} : A →ᵗ B) → f ≡ᵗ g → f ≡ᵗ g
-_ ≡⟨⟩ f≡g = f≡g
-
-step-≡ : ∀ {A B} (f {g h} : A →ᵗ B) → g ≡ᵗ h → f ≡ᵗ g → f ≡ᵗ h
-step-≡ _ g≡h f≡g = ≡ᵗ-trans f≡g g≡h
-
-_∎ : ∀ {A B} (f : A →ᵗ B) → f ≡ᵗ f
-_∎ _ = ≡ᵗ-refl
 
 syntax step-≡ f g≡h f≡g = f ≡⟨ f≡g ⟩ g≡h
 

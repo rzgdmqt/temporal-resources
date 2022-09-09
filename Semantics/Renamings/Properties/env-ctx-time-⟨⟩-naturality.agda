@@ -227,11 +227,144 @@ env-ctx-time-⟨⟩-nat {Γ} {.(Γ ⟨ 0 ⟩)} {A} ⟨⟩-η⁻¹-ren =
     ∘ᵗ ⟨ 0 ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
   ∎
 -}
-env-ctx-time-⟨⟩-nat {.(_ ⟨ τ + τ' ⟩)} {.((_ ⟨ _ ⟩) ⟨ _ ⟩)} (⟨⟩-μ-ren {τ = τ} {τ' = τ'}) = {!!}
-env-ctx-time-⟨⟩-nat {.((_ ⟨ _ ⟩) ⟨ _ ⟩)} {.(_ ⟨ τ + τ' ⟩)} (⟨⟩-μ⁻¹-ren {τ = τ} {τ' = τ'}) = {!!}
-env-ctx-time-⟨⟩-nat {.(_ ⟨ _ ⟩)} {.(_ ⟨ _ ⟩)} (⟨⟩-≤-ren x) = {!!}
-env-ctx-time-⟨⟩-nat {.(_ ∷ _)} {.(_ ∷ _)} (cong-∷-ren ρ) = {!!}
-env-ctx-time-⟨⟩-nat {.(_ ⟨ _ ⟩)} {.(_ ⟨ _ ⟩)} {A} (cong-⟨⟩-ren {Γ} {Γ'} {τ} ρ) = 
+env-ctx-time-⟨⟩-nat {.(_ ⟨ τ + τ' ⟩)} {.((_ ⟨ _ ⟩) ⟨ _ ⟩)} {A} (⟨⟩-μ-ren {Γ} {τ} {τ'}) = 
+  begin
+       (   ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) (τ + τ')))
+        ∘ᵗ μ {A}
+        ∘ᵗ ⟨ τ + τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ))
+    ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉᵒ A} (≤-reflexive (+-comm τ τ'))
+    ∘ᵗ μ {⟦ Γ ⟧ᵉᵒ A}
+  ≡⟨ {!!} ⟩
+       ⟨⟩-≤ {A} (≤-reflexive (sym (+-assoc (ctx-time Γ) τ τ')))
+    ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ + τ) τ'))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ τ' ⟩ᶠ (⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ)))
+    ∘ᵗ ⟨ τ' ⟩ᶠ (μ {A})
+    ∘ᵗ ⟨ τ' ⟩ᶠ (⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ))
+  ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congʳ (∘ᵗ-congʳ (∘ᵗ-congʳ (≡ᵗ-sym (⟨⟩-∘ᵗ _ _))))) ⟩
+       ⟨⟩-≤ {A} (≤-reflexive (sym (+-assoc (ctx-time Γ) τ τ')))
+    ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ + τ) τ'))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ τ' ⟩ᶠ (   ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ)))
+    ∘ᵗ ⟨ τ' ⟩ᶠ (   μ {A}
+                ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ))
+  ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congʳ (∘ᵗ-congʳ (≡ᵗ-sym (⟨⟩-∘ᵗ _ _)))) ⟩
+       ⟨⟩-≤ {A} (≤-reflexive (sym (+-assoc (ctx-time Γ) τ τ')))
+    ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ + τ) τ'))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ τ' ⟩ᶠ (   ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ))
+                ∘ᵗ μ {A}
+                ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ))
+  ∎
+env-ctx-time-⟨⟩-nat {.((_ ⟨ _ ⟩) ⟨ _ ⟩)} {.(_ ⟨ τ + τ' ⟩)} (⟨⟩-μ⁻¹-ren {Γ} {τ} {τ'}) = {!!}
+env-ctx-time-⟨⟩-nat {.(_ ⟨ _ ⟩)} {.(_ ⟨ _ ⟩)} {A} (⟨⟩-≤-ren {Γ} {τ} {τ'} p) =
+  {!!}
+{-
+  begin
+       (   ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ))
+        ∘ᵗ μ {A}
+        ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ))
+    ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉᵒ A} p
+  ≡⟨ ≡ᵗ-trans (∘ᵗ-assoc _ _ _) (∘ᵗ-congʳ (∘ᵗ-assoc _ _ _)) ⟩
+       ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+    ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉᵒ A} p
+  ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congʳ (
+      begin
+           ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+        ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉᵒ A} p
+      ≡⟨ ⟨⟩-≤-nat _ _ ⟩
+           ⟨⟩-≤ {⟨ ctx-time Γ ⟩ᵒ A} p
+        ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+      ≡⟨ ≡ᵗ-sym (∘ᵗ-identityˡ _) ⟩
+           idᵗ
+        ∘ᵗ ⟨⟩-≤ {⟨ ctx-time Γ ⟩ᵒ A} p
+        ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+      ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym ⟨⟩-idᵗ) ⟩
+           ⟨ τ ⟩ᶠ idᵗ
+        ∘ᵗ ⟨⟩-≤ {⟨ ctx-time Γ ⟩ᵒ A} p
+        ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+      ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym (≡-≡ᵗ (cong ⟨ τ ⟩ᶠ (≡ᵗ-≡ ⟨⟩-≤-refl)))) ⟩
+           ⟨ τ ⟩ᶠ (⟨⟩-≤ {A} ≤-refl)
+        ∘ᵗ ⟨⟩-≤ {⟨ ctx-time Γ ⟩ᵒ A} p
+        ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+      ∎)) ⟩
+       ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ τ ⟩ᶠ (⟨⟩-≤ {A} ≤-refl)
+    ∘ᵗ ⟨⟩-≤ {⟨ ctx-time Γ ⟩ᵒ A} p
+    ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+  ≡⟨ ∘ᵗ-congʳ
+      (≡ᵗ-trans
+        (∘ᵗ-congʳ (≡ᵗ-sym (∘ᵗ-assoc _ _ _)))
+        (≡ᵗ-sym (∘ᵗ-assoc _ _ _))) ⟩
+       ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ))
+    ∘ᵗ (   μ {A}
+        ∘ᵗ ⟨ τ ⟩ᶠ (⟨⟩-≤ {A} ≤-refl)
+        ∘ᵗ ⟨⟩-≤ {⟨ ctx-time Γ ⟩ᵒ A} p)
+    ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+  ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congˡ (≡ᵗ-sym (⟨⟩-μ-≤ p ≤-refl))) ⟩
+       ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ))
+    ∘ᵗ (   ⟨⟩-≤ {A} (+-mono-≤ p ≤-refl)
+        ∘ᵗ μ {A})
+    ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+  ≡⟨ ≡ᵗ-trans (∘ᵗ-congʳ (∘ᵗ-assoc _ _ _)) (≡ᵗ-sym (∘ᵗ-assoc _ _ _)) ⟩
+       (   ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ))
+        ∘ᵗ ⟨⟩-≤ {A} (+-mono-≤ p ≤-refl))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+  ≡⟨ ∘ᵗ-congˡ (⟨⟩-≤-trans _ _) ⟩
+       ⟨⟩-≤ {A} (≤-trans (≤-reflexive (+-comm (ctx-time Γ) τ)) (+-mono-≤ p ≤-refl))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+  ≡⟨ ∘ᵗ-congˡ (≡-≡ᵗ (cong ⟨⟩-≤ (≤-irrelevant _ _))) ⟩
+       ⟨⟩-≤ {A} (≤-trans (+-monoʳ-≤ (ctx-time Γ) p) (≤-reflexive (+-comm (ctx-time Γ) τ')))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+  ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym (⟨⟩-≤-trans _ _)) ⟩
+       (   ⟨⟩-≤ {A} (+-monoʳ-≤ (ctx-time Γ) p)
+        ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ')))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+  ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
+       ⟨⟩-≤ {A} (+-monoʳ-≤ (ctx-time Γ) p)
+    ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ'))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ τ' ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+  ∎
+-}
+env-ctx-time-⟨⟩-nat {.(_ ∷ _)} {.(_ ∷ _)} {A} (cong-∷-ren {Γ} {Γ'} {B} ρ) =
+  {!!}
+{-
+  begin
+       (env-ctx-time-⟨⟩ Γ ∘ᵗ fstᵗ)
+    ∘ᵗ mapˣᵗ ⟦ ρ ⟧ʳ idᵗ
+  ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
+       env-ctx-time-⟨⟩ Γ
+    ∘ᵗ fstᵗ
+    ∘ᵗ mapˣᵗ ⟦ ρ ⟧ʳ idᵗ
+  ≡⟨ ∘ᵗ-congʳ (⟨⟩ᵗ-fstᵗ _ _) ⟩
+       env-ctx-time-⟨⟩ Γ
+    ∘ᵗ ⟦ ρ ⟧ʳ {A}
+    ∘ᵗ fstᵗ
+  ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
+       (   env-ctx-time-⟨⟩ Γ
+        ∘ᵗ ⟦ ρ ⟧ʳ {A})
+    ∘ᵗ fstᵗ
+  ≡⟨ ∘ᵗ-congˡ (env-ctx-time-⟨⟩-nat ρ) ⟩
+       (   ⟨⟩-≤ {A} (ren-≤-ctx-time ρ)
+        ∘ᵗ env-ctx-time-⟨⟩ Γ')
+    ∘ᵗ fstᵗ
+  ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
+       ⟨⟩-≤ {A} (ren-≤-ctx-time ρ)
+    ∘ᵗ env-ctx-time-⟨⟩ Γ'
+    ∘ᵗ fstᵗ
+  ∎
+-}
+env-ctx-time-⟨⟩-nat {.(_ ⟨ _ ⟩)} {.(_ ⟨ _ ⟩)} {A} (cong-⟨⟩-ren {Γ} {Γ'} {τ} ρ) =
+  {!!}
+{-
   begin
        (   ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ))
         ∘ᵗ μ {A}
@@ -301,3 +434,4 @@ env-ctx-time-⟨⟩-nat {.(_ ⟨ _ ⟩)} {.(_ ⟨ _ ⟩)} {A} (cong-⟨⟩-ren {
     ∘ᵗ μ {A}
     ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ')
   ∎
+-}
