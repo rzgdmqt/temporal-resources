@@ -328,6 +328,48 @@ var-split₂-wk-ctx-ren {Γ' = Γ' ∷ A} x =
 var-split₂-wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} x =
   cong (_⟨ τ ⟩) (var-split₂-wk-ctx-ren x)
 
+-- Splitting a renaming by a variable
+
+postulate
+  var-split-ren : ∀ {Γ Γ' A τ}
+                → (ρ : Ren Γ Γ')
+                → (x : A ∈[ τ ] Γ)
+                → Ren (proj₁ (proj₂ (var-split x)))
+                      (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
+{-                    
+var-split-ren id-ren x =
+  id-ren
+var-split-ren (ρ ∘ʳ ρ') x =
+     var-split-ren ρ (proj₂ (proj₂ (var-rename ρ' x)))
+  ∘ʳ var-split-ren ρ' x
+var-split-ren wk-ren x =
+  wk-ren
+var-split-ren (var-ren y) Hd =
+     eq-ren ++ᶜ-identityˡ
+  ∘ʳ wk-ctx-ren 
+var-split-ren (var-ren y) (Tl-∷ x) with var-split x
+... | (Γ₁ , Γ₂ , p , q) with var-in-split p y
+... | inj₁ (z , r , s) =
+  {!!}
+... | inj₂ (z , r , s) =
+  var-ren z
+var-split-ren ⟨⟩-η-ren x = {!!}
+var-split-ren ⟨⟩-η⁻¹-ren x = {!!}
+var-split-ren ⟨⟩-μ-ren x = {!!}
+var-split-ren ⟨⟩-μ⁻¹-ren x = {!!}
+var-split-ren (⟨⟩-≤-ren p) x = {!!}
+var-split-ren (cong-∷-ren ρ) x = {!!}
+var-split-ren (cong-⟨⟩-ren ρ) x = {!!}
+-}
+{-
+
+(Tl-∷ x) with var-split x
+... | (Γ₁ , Γ₂ , p , q) with var-in-split p y
+... | inj₁ (z , r , s) = {!!}
+... | inj₂ (Γ'' , Γ''' , r , s , t) = {!!}
+
+-}
+
 -- Action of renamings on well-typed values and computations
 
 mutual

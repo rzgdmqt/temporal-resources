@@ -28,16 +28,6 @@ open import Util.Time
 
 mutual
 
-  {-
-  var-in-env∘ᵗ⟦⟧ʳ≡⟦⟧ʳ∘ᵗvar-in-env : ∀ {Γ Γ' A τ}
-                                  → (ρ : Ren Γ Γ')
-                                  → (x : A ∈[ τ ] Γ)
-                                  →    var-in-env x
-                                    ∘ᵗ ⟦ ρ ⟧ʳ
-                                 ≡ᵗ    {!⟦ ? ⟧ʳ!}
-                                    ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
-  var-in-env∘ᵗ⟦⟧ʳ≡⟦⟧ʳ∘ᵗvar-in-env ρ x = {!!}
-  -}
 
   V-rename≡∘ᵗ : ∀ {Γ Γ' A}
               → (ρ : Ren Γ Γ')
@@ -50,7 +40,55 @@ mutual
          ε-⟨⟩
       ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
       ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
-    ≡⟨ {!!} ⟩
+    ≡⟨⟩
+         (η⁻¹ ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
+      ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
+      ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
+    ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
+         η⁻¹
+      ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
+      ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
+      ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
+    ≡⟨ ∘ᵗ-congʳ (
+        begin
+             ⟨⟩-≤ z≤n
+          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
+          ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
+        ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym (⟨⟩-≤-trans _ _)) ⟩
+             (   ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
+              ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} (ren-≤-ctx-time (var-split-ren ρ x)))
+          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
+          ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
+        ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
+             ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
+          ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} (ren-≤-ctx-time (var-split-ren ρ x))
+          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
+          ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
+        ≡⟨ ∘ᵗ-congʳ (
+            begin
+                 ⟨⟩-≤ {⟦ A ⟧ᵛ} (ren-≤-ctx-time (var-split-ren ρ x))
+              ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
+              ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
+            ≡⟨ {!!} ⟩
+                 env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x)))
+              ∘ᵗ var-in-env x
+              ∘ᵗ ⟦ ρ ⟧ʳ
+            ∎) ⟩
+             ⟨⟩-≤ z≤n
+          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x)))
+          ∘ᵗ var-in-env x
+          ∘ᵗ ⟦ ρ ⟧ʳ
+        ∎) ⟩
+          η⁻¹
+      ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
+      ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))) ∘ᵗ var-in-env x
+      ∘ᵗ ⟦ ρ ⟧ʳ
+    ≡⟨ ≡ᵗ-sym (≡ᵗ-trans (∘ᵗ-assoc _ _ _) (≡ᵗ-trans (∘ᵗ-assoc _ _ _) (∘ᵗ-congʳ (∘ᵗ-congʳ (∘ᵗ-assoc _ _ _))))) ⟩
+         (   (   η⁻¹
+              ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
+          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))) ∘ᵗ var-in-env x)
+      ∘ᵗ ⟦ ρ ⟧ʳ
+    ≡⟨⟩
          (   ε-⟨⟩
           ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))) ∘ᵗ var-in-env x)
       ∘ᵗ ⟦ ρ ⟧ʳ
@@ -917,6 +955,8 @@ mutual
     ∎
   -}
   C-rename≡∘ᵗ ρ (unbox {A} {C} {τ} p V M) =
+    {!!}
+  {-
     begin
          ⟦ C-rename (cong-∷-ren ρ) M ⟧ᶜᵗ
       ∘ᵗ ⟨ idᵗ ,
@@ -990,6 +1030,7 @@ mutual
                ∘ᵗ env-⟨⟩-ᶜ τ p ⟩ᵗ)
       ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
+  -}
   C-rename≡∘ᵗ ρ (delay τs M) =
     {!!}
   {-

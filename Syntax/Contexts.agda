@@ -158,22 +158,24 @@ var-in-split : ∀ {Γ Γ₁ Γ₂ A τ}
              → (Σ[ y ∈ A ∈[ τ ∸ ctx-time Γ₂ ] Γ₁ ]
                    proj₁ (var-split x) ≡ proj₁ (var-split y)
                  × proj₁ (proj₂ (var-split x)) ≡ proj₁ (proj₂ (var-split y)) ++ᶜ Γ₂)
-             ⊎ (Σ[ Γ' ∈ Ctx ] Σ[ Γ'' ∈ Ctx ]
-                   (Γ' ∷ A , Γ'' split Γ₂)
-                 × Γ₁ ++ᶜ Γ' ≡ proj₁ (var-split x)
-                 × Γ'' ≡ proj₁ (proj₂ (var-split x)))
+             ⊎ (Σ[ y ∈ A ∈[ τ ] Γ₂ ]
+                   proj₁ (var-split x) ≡ Γ₁ ++ᶜ proj₁ (var-split y)
+                 × proj₁ (proj₂ (var-split x)) ≡ proj₁ (proj₂ (var-split y)))
 
-var-in-split split-[] x = inj₁ (x , refl , refl)
-var-in-split (split-∷ p) Hd = inj₂ (_ , [] , split-[] , split-≡ p , refl)
+var-in-split split-[] x =
+  inj₁ (x , refl , refl) 
+var-in-split (split-∷ p) Hd =
+  inj₂ (Hd , sym (split-≡ p) , refl)
 var-in-split (split-∷ p) (Tl-∷ {B = B} x) with var-in-split p x
-... | inj₁ (y , q , r) = inj₁ (y , q , cong (_∷ B) r)
-... | inj₂ (Γ' , Γ'' , q , r , s) =
-  inj₂ (Γ' , Γ'' ∷ _ , split-∷ q , r , cong (_∷ B) s)
+... | inj₁ (y , q , r) =
+  inj₁ (y , q , cong (_∷ B) r)
+... | inj₂ (y , q , r) =
+  inj₂ (Tl-∷ y , q , cong (_∷ B) r)
 var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A}
   (split-⟨⟩ p) (Tl-⟨⟩ {τ' = τ'} x) with var-in-split p x
 ... | inj₁ (y , q , r) =
-  inj₁ (
-    subst (A ∈[_] Γ₁)
+  inj₁
+    (subst (A ∈[_] Γ₁)
       (trans
         (trans
           (trans
@@ -185,11 +187,12 @@ var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A}
                 (sym (+-∸-assoc τ' (≤-refl {τ})))))
             (∸-+-assoc (τ' + τ) τ (ctx-time Γ₂)))
           (cong (τ' + τ ∸_) (+-comm τ (ctx-time Γ₂))))
-        (cong (_∸ (ctx-time Γ₂ + τ)) (+-comm τ' τ))) y ,
-    trans q (var-in-split-proj₁-subst y _) ,
-    cong (_⟨ τ ⟩) (trans r (cong (_++ᶜ Γ₂) (var-in-split-proj₂-subst y _))))
-... | inj₂ (Γ' , Γ'' , q , r , s) =
-  inj₂ (Γ' , Γ'' ⟨ τ ⟩ , split-⟨⟩ q , r , cong (_⟨ τ ⟩) s)
+        (cong (_∸ (ctx-time Γ₂ + τ)) (+-comm τ' τ)))
+      y ,
+     trans q (var-in-split-proj₁-subst y _) ,
+     cong (_⟨ τ ⟩) (trans r (cong (_++ᶜ Γ₂) (var-in-split-proj₂-subst y _))))
+... | inj₂ (y , q , r) =
+  inj₂ (Tl-⟨⟩ y , q , cong (_⟨ τ ⟩) r)
 
 -- Time-travelling operation on contexts
 

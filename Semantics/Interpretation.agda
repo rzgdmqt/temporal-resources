@@ -121,7 +121,7 @@ env-⟨⟩-ᶜ {Γ ⟨ τ' ⟩} (suc τ) p {A} with suc τ ≤? τ'
 
 -- Projecting a variable out of an environment
 
-var-in-env : ∀ {Γ A τ} → (x : A ∈[ τ ] Γ) → ⟦ Γ ⟧ᵉ →ᵗ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᵒ ⟦ A ⟧ᵛ
+var-in-env : ∀ {Γ A B τ} → (x : A ∈[ τ ] Γ) → ⟦ Γ ⟧ᵉᵒ B →ᵗ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᵒ ⟦ A ⟧ᵛ
 var-in-env Hd        = sndᵗ
 var-in-env (Tl-∷ x)  = mapˣᵗ (var-in-env x) idᵗ
 var-in-env (Tl-⟨⟩ {τ = τ} x) = ⟨ τ ⟩ᶠ (var-in-env x)
