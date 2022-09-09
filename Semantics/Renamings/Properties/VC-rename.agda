@@ -20,6 +20,7 @@ open import Semantics.Modality.Adjunction
 open import Semantics.Monad
 open import Semantics.Interpretation
 open import Semantics.Renamings.Core
+open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality
 
 open import Util.Equality
 open import Util.Operations
@@ -970,7 +971,7 @@ mutual
                          (≡ᵗ-trans
                            (∘ᵗ-assoc _ _ _)
                            (≡ᵗ-trans
-                             (∘ᵗ-congʳ {!!})
+                             (∘ᵗ-congʳ (≡ᵗ-sym (env-⟨⟩-ᶜ-nat τ p ρ)))
                              (≡ᵗ-sym (∘ᵗ-assoc _ _ _))))))
                      (≡ᵗ-sym (∘ᵗ-assoc _ _ _)))))) ⟩
           ⟨ idᵗ ∘ᵗ ⟦ ρ ⟧ʳ , (ε⊣ ∘ᵗ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵗ env-⟨⟩-ᶜ τ p) ∘ᵗ ⟦ ρ ⟧ʳ ⟩ᵗ

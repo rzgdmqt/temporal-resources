@@ -101,5 +101,6 @@ open import Semantics.Interpretation
 ---- Semantics of renamings
 
 open import Semantics.Renamings.Core
+open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality    -- TODO: finish typing up
 open import Semantics.Renamings.Properties.VC-rename
 open import Semantics.Renamings
