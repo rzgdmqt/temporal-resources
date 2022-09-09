@@ -2,7 +2,7 @@
 -- Relating the syntactic actions of renamings to semantic morphism composition --
 ----------------------------------------------------------------------------------
 
-module Semantics.Renamings.Properties.Rename where
+module Semantics.Renamings.Properties.VC-rename where
 
 open import Function
 
