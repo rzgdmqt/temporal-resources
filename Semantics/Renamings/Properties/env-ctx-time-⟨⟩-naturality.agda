@@ -65,21 +65,158 @@ env-ctx-time-⟨⟩-nat {Γ} {Γ'} {A} (_∘ʳ_ {Γ' = Γ''} ρ ρ') =
        ⟨⟩-≤ (≤-trans (ren-≤-ctx-time ρ') (ren-≤-ctx-time ρ))
     ∘ᵗ env-ctx-time-⟨⟩ Γ'
   ∎
-env-ctx-time-⟨⟩-nat {Γ} {.(Γ ∷ _)} wk-ren = {!!}
-env-ctx-time-⟨⟩-nat {.(Γ' ∷ _)} {Γ'} (var-ren x) = {!!}
-env-ctx-time-⟨⟩-nat {.(Γ' ⟨ 0 ⟩)} {Γ'} ⟨⟩-η-ren = {!!}
-env-ctx-time-⟨⟩-nat {Γ} {.(Γ ⟨ 0 ⟩)} ⟨⟩-η⁻¹-ren = {!!}
+env-ctx-time-⟨⟩-nat {Γ} {.(Γ ∷ _)} wk-ren = 
+  begin
+    env-ctx-time-⟨⟩ Γ ∘ᵗ fstᵗ
+  ≡⟨ ≡ᵗ-sym (∘ᵗ-identityˡ _) ⟩
+    idᵗ ∘ᵗ env-ctx-time-⟨⟩ Γ ∘ᵗ fstᵗ
+  ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym ⟨⟩-≤-refl) ⟩
+    ⟨⟩-≤ ≤-refl ∘ᵗ env-ctx-time-⟨⟩ Γ ∘ᵗ fstᵗ
+  ∎
+env-ctx-time-⟨⟩-nat {.(Γ' ∷ _)} {Γ'} (var-ren x) = 
+  begin
+    (env-ctx-time-⟨⟩ Γ' ∘ᵗ fstᵗ) ∘ᵗ
+      ⟨ idᵗ ,    ε-⟨⟩
+              ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x)))
+              ∘ᵗ var-in-env x ⟩ᵗ
+  ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
+       env-ctx-time-⟨⟩ Γ'
+    ∘ᵗ (   fstᵗ
+        ∘ᵗ ⟨ idᵗ ,    ε-⟨⟩
+                   ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x)))
+                   ∘ᵗ var-in-env x ⟩ᵗ)
+  ≡⟨ ∘ᵗ-congʳ (⟨⟩ᵗ-fstᵗ _ _) ⟩
+       env-ctx-time-⟨⟩ Γ'
+    ∘ᵗ idᵗ
+  ≡⟨ ∘ᵗ-identityʳ _ ⟩
+       env-ctx-time-⟨⟩ Γ'
+  ≡⟨ ≡ᵗ-sym (∘ᵗ-identityˡ _) ⟩
+    idᵗ ∘ᵗ env-ctx-time-⟨⟩ Γ'
+  ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym ⟨⟩-≤-refl) ⟩
+    ⟨⟩-≤ ≤-refl ∘ᵗ env-ctx-time-⟨⟩ Γ'
+  ∎
+env-ctx-time-⟨⟩-nat {.(Γ' ⟨ 0 ⟩)} {Γ'} {A} ⟨⟩-η-ren = 
+  begin
+       (   ⟨⟩-≤ (≤-reflexive (+-comm (ctx-time Γ') 0))
+        ∘ᵗ μ {A}
+        ∘ᵗ ⟨ 0 ⟩ᶠ (env-ctx-time-⟨⟩ Γ'))
+    ∘ᵗ η
+  ≡⟨ ≡ᵗ-trans (∘ᵗ-assoc _ _ _) (∘ᵗ-congʳ (∘ᵗ-assoc _ _ _)) ⟩
+       ⟨⟩-≤ (≤-reflexive (+-comm (ctx-time Γ') 0))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ 0 ⟩ᶠ (env-ctx-time-⟨⟩ Γ')
+    ∘ᵗ η
+  ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congʳ (⟨⟩-η-nat _)) ⟩
+       ⟨⟩-≤ (≤-reflexive (+-comm (ctx-time Γ') 0))
+    ∘ᵗ μ {A}
+    ∘ᵗ η
+    ∘ᵗ env-ctx-time-⟨⟩ Γ'
+  ≡⟨ ∘ᵗ-congʳ (≡ᵗ-sym (∘ᵗ-assoc _ _ _)) ⟩
+       ⟨⟩-≤ (≤-reflexive (+-comm (ctx-time Γ') 0))
+    ∘ᵗ (   μ {A}
+        ∘ᵗ η)
+    ∘ᵗ env-ctx-time-⟨⟩ Γ'
+  ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congˡ ⟨⟩-μ∘η≡id) ⟩
+       ⟨⟩-≤ (≤-reflexive (+-comm (ctx-time Γ') 0))
+    ∘ᵗ idᵗ
+    ∘ᵗ env-ctx-time-⟨⟩ Γ'
+  ≡⟨ ∘ᵗ-congʳ (∘ᵗ-identityˡ _) ⟩
+       ⟨⟩-≤ (≤-reflexive (+-comm (ctx-time Γ') 0))
+    ∘ᵗ env-ctx-time-⟨⟩ Γ'
+  ≡⟨ ∘ᵗ-congˡ (≡-≡ᵗ (cong ⟨⟩-≤ (≤-irrelevant _ _))) ⟩
+       ⟨⟩-≤ (≤-reflexive (+-identityʳ (ctx-time Γ')))
+    ∘ᵗ env-ctx-time-⟨⟩ Γ'
+  ∎
+env-ctx-time-⟨⟩-nat {Γ} {.(Γ ⟨ 0 ⟩)} {A} ⟨⟩-η⁻¹-ren = 
+  begin
+       env-ctx-time-⟨⟩ Γ
+    ∘ᵗ η⁻¹
+  ≡⟨ ∘ᵗ-congˡ (
+      begin
+        env-ctx-time-⟨⟩ Γ
+      ≡⟨ ≡ᵗ-sym (∘ᵗ-identityˡ _) ⟩
+           idᵗ
+        ∘ᵗ env-ctx-time-⟨⟩ Γ
+      ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym (⟨⟩-≤-refl)) ⟩
+           ⟨⟩-≤ {A} ≤-refl
+        ∘ᵗ env-ctx-time-⟨⟩ Γ
+      ≡⟨ ∘ᵗ-congˡ (≡-≡ᵗ (cong ⟨⟩-≤ (≤-irrelevant _ _))) ⟩
+           (⟨⟩-≤ {A} (≤-trans
+             (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
+             (≤-reflexive (+-comm (ctx-time Γ) 0))))
+        ∘ᵗ env-ctx-time-⟨⟩ Γ
+      ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym (⟨⟩-≤-trans _ _)) ⟩
+           (   ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
+            ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) 0)))
+        ∘ᵗ env-ctx-time-⟨⟩ Γ
+      ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
+           ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
+        ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) 0))
+        ∘ᵗ env-ctx-time-⟨⟩ Γ
+      ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congʳ (≡ᵗ-sym (∘ᵗ-identityˡ _))) ⟩
+           ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
+        ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) 0))
+        ∘ᵗ idᵗ
+        ∘ᵗ env-ctx-time-⟨⟩ Γ
+      ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congʳ (∘ᵗ-congˡ (≡ᵗ-sym ⟨⟩-μ∘η≡id))) ⟩
+           ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
+        ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) 0))
+        ∘ᵗ (μ {A}
+            ∘ᵗ η)
+        ∘ᵗ env-ctx-time-⟨⟩ Γ
+      ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congʳ (∘ᵗ-assoc _ _ _)) ⟩
+           ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
+        ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) 0))
+        ∘ᵗ μ {A}
+        ∘ᵗ η
+        ∘ᵗ env-ctx-time-⟨⟩ Γ
+      ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congʳ (∘ᵗ-congʳ (≡ᵗ-sym (⟨⟩-η-nat _)))) ⟩
+           ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
+        ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) 0))
+        ∘ᵗ μ {A}
+        ∘ᵗ ⟨ 0 ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+        ∘ᵗ η {⟦ Γ ⟧ᵉᵒ A}
+      ∎) ⟩
+       (   ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
+        ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) 0))
+        ∘ᵗ μ {A}
+        ∘ᵗ ⟨ 0 ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+        ∘ᵗ η {⟦ Γ ⟧ᵉᵒ A})
+    ∘ᵗ η⁻¹ {⟦ Γ ⟧ᵉᵒ A}
+  ≡⟨ ≡ᵗ-sym
+      (≡ᵗ-trans
+        (∘ᵗ-assoc _ _ _)
+        (≡ᵗ-trans
+          (∘ᵗ-congʳ
+            (≡ᵗ-trans
+              (≡ᵗ-trans
+                (∘ᵗ-assoc _ _ _)
+                (∘ᵗ-congʳ (≡ᵗ-trans
+                  (∘ᵗ-assoc _ _ _)
+                  (≡ᵗ-trans
+                    (∘ᵗ-congʳ (≡ᵗ-sym (∘ᵗ-assoc _ _ _)))
+                    (≡ᵗ-sym (∘ᵗ-assoc _ _ _))))))
+              (≡ᵗ-sym (∘ᵗ-assoc _ _ _))))
+          (≡ᵗ-sym (∘ᵗ-assoc _ _ _)))) ⟩
+       (   ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
+        ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) 0))
+        ∘ᵗ μ {A}
+        ∘ᵗ ⟨ 0 ⟩ᶠ (env-ctx-time-⟨⟩ Γ))
+    ∘ᵗ (η ∘ᵗ η⁻¹ {⟦ Γ ⟧ᵉᵒ A})
+  ≡⟨ ∘ᵗ-congʳ ⟨⟩-η∘η⁻¹≡id ⟩
+       (   ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
+        ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) 0))
+        ∘ᵗ μ {A}
+        ∘ᵗ ⟨ 0 ⟩ᶠ (env-ctx-time-⟨⟩ Γ))
+    ∘ᵗ idᵗ
+  ≡⟨ ∘ᵗ-identityʳ _ ⟩
+       ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ (ctx-time Γ))))
+    ∘ᵗ ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) 0))
+    ∘ᵗ μ {A}
+    ∘ᵗ ⟨ 0 ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+  ∎
 env-ctx-time-⟨⟩-nat {.(_ ⟨ τ + τ' ⟩)} {.((_ ⟨ _ ⟩) ⟨ _ ⟩)} (⟨⟩-μ-ren {τ = τ} {τ' = τ'}) = {!!}
 env-ctx-time-⟨⟩-nat {.((_ ⟨ _ ⟩) ⟨ _ ⟩)} {.(_ ⟨ τ + τ' ⟩)} (⟨⟩-μ⁻¹-ren {τ = τ} {τ' = τ'}) = {!!}
 env-ctx-time-⟨⟩-nat {.(_ ⟨ _ ⟩)} {.(_ ⟨ _ ⟩)} (⟨⟩-≤-ren x) = {!!}
 env-ctx-time-⟨⟩-nat {.(_ ∷ _)} {.(_ ∷ _)} (cong-∷-ren ρ) = {!!}
 env-ctx-time-⟨⟩-nat {.(_ ⟨ _ ⟩)} {.(_ ⟨ _ ⟩)} (cong-⟨⟩-ren ρ) = {!!}
-
-
-
-{-
-
-env-ctx-time-⟨⟩ : (Γ : Ctx)
-                → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵗ ⟨ ctx-time Γ ⟩ᵒ A
-
--}
