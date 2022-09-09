@@ -121,10 +121,17 @@ env-⟨⟩-ᶜ {Γ ⟨ τ' ⟩} (suc τ) p {A} with suc τ ≤? τ'
 
 -- Projecting a variable out of an environment
 
+var-in-env : ∀ {Γ A B τ} → (x : A ∈[ τ ] Γ) → ⟦ Γ ⟧ᵉᵒ B →ᵗ ⟦ A ⟧ᵛ
+var-in-env Hd = sndᵗ
+var-in-env (Tl-∷ x) = var-in-env x ∘ᵗ fstᵗ
+var-in-env (Tl-⟨⟩ {τ = τ} x) = ε-⟨⟩ ∘ᵗ ⟨ τ ⟩ᶠ (var-in-env x)
+
+{-
 var-in-env : ∀ {Γ A B τ} → (x : A ∈[ τ ] Γ) → ⟦ Γ ⟧ᵉᵒ B →ᵗ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᵒ ⟦ A ⟧ᵛ
 var-in-env Hd        = sndᵗ
 var-in-env (Tl-∷ x)  = mapˣᵗ (var-in-env x) idᵗ
 var-in-env (Tl-⟨⟩ {τ = τ} x) = ⟨ τ ⟩ᶠ (var-in-env x)
+-}
 
 -- Semantic constants for base-typed value constants
 
@@ -137,10 +144,7 @@ mutual
 
   ⟦_⟧ᵛᵗ : ∀ {Γ A} → Γ ⊢V⦂ A → ⟦ Γ ⟧ᵉ →ᵗ ⟦ A ⟧ᵛ
   
-  ⟦ var x ⟧ᵛᵗ =
-       ε-⟨⟩
-    ∘ᵗ (env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))))
-    ∘ᵗ var-in-env x
+  ⟦ var x ⟧ᵛᵗ = var-in-env x
   
   ⟦ const c ⟧ᵛᵗ = constᵗ c ∘ᵗ terminalᵗ
   

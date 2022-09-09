@@ -31,9 +31,7 @@ open import Util.Time
 ⟦ wk-ren ⟧ʳ =
   fstᵗ
 ⟦ var-ren x ⟧ʳ =
-  ⟨ idᵗ ,    ε-⟨⟩
-          ∘ᵗ (env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))))
-          ∘ᵗ var-in-env x ⟩ᵗ
+  ⟨ idᵗ , var-in-env x ⟩ᵗ
 ⟦ ⟨⟩-η-ren ⟧ʳ =
   η
 ⟦ ⟨⟩-η⁻¹-ren ⟧ʳ =

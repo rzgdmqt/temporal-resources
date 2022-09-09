@@ -20,7 +20,8 @@ open import Semantics.Modality.Adjunction
 open import Semantics.Monad
 open import Semantics.Interpretation
 open import Semantics.Renamings.Core
-open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality
+
+--open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality
 
 open import Util.Equality
 open import Util.Operations
@@ -36,6 +37,12 @@ mutual
              ≡ᵗ ⟦ V ⟧ᵛᵗ ∘ᵗ ⟦ ρ ⟧ʳ
 
   V-rename≡∘ᵗ {Γ} {Γ'} {A} ρ (var {τ = τ} x) =
+    begin
+      var-in-env (proj₂ (proj₂ (var-rename ρ x)))
+    ≡⟨ {!!} ⟩
+      var-in-env x ∘ᵗ ⟦ ρ ⟧ʳ
+    ∎
+    {-
     begin
          ε-⟨⟩
       ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
@@ -93,6 +100,7 @@ mutual
           ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))) ∘ᵗ var-in-env x)
       ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
+  -}
   V-rename≡∘ᵗ ρ (const c) =
     begin
       constᵗ c ∘ᵗ terminalᵗ
