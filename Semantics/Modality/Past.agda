@@ -312,6 +312,26 @@ abstract
                 (sym (monotone-trans A _ _ _)))))
           (sym (∘ᵗ-reveal _ _ _))) })
 
+
+  ⟨⟩-μ⁻¹-≤₂ : ∀ {A τ₁ τ₂ τ₂'} → (q : τ₂ ≤ τ₂')
+            → μ⁻¹ {A} ∘ᵗ ⟨⟩-≤ {A} (+-monoʳ-≤ τ₁ q)
+           ≡ᵗ ⟨ τ₁ ⟩ᶠ (⟨⟩-≤ {A} q) ∘ᵗ μ⁻¹ {A}
+  ⟨⟩-μ⁻¹-≤₂ {A} q =
+    eqᵗ (λ { {t} (r , x) → 
+      trans
+        (∘ᵗ-reveal _ _ _)
+        (trans
+          (cong₂ _,_
+            (≤-irrelevant _ _)
+            (cong₂ _,_
+              (≤-irrelevant _ _)
+              (trans
+                (monotone-trans A _ _ _)
+                (trans
+                  (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+                  (sym (monotone-trans A _ _ _))))))
+          (sym (∘ᵗ-reveal _ _ _))) })
+
 -- η is invertible
 
 abstract
@@ -412,3 +432,16 @@ abstract
                   (sym (monotone-trans A _ _ _)))))
             (sym (cong (map-carrier (⟨⟩-≤ {A} (≤-reflexive (+-assoc τ₁ τ₂ τ₃)))) (∘ᵗ-reveal _ _ _)))  )
           (sym (∘ᵗ-reveal _ _ _))) })
+
+-- Graded monad laws (for inverses)
+
+  ⟨⟩-Tη⁻¹∘ᵗμ⁻¹≡id : ∀ {A τ}
+      →  ⟨ τ ⟩ᶠ (η⁻¹ {A}) ∘ᵗ μ⁻¹ {A} {τ} {0}
+      ≡ᵗ ⟨⟩-≤ {A} (≤-reflexive (sym (+-identityʳ _)))
+  ⟨⟩-Tη⁻¹∘ᵗμ⁻¹≡id {A} =
+    eqᵗ (λ { {t} (p , x) →
+      trans
+        (∘ᵗ-reveal _ _ _)
+        (cong₂ _,_
+          (≤-irrelevant _ _)
+          (cong (λ p → monotone A p x) (≤-irrelevant _ _)))})

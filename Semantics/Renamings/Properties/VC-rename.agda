@@ -22,6 +22,7 @@ open import Semantics.Interpretation
 open import Semantics.Renamings.Core
 
 open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality
+open import Semantics.Renamings.Properties.var-in-env
 
 open import Util.Equality
 open import Util.Operations
@@ -39,68 +40,9 @@ mutual
   V-rename≡∘ᵗ {Γ} {Γ'} {A} ρ (var {τ = τ} x) =
     begin
       var-in-env (proj₂ (proj₂ (var-rename ρ x)))
-    ≡⟨ {!!} ⟩
+    ≡⟨ var-in-env∘var-rename≡var-rename∘ᵗ⟦⟧ʳ ρ x ⟩
       var-in-env x ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-    {-
-    begin
-         ε-⟨⟩
-      ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
-      ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
-    ≡⟨⟩
-         (η⁻¹ ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
-      ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
-      ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
-    ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
-         η⁻¹
-      ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
-      ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
-      ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
-    ≡⟨ ∘ᵗ-congʳ (
-        begin
-             ⟨⟩-≤ z≤n
-          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
-          ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
-        ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym (⟨⟩-≤-trans _ _)) ⟩
-             (   ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
-              ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} (ren-≤-ctx-time (var-split-ren ρ x)))
-          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
-          ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
-        ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
-             ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
-          ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} (ren-≤-ctx-time (var-split-ren ρ x))
-          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
-          ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
-        ≡⟨ ∘ᵗ-congʳ (
-            begin
-                 ⟨⟩-≤ {⟦ A ⟧ᵛ} (ren-≤-ctx-time (var-split-ren ρ x))
-              ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split (proj₂ (proj₂ (var-rename ρ x))))))
-              ∘ᵗ var-in-env (proj₂ (proj₂ (var-rename ρ x)))
-            ≡⟨ {!!} ⟩
-                 env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x)))
-              ∘ᵗ var-in-env x
-              ∘ᵗ ⟦ ρ ⟧ʳ
-            ∎) ⟩
-             ⟨⟩-≤ z≤n
-          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x)))
-          ∘ᵗ var-in-env x
-          ∘ᵗ ⟦ ρ ⟧ʳ
-        ∎) ⟩
-          η⁻¹
-      ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
-      ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))) ∘ᵗ var-in-env x
-      ∘ᵗ ⟦ ρ ⟧ʳ
-    ≡⟨ ≡ᵗ-sym (≡ᵗ-trans (∘ᵗ-assoc _ _ _) (≡ᵗ-trans (∘ᵗ-assoc _ _ _) (∘ᵗ-congʳ (∘ᵗ-congʳ (∘ᵗ-assoc _ _ _))))) ⟩
-         (   (   η⁻¹
-              ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
-          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))) ∘ᵗ var-in-env x)
-      ∘ᵗ ⟦ ρ ⟧ʳ
-    ≡⟨⟩
-         (   ε-⟨⟩
-          ∘ᵗ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))) ∘ᵗ var-in-env x)
-      ∘ᵗ ⟦ ρ ⟧ʳ
-    ∎
-  -}
   V-rename≡∘ᵗ ρ (const c) =
     begin
       constᵗ c ∘ᵗ terminalᵗ
@@ -161,8 +103,6 @@ mutual
       (ηᵀ ∘ᵗ ⟦ V ⟧ᵛᵗ) ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
   C-rename≡∘ᵗ {Γ} {Γ'} ρ (_;_ {A} {B} {τ} {τ'} M N) =
-    {!!}
-  {-
     begin
          μᵀ
       ∘ᵗ Tᶠ ⟦ C-rename (cong-∷-ren (cong-⟨⟩-ren ρ)) N ⟧ᶜᵗ
@@ -258,7 +198,6 @@ mutual
           ∘ᵗ ⟨ η⊣ {⟦ Γ ⟧ᵉ} {τ} , ⟦ M ⟧ᶜᵗ ⟩ᵗ)
       ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  -}
   C-rename≡∘ᵗ ρ (V · W) = 
     begin
       appᵗ ∘ᵗ ⟨ ⟦ V-rename ρ V ⟧ᵛᵗ , ⟦ V-rename ρ W ⟧ᵛᵗ ⟩ᵗ
@@ -279,8 +218,6 @@ mutual
       (initialᵗ ∘ᵗ ⟦ V ⟧ᵛᵗ) ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
   C-rename≡∘ᵗ ρ (perform op V M) =
-    {!!}
-  {-
     begin
          opᵀ op
       ∘ᵗ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵗ ⟦ V-rename ρ V ⟧ᵛᵗ ,
@@ -368,10 +305,7 @@ mutual
             ∘ᵗ η⊣ ⟩ᵗ)
       ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  -}
   C-rename≡∘ᵗ {Γ} {Γ'} ρ (handle_`with_`in {A} {B} {τ} {τ'} M H N) =
-    {!!}
-  {-
     begin
       uncurryᵗ
         (   T-alg-of-handlerᵀ
@@ -961,10 +895,7 @@ mutual
        ∘ᵗ ⟨ idᵗ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵗ ⟩ᵗ)
       ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  -}
   C-rename≡∘ᵗ ρ (unbox {A} {C} {τ} p V M) =
-    {!!}
-  {-
     begin
          ⟦ C-rename (cong-∷-ren ρ) M ⟧ᶜᵗ
       ∘ᵗ ⟨ idᵗ ,
@@ -1038,10 +969,7 @@ mutual
                ∘ᵗ env-⟨⟩-ᶜ τ p ⟩ᵗ)
       ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  -}
   C-rename≡∘ᵗ ρ (delay τs M) =
-    {!!}
-  {-
     begin
       delayᵀ τs ∘ᵗ [ τs ]ᶠ ⟦ C-rename (cong-⟨⟩-ren ρ) M ⟧ᶜᵗ ∘ᵗ η⊣
     ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congˡ (≡ᵗ-cong [ τs ]ᶠ (C-rename≡∘ᵗ (cong-⟨⟩-ren ρ) M))) ⟩
@@ -1057,4 +985,3 @@ mutual
     ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
       (delayᵀ τs ∘ᵗ [ τs ]ᶠ ⟦ M ⟧ᶜᵗ ∘ᵗ η⊣) ∘ᵗ ⟦ ρ ⟧ʳ
     ∎
-  -}
