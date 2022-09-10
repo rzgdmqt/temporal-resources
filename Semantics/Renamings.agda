@@ -17,8 +17,7 @@ open import Semantics.TSets
 open import Semantics.Modality.Past
 open import Semantics.Interpretation
 open import Semantics.Renamings.Core
-open import Semantics.Renamings.Properties.wk-⟨⟩-ctx
-open import Semantics.Renamings.Properties.Rename
+open import Semantics.Renamings.Properties.VC-rename
 
 open import Util.Equality
 open import Util.Operations

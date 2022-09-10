@@ -102,6 +102,7 @@ open import Semantics.Interpretation
 
 open import Semantics.Renamings.Core
 open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality    -- TODO: finish typing up
-open import Semantics.Renamings.Properties.env-ctx-time-⟨⟩-naturality
+-- open import Semantics.Renamings.Properties.env-ctx-time-⟨⟩-naturality     -- TODO: will this be needed?
+open import Semantics.Renamings.Properties.var-in-env
 open import Semantics.Renamings.Properties.VC-rename
 open import Semantics.Renamings
