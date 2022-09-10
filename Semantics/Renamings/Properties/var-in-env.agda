@@ -23,10 +23,10 @@ open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
-var-in-env∘ᵗ⟦⟧ʳ : ∀ {Γ Γ' A B τ}
+var-in-env∘ᵗ⟦⟧ʳ : ∀ {Γ Γ' A τ}
                 → (ρ : Ren Γ Γ')
                 → (x : A ∈[ τ ] Γ)
-                → var-in-env {B = B} (proj₂ (proj₂ (var-rename ρ x)))
+                → var-in-env (proj₂ (proj₂ (var-rename ρ x)))
                ≡ᵗ var-in-env x ∘ᵗ ⟦ ρ ⟧ʳ
                
 var-in-env∘ᵗ⟦⟧ʳ id-ren x = 
@@ -35,11 +35,11 @@ var-in-env∘ᵗ⟦⟧ʳ id-ren x =
   ≡⟨ ≡ᵗ-sym (∘ᵗ-identityʳ _) ⟩
     var-in-env x ∘ᵗ idᵗ
   ∎
-var-in-env∘ᵗ⟦⟧ʳ {B = B} (ρ ∘ʳ ρ') x = 
+var-in-env∘ᵗ⟦⟧ʳ (ρ ∘ʳ ρ') x = 
   begin
     var-in-env (proj₂ (proj₂ (var-rename ρ (proj₂ (proj₂ (var-rename ρ' x))))))
   ≡⟨ var-in-env∘ᵗ⟦⟧ʳ ρ (proj₂ (proj₂ (var-rename ρ' x))) ⟩
-    (var-in-env {B = B} (proj₂ (proj₂ (var-rename ρ' x)))) ∘ᵗ ⟦ ρ ⟧ʳ
+    (var-in-env (proj₂ (proj₂ (var-rename ρ' x)))) ∘ᵗ ⟦ ρ ⟧ʳ
   ≡⟨ ∘ᵗ-congˡ (var-in-env∘ᵗ⟦⟧ʳ ρ' x) ⟩
     (var-in-env x ∘ᵗ ⟦ ρ' ⟧ʳ) ∘ᵗ ⟦ ρ ⟧ʳ
   ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
@@ -63,7 +63,9 @@ var-in-env∘ᵗ⟦⟧ʳ (var-ren y) (Tl-∷ x) =
   ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
     (var-in-env x ∘ᵗ fstᵗ) ∘ᵗ ⟨ idᵗ , var-in-env y ⟩ᵗ
   ∎
-var-in-env∘ᵗ⟦⟧ʳ {A = A} ⟨⟩-η-ren (Tl-⟨⟩ x) = 
+var-in-env∘ᵗ⟦⟧ʳ {A = A} ⟨⟩-η-ren (Tl-⟨⟩ x) =
+  {!!}
+{-
   begin
     var-in-env x
   ≡⟨ ≡ᵗ-sym (∘ᵗ-identityˡ _) ⟩
@@ -85,6 +87,7 @@ var-in-env∘ᵗ⟦⟧ʳ {A = A} ⟨⟩-η-ren (Tl-⟨⟩ x) =
   ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
     (ε-⟨⟩ ∘ᵗ ⟨ 0 ⟩ᶠ (var-in-env x)) ∘ᵗ η
   ∎
+-}
 var-in-env∘ᵗ⟦⟧ʳ {A = A} ⟨⟩-η⁻¹-ren x = 
   begin
     ε-⟨⟩ ∘ᵗ ⟨ 0 ⟩ᶠ (var-in-env x)
@@ -99,7 +102,7 @@ var-in-env∘ᵗ⟦⟧ʳ {A = A} ⟨⟩-η⁻¹-ren x =
   ≡⟨ ≡ᵗ-sym (⟨⟩-η⁻¹-nat _) ⟩
     var-in-env x ∘ᵗ η⁻¹
   ∎
-var-in-env∘ᵗ⟦⟧ʳ {A = A} {B = B} (⟨⟩-μ-ren {Γ} {τ} {τ'}) (Tl-⟨⟩ x) =
+var-in-env∘ᵗ⟦⟧ʳ {A = A} (⟨⟩-μ-ren {Γ} {τ} {τ'}) (Tl-⟨⟩ x) =
   begin
        ε-⟨⟩
     ∘ᵗ ⟨ τ' ⟩ᶠ (ε-⟨⟩ {⟦ A ⟧ᵛ} ∘ᵗ ⟨ τ ⟩ᶠ (var-in-env x))
@@ -116,16 +119,76 @@ var-in-env∘ᵗ⟦⟧ʳ {A = A} {B = B} (⟨⟩-μ-ren {Γ} {τ} {τ'}) (Tl-⟨
     ∘ᵗ (   ⟨ τ' ⟩ᶠ (η⁻¹ {⟦ A ⟧ᵛ})
         ∘ᵗ ⟨ τ' ⟩ᶠ(⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n))
     ∘ᵗ ⟨ τ' ⟩ᶠ (⟨ τ ⟩ᶠ (var-in-env x))
-  ≡⟨ {!!} ⟩
+  ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
+       (   (η⁻¹ ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
+        ∘ᵗ (   ⟨ τ' ⟩ᶠ (η⁻¹ {⟦ A ⟧ᵛ})
+            ∘ᵗ ⟨ τ' ⟩ᶠ(⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)))
+    ∘ᵗ ⟨ τ' ⟩ᶠ (⟨ τ ⟩ᶠ (var-in-env x))
+  ≡⟨ ∘ᵗ-congˡ
+      (≡ᵗ-trans
+        (∘ᵗ-assoc _ _ _)
+        (≡ᵗ-trans
+          (∘ᵗ-congʳ (
+            begin
+                 ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
+              ∘ᵗ ⟨ τ' ⟩ᶠ (η⁻¹ {⟦ A ⟧ᵛ})
+              ∘ᵗ ⟨ τ' ⟩ᶠ (⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
+            ≡⟨ {!!} ⟩
+                 ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
+              ∘ᵗ μ {⟦ A ⟧ᵛ}
+            ≡⟨⟩
+                 ⟨⟩-≤ {⟦ A ⟧ᵛ} (≤-trans z≤n (≤-reflexive (+-comm τ τ')))
+              ∘ᵗ μ {⟦ A ⟧ᵛ}
+            ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym (⟨⟩-≤-trans _ _)) ⟩
+                 (   ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
+                  ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} (≤-reflexive (+-comm τ τ')))
+              ∘ᵗ μ {⟦ A ⟧ᵛ}
+            ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
+                 ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
+              ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} (≤-reflexive (+-comm τ τ'))
+              ∘ᵗ μ {⟦ A ⟧ᵛ}
+            ∎))
+          (≡ᵗ-sym (∘ᵗ-assoc _ _ _)))) ⟩
+       (   (η⁻¹ ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
+        ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} (≤-reflexive (+-comm τ τ'))
+        ∘ᵗ μ {⟦ A ⟧ᵛ})
+    ∘ᵗ ⟨ τ' ⟩ᶠ (⟨ τ ⟩ᶠ (var-in-env x))
+  ≡⟨ ≡ᵗ-trans (∘ᵗ-assoc _ _ _) (∘ᵗ-congʳ (∘ᵗ-assoc _ _ _)) ⟩
+       (η⁻¹ ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
+    ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} (≤-reflexive (+-comm τ τ'))
+    ∘ᵗ μ {⟦ A ⟧ᵛ}
+    ∘ᵗ ⟨ τ' ⟩ᶠ (⟨ τ ⟩ᶠ (var-in-env x))
+  ≡⟨⟩
+       (η⁻¹ ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
+    ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} (≤-reflexive (+-comm τ τ'))
+    ∘ᵗ (   μ {⟦ A ⟧ᵛ}
+        ∘ᵗ ⟨ τ' ⟩ᶠ (⟨ τ ⟩ᶠ (var-in-env x)))
+  ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congʳ (≡ᵗ-sym (⟨⟩-μ-nat _))) ⟩
+       (η⁻¹ ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
+    ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} (≤-reflexive (+-comm τ τ'))
+    ∘ᵗ (   ⟨ τ' + τ ⟩ᶠ (var-in-env x)
+        ∘ᵗ μ {⟦ Γ ⟧ᵉ})
+  ≡⟨ ∘ᵗ-congʳ (≡ᵗ-sym (∘ᵗ-assoc _ _ _)) ⟩
+       (η⁻¹ ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
+    ∘ᵗ (   ⟨⟩-≤ {⟦ A ⟧ᵛ} (≤-reflexive (+-comm τ τ'))
+        ∘ᵗ ⟨ τ' + τ ⟩ᶠ (var-in-env x))
+    ∘ᵗ μ {⟦ Γ ⟧ᵉ}
+  ≡⟨ ∘ᵗ-congʳ (∘ᵗ-congˡ (≡ᵗ-sym (⟨⟩-≤-nat _ _))) ⟩
+       (η⁻¹ ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
+    ∘ᵗ (   ⟨ τ + τ' ⟩ᶠ (var-in-env x)
+        ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ τ')))
+    ∘ᵗ μ {⟦ Γ ⟧ᵉ}
+  ≡⟨ ∘ᵗ-congʳ (∘ᵗ-assoc _ _ _) ⟩
        (η⁻¹ ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n)
     ∘ᵗ ⟨ τ + τ' ⟩ᶠ (var-in-env x)
-    ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉᵒ B} (≤-reflexive (+-comm τ τ')) ∘ᵗ μ {⟦ Γ ⟧ᵉᵒ B}
+    ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ τ'))
+    ∘ᵗ μ {⟦ Γ ⟧ᵉ}
   ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
        ((η⁻¹ ∘ᵗ ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n) ∘ᵗ ⟨ τ + τ' ⟩ᶠ (var-in-env x))
-    ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉᵒ B} (≤-reflexive (+-comm τ τ')) ∘ᵗ μ {⟦ Γ ⟧ᵉᵒ B}
+    ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ τ')) ∘ᵗ μ {⟦ Γ ⟧ᵉ}
   ≡⟨⟩
        (ε-⟨⟩ ∘ᵗ ⟨ τ + τ' ⟩ᶠ (var-in-env x))
-    ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉᵒ B} (≤-reflexive (+-comm τ τ')) ∘ᵗ μ {⟦ Γ ⟧ᵉᵒ B}
+    ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ τ')) ∘ᵗ μ {⟦ Γ ⟧ᵉ}
   ∎
 var-in-env∘ᵗ⟦⟧ʳ ⟨⟩-μ⁻¹-ren x = {!!}
 var-in-env∘ᵗ⟦⟧ʳ (⟨⟩-≤-ren p) (Tl-⟨⟩ x) = {!!}
