@@ -23,7 +23,7 @@ open import Util.Time
 
 -- Semantics of renamings as maps between environments
 
-⟦_⟧ʳ : ∀ {Γ Γ' : Ctx} → Ren Γ Γ' → {A : TSet} → ⟦ Γ' ⟧ᵉᵒ A →ᵗ ⟦ Γ ⟧ᵉᵒ A
+⟦_⟧ʳ : ∀ {Γ Γ' : Ctx} → Ren Γ Γ' → ⟦ Γ' ⟧ᵉ →ᵗ ⟦ Γ ⟧ᵉ
 ⟦ id-ren ⟧ʳ =
   idᵗ
 ⟦ ρ' ∘ʳ ρ ⟧ʳ =
@@ -36,14 +36,14 @@ open import Util.Time
   η
 ⟦ ⟨⟩-η⁻¹-ren ⟧ʳ =
   η⁻¹
-⟦ ⟨⟩-μ-ren {Γ} {τ} {τ'} ⟧ʳ {A} =
-     ⟨⟩-≤ {⟦ Γ ⟧ᵉᵒ A} (≤-reflexive (+-comm τ τ'))
-  ∘ᵗ μ {A = ⟦ Γ ⟧ᵉᵒ A}
-⟦ ⟨⟩-μ⁻¹-ren {Γ} {τ} {τ'} ⟧ʳ {A} =
-     μ⁻¹ {⟦ Γ ⟧ᵉᵒ A}
-  ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉᵒ A} (≤-reflexive (+-comm τ' τ))
-⟦ ⟨⟩-≤-ren {Γ} p ⟧ʳ {A} =
-  ⟨⟩-≤ {⟦ Γ ⟧ᵉᵒ A} p
+⟦ ⟨⟩-μ-ren {Γ} {τ} {τ'} ⟧ʳ =
+     ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ τ'))
+  ∘ᵗ μ {A = ⟦ Γ ⟧ᵉ}
+⟦ ⟨⟩-μ⁻¹-ren {Γ} {τ} {τ'} ⟧ʳ =
+     μ⁻¹ {⟦ Γ ⟧ᵉ}
+  ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ' τ))
+⟦ ⟨⟩-≤-ren {Γ} p ⟧ʳ =
+  ⟨⟩-≤ {⟦ Γ ⟧ᵉ} p
 ⟦ cong-∷-ren ρ ⟧ʳ =
   mapˣᵗ ⟦ ρ ⟧ʳ idᵗ
 ⟦ cong-⟨⟩-ren {Γ} {Γ'} {τ} ρ ⟧ʳ =
