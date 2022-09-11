@@ -22,7 +22,7 @@ open import Semantics.Interpretation
 open import Semantics.Renamings.Core
 
 open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality
-open import Semantics.Renamings.Properties.var-in-env
+open import Semantics.Renamings.Properties.var-in-env-var-rename
 
 open import Util.Equality
 open import Util.Operations

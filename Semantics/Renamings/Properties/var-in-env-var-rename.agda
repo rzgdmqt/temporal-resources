@@ -2,7 +2,7 @@
 -- Relating the syntactic actions of renamings to semantic morphism composition --
 ----------------------------------------------------------------------------------
 
-module Semantics.Renamings.Properties.var-in-env where
+module Semantics.Renamings.Properties.var-in-env-var-rename where
 
 open import Function
 

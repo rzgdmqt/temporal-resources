@@ -55,16 +55,6 @@ mutual
 ⟦⟧ᵍ-⟦⟧ᵛ Empty    = idᵗ
 ⟦⟧ᵍ-⟦⟧ᵛ ([ τ ]ᵍ A) = [ τ ]ᶠ (⟦⟧ᵍ-⟦⟧ᵛ A)
 
--- Interpretation of contexts as TSets
-
-⟦_⟧ᵉ : Ctx → TSet
-⟦ [] ⟧ᵉ      = 𝟙ᵗ
-⟦ Γ ∷ A ⟧ᵉ   = ⟦ Γ ⟧ᵉ ×ᵗ ⟦ A ⟧ᵛ
-⟦ Γ ⟨ τ ⟩ ⟧ᵉ = ⟨ τ ⟩ᵒ ⟦ Γ ⟧ᵉ
-
-infix 25 ⟦_⟧ᵉ
-
-{-
 -- Interpretation of contexts as functors
 
 ⟦_⟧ᵉᵒ : Ctx → TSet → TSet
@@ -83,7 +73,6 @@ infix 25 ⟦_⟧ᵉ
 ⟦ Γ ⟧ᵉ = ⟦ Γ ⟧ᵉᵒ 𝟙ᵗ
 
 infix 25 ⟦_⟧ᵉ
-
 
 -- Splitting an environment according to context splitting
 
@@ -106,7 +95,6 @@ env-ctx-time-⟨⟩ (Γ ⟨ τ ⟩) {A} =
      ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ))
   ∘ᵗ μ {A}
   ∘ᵗ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
--}
 
 -- Interaction of ⟨_⟩ modality and the time-travelling operation on contexts
 
@@ -137,13 +125,6 @@ var-in-env : ∀ {Γ A τ} → (x : A ∈[ τ ] Γ) → ⟦ Γ ⟧ᵉ →ᵗ ⟦
 var-in-env Hd = sndᵗ
 var-in-env (Tl-∷ x) = var-in-env x ∘ᵗ fstᵗ
 var-in-env (Tl-⟨⟩ {τ = τ} x) = ε-⟨⟩ ∘ᵗ ⟨ τ ⟩ᶠ (var-in-env x)
-
-{-
-var-in-env : ∀ {Γ A B τ} → (x : A ∈[ τ ] Γ) → ⟦ Γ ⟧ᵉᵒ B →ᵗ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᵒ ⟦ A ⟧ᵛ
-var-in-env Hd        = sndᵗ
-var-in-env (Tl-∷ x)  = mapˣᵗ (var-in-env x) idᵗ
-var-in-env (Tl-⟨⟩ {τ = τ} x) = ⟨ τ ⟩ᶠ (var-in-env x)
--}
 
 -- Semantic constants for base-typed value constants
 
