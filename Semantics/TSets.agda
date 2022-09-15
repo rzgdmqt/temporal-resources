@@ -274,32 +274,6 @@ abstract
   ⟨⟩ᵗ-unique f g h (eqᵗ p) (eqᵗ q) =
     eqᵗ (λ x → cong₂ _,_ (p x) (q x))
 
-  ⟨⟩ᵗ-∘ᵗ : ∀ {A B C D} → (f : A →ᵗ B) → (g : B →ᵗ C) → (h : B →ᵗ D)
-         → ⟨ g ∘ᵗ f , h ∘ᵗ f ⟩ᵗ ≡ᵗ ⟨ g , h ⟩ᵗ ∘ᵗ f
-  ⟨⟩ᵗ-∘ᵗ f g h = 
-    begin
-      ⟨ g ∘ᵗ f , h ∘ᵗ f ⟩ᵗ
-    ≡⟨ ≡ᵗ-sym
-         (⟨⟩ᵗ-unique
-           (g ∘ᵗ f) (h ∘ᵗ f) (⟨ g , h ⟩ᵗ ∘ᵗ f)
-           (begin
-              fstᵗ ∘ᵗ ⟨ g , h ⟩ᵗ ∘ᵗ f
-            ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc fstᵗ ⟨ g , h ⟩ᵗ f) ⟩
-              (fstᵗ ∘ᵗ ⟨ g , h ⟩ᵗ) ∘ᵗ f
-            ≡⟨ ∘ᵗ-congˡ (⟨⟩ᵗ-fstᵗ g h) ⟩
-              g ∘ᵗ f
-            ∎)
-           (begin
-              sndᵗ ∘ᵗ ⟨ g , h ⟩ᵗ ∘ᵗ f
-            ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc sndᵗ ⟨ g , h ⟩ᵗ f) ⟩
-              (sndᵗ ∘ᵗ ⟨ g , h ⟩ᵗ) ∘ᵗ f
-            ≡⟨ ∘ᵗ-congˡ (⟨⟩ᵗ-sndᵗ g h) ⟩
-              h ∘ᵗ f
-            ∎))
-     ⟩
-      ⟨ g , h ⟩ᵗ ∘ᵗ f
-    ∎
-
   mapˣᵗ-×ᵗ-assoc : ∀ {A B C A' B' C'}
                  → (f : A →ᵗ A') (g : B →ᵗ B') (h : C →ᵗ C')
                  → mapˣᵗ (mapˣᵗ f g) h ∘ᵗ ×ᵗ-assoc
