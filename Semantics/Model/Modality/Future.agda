@@ -11,6 +11,7 @@ open import Semantics.Model.Category
 
 module Semantics.Model.Modality.Future (Cat : Category) where
 
+open import Util.Equality
 open import Util.Time
 
 open Category Cat
@@ -44,52 +45,52 @@ record Future : Set₁ where
 
     -- [_] is functorial
 
-    []-idᵐ : ∀ {A τ} → [ τ ]ᶠ (idᵐ {A = A}) ≡ᵐ idᵐ
+    []-idᵐ : ∀ {A τ} → [ τ ]ᶠ (idᵐ {A = A}) ≡ idᵐ
     []-∘ᵐ : ∀ {A B C τ} → (f : A →ᵐ B) → (g : B →ᵐ C)
-          → [ τ ]ᶠ (g ∘ᵐ f) ≡ᵐ [ τ ]ᶠ g ∘ᵐ [ τ ]ᶠ f
+          → [ τ ]ᶠ (g ∘ᵐ f) ≡ [ τ ]ᶠ g ∘ᵐ [ τ ]ᶠ f
 
     -- []-≤ is natural
 
     []-≤-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵐ B) → (p : τ₁ ≤ τ₂)
-             → [ τ₂ ]ᶠ f ∘ᵐ []-≤ {A = A} p ≡ᵐ []-≤ {A = B} p ∘ᵐ [ τ₁ ]ᶠ f
+             → [ τ₂ ]ᶠ f ∘ᵐ []-≤ {A = A} p ≡ []-≤ {A = B} p ∘ᵐ [ τ₁ ]ᶠ f
 
     -- [_] is functorial in the gradings
 
-    []-≤-refl : ∀ {A τ} → []-≤ {A} (≤-refl {τ}) ≡ᵐ idᵐ
+    []-≤-refl : ∀ {A τ} → []-≤ {A} (≤-refl {τ}) ≡ idᵐ
     []-≤-trans : ∀ {A τ τ' τ''} → (p : τ ≤ τ') → (q : τ' ≤ τ'')
-               → []-≤ {A} q ∘ᵐ []-≤ {A} p ≡ᵐ []-≤ {A} (≤-trans p q)
+               → []-≤ {A} q ∘ᵐ []-≤ {A} p ≡ []-≤ {A} (≤-trans p q)
 
     -- ε and ε⁻¹ are natural
 
-    []-ε-nat : ∀ {A B} → (f : A →ᵐ B) → f ∘ᵐ ε ≡ᵐ ε ∘ᵐ [ 0 ]ᶠ f
-    []-ε⁻¹-nat : ∀ {A B} → (f : A →ᵐ B) → [ 0 ]ᶠ f ∘ᵐ ε⁻¹ ≡ᵐ ε⁻¹ ∘ᵐ f
+    []-ε-nat : ∀ {A B} → (f : A →ᵐ B) → f ∘ᵐ ε ≡ ε ∘ᵐ [ 0 ]ᶠ f
+    []-ε⁻¹-nat : ∀ {A B} → (f : A →ᵐ B) → [ 0 ]ᶠ f ∘ᵐ ε⁻¹ ≡ ε⁻¹ ∘ᵐ f
 
     -- δ and δ⁻¹ is natural
 
     []-δ-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵐ B)
-             → [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f) ∘ᵐ δ {A} ≡ᵐ δ {B} ∘ᵐ [ τ₁ + τ₂ ]ᶠ f
+             → [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f) ∘ᵐ δ {A} ≡ δ {B} ∘ᵐ [ τ₁ + τ₂ ]ᶠ f
     []-δ⁻¹-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵐ B)
-               → [ τ₁ + τ₂ ]ᶠ f ∘ᵐ δ⁻¹ {A} ≡ᵐ δ⁻¹ {B} ∘ᵐ [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f)
+               → [ τ₁ + τ₂ ]ᶠ f ∘ᵐ δ⁻¹ {A} ≡ δ⁻¹ {B} ∘ᵐ [ τ₁ ]ᶠ ([ τ₂ ]ᶠ f)
     []-δ-≤ : ∀ {A τ₁ τ₂ τ₁' τ₂'} → (p : τ₁ ≤ τ₁') → (q : τ₂ ≤ τ₂')
-           → [ τ₁' ]ᶠ ([]-≤ {A} q) ∘ᵐ []-≤ {[ τ₂ ]ᵒ A} p ∘ᵐ δ {A = A} ≡ᵐ δ {A} ∘ᵐ []-≤ {A} (+-mono-≤ p q)
+           → [ τ₁' ]ᶠ ([]-≤ {A} q) ∘ᵐ []-≤ {[ τ₂ ]ᵒ A} p ∘ᵐ δ {A = A} ≡ δ {A} ∘ᵐ []-≤ {A} (+-mono-≤ p q)
 
     -- ε is invertible
 
-    []-ε∘ε⁻¹≡id : ∀ {A} → ε {A} ∘ᵐ ε⁻¹ ≡ᵐ idᵐ
-    []-ε⁻¹∘ε≡id : ∀ {A} → ε⁻¹ {A} ∘ᵐ ε ≡ᵐ idᵐ
+    []-ε∘ε⁻¹≡id : ∀ {A} → ε {A} ∘ᵐ ε⁻¹ ≡ idᵐ
+    []-ε⁻¹∘ε≡id : ∀ {A} → ε⁻¹ {A} ∘ᵐ ε ≡ idᵐ
 
     -- δ is invertible
 
-    []-δ∘δ⁻¹≡id : ∀ {A τ₁ τ₂} → δ {A} {τ₁} {τ₂} ∘ᵐ δ⁻¹ {A} {τ₁} {τ₂} ≡ᵐ idᵐ
-    []-δ⁻¹∘δ≡id : ∀ {A τ₁ τ₂} → δ⁻¹ {A} {τ₁} {τ₂} ∘ᵐ δ {A} {τ₁} {τ₂} ≡ᵐ idᵐ
+    []-δ∘δ⁻¹≡id : ∀ {A τ₁ τ₂} → δ {A} {τ₁} {τ₂} ∘ᵐ δ⁻¹ {A} {τ₁} {τ₂} ≡ idᵐ
+    []-δ⁻¹∘δ≡id : ∀ {A τ₁ τ₂} → δ⁻¹ {A} {τ₁} {τ₂} ∘ᵐ δ {A} {τ₁} {τ₂} ≡ idᵐ
 
     -- Graded comonad laws
 
-    []-ε∘δ≡id : ∀ {A τ} → ε ∘ᵐ δ {A} {0} {τ} ≡ᵐ idᵐ
-    []-Dε∘δ≡≤ : ∀ {A τ} → [ τ ]ᶠ (ε {A}) ∘ᵐ δ {A} {τ} {0} ≡ᵐ []-≤ {A} (≤-reflexive (+-identityʳ τ))
+    []-ε∘δ≡id : ∀ {A τ} → ε ∘ᵐ δ {A} {0} {τ} ≡ idᵐ
+    []-Dε∘δ≡≤ : ∀ {A τ} → [ τ ]ᶠ (ε {A}) ∘ᵐ δ {A} {τ} {0} ≡ []-≤ {A} (≤-reflexive (+-identityʳ τ))
     []-δ∘δ≡Dδ∘δ∘≤ : ∀ {A τ₁ τ₂ τ₃}
                   → δ {[ τ₃ ]ᵒ A} {τ₁} {τ₂} ∘ᵐ δ {A} {τ₁ + τ₂} {τ₃}
-                  ≡ᵐ    [ τ₁ ]ᶠ (δ {A} {τ₂} {τ₃}) ∘ᵐ δ {A} {τ₁} {τ₂ + τ₃}
+                  ≡    [ τ₁ ]ᶠ (δ {A} {τ₂} {τ₃}) ∘ᵐ δ {A} {τ₁} {τ₂ + τ₃}
                      ∘ᵐ []-≤ {A} (≤-reflexive (+-assoc τ₁ τ₂ τ₃))
 
     -- [_]ᵒ is monoidal (with respect to ×ᵐ) (TODO: derive from adjunction)

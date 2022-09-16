@@ -10,6 +10,7 @@ module Semantics.Model.Modality.Adjunction (Cat : Category)
                                            (Fut : Future Cat)
                                            (Pas : Past Cat) where
 
+open import Util.Equality
 open import Util.Time
 
 open Category Cat
@@ -32,22 +33,22 @@ record Adjunction : Set₁ where
     -- η-⊣ is natural
 
     η⊣-nat : ∀ {A B τ} → (f : A →ᵐ B)
-           → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵐ η⊣ ≡ᵐ η⊣ ∘ᵐ f
+           → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵐ η⊣ ≡ η⊣ ∘ᵐ f
 
     -- ε-⊣ is natural
 
     ε⊣-nat : ∀ {A B τ} → (f : A →ᵐ B)
-           → f ∘ᵐ ε⊣ ≡ᵐ ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
+           → f ∘ᵐ ε⊣ ≡ ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
 
     -- Triangle equations of the adjunction
   
-    ε⊣∘Fη≡id : ∀ {A τ} → ε⊣ {⟨ τ ⟩ᵒ A} ∘ᵐ ⟨ τ ⟩ᶠ (η⊣ {A}) ≡ᵐ idᵐ
-    Gε⊣∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε⊣ {A}) ∘ᵐ η⊣ {[ τ ]ᵒ A} ≡ᵐ idᵐ
+    ε⊣∘Fη≡id : ∀ {A τ} → ε⊣ {⟨ τ ⟩ᵒ A} ∘ᵐ ⟨ τ ⟩ᶠ (η⊣ {A}) ≡ idᵐ
+    Gε⊣∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε⊣ {A}) ∘ᵐ η⊣ {[ τ ]ᵒ A} ≡ idᵐ
 
     -- Interaction between η-⊣/ε-⊣ of the adjunction and η/ε of the modalities
 
-    η⊣≡ε⁻¹∘η : ∀ {A} → η⊣ {A} ≡ᵐ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵐ η {A}
-    ε⊣≡ε∘η⁻¹ : ∀ {A} → ε⊣ {A} ≡ᵐ ε {A} ∘ᵐ η⁻¹ {[ 0 ]ᵒ A}
+    η⊣≡ε⁻¹∘η : ∀ {A} → η⊣ {A} ≡ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵐ η {A}
+    ε⊣≡ε∘η⁻¹ : ∀ {A} → ε⊣ {A} ≡ ε {A} ∘ᵐ η⁻¹ {[ 0 ]ᵒ A}
 
     -- Interaction between η-⊣/ε-⊣ of the adjunction and μ/δ of the modalities
 

@@ -12,7 +12,7 @@ open import Data.Product renaming (map to mapˣ)
 open import Data.Sum renaming (map to map⁺)
 open import Data.Unit hiding (_≤_)
 
-open import Util.Equality
+open import Util.Equality hiding (begin_; _≡⟨⟩_; step-≡; _∎)
 open import Util.Time
 
 -- Time-varying sets (covariant presheaves on (ℕ,≤))
@@ -78,27 +78,6 @@ abstract
    
   ≡ᵗ-trans : ∀ {A B} {f g h : A →ᵗ B} → f ≡ᵗ g → g ≡ᵗ h → f ≡ᵗ h
   ≡ᵗ-trans p q = eqᵗ (λ x → trans (prf p x) (prf q x))
-
--- Begin-qed style reasoning for ≡ᵗ
-
-abstract
-  begin_ : ∀ {A B} {f g : A →ᵗ B} → f ≡ᵗ g → f ≡ᵗ g
-  begin_ f≡g = f≡g
-   
-  _≡⟨⟩_ : ∀ {A B} (f {g} : A →ᵗ B) → f ≡ᵗ g → f ≡ᵗ g
-  _ ≡⟨⟩ f≡g = f≡g
-   
-  step-≡ : ∀ {A B} (f {g h} : A →ᵗ B) → g ≡ᵗ h → f ≡ᵗ g → f ≡ᵗ h
-  step-≡ _ g≡h f≡g = ≡ᵗ-trans f≡g g≡h
-   
-  _∎ : ∀ {A B} (f : A →ᵗ B) → f ≡ᵗ f
-  _∎ _ = ≡ᵗ-refl
-
-infix  3 _∎
-infixr 2 _≡⟨⟩_ step-≡
-infix  1 begin_
-
-syntax step-≡ f g≡h f≡g = f ≡⟨ f≡g ⟩ g≡h
 
 -- ≡ᵗ implies ≡ and vice versa
 

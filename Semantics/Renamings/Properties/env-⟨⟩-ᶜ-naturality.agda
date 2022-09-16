@@ -31,13 +31,13 @@ postulate
                → (ρ : Ren Γ Γ')
                →    env-⟨⟩-ᶜ {Γ} τ p
                  ∘ᵐ ⟦ ρ ⟧ʳ
-              ≡ᵐ    ⟨ τ ⟩ᶠ ⟦ ρ -ʳ τ ⟧ʳ
+              ≡    ⟨ τ ⟩ᶠ ⟦ ρ -ʳ τ ⟧ʳ
                  ∘ᵐ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ))
 {-
 env-⟨⟩-ᶜ-nat zero p ρ = 
   begin
     η ∘ᵐ ⟦ ρ ⟧ʳ
-  ≡⟨ ≡ᵐ-sym (⟨⟩-η-nat _) ⟩
+  ≡⟨ ≡-sym (⟨⟩-η-nat _) ⟩
     ⟨ zero ⟩ᶠ ⟦ ρ ⟧ʳ ∘ᵐ η
   ∎
 env-⟨⟩-ᶜ-nat {Γ ∷ A} {Γ'} (suc τ) p ρ =
@@ -50,10 +50,10 @@ env-⟨⟩-ᶜ-nat {Γ ∷ A} {Γ'} (suc τ) p ρ =
   ≡⟨ env-⟨⟩-ᶜ-nat (suc τ) p (ρ ∘ʳ wk-ren) ⟩
        ⟨ suc τ ⟩ᶠ (idᵐ ∘ᵐ ⟦ ρ -ʳ suc τ ⟧ʳ)
     ∘ᵐ env-⟨⟩-ᶜ {Γ'} (suc τ) (≤-trans p (≤-trans ≤-refl (ren-≤-ctx-time ρ)))
-  ≡⟨ ∘ᵐ-congˡ (≡ᵐ-cong ⟨ suc τ ⟩ᶠ (∘ᵐ-identityˡ _)) ⟩
+  ≡⟨ ∘ᵐ-congˡ (≡-cong ⟨ suc τ ⟩ᶠ (∘ᵐ-identityˡ _)) ⟩
        ⟨ suc τ ⟩ᶠ ⟦ ρ -ʳ suc τ ⟧ʳ
     ∘ᵐ env-⟨⟩-ᶜ {Γ'} (suc τ) (≤-trans p (≤-trans ≤-refl (ren-≤-ctx-time ρ)))
-  ≡⟨ ∘ᵐ-congʳ (≡-≡ᵐ (cong (λ p → env-⟨⟩-ᶜ {Γ'} (suc τ) p) (≤-irrelevant _ _))) ⟩
+  ≡⟨ ∘ᵐ-congʳ (≡-≡ (cong (λ p → env-⟨⟩-ᶜ {Γ'} (suc τ) p) (≤-irrelevant _ _))) ⟩
        ⟨ suc τ ⟩ᶠ ⟦ ρ -ʳ suc τ ⟧ʳ
     ∘ᵐ env-⟨⟩-ᶜ {Γ'} (suc τ) (≤-trans p (ren-≤-ctx-time ρ))
   ∎
@@ -66,7 +66,7 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ τ' ⟩} (suc τ) p id-ren with suc τ ≤? τ'
   ≡⟨ ∘ᵐ-identityʳ _ ⟩
        μ⁻¹ {⟦ Γ ⟧ᵉ} {suc τ} {τ' ∸ suc τ}
     ∘ᵐ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (m+[n∸m]≡n q))
-  ≡⟨ ∘ᵐ-congˡ (≡ᵐ-sym (∘ᵐ-identityˡ _)) ⟩
+  ≡⟨ ∘ᵐ-congˡ (≡-sym (∘ᵐ-identityˡ _)) ⟩
        (   idᵐ
         ∘ᵐ μ⁻¹ {⟦ Γ ⟧ᵉ} {suc τ} {τ' ∸ suc τ})
     ∘ᵐ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (m+[n∸m]≡n q))
@@ -74,7 +74,7 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ τ' ⟩} (suc τ) p id-ren with suc τ ≤? τ'
        idᵐ
     ∘ᵐ μ⁻¹ {⟦ Γ ⟧ᵉ} {suc τ} {τ' ∸ suc τ}
     ∘ᵐ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (m+[n∸m]≡n q))
-  ≡⟨ ∘ᵐ-congˡ (≡ᵐ-sym ⟨⟩-idᵐ) ⟩
+  ≡⟨ ∘ᵐ-congˡ (≡-sym ⟨⟩-idᵐ) ⟩
        ⟨ suc τ ⟩ᶠ idᵐ
     ∘ᵐ μ⁻¹ {⟦ Γ ⟧ᵉ} {suc τ} {τ' ∸ suc τ}
     ∘ᵐ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (m+[n∸m]≡n q))
@@ -93,20 +93,20 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ τ' ⟩} (suc τ) p id-ren with suc τ ≤? τ'
       ∘ᵐ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
                    (≤-trans (∸-monoˡ-≤ τ' p)
                     (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
-    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (≡ᵐ-cong ⟨ τ' ⟩ᶠ (≡-≡ᵐ (cong (env-⟨⟩-ᶜ (suc τ ∸ τ')) (≤-irrelevant _ _))))) ⟩
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (≡-cong ⟨ τ' ⟩ᶠ (≡-≡ (cong (env-⟨⟩-ᶜ (suc τ ∸ τ')) (≤-irrelevant _ _))))) ⟩
          ⟨⟩-≤ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ} (m≤n+m∸n (suc τ) τ')
       ∘ᵐ μ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ}
       ∘ᵐ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
                    (≤-trans (∸-monoˡ-≤ τ' (≤-trans p (≤-reflexive refl)))
                     (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
-    ≡⟨ ≡ᵐ-sym (∘ᵐ-identityˡ _) ⟩
+    ≡⟨ ≡-sym (∘ᵐ-identityˡ _) ⟩
          idᵐ
       ∘ᵐ ⟨⟩-≤ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ} (m≤n+m∸n (suc τ) τ')
       ∘ᵐ μ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ}
       ∘ᵐ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
                    (≤-trans (∸-monoˡ-≤ τ' (≤-trans p (≤-reflexive refl)))
                     (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
-    ≡⟨ ∘ᵐ-congˡ (≡ᵐ-sym ⟨⟩-idᵐ) ⟩
+    ≡⟨ ∘ᵐ-congˡ (≡-sym ⟨⟩-idᵐ) ⟩
          ⟨ suc τ ⟩ᶠ idᵐ
       ∘ᵐ ⟨⟩-≤ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ} (m≤n+m∸n (suc τ) τ')
       ∘ᵐ μ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ}
@@ -121,12 +121,12 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ τ' ⟩} (suc τ) p wk-ren with suc τ ≤? τ'
        (   μ⁻¹ {⟦ Γ ⟧ᵉ}
         ∘ᵐ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (m+[n∸m]≡n q)))
     ∘ᵐ fstᵐ
-  ≡⟨ ≡ᵐ-sym (∘ᵐ-identityˡ _) ⟩
+  ≡⟨ ≡-sym (∘ᵐ-identityˡ _) ⟩
        idᵐ
     ∘ᵐ (   μ⁻¹ {⟦ Γ ⟧ᵉ}
         ∘ᵐ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (m+[n∸m]≡n q)))
     ∘ᵐ fstᵐ
-  ≡⟨ ∘ᵐ-congˡ (≡ᵐ-sym ⟨⟩-idᵐ) ⟩
+  ≡⟨ ∘ᵐ-congˡ (≡-sym ⟨⟩-idᵐ) ⟩
        ⟨ suc τ ⟩ᶠ idᵐ
     ∘ᵐ (   μ⁻¹ {⟦ Γ ⟧ᵉ}
         ∘ᵐ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (m+[n∸m]≡n q)))
@@ -140,15 +140,15 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ τ' ⟩} (suc τ) p wk-ren with suc τ ≤? τ'
                      (≤-trans (∸-monoˡ-≤ τ' p)
                       (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ')))))
     ∘ᵐ fstᵐ
-  ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congʳ (∘ᵐ-congʳ (≡ᵐ-cong ⟨ τ' ⟩ᶠ
-      (≡-≡ᵐ (cong (env-⟨⟩-ᶜ (suc τ ∸ τ')) (≤-irrelevant _ _)))))) ⟩
+  ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congʳ (∘ᵐ-congʳ (≡-cong ⟨ τ' ⟩ᶠ
+      (≡-≡ (cong (env-⟨⟩-ᶜ (suc τ ∸ τ')) (≤-irrelevant _ _)))))) ⟩
        (   ⟨⟩-≤ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ} (m≤n+m∸n (suc τ) τ')
         ∘ᵐ μ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ}
         ∘ᵐ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
                      (≤-trans (∸-monoˡ-≤ τ' (≤-trans p (≤-reflexive refl)))
                       (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ')))))
     ∘ᵐ fstᵐ
-  ≡⟨ ≡ᵐ-sym (∘ᵐ-identityˡ _) ⟩
+  ≡⟨ ≡-sym (∘ᵐ-identityˡ _) ⟩
        idᵐ
     ∘ᵐ (   ⟨⟩-≤ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ} (m≤n+m∸n (suc τ) τ')
         ∘ᵐ μ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ}
@@ -156,7 +156,7 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ τ' ⟩} (suc τ) p wk-ren with suc τ ≤? τ'
                      (≤-trans (∸-monoˡ-≤ τ' (≤-trans p (≤-reflexive refl)))
                       (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ')))))
     ∘ᵐ fstᵐ
-  ≡⟨ ∘ᵐ-congˡ (≡ᵐ-sym ⟨⟩-idᵐ) ⟩
+  ≡⟨ ∘ᵐ-congˡ (≡-sym ⟨⟩-idᵐ) ⟩
        ⟨ suc τ ⟩ᶠ idᵐ
     ∘ᵐ (   ⟨⟩-≤ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ} (m≤n+m∸n (suc τ) τ')
         ∘ᵐ μ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ}
@@ -172,7 +172,7 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ .0 ⟩} (suc τ) p ⟨⟩-η-ren =
         ∘ᵐ ⟨ 0 ⟩ᶠ (env-⟨⟩-ᶜ {Γ} (suc τ)
                     (≤-trans (∸-monoˡ-≤ 0 p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) 0)))))
     ∘ᵐ η {⟦ Γ ⟧ᵉ}
-  ≡⟨ ≡ᵐ-trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)) ⟩
+  ≡⟨ ≡-trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)) ⟩
        ⟨⟩-≤ {⟦ Γ -ᶜ suc τ ⟧ᵉ} ≤-refl
     ∘ᵐ μ {⟦ Γ -ᶜ suc τ ⟧ᵉ}
     ∘ᵐ ⟨ 0 ⟩ᶠ (env-⟨⟩-ᶜ {Γ} (suc τ)
@@ -184,7 +184,7 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ .0 ⟩} (suc τ) p ⟨⟩-η-ren =
     ∘ᵐ η {⟨ suc τ  ⟩ᵒ ⟦ Γ -ᶜ suc τ ⟧ᵉ}
     ∘ᵐ env-⟨⟩-ᶜ {Γ} (suc τ)
          (≤-trans (∸-monoˡ-≤ 0 p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) 0)))
-  ≡⟨ ∘ᵐ-congʳ (≡ᵐ-trans (≡ᵐ-sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ ⟨⟩-μ∘η≡id)) ⟩
+  ≡⟨ ∘ᵐ-congʳ (≡-trans (≡-sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ ⟨⟩-μ∘η≡id)) ⟩
        ⟨⟩-≤ {⟦ Γ -ᶜ suc τ ⟧ᵉ} ≤-refl
     ∘ᵐ idᵐ
     ∘ᵐ env-⟨⟩-ᶜ {Γ} (suc τ)
@@ -198,11 +198,11 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ .0 ⟩} (suc τ) p ⟨⟩-η-ren =
        idᵐ
     ∘ᵐ env-⟨⟩-ᶜ {Γ} (suc τ)
          (≤-trans (∸-monoˡ-≤ 0 p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) 0)))
-  ≡⟨ ∘ᵐ-congʳ (≡-≡ᵐ (cong (env-⟨⟩-ᶜ {Γ} (suc τ)) (≤-irrelevant _ _))) ⟩
+  ≡⟨ ∘ᵐ-congʳ (≡-≡ (cong (env-⟨⟩-ᶜ {Γ} (suc τ)) (≤-irrelevant _ _))) ⟩
        idᵐ
     ∘ᵐ env-⟨⟩-ᶜ {Γ} (suc τ)
          (≤-trans p (≤-reflexive (+-identityʳ (ctx-time Γ))))
-  ≡⟨ ∘ᵐ-congˡ (≡ᵐ-sym ⟨⟩-idᵐ) ⟩
+  ≡⟨ ∘ᵐ-congˡ (≡-sym ⟨⟩-idᵐ) ⟩
        ⟨ suc τ ⟩ᶠ idᵐ
     ∘ᵐ env-⟨⟩-ᶜ {Γ} (suc τ)
          (≤-trans p (≤-reflexive (+-identityʳ (ctx-time Γ))))

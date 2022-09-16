@@ -43,20 +43,20 @@ record Monad : Set₁ where
 
     -- Functoriality
 
-    Tᶠ-idᵐ : ∀ {A τ} → Tᶠ {A} {A} {τ} idᵐ ≡ᵐ idᵐ
+    Tᶠ-idᵐ : ∀ {A τ} → Tᶠ {A} {A} {τ} idᵐ ≡ idᵐ
     Tᶠ-∘ᵐ : ∀ {A B C τ} → (g : B →ᵐ C) → (f : A →ᵐ B)
-          → Tᶠ {A} {C} {τ} (g ∘ᵐ f) ≡ᵐ Tᶠ g ∘ᵐ Tᶠ f
+          → Tᶠ {A} {C} {τ} (g ∘ᵐ f) ≡ Tᶠ g ∘ᵐ Tᶠ f
 
     -- Unit and multiplication are natural
 
-    ηᵀ-nat : ∀ {A B} → (f : A →ᵐ B) → ηᵀ ∘ᵐ f ≡ᵐ Tᶠ f ∘ᵐ ηᵀ
-    μᵀ-nat : ∀ {A B τ τ'} → (f : A →ᵐ B) → μᵀ {τ = τ} {τ' = τ'} ∘ᵐ Tᶠ (Tᶠ f) ≡ᵐ Tᶠ f ∘ᵐ μᵀ
+    ηᵀ-nat : ∀ {A B} → (f : A →ᵐ B) → ηᵀ ∘ᵐ f ≡ Tᶠ f ∘ᵐ ηᵀ
+    μᵀ-nat : ∀ {A B τ τ'} → (f : A →ᵐ B) → μᵀ {τ = τ} {τ' = τ'} ∘ᵐ Tᶠ (Tᶠ f) ≡ Tᶠ f ∘ᵐ μᵀ
 
     -- Graded monad laws
 
-    μᵀ-identity₁ : ∀ {A τ} →  μᵀ {τ = 0} {τ' = τ} ∘ᵐ ηᵀ {Tᵒ A τ} ≡ᵐ idᵐ
-    μᵀ-identity₂ : ∀ {A τ} →  μᵀ {τ = τ} {τ' = 0} ∘ᵐ Tᶠ (ηᵀ {A}) ≡ᵐ τ-substᵀ (sym (+-identityʳ τ))
-    μᵀ-assoc : ∀ {A τ τ' τ''} →  μᵀ {A} {τ} {τ' + τ''} ∘ᵐ Tᶠ μᵀ ≡ᵐ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵐ (μᵀ ∘ᵐ μᵀ)
+    μᵀ-identity₁ : ∀ {A τ} →  μᵀ {τ = 0} {τ' = τ} ∘ᵐ ηᵀ {Tᵒ A τ} ≡ idᵐ
+    μᵀ-identity₂ : ∀ {A τ} →  μᵀ {τ = τ} {τ' = 0} ∘ᵐ Tᶠ (ηᵀ {A}) ≡ τ-substᵀ (sym (+-identityʳ τ))
+    μᵀ-assoc : ∀ {A τ τ' τ''} →  μᵀ {A} {τ} {τ' + τ''} ∘ᵐ Tᶠ μᵀ ≡ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵐ (μᵀ ∘ᵐ μᵀ)
 
     -- EFFECTS
 
@@ -69,18 +69,18 @@ record Monad : Set₁ where
     -- Operations are natural
 
     delayᵀ-nat : ∀ {A B} (τ : Time) {τ'} → (f : A →ᵐ B)
-               →  delayᵀ τ {τ' = τ'} ∘ᵐ [ τ ]ᶠ (Tᶠ f) ≡ᵐ Tᶠ f ∘ᵐ delayᵀ τ
+               →  delayᵀ τ {τ' = τ'} ∘ᵐ [ τ ]ᶠ (Tᶠ f) ≡ Tᶠ f ∘ᵐ delayᵀ τ
     opᵀ-nat : ∀ {A B τ} → (op : Op) → (f : A →ᵐ B)
-            →  opᵀ {τ = τ} op ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ (Tᶠ f))) ≡ᵐ Tᶠ f ∘ᵐ opᵀ op
+            →  opᵀ {τ = τ} op ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ (Tᶠ f))) ≡ Tᶠ f ∘ᵐ opᵀ op
 
     -- Operations are algebraic
 
     delayᵀ-algebraicity : ∀ {A} (τ : Time) {τ' τ''}
                         → μᵀ {A} {τ + τ'} {τ''} ∘ᵐ delayᵀ τ {τ'}
-                       ≡ᵐ τ-substᵀ (sym (+-assoc τ τ' τ'')) ∘ᵐ delayᵀ τ ∘ᵐ [ τ ]ᶠ (μᵀ {A} {τ'} {τ''})
+                       ≡ τ-substᵀ (sym (+-assoc τ τ' τ'')) ∘ᵐ delayᵀ τ ∘ᵐ [ τ ]ᶠ (μᵀ {A} {τ'} {τ''})
     opᵀ-algebraicity : ∀ {A τ τ'} → (op : Op)
                      → μᵀ {A} {op-time op + τ} {τ'} ∘ᵐ opᵀ {τ = τ} op
-                    ≡ᵐ τ-substᵀ (sym (+-assoc (op-time op) τ τ')) ∘ᵐ opᵀ op ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ μᵀ))
+                    ≡ τ-substᵀ (sym (+-assoc (op-time op) τ τ')) ∘ᵐ opᵀ op ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ μᵀ))
 
     -- STRENGTH
 
@@ -91,13 +91,13 @@ record Monad : Set₁ where
     -- Strength is natural
     
     strᵀ-nat : ∀ {A A' B B' τ} → (f : A →ᵐ A') → (g : B →ᵐ B')
-             → strᵀ {A'} {B'} ∘ᵐ mapˣᵐ ([ τ ]ᶠ f) (Tᶠ g) ≡ᵐ Tᶠ (mapˣᵐ f g) ∘ᵐ strᵀ {A} {B}
+             → strᵀ {A'} {B'} ∘ᵐ mapˣᵐ ([ τ ]ᶠ f) (Tᶠ g) ≡ Tᶠ (mapˣᵐ f g) ∘ᵐ strᵀ {A} {B}
     
     -- Operations are algebraic wrt strength
 
     strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ'}
                              → strᵀ {A} {B} {τ + τ'} ∘ᵐ mapˣᵐ idᵐ ((delayᵀ τ {τ'}))
-                            ≡ᵐ delayᵀ τ ∘ᵐ [ τ ]ᶠ (strᵀ {A} {B} {τ'}) ∘ᵐ []-monoidal ∘ᵐ mapˣᵐ (δ {A} {τ} {τ'}) idᵐ
+                            ≡ delayᵀ τ ∘ᵐ [ τ ]ᶠ (strᵀ {A} {B} {τ'}) ∘ᵐ []-monoidal ∘ᵐ mapˣᵐ (δ {A} {τ} {τ'}) idᵐ
 
     -- strᵀ-opᵀ-algebraicity : (TODO)
 

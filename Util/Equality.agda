@@ -8,6 +8,7 @@ open import Level renaming (zero to lzero; suc to lsuc)
 
 import Relation.Binary.PropositionalEquality as Eq
 open Eq public hiding (Extensionality) renaming ([_] to [|_|])
+open Eq.≡-Reasoning public using (begin_; _≡⟨⟩_; step-≡; _∎)
 
 open import Axiom.Extensionality.Propositional
 
