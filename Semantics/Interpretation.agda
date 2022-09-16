@@ -2,6 +2,8 @@
 -- Interpretation of well-typed terms in time-varying sets --
 -------------------------------------------------------------
 
+module Semantics.Interpretation where
+
 open import Function
 
 open import Data.Product
@@ -22,8 +24,7 @@ open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
-module Semantics.Interpretation where
-
+{-
 -- Interpretation of value and computation types
 
 mutual
@@ -208,3 +209,4 @@ mutual
     
   infix 25 ⟦_⟧ᶜᵗ
 
+-}
