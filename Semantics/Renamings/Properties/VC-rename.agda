@@ -2,34 +2,29 @@
 -- Relating the syntactic actions of renamings to semantic morphism composition --
 ----------------------------------------------------------------------------------
 
-module Semantics.Renamings.Properties.VC-rename where
+open import Semantics.Model
 
-open import Function
+module Semantics.Renamings.Properties.VC-rename (Mod : Model) where
 
 open import Data.Product
 
 open import Syntax.Types
-open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Renamings
 
-open import Semantics.TSets
-open import Semantics.Modality.Past
-open import Semantics.Modality.Future
-open import Semantics.Modality.Adjunction
-open import Semantics.Monad
-open import Semantics.Interpretation
-open import Semantics.Renamings.Core
+open import Semantics.Interpretation Mod
+open import Semantics.Renamings.Core Mod
 
-open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality
-open import Semantics.Renamings.Properties.var-in-env-var-rename
+open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality Mod
+open import Semantics.Renamings.Properties.var-in-env-var-rename Mod
 
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
-mutual
+open Model Mod
 
+mutual
 
   V-rename≡∘ᵗ : ∀ {Γ Γ' A}
               → (ρ : Ren Γ Γ')

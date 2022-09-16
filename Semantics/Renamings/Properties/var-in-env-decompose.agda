@@ -2,9 +2,9 @@
 -- Relating the syntactic actions of renamings to semantic morphism composition --
 ----------------------------------------------------------------------------------
 
-module Semantics.Renamings.Properties.var-in-env-decompose where
+open import Semantics.Model
 
-open import Function
+module Semantics.Renamings.Properties.var-in-env-decompose (Mod : Model) where
 
 open import Data.Product
 
@@ -14,14 +14,14 @@ open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Renamings
 
-open import Semantics.TSets
-open import Semantics.Modality.Past
-open import Semantics.Interpretation
-open import Semantics.Renamings.Core
+open import Semantics.Interpretation Mod
+open import Semantics.Renamings.Core Mod
 
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
+
+open Model Mod
 
 var-in-env-decompose : ∀ {Γ A τ}
                      → (x : A ∈[ τ ] Γ)

@@ -2,11 +2,9 @@
 -- Interpretation of well-typed terms in time-varying sets --
 -------------------------------------------------------------
 
-module Semantics.Interpretation where
+open import Semantics.Model
 
-open import Function
-
-open import Data.Product
+module Semantics.Interpretation (Mod : Model) where
 
 open import Relation.Nullary
 
@@ -14,17 +12,11 @@ open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Language
 
-open import Semantics.TSets
-open import Semantics.Modality.Future
-open import Semantics.Modality.Past
-open import Semantics.Modality.Adjunction
-open import Semantics.Monad
-
-open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
-{-
+open Model Mod
+
 -- Interpretation of value and computation types
 
 mutual
@@ -127,11 +119,6 @@ var-in-env Hd = sndᵗ
 var-in-env (Tl-∷ x) = var-in-env x ∘ᵗ fstᵗ
 var-in-env (Tl-⟨⟩ {τ = τ} x) = ε-⟨⟩ ∘ᵗ ⟨ τ ⟩ᶠ (var-in-env x)
 
--- Semantic constants for base-typed value constants
-
-constᵗ : ∀ {B} → BaseSet B → 𝟙ᵗ →ᵗ ConstTSet (BaseSet B)
-constᵗ c = tset-map (λ _ → c) (λ _ _ → refl)
-
 -- Interpretation of well-typed value and computation terms
 
 mutual
@@ -209,4 +196,3 @@ mutual
     
   infix 25 ⟦_⟧ᶜᵗ
 
--}

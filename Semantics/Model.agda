@@ -14,10 +14,6 @@ open import Semantics.Model.BaseGroundTypes
 
 open import Semantics.Model.Monad
 
-open import Util.Equality
-open import Util.Operations
-open import Util.Time
-
 record Model : Set₂ where
 
   field

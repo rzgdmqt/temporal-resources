@@ -61,9 +61,33 @@ open import Syntax.Substitutions
 
 open import Syntax.EquationalTheory
 
+-- MODEL
+--------
 
--- SEMANTICS
-------------
+open import Semantics.Model
+
+-- INTERPRETATION
+-----------------
+
+---- Interpretation of types/terms
+
+open import Semantics.Interpretation
+
+---- Semantics of renamings
+
+open import Semantics.Renamings.Core
+open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality    -- TODO: finish typing up
+
+-- open import Semantics.Renamings.Properties.env-ctx-time-⟨⟩-naturality     -- TODO: will this be needed?
+
+open import Semantics.Renamings.Properties.var-in-env-var-rename
+open import Semantics.Renamings.Properties.var-in-env-decompose
+open import Semantics.Renamings.Properties.VC-rename
+open import Semantics.Renamings
+
+{-
+-- TEMPORAL SETS SEMANTICS
+--------------------------
 
 ---- Time-varying sets
 
@@ -73,9 +97,6 @@ open import Semantics.TSets
 
 open import Semantics.Modality.Future
 open import Semantics.Modality.Past
-
----- Adjunction between modalities
-
 open import Semantics.Modality.Adjunction
 
 ---- Free monad on algebraic operations
@@ -93,17 +114,4 @@ open import Semantics.Monad.Effects.Algebraicity
 open import Semantics.Monad.Handling
 
 open import Semantics.Monad
-
----- Interpretation of types and terms
-
-open import Semantics.Interpretation
-
----- Semantics of renamings
-
-open import Semantics.Renamings.Core
-open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality    -- TODO: finish typing up
--- open import Semantics.Renamings.Properties.env-ctx-time-⟨⟩-naturality     -- TODO: will this be needed?
-open import Semantics.Renamings.Properties.var-in-env-var-rename
-open import Semantics.Renamings.Properties.var-in-env-decompose
-open import Semantics.Renamings.Properties.VC-rename
-open import Semantics.Renamings
+-}

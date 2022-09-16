@@ -2,24 +2,18 @@
 -- Semantics of variable renamings --
 -------------------------------------
 
-module Semantics.Renamings.Core where
+open import Semantics.Model
 
-open import Function
+module Semantics.Renamings.Core (Mod : Model) where
 
-open import Data.Product
-
-open import Syntax.Types
 open import Syntax.Contexts
-open import Syntax.Language
 open import Syntax.Renamings
 
-open import Semantics.TSets
-open import Semantics.Modality.Past
-open import Semantics.Interpretation
+open import Semantics.Interpretation Mod
 
-open import Util.Equality
-open import Util.Operations
 open import Util.Time
+
+open Model Mod
 
 -- Semantics of renamings as maps between environments
 
@@ -37,14 +31,13 @@ open import Util.Time
 ⟦ ⟨⟩-η⁻¹-ren ⟧ʳ =
   η⁻¹
 ⟦ ⟨⟩-μ-ren {Γ} {τ} {τ'} ⟧ʳ =
-     ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ τ'))
-  ∘ᵗ μ {A = ⟦ Γ ⟧ᵉ}
+  ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ τ')) ∘ᵗ μ {A = ⟦ Γ ⟧ᵉ}
 ⟦ ⟨⟩-μ⁻¹-ren {Γ} {τ} {τ'} ⟧ʳ =
-     μ⁻¹ {⟦ Γ ⟧ᵉ}
-  ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ' τ))
+  μ⁻¹ {⟦ Γ ⟧ᵉ} ∘ᵗ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (+-comm τ' τ))
 ⟦ ⟨⟩-≤-ren {Γ} p ⟧ʳ =
   ⟨⟩-≤ {⟦ Γ ⟧ᵉ} p
 ⟦ cong-∷-ren ρ ⟧ʳ =
   mapˣᵗ ⟦ ρ ⟧ʳ idᵗ
 ⟦ cong-⟨⟩-ren {Γ} {Γ'} {τ} ρ ⟧ʳ =
   ⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ
+
