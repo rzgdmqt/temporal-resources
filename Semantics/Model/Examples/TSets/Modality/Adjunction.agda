@@ -2,7 +2,7 @@
 -- Adjunction between the `[ t ] A` and `Γ ⟨ t ⟩` modalities --
 ---------------------------------------------------------------
 
-module Semantics.Modality.Adjunction where
+module Semantics.Model.Examples.TSets.Modality.Adjunction where
 
 open import Function
 
@@ -13,10 +13,10 @@ open import Data.Unit hiding (_≤_)
 
 open import Syntax.Language
 
-open import Semantics.TSets
+open import Semantics.Model.Examples.TSets.TSets
 
-open import Semantics.Modality.Future
-open import Semantics.Modality.Past
+open import Semantics.Model.Examples.TSets.Modality.Future
+open import Semantics.Model.Examples.TSets.Modality.Past
 
 open import Util.Equality
 open import Util.Time

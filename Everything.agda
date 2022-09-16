@@ -43,6 +43,7 @@ open import Util.Operations
 
 open import Util.HProp
 
+
 -- SYNTAX
 ---------
 
@@ -61,13 +62,13 @@ open import Syntax.Substitutions
 
 open import Syntax.EquationalTheory
 
--- MODEL
---------
+
+-- ABSTRACT SEMANTICS
+---------------------
+
+---- Models
 
 open import Semantics.Model
-
--- INTERPRETATION
------------------
 
 ---- Interpretation of types/terms
 
@@ -85,33 +86,30 @@ open import Semantics.Renamings.Properties.var-in-env-decompose
 open import Semantics.Renamings.Properties.VC-rename
 open import Semantics.Renamings
 
-{-
--- TEMPORAL SETS SEMANTICS
+
+-- TIME-VARYING SEMANTICS
 --------------------------
 
 ---- Time-varying sets
 
-open import Semantics.TSets
+open import Semantics.Model.Examples.TSets.TSets
 
 ---- Temporal modalities
 
-open import Semantics.Modality.Future
-open import Semantics.Modality.Past
-open import Semantics.Modality.Adjunction
+open import Semantics.Model.Examples.TSets.Modality.Future
+open import Semantics.Model.Examples.TSets.Modality.Past
+open import Semantics.Model.Examples.TSets.Modality.Adjunction
 
 ---- Free monad on algebraic operations
 
-open import Semantics.Monad.Core
+open import Semantics.Model.Examples.TSets.Monad.Core
 
-open import Semantics.Monad.Strength
-open import Semantics.Monad.Strength.Naturality
-open import Semantics.Monad.Strength.Algebraicity
+open import Semantics.Model.Examples.TSets.Monad.Strength
+open import Semantics.Model.Examples.TSets.Monad.Strength.Naturality
+open import Semantics.Model.Examples.TSets.Monad.Strength.Algebraicity
 
-open import Semantics.Monad.Effects
-open import Semantics.Monad.Effects.Naturality
-open import Semantics.Monad.Effects.Algebraicity
+open import Semantics.Model.Examples.TSets.Monad.Effects
+open import Semantics.Model.Examples.TSets.Monad.Effects.Naturality
+open import Semantics.Model.Examples.TSets.Monad.Effects.Algebraicity
 
-open import Semantics.Monad.Handling
-
-open import Semantics.Monad
--}
+open import Semantics.Model.Examples.TSets.Monad.Handling

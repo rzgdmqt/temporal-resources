@@ -3,7 +3,7 @@
 -- their morphisms, and basic categorical structures  --
 --------------------------------------------------------
 
-module Semantics.TSets where
+module Semantics.Model.Examples.TSets.TSets where
 
 open import Function
 
