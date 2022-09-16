@@ -200,7 +200,7 @@ var-in-env-decompose {Γ ⟨ τ ⟩} {A} {.(τ + τ')} (Tl-⟨⟩ {τ' = τ'} x)
         ∘ᵐ ⟨ τ ⟩ᶠ (⟨⟩-≤ {⟦ proj₁ (var-split (Tl-⟨⟩ {τ = τ} x)) ⟧ᵉ ×ᵐ ⟦ A ⟧ᵛ} z≤n)
         ∘ᵐ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x))))
         ∘ᵐ ⟨ τ ⟩ᶠ (split-env (proj₁ (proj₂ (proj₂ (var-split x)))))
-      ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ ⟨⟩-Tη⁻¹∘ᵐμ⁻¹≡id)) ⟩
+      ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ ⟨⟩-Tη⁻¹∘μ⁻¹≡id)) ⟩
            ⟨⟩-≤ {⟦ proj₁ (var-split (Tl-⟨⟩ {τ = τ} x)) ⟧ᵉ ×ᵐ ⟦ A ⟧ᵛ} z≤n
         ∘ᵐ ⟨⟩-≤ {⟦ proj₁ (var-split (Tl-⟨⟩ {τ = τ} x)) ⟧ᵉ ×ᵐ ⟦ A ⟧ᵛ} (≤-reflexive (sym (+-identityʳ _)))
         ∘ᵐ μ {⟦ proj₁ (var-split (Tl-⟨⟩ {τ = τ} x)) ⟧ᵉ ×ᵐ ⟦ A ⟧ᵛ}

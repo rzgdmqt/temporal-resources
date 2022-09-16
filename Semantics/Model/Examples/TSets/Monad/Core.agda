@@ -16,6 +16,7 @@ open import Data.Unit hiding (_≤_)
 open import Semantics.Model.Examples.TSets.TSets
 open import Semantics.Model.Examples.TSets.Modality.Future
 open import Semantics.Model.Examples.TSets.Modality.Past
+open import Semantics.Model.Examples.TSets.BaseGroundTypes
 
 open import Util.Equality
 open import Util.Operations

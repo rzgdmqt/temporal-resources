@@ -131,14 +131,6 @@ open import Util.Time
       → ⟨ τ ⟩ᶠ (g ∘ᵗ f) ≡ᵗ ⟨ τ ⟩ᶠ g ∘ᵗ ⟨ τ ⟩ᶠ f
 ⟨⟩-∘ᵗ g f =
   eqᵗ (λ {t} x → refl)
- 
-⟨⟩-cong : ∀ {A B τ} {f g : A →ᵗ B}
-        → f ≡ᵗ g
-        → ⟨ τ ⟩ᶠ f ≡ᵗ ⟨ τ ⟩ᶠ g
-⟨⟩-cong p = eqᵗ (λ x →
-  cong₂ _,_
-    refl
-    (cong-app (fun-ext (prf p)) (proj₂ x)))
 
 -- ⟨⟩-≤ is natural
 
@@ -167,14 +159,6 @@ open import Util.Time
       (cong₂ _,_
         (≤-irrelevant _ _)
         (cong (λ q → monotone A q x) (≤-irrelevant _ _)))) })
-
-⟨⟩-≤-cong : ∀ {A τ τ'} → (p q : τ ≤ τ')
-          → ⟨⟩-≤ {A} p ≡ᵗ ⟨⟩-≤ {A} q
-⟨⟩-≤-cong {A} p q =
-  eqᵗ (λ { (r , x) →
-    cong₂ _,_
-      (≤-irrelevant _ _)
-      (cong (λ r → monotone A r x) (≤-irrelevant _ _)) })
 
 -- η and η⁻¹ are natural
 
@@ -334,10 +318,10 @@ open import Util.Time
 
 -- Graded monad laws (for inverses)
 
-⟨⟩-Tη⁻¹∘ᵗμ⁻¹≡id : ∀ {A τ}
+⟨⟩-Tη⁻¹∘μ⁻¹≡id : ∀ {A τ}
     →  ⟨ τ ⟩ᶠ (η⁻¹ {A}) ∘ᵗ μ⁻¹ {A} {τ} {0}
     ≡ᵗ ⟨⟩-≤ {A} (≤-reflexive (sym (+-identityʳ _)))
-⟨⟩-Tη⁻¹∘ᵗμ⁻¹≡id {A} =
+⟨⟩-Tη⁻¹∘μ⁻¹≡id {A} =
   eqᵗ (λ { {t} (p , x) →
     (cong₂ _,_
       (≤-irrelevant _ _)

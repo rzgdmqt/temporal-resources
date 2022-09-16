@@ -13,6 +13,7 @@ open import Data.Sum renaming (map to map⁺)
 open import Data.Unit hiding (_≤_)
 
 open import Util.Equality hiding (begin_; _≡⟨⟩_; step-≡; _∎)
+open import Util.Operations
 open import Util.Time
 
 -- Time-varying sets (covariant presheaves on (ℕ,≤))
@@ -32,11 +33,6 @@ record TSet : Set₁ where
                    → (x : carrier t) → monotone q (monotone p x) ≡ monotone (≤-trans p q) x
 
 open TSet public
-
--- Constant time-varying sets
-
-ConstTSet : Set → TSet
-ConstTSet A = tset (λ _ → A) (λ _ → id) (λ _ → refl) (λ _ _ _ → refl)
 
 -- Maps of time-varying sets
 
@@ -230,27 +226,27 @@ mapˣᵗ-∘ᵗ f g h i =
 
 ---- Set-indexed products
 
-Π : (I : Set) → (I → TSet) → TSet
-Π I A =
+Πᵗ : (I : Set) → (I → TSet) → TSet
+Πᵗ I A =
   tset
     (λ τ → (i : I) → carrier (A i) τ)
     (λ p f i → monotone (A i) p (f i))
     (λ f → fun-ext (λ i → monotone-refl (A i) (f i)))
     (λ p q f → fun-ext (λ i → monotone-trans (A i) p q (f i)))
  
-projᵗ : ∀ {I A} → (i : I) → Π I A →ᵗ A i
+projᵗ : ∀ {I A} → (i : I) → Πᵗ I A →ᵗ A i
 projᵗ i =
   tset-map
     (λ f → f i)
     (λ p f → refl)
     
-⟨_⟩ᵢᵗ : ∀ {I A B} → ((i : I) → A →ᵗ B i) → A →ᵗ Π I B
+⟨_⟩ᵢᵗ : ∀ {I A B} → ((i : I) → A →ᵗ B i) → A →ᵗ Πᵗ I B
 ⟨ fs ⟩ᵢᵗ =
   tset-map
     (λ x i → map-carrier (fs i) x)
     (λ p x → fun-ext (λ i → map-nat (fs i) p x))
    
-mapⁱˣᵗ : ∀ {I A B} → ((i : I) → A i →ᵗ B i) → Π I A →ᵗ Π I B
+mapⁱˣᵗ : ∀ {I A B} → ((i : I) → A i →ᵗ B i) → Πᵗ I A →ᵗ Πᵗ I B
 mapⁱˣᵗ fs = ⟨ (λ i → fs i ∘ᵗ projᵗ i) ⟩ᵢᵗ
 
 mapⁱˣᵗ-identity : ∀ {I A}
@@ -383,10 +379,10 @@ curryᵗ-mapˣᵗ f g h =
       cong (map-carrier f)
         (cong₂ _,_ (map-nat g _ x) refl))))
  
-uncurryᵗ-mapʳ : ∀ {A B C D}
-             → (f : A →ᵗ B)
-             → (g : B →ᵗ C ⇒ᵗ D)
-             → uncurryᵗ (g ∘ᵗ f)
-            ≡ᵗ uncurryᵗ g ∘ᵗ mapˣᵗ f idᵗ
-uncurryᵗ-mapʳ f g =
+uncurryᵗ-mapˣᵗʳ : ∀ {A B C D}
+                → (f : A →ᵗ B)
+                → (g : B →ᵗ C ⇒ᵗ D)
+                → uncurryᵗ (g ∘ᵗ f)
+               ≡ᵗ uncurryᵗ g ∘ᵗ mapˣᵗ f idᵗ
+uncurryᵗ-mapˣᵗʳ f g =
   eqᵗ (λ xy → refl)

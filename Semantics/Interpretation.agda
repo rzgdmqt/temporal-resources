@@ -22,7 +22,7 @@ open Model Mod
 mutual
 
   ⟦_⟧ᵛ : VType → Obj
-  ⟦ Base B ⟧ᵛ  = ConstObj (BaseSet B)
+  ⟦ Base B ⟧ᵛ  = ConstObj B
   ⟦ Unit ⟧ᵛ    = 𝟙ᵐ
   ⟦ Empty ⟧ᵛ   = 𝟘ᵐ
   ⟦ A ⇒ C ⟧ᵛ   = ⟦ A ⟧ᵛ ⇒ᵐ ⟦ C ⟧ᶜ

@@ -273,7 +273,7 @@ var-in-env∘var-rename≡var-rename∘ᵐ⟦⟧ʳ {A = A} (⟨⟩-μ⁻¹-ren {
         ∘ᵐ ⟨⟩-≤ {⟦ A ⟧ᵛ} (≤-reflexive (sym (+-identityʳ _)))
         ∘ᵐ ⟨⟩-≤ {⟦ A ⟧ᵛ} (+-monoʳ-≤ τ' z≤n)
         ∘ᵐ ⟨⟩-≤ {⟦ A ⟧ᵛ} (≤-reflexive (+-comm τ' τ))
-      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (sym ⟨⟩-Tη⁻¹∘ᵐμ⁻¹≡id)) ⟩
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (sym ⟨⟩-Tη⁻¹∘μ⁻¹≡id)) ⟩
            ⟨⟩-≤ {⟦ A ⟧ᵛ} z≤n
         ∘ᵐ (   ⟨ τ' ⟩ᶠ (η⁻¹ {⟦ A ⟧ᵛ})
             ∘ᵐ μ⁻¹ {⟦ A ⟧ᵛ})

@@ -29,7 +29,7 @@ mutual
   {-# TERMINATING #-}
 
   T-alg-of-handlerˢ : ∀ {A τ τ' t}
-                    → carrier (Π Op (λ op → Π Time (λ τ'' →
+                    → carrier (Πᵗ Op (λ op → Πᵗ Time (λ τ'' →
                         ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ A τ'')))
                           ⇒ᵗ Tᵒ A (op-time op + τ'')))) t
                     → {t' : Time}
@@ -55,7 +55,7 @@ mutual
         (T-alg-of-handlerˢ h (≤-stepsʳ τ p) k))
 
   T-alg-of-handlerˢ-≤t-cod-nat : ∀ {A τ τ'} → {t t' : ℕ} → (p : t ≤ t')
-                               → (h : carrier (Π Op (λ op → Π Time (λ τ'' →
+                               → (h : carrier (Πᵗ Op (λ op → Πᵗ Time (λ τ'' →
                                         ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ A τ'')))
                                           ⇒ᵗ Tᵒ A (op-time op + τ'')))) t)
                                → {t'' : Time}
@@ -84,14 +84,14 @@ mutual
       (τ-substˢ-≤t (sym (+-assoc τ _ _)) q _)
 
   T-alg-of-handlerˢ-≤t-nat : ∀ {A τ τ'} → {t t' : ℕ} → (p : t ≤ t')
-                           → (h : carrier (Π Op (λ op → Π Time (λ τ'' →
+                           → (h : carrier (Πᵗ Op (λ op → Πᵗ Time (λ τ'' →
                                     ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ A τ'')))
                                       ⇒ᵗ Tᵒ A (op-time op + τ'')))) t)
                            → {t'' : Time}
                            → (q : t' ≤ t'')
                            → (c : Tˢ (Tᵒ A τ') τ t'')
                            → T-alg-of-handlerˢ
-                               (monotone (Π Op (λ op → Π Time (λ τ'' →
+                               (monotone (Πᵗ Op (λ op → Πᵗ Time (λ τ'' →
                                            ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ
                                              ⇒ᵗ (Tᵒ A τ''))) ⇒ᵗ Tᵒ A (op-time op + τ'')))) p h)
                                q c
@@ -114,7 +114,7 @@ mutual
           (cong (λ p → T-alg-of-handlerˢ h p k) (≤-irrelevant _ _))))
 
 T-alg-of-handlerᵀ : ∀ {A τ τ'}
-                  → Π Op (λ op → Π Time (λ τ'' →
+                  → Πᵗ Op (λ op → Πᵗ Time (λ τ'' →
                      ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ A τ'')))
                        ⇒ᵗ Tᵒ A (op-time op + τ'')))
                   →ᵗ Tᵒ (Tᵒ A τ') τ ⇒ᵗ Tᵒ A (τ + τ')

@@ -94,6 +94,10 @@ open import Semantics.Renamings
 
 open import Semantics.Model.Examples.TSets.TSets
 
+---- Semantics of base types
+
+open import Semantics.Model.Examples.TSets.BaseGroundTypes
+
 ---- Temporal modalities
 
 open import Semantics.Model.Examples.TSets.Modality.Future
@@ -113,3 +117,7 @@ open import Semantics.Model.Examples.TSets.Monad.Effects.Naturality
 open import Semantics.Model.Examples.TSets.Monad.Effects.Algebraicity
 
 open import Semantics.Model.Examples.TSets.Monad.Handling
+
+---- The time-varying sets model
+
+-- open import Semantics.Model.Examples.TSets.Model

@@ -105,6 +105,6 @@ record Category : Set₂ where
     
     curryᵐ-mapˣᵐ : ∀ {A B C D E} → (f : C ×ᵐ D →ᵐ E) → (g : A →ᵐ C) → (h : B →ᵐ D)
                  → curryᵐ (f ∘ᵐ mapˣᵐ g h) ≡ map⇒ᵐ h idᵐ ∘ᵐ curryᵐ f ∘ᵐ g
-    uncurryᵐ-mapʳ : ∀ {A B C D} → (f : A →ᵐ B) → (g : B →ᵐ C ⇒ᵐ D) → uncurryᵐ (g ∘ᵐ f) ≡ uncurryᵐ g ∘ᵐ mapˣᵐ f idᵐ
+    uncurryᵐ-mapˣᵐʳ : ∀ {A B C D} → (f : A →ᵐ B) → (g : B →ᵐ C ⇒ᵐ D) → uncurryᵐ (g ∘ᵐ f) ≡ uncurryᵐ g ∘ᵐ mapˣᵐ f idᵐ
 
   infixr 22 _⇒ᵐ_

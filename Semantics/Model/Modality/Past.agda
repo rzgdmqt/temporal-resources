@@ -49,8 +49,6 @@ record Past : Set₁ where
     ⟨⟩-∘ᵐ : ∀ {A B C τ} → (g : B →ᵐ C) → (f : A →ᵐ B)
           → ⟨ τ ⟩ᶠ (g ∘ᵐ f) ≡ ⟨ τ ⟩ᶠ g ∘ᵐ ⟨ τ ⟩ᶠ f
 
-    ⟨⟩-cong : ∀ {A B τ} {f g : A →ᵐ B} → f ≡ g → ⟨ τ ⟩ᶠ f ≡ ⟨ τ ⟩ᶠ g
-
     -- ⟨⟩-≤ is natural
 
     ⟨⟩-≤-nat : ∀ {A B τ₁ τ₂} → (f : A →ᵐ B) → (p : τ₁ ≤ τ₂)
@@ -61,8 +59,6 @@ record Past : Set₁ where
     ⟨⟩-≤-refl : ∀ {A τ} → ⟨⟩-≤ {A} (≤-refl {τ}) ≡ idᵐ
     ⟨⟩-≤-trans : ∀ {A τ τ' τ''} → (p : τ ≤ τ') → (q : τ' ≤ τ'')
                → ⟨⟩-≤ {A} p ∘ᵐ ⟨⟩-≤ {A} q ≡ ⟨⟩-≤ {A} (≤-trans p q)
-
-    ⟨⟩-≤-cong : ∀ {A τ τ'} → (p q : τ ≤ τ') → ⟨⟩-≤ {A} p ≡ ⟨⟩-≤ {A} q
 
     -- η and η⁻¹ are natural
 
@@ -109,7 +105,7 @@ record Past : Set₁ where
 
     -- Graded monad laws (for inverses) (TODO: derive from above)
 
-    ⟨⟩-Tη⁻¹∘ᵐμ⁻¹≡id : ∀ {A τ} →  ⟨ τ ⟩ᶠ (η⁻¹ {A}) ∘ᵐ μ⁻¹ {A} {τ} {0} ≡ ⟨⟩-≤ {A} (≤-reflexive (sym (+-identityʳ _)))
+    ⟨⟩-Tη⁻¹∘μ⁻¹≡id : ∀ {A τ} →  ⟨ τ ⟩ᶠ (η⁻¹ {A}) ∘ᵐ μ⁻¹ {A} {τ} {0} ≡ ⟨⟩-≤ {A} (≤-reflexive (sym (+-identityʳ _)))
 
   -- DERIVED STRUCTURE
 

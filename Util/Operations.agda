@@ -11,7 +11,7 @@ module Util.Operations where
 postulate
   BaseType : Set
 
--- Sets corresponding to base types
+-- Set of (constant) elements for each base type
 
 postulate
   BaseSet  : BaseType → Set
