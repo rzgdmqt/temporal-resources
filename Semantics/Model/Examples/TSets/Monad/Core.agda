@@ -184,7 +184,7 @@ Tˢᶠ-idᵗ : ∀ {A τ} → {t : Time}
         → (c : Tˢ A τ t)
         → Tˢᶠ idᵗ c ≡ c
 Tˢᶠ-idᵗ (leaf v) =
-  cong leaf (idᵗ-reveal v)
+  refl
 Tˢᶠ-idᵗ (op-node op v k k-nat) =
   dcong₂ (op-node op v)
     (ifun-ext (fun-ext (λ p → fun-ext (λ y → Tˢᶠ-idᵗ (k p y)))))
@@ -199,7 +199,7 @@ Tˢᶠ-∘ᵗ : ∀ {A B C τ}
        → (c : Tˢ A τ t)
        → Tˢᶠ (g ∘ᵗ f) c ≡ Tˢᶠ g (Tˢᶠ f c)
 Tˢᶠ-∘ᵗ g f (leaf v) =
-  cong leaf (∘ᵗ-reveal g f v)
+  refl
 Tˢᶠ-∘ᵗ g f (op-node op v k k-nat) =
   dcong₂ (op-node op v)
     (ifun-ext (fun-ext (λ p → (fun-ext (λ y → Tˢᶠ-∘ᵗ g f (k p y))))))
@@ -219,20 +219,14 @@ Tᶠ f = tset-map (Tˢᶠ f) (Tˢᶠ-≤t-nat f)
 Tᶠ-idᵗ : ∀ {A τ}
        → Tᶠ {A} {A} {τ} idᵗ ≡ᵗ idᵗ
 Tᶠ-idᵗ =
-  eqᵗ (λ c →
-    trans
-      (Tˢᶠ-idᵗ c)
-      (sym (idᵗ-reveal c)))
+  eqᵗ Tˢᶠ-idᵗ
 
 Tᶠ-∘ᵗ : ∀ {A B C τ}
       → (g : B →ᵗ C)
       → (f : A →ᵗ B)
       → Tᶠ {A} {C} {τ} (g ∘ᵗ f) ≡ᵗ Tᶠ g ∘ᵗ Tᶠ f
 Tᶠ-∘ᵗ g f =
-  eqᵗ (λ c →
-    trans
-      (Tˢᶠ-∘ᵗ g f c)
-      (sym (∘ᵗ-reveal (Tᶠ g) (Tᶠ f) c)))
+  eqᵗ (Tˢᶠ-∘ᵗ g f)
 
 
 -- "subst" for time-gradings
@@ -317,10 +311,7 @@ Tᶠ-∘ᵗ g f =
        → (f : A →ᵗ B)
        → ηᵀ ∘ᵗ f ≡ᵗ Tᶠ f ∘ᵗ ηᵀ
 ηᵀ-nat f =
-  eqᵗ (λ c →
-    trans
-      (∘ᵗ-reveal ηᵀ f c)
-      (sym (∘ᵗ-reveal (Tᶠ f) ηᵀ c)))
+  eqᵗ (λ c → refl)
 
 
 -- Multiplication
@@ -394,12 +385,7 @@ mutual
        → (f : A →ᵗ B)
        → μᵀ {τ = τ} {τ' = τ'} ∘ᵗ Tᶠ (Tᶠ f) ≡ᵗ Tᶠ f ∘ᵗ μᵀ
 μᵀ-nat f =
-  eqᵗ (λ c →
-    trans
-      (∘ᵗ-reveal μᵀ (Tᶠ (Tᶠ f)) c)
-      (trans
-        (μˢ-nat f c)
-        (sym (∘ᵗ-reveal (Tᶠ f) μᵀ c))))
+  eqᵗ (μˢ-nat f)
 
 τ-substˢ-μˢ : ∀ {A τ τ' τ'' t}
            → (p : τ ≡ τ'')
@@ -416,8 +402,7 @@ mutual
 μᵀ-identity₁ : ∀ {A τ}
              →  μᵀ {τ = 0} {τ' = τ} ∘ᵗ ηᵀ {Tᵒ A τ} ≡ᵗ idᵗ
 μᵀ-identity₁ =
-  eqᵗ (λ c →
-    trans (∘ᵗ-reveal μᵀ ηᵀ c) (sym (idᵗ-reveal c)))
+  eqᵗ (λ c → refl)
 
 ---- Second identity law
 
@@ -461,10 +446,7 @@ mutual
              →  μᵀ {τ = τ} {τ' = 0} ∘ᵗ Tᶠ (ηᵀ {A})
              ≡ᵗ τ-substᵀ (sym (+-identityʳ τ))
 μᵀ-identity₂ =
-  eqᵗ (λ c →
-    trans
-      (∘ᵗ-reveal μᵀ (Tᶠ ηᵀ) c)
-      (μˢ-identity₂ c))
+  eqᵗ μˢ-identity₂
 
 ---- Associativity law
 
@@ -576,19 +558,7 @@ mutual
          →  μᵀ {A} {τ} {τ' + τ''} ∘ᵗ Tᶠ μᵀ
          ≡ᵗ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵗ (μᵀ ∘ᵗ μᵀ)
 μᵀ-assoc {A} {τ} {τ'} {τ''} =
-  eqᵗ (λ c →
-    trans
-      (∘ᵗ-reveal μᵀ (Tᶠ μᵀ) c)
-      (trans
-        (trans
-          (μˢ-assoc c)
-          (sym
-            (cong (map-carrier (τ-substᵀ (+-assoc τ τ' τ'')))
-              (∘ᵗ-reveal _ _ c))))
-        (sym
-          (∘ᵗ-reveal _ _ c))))
-
-
+  eqᵗ μˢ-assoc
 
 
 

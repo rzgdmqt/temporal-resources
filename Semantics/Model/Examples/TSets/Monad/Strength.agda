@@ -32,9 +32,7 @@ mutual
        → Tˢ (A ×ᵗ B) τ t
   strˢ {A} {B} v (leaf w) =
     leaf
-      (pack-×ᵗ
-        (monotone A (≤-reflexive (+-identityʳ _)) v ,
-         w))
+      (monotone A (≤-reflexive (+-identityʳ _)) v , w)
   strˢ {A} {B} {_} {t} v (op-node {τ = τ} op w k k-nat) =
     op-node op w
       (λ p y →
@@ -68,15 +66,12 @@ mutual
               ≡ Tˢ-≤t p (strˢ {A = A} {B = B} v c)
   strˢ-≤t-nat {A} {B} {_} {t} {t'} p v (leaf w) =
     cong leaf
-      (trans
-        (cong pack-×ᵗ
-          (cong (_, monotone B p w)
-            (trans
-              (monotone-trans A _ _ v)
-              (trans
-                (cong (λ p → monotone A p v) (≤-irrelevant _ _))
-                (sym (monotone-trans A _ _ v))))))
-        (sym (pack-×ᵗ-monotone p _)))
+      (cong (_, monotone B p w)
+        (trans
+          (monotone-trans A _ _ v)
+          (trans
+            (cong (λ p → monotone A p v) (≤-irrelevant _ _))
+            (sym (monotone-trans A _ _ v)))))
   strˢ-≤t-nat {A} {B} {_} {t} {t'} p v (op-node op w k k-nat) =
     dcong₂ (op-node op (monotone ⟦ param op ⟧ᵍ p w))
       (ifun-ext (fun-ext (λ q → fun-ext (λ y →
@@ -100,11 +95,5 @@ strᵀ : ∀ {A B τ}
      → [ τ ]ᵒ A ×ᵗ Tᵒ B τ →ᵗ Tᵒ (A ×ᵗ B) τ
 strᵀ {A} {B} {τ} =
   tset-map
-    (λ vc → strˢ {A} {B} (proj₁ (unpack-×ᵗ vc)) (proj₂ (unpack-×ᵗ vc)))
-    (λ p vc →
-      trans
-        (cong₂ strˢ
-          (sym (cong proj₁ (unpack-×ᵗ-monotone {[ τ ]ᵒ A} {Tᵒ B τ} p vc)))
-          (sym (cong proj₂ (unpack-×ᵗ-monotone {[ τ ]ᵒ A} {Tᵒ B τ} p vc))))
-        (strˢ-≤t-nat p _ _))
-
+    (λ vc → strˢ {A} {B} (proj₁ vc) (proj₂ vc))
+    (λ p vc → strˢ-≤t-nat p (proj₁ vc) (proj₂ vc))

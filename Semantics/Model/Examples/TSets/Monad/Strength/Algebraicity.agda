@@ -28,84 +28,10 @@ strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ'}
                             ∘ᵗ mapˣᵗ idᵗ (delayᵀ τ {τ'})
                          ≡ᵗ    delayᵀ τ
                             ∘ᵗ [ τ ]ᶠ (strᵀ {A} {B} {τ'})
-                            ∘ᵗ []-monoidal
+                            ∘ᵗ []-monoidal {[ τ' ]ᵒ A} {Tᵒ B τ'}
                             ∘ᵗ mapˣᵗ (δ {A} {τ} {τ'}) idᵗ
 strᵀ-delayᵀ-algebraicity {A} {B} {τ} {τ'} =
-  eqᵗ (λ c →
-    trans
-      (∘ᵗ-reveal _ _ _)
-      (trans
-        (trans
-          (cong₂ strˢ
-            (trans
-              (cong (λ xy → proj₁ (unpack-×ᵗ xy)) (⟨⟩ᵗ-reveal _ _ _))
-              (trans
-                (cong proj₁ (pack-unpack-×ᵗ _))
-                (trans
-                  (∘ᵗ-reveal _ _ _)
-                  (trans
-                    (idᵗ-reveal _)
-                    (fstᵗ-reveal _)))))
-            (trans
-              (cong (λ xy → proj₂ (unpack-×ᵗ xy)) (⟨⟩ᵗ-reveal _ _ _))
-              (trans
-                (cong proj₂ (pack-unpack-×ᵗ _))
-                (trans
-                  (∘ᵗ-reveal _ _ _)
-                  (cong (map-carrier (delayᵀ τ))
-                    (sndᵗ-reveal _))))))
-          (cong (delay-node τ)
-            (trans
-              (cong₂ strˢ
-                (sym
-                  (trans
-                    (cong (λ xy → proj₁ (unpack-×ᵗ xy))
-                      (trans
-                        (∘ᵗ-reveal _ _ _)
-                        (trans
-                          ([]-monoidal-reveal _)
-                          (trans
-                            (cong
-                              (λ xy → pack-×ᵗ (unpack-×ᵗ {[ τ ]ᵒ ([ τ' ]ᵒ A)} {[ τ ]ᵒ (Tᵒ B τ')} xy))
-                              (⟨⟩ᵗ-reveal _ _ _))
-                            (cong pack-×ᵗ
-                              (pack-unpack-×ᵗ
-                                {[ τ ]ᵒ ([ τ' ]ᵒ A)}
-                                {[ τ ]ᵒ (Tᵒ B τ')}
-                                (map-carrier (δ {A} {τ} {τ'} ∘ᵗ fstᵗ) c ,
-                                 map-carrier (idᵗ ∘ᵗ sndᵗ) c)))))))
-                    (trans
-                      (cong proj₁ (pack-unpack-×ᵗ _))
-                      (trans
-                        (∘ᵗ-reveal _ _ _)
-                        (trans
-                          (cong
-                            (map-carrier (δ {A} {τ} {τ'}))
-                            (fstᵗ-reveal _))
-                          (δ-reveal _))))))
-                (sym
-                  (trans
-                    (cong (λ xy → proj₂ (unpack-×ᵗ xy)) (∘ᵗ-reveal _ _ _))
-                    (trans
-                      (cong (λ xy → proj₂ (unpack-×ᵗ xy)) ([]-monoidal-reveal _))
-                      (trans
-                        (cong proj₂ (pack-unpack-×ᵗ _))
-                        (trans
-                          (cong (λ xy → proj₂ (unpack-×ᵗ xy)) (⟨⟩ᵗ-reveal _ _ _))
-                          (trans
-                            (cong proj₂ (pack-unpack-×ᵗ _))
-                            (trans
-                              (∘ᵗ-reveal _ _ _)
-                              (trans
-                                (idᵗ-reveal _)
-                                (sndᵗ-reveal _))))))))))
-              (sym ([]-reveal _ _ _)))))
-        (sym
-          (trans
-            (∘ᵗ-reveal _ _ _)
-            (cong (map-carrier (delayᵀ τ))
-              (∘ᵗ-reveal _ _ _))))))
-
+  eqᵗ (λ c → refl)
 
 
 -- Algebraicity of algebraic operations wrt strength

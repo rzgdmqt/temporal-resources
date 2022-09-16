@@ -121,32 +121,12 @@ T-alg-of-handlerᵀ : ∀ {A τ τ'}
 T-alg-of-handlerᵀ {A} {τ} {τ'} =
   tset-map
     (λ {t} h →
-      pack-⇒ᵗ
-        (tset-map
-          (λ pc →
-            T-alg-of-handlerˢ h
-              (unpack-homᵒ t (proj₁ (unpack-×ᵗ pc)))
-              (proj₂ (unpack-×ᵗ pc)))
-          (λ p qc →
-            trans
-              (cong₂ (T-alg-of-handlerˢ h)
-                {u = proj₂ (unpack-×ᵗ (monotone (homᵒ t ×ᵗ Tᵒ (Tᵒ A τ') τ) p qc))}
-                {v = Tˢ-≤t p (proj₂ (unpack-×ᵗ qc))}
-                (≤-irrelevant _ _)
-                (sym (cong proj₂ (unpack-×ᵗ-monotone {homᵒ t} {Tᵒ (Tᵒ A τ') τ} p qc))))
-              (T-alg-of-handlerˢ-≤t-cod-nat _ h p (proj₂ (unpack-×ᵗ qc))))))
+      tset-map
+        (λ { {t'} (p , c) →
+          T-alg-of-handlerˢ h p c })
+        (λ { {t'} {t''} p (q , c) → 
+          T-alg-of-handlerˢ-≤t-cod-nat q h p c }))            
     (λ {t} {t'} p h →
-      trans
-        (cong pack-⇒ᵗ
-          (dcong₂ tset-map
-            (ifun-ext (λ {t''} → fun-ext (λ qc →
-              trans
-                (T-alg-of-handlerˢ-≤t-nat p h _ (proj₂ (unpack-×ᵗ qc)))
-                (cong₂ (T-alg-of-handlerˢ {A} {τ} {τ'} {t} h)
-                  {u = proj₂ (unpack-×ᵗ qc)}
-                  {v = proj₂ (unpack-×ᵗ {_} {Tᵒ (Tᵒ A τ') τ} {t''} (pack-×ᵗ (pack-homᵒ t (≤-trans p (unpack-homᵒ t' (proj₁ (unpack-×ᵗ qc)))) , proj₂ (unpack-×ᵗ qc))))}
-                  (≤-irrelevant _ _)
-                  (sym (cong proj₂ (pack-unpack-×ᵗ (pack-homᵒ t (≤-trans p (unpack-homᵒ t' (proj₁ (unpack-×ᵗ qc)))) , proj₂ (unpack-×ᵗ qc)))))) )))
-            (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ rc → uip)))))))
-        (sym (pack-⇒ᵗ-monotone p _)))
-
+      dcong₂ tset-map
+        (ifun-ext (fun-ext (λ pc → T-alg-of-handlerˢ-≤t-nat p h (proj₁ pc) (proj₂ pc))))
+        (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ rc → uip))))))

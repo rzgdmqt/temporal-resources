@@ -92,14 +92,6 @@ g ∘ᵗ f =
       trans
         (cong (λ y → map-carrier g y) (map-nat f p x))
         (map-nat g p (map-carrier f x)))
- 
-idᵗ-reveal : ∀ {A}
-           → ∀ {t} → (x : carrier A t) → map-carrier (idᵗ {A}) x ≡ x
-idᵗ-reveal x = refl
- 
-∘ᵗ-reveal : ∀ {A B C} → (g : B →ᵗ C) → (f : A →ᵗ B)
-          → ∀ {t} → (x : carrier A t) → map-carrier (g ∘ᵗ f) x ≡ map-carrier g (map-carrier f x)
-∘ᵗ-reveal g f x = refl
 
 infixr 9 _∘ᵗ_
 

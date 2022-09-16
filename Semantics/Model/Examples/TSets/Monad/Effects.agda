@@ -39,31 +39,12 @@ opᵀ {A} {τ} op =
   tset-map
     (λ {t} vk →
       op-node op
-        (proj₁ (unpack-×ᵗ vk))
+        (proj₁ vk)
         (λ p y →
-          map-carrier
-            (unpack-⇒ᵗ (proj₂ (unpack-×ᵗ vk)))
-            (pack-×ᵗ (pack-homᵒ (t + op-time op) p , y)))
+          map-carrier (proj₂ vk) (p , y))
         (λ p q y →
-          trans
-            (cong (map-carrier (unpack-⇒ᵗ (proj₂ (unpack-×ᵗ vk))))
-              (trans
-                (cong pack-×ᵗ
-                  (cong (_, monotone ⟦ arity op ⟧ᵍ p y)
-                    (sym (pack-homᵒ-monotone _ _))))
-                (sym (pack-×ᵗ-monotone _ _))))
-            (map-nat (unpack-⇒ᵗ (proj₂ (unpack-×ᵗ vk))) _ _)))
+          map-nat (proj₂ vk) _ (q , y)))
     (λ {t} {t'} p k →
-      dcong₃ (op-node op)
-        (sym (cong proj₁ (unpack-×ᵗ-monotone _ k)))
-        (ifun-ext (fun-ext (λ q → fun-ext (λ y →
-          trans
-            (cong (λ (k : {t' : Time} → _ + op-time op ≤ t' → carrier ⟦ arity op ⟧ᵍ t' → Tˢ A _ t') → k q y)
-              (subst-const _ (sym (cong proj₁ (unpack-×ᵗ-monotone p k))) _))
-            (trans
-              (cong (λ (f : homᵒ (t' + op-time op) ×ᵗ ⟦ arity op ⟧ᵍ →ᵗ Tᵒ A τ) → map-carrier f (pack-×ᵗ (pack-homᵒ (t' + op-time op) q , y)))
-                {(unpack-⇒ᵗ (proj₂ (unpack-×ᵗ (monotone (⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ)) p k))))}
-                {(unpack-⇒ᵗ (monotone (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ) (+-mono-≤ p ≤-refl) (proj₂ (unpack-×ᵗ k))))}
-                (cong unpack-⇒ᵗ (sym (cong proj₂ (unpack-×ᵗ-monotone _ _)))))
-              (unpack-⇒ᵗ-map-carrier (proj₂ (unpack-×ᵗ k)) _ _ y))))))
+      dcong₂ (op-node op (monotone ⟦ param op ⟧ᵍ p (proj₁ k)))
+        (ifun-ext (fun-ext (λ p → fun-ext (λ y → refl))))
         (ifun-ext (ifun-ext (fun-ext (λ q → fun-ext (λ r → fun-ext (λ y → uip)))))))
