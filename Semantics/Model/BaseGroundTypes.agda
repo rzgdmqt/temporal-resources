@@ -5,7 +5,8 @@
 open import Semantics.Model.Category
 open import Semantics.Model.Modality.Future
 
-module Semantics.Model.BaseGroundTypes (Cat : Category) (Fut : Future Cat) where
+module Semantics.Model.BaseGroundTypes (Cat : Category)
+                                       (Fut : Future Cat) where
 
 open import Util.Operations
 

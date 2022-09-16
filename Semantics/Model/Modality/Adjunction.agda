@@ -6,8 +6,9 @@ open import Semantics.Model.Category
 open import Semantics.Model.Modality.Future
 open import Semantics.Model.Modality.Past
 
-module Semantics.Model.Modality.Adjunction
-  (Cat : Category) (Fut : Future Cat) (Pas : Past Cat) where
+module Semantics.Model.Modality.Adjunction (Cat : Category)
+                                           (Fut : Future Cat)
+                                           (Pas : Past Cat) where
 
 open import Util.Time
 
