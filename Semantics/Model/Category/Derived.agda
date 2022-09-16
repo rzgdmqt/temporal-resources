@@ -10,150 +10,150 @@ open Category Cat
 
 -- BINARY PRODUCTS
 
-⟨⟩ᵗ-∘ᵗ : ∀ {A B C D} → (f : A →ᵗ B) → (g : B →ᵗ C) → (h : B →ᵗ D)
-       → ⟨ g ∘ᵗ f , h ∘ᵗ f ⟩ᵗ ≡ᵗ ⟨ g , h ⟩ᵗ ∘ᵗ f
-⟨⟩ᵗ-∘ᵗ f g h = 
+⟨⟩ᵐ-∘ᵐ : ∀ {A B C D} → (f : A →ᵐ B) → (g : B →ᵐ C) → (h : B →ᵐ D)
+       → ⟨ g ∘ᵐ f , h ∘ᵐ f ⟩ᵐ ≡ᵐ ⟨ g , h ⟩ᵐ ∘ᵐ f
+⟨⟩ᵐ-∘ᵐ f g h = 
   begin
-    ⟨ g ∘ᵗ f , h ∘ᵗ f ⟩ᵗ
-  ≡⟨ ≡ᵗ-sym
-       (⟨⟩ᵗ-unique
-         (g ∘ᵗ f) (h ∘ᵗ f) (⟨ g , h ⟩ᵗ ∘ᵗ f)
+    ⟨ g ∘ᵐ f , h ∘ᵐ f ⟩ᵐ
+  ≡⟨ ≡ᵐ-sym
+       (⟨⟩ᵐ-unique
+         (g ∘ᵐ f) (h ∘ᵐ f) (⟨ g , h ⟩ᵐ ∘ᵐ f)
          (begin
-            fstᵗ ∘ᵗ ⟨ g , h ⟩ᵗ ∘ᵗ f
-          ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc fstᵗ ⟨ g , h ⟩ᵗ f) ⟩
-            (fstᵗ ∘ᵗ ⟨ g , h ⟩ᵗ) ∘ᵗ f
-          ≡⟨ ∘ᵗ-congˡ (⟨⟩ᵗ-fstᵗ g h) ⟩
-            g ∘ᵗ f
+            fstᵐ ∘ᵐ ⟨ g , h ⟩ᵐ ∘ᵐ f
+          ≡⟨ ≡ᵐ-sym (∘ᵐ-assoc fstᵐ ⟨ g , h ⟩ᵐ f) ⟩
+            (fstᵐ ∘ᵐ ⟨ g , h ⟩ᵐ) ∘ᵐ f
+          ≡⟨ ∘ᵐ-congˡ (⟨⟩ᵐ-fstᵐ g h) ⟩
+            g ∘ᵐ f
           ∎)
          (begin
-            sndᵗ ∘ᵗ ⟨ g , h ⟩ᵗ ∘ᵗ f
-          ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc sndᵗ ⟨ g , h ⟩ᵗ f) ⟩
-            (sndᵗ ∘ᵗ ⟨ g , h ⟩ᵗ) ∘ᵗ f
-          ≡⟨ ∘ᵗ-congˡ (⟨⟩ᵗ-sndᵗ g h) ⟩
-            h ∘ᵗ f
+            sndᵐ ∘ᵐ ⟨ g , h ⟩ᵐ ∘ᵐ f
+          ≡⟨ ≡ᵐ-sym (∘ᵐ-assoc sndᵐ ⟨ g , h ⟩ᵐ f) ⟩
+            (sndᵐ ∘ᵐ ⟨ g , h ⟩ᵐ) ∘ᵐ f
+          ≡⟨ ∘ᵐ-congˡ (⟨⟩ᵐ-sndᵐ g h) ⟩
+            h ∘ᵐ f
           ∎))
    ⟩
-    ⟨ g , h ⟩ᵗ ∘ᵗ f
+    ⟨ g , h ⟩ᵐ ∘ᵐ f
   ∎
 
-mapˣᵗ-×ᵗ-assoc : ∀ {A B C A' B' C'} → (f : A →ᵗ A') (g : B →ᵗ B') (h : C →ᵗ C')
-               → mapˣᵗ (mapˣᵗ f g) h ∘ᵗ ×ᵗ-assoc ≡ᵗ ×ᵗ-assoc ∘ᵗ mapˣᵗ f (mapˣᵗ g h)
-mapˣᵗ-×ᵗ-assoc f g h = 
+mapˣᵐ-×ᵐ-assoc : ∀ {A B C A' B' C'} → (f : A →ᵐ A') (g : B →ᵐ B') (h : C →ᵐ C')
+               → mapˣᵐ (mapˣᵐ f g) h ∘ᵐ ×ᵐ-assoc ≡ᵐ ×ᵐ-assoc ∘ᵐ mapˣᵐ f (mapˣᵐ g h)
+mapˣᵐ-×ᵐ-assoc f g h = 
   begin
-    mapˣᵗ (mapˣᵗ f g) h ∘ᵗ ×ᵗ-assoc
+    mapˣᵐ (mapˣᵐ f g) h ∘ᵐ ×ᵐ-assoc
   ≡⟨⟩
-       ⟨ ⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ fstᵗ , h ∘ᵗ sndᵗ ⟩ᵗ
-    ∘ᵗ ⟨ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ , sndᵗ ∘ᵗ sndᵗ ⟩ᵗ
-  ≡⟨ ≡ᵗ-sym (⟨⟩ᵗ-∘ᵗ _ _ _) ⟩
-    ⟨    (⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ fstᵗ)
-      ∘ᵗ ⟨ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ , sndᵗ ∘ᵗ sndᵗ ⟩ᵗ ,
-         (h ∘ᵗ sndᵗ)
-      ∘ᵗ ⟨ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ , sndᵗ ∘ᵗ sndᵗ ⟩ᵗ ⟩ᵗ
-  ≡⟨ ≡ᵗ-cong₂ ⟨_,_⟩ᵗ
+       ⟨ ⟨ f ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ
+    ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+  ≡⟨ ≡ᵐ-sym (⟨⟩ᵐ-∘ᵐ _ _ _) ⟩
+    ⟨    (⟨ f ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ)
+      ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ ,
+         (h ∘ᵐ sndᵐ)
+      ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
+  ≡⟨ ≡ᵐ-cong₂ ⟨_,_⟩ᵐ
       (begin
-           (⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ fstᵗ)
-        ∘ᵗ ⟨ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ , sndᵗ ∘ᵗ sndᵗ ⟩ᵗ
-      ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
-           ⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ
-        ∘ᵗ fstᵗ
-        ∘ᵗ ⟨ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ , sndᵗ ∘ᵗ sndᵗ ⟩ᵗ
-      ≡⟨ ∘ᵗ-congʳ (⟨⟩ᵗ-fstᵗ _ _) ⟩
-           ⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ
-        ∘ᵗ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ
-      ≡⟨ ≡ᵗ-sym (⟨⟩ᵗ-∘ᵗ _ _ _) ⟩
-        ⟨ (f ∘ᵗ fstᵗ) ∘ᵗ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ ,
-          (g ∘ᵗ sndᵗ) ∘ᵗ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ ⟩ᵗ
-      ≡⟨ ≡ᵗ-cong₂ ⟨_,_⟩ᵗ
-          (≡ᵗ-trans
-            (∘ᵗ-assoc _ _ _)
-            (≡ᵗ-trans
-              (∘ᵗ-congʳ (⟨⟩ᵗ-fstᵗ _ _))
-              (≡ᵗ-sym (⟨⟩ᵗ-fstᵗ _ _))))
-          (≡ᵗ-trans
-            (∘ᵗ-assoc _ _ _)
-            (≡ᵗ-trans
-              (∘ᵗ-congʳ (⟨⟩ᵗ-sndᵗ _ _))
-              (≡ᵗ-sym
-                (≡ᵗ-trans
-                  (∘ᵗ-assoc _ _ _)
-                  (≡ᵗ-trans
-                    (∘ᵗ-congʳ (⟨⟩ᵗ-sndᵗ _ _))
-                    (≡ᵗ-trans
-                      (≡ᵗ-sym (∘ᵗ-assoc _ _ _))
-                      (≡ᵗ-trans
-                        (∘ᵗ-congˡ (⟨⟩ᵗ-fstᵗ _ _))
-                        (∘ᵗ-assoc _ _ _)))))))) ⟩
-        ⟨    fstᵗ
-          ∘ᵗ ⟨ f ∘ᵗ fstᵗ , ⟨ g ∘ᵗ fstᵗ , h ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ sndᵗ ⟩ᵗ ,
-             (fstᵗ ∘ᵗ sndᵗ)
-          ∘ᵗ ⟨ f ∘ᵗ fstᵗ , ⟨ g ∘ᵗ fstᵗ , h ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ sndᵗ ⟩ᵗ ⟩ᵗ
-      ≡⟨ ⟨⟩ᵗ-∘ᵗ _ _ _ ⟩
-           ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ
-        ∘ᵗ ⟨ f ∘ᵗ fstᵗ , ⟨ g ∘ᵗ fstᵗ , h ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ sndᵗ ⟩ᵗ
+           (⟨ f ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ)
+        ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
+           ⟨ f ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ
+        ∘ᵐ fstᵐ
+        ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _) ⟩
+           ⟨ f ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ
+        ∘ᵐ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ≡ᵐ-sym (⟨⟩ᵐ-∘ᵐ _ _ _) ⟩
+        ⟨ (f ∘ᵐ fstᵐ) ∘ᵐ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ ,
+          (g ∘ᵐ sndᵐ) ∘ᵐ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
+      ≡⟨ ≡ᵐ-cong₂ ⟨_,_⟩ᵐ
+          (≡ᵐ-trans
+            (∘ᵐ-assoc _ _ _)
+            (≡ᵐ-trans
+              (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))
+              (≡ᵐ-sym (⟨⟩ᵐ-fstᵐ _ _))))
+          (≡ᵐ-trans
+            (∘ᵐ-assoc _ _ _)
+            (≡ᵐ-trans
+              (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))
+              (≡ᵐ-sym
+                (≡ᵐ-trans
+                  (∘ᵐ-assoc _ _ _)
+                  (≡ᵐ-trans
+                    (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))
+                    (≡ᵐ-trans
+                      (≡ᵐ-sym (∘ᵐ-assoc _ _ _))
+                      (≡ᵐ-trans
+                        (∘ᵐ-congˡ (⟨⟩ᵐ-fstᵐ _ _))
+                        (∘ᵐ-assoc _ _ _)))))))) ⟩
+        ⟨    fstᵐ
+          ∘ᵐ ⟨ f ∘ᵐ fstᵐ , ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ sndᵐ ⟩ᵐ ,
+             (fstᵐ ∘ᵐ sndᵐ)
+          ∘ᵐ ⟨ f ∘ᵐ fstᵐ , ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
+      ≡⟨ ⟨⟩ᵐ-∘ᵐ _ _ _ ⟩
+           ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ
+        ∘ᵐ ⟨ f ∘ᵐ fstᵐ , ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ sndᵐ ⟩ᵐ
       ∎)
       (begin
-           (h ∘ᵗ sndᵗ)
-        ∘ᵗ ⟨ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ , sndᵗ ∘ᵗ sndᵗ ⟩ᵗ
-      ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
+           (h ∘ᵐ sndᵐ)
+        ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
            h
-        ∘ᵗ sndᵗ
-        ∘ᵗ ⟨ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ , sndᵗ ∘ᵗ sndᵗ ⟩ᵗ
-      ≡⟨ ∘ᵗ-congʳ (⟨⟩ᵗ-sndᵗ _ _) ⟩
+        ∘ᵐ sndᵐ
+        ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _) ⟩
            h
-        ∘ᵗ sndᵗ ∘ᵗ sndᵗ
-      ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
-           (h ∘ᵗ sndᵗ)
-        ∘ᵗ sndᵗ
-      ≡⟨ ∘ᵗ-congˡ (≡ᵗ-sym (⟨⟩ᵗ-sndᵗ _ _)) ⟩
-           (   sndᵗ
-            ∘ᵗ ⟨ g ∘ᵗ fstᵗ , h ∘ᵗ sndᵗ ⟩ᵗ)
-        ∘ᵗ sndᵗ
-      ≡⟨ ∘ᵗ-assoc _ _ _ ⟩
-           sndᵗ
-        ∘ᵗ ⟨ g ∘ᵗ fstᵗ , h ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ sndᵗ
-      ≡⟨ ∘ᵗ-congʳ (≡ᵗ-sym (⟨⟩ᵗ-sndᵗ _ _)) ⟩
-           sndᵗ
-        ∘ᵗ sndᵗ
-        ∘ᵗ ⟨ f ∘ᵗ fstᵗ , ⟨ g ∘ᵗ fstᵗ , h ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ sndᵗ ⟩ᵗ
-      ≡⟨ ≡ᵗ-sym (∘ᵗ-assoc _ _ _) ⟩
-           (sndᵗ ∘ᵗ sndᵗ)
-        ∘ᵗ ⟨ f ∘ᵗ fstᵗ , ⟨ g ∘ᵗ fstᵗ , h ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ sndᵗ ⟩ᵗ
+        ∘ᵐ sndᵐ ∘ᵐ sndᵐ
+      ≡⟨ ≡ᵐ-sym (∘ᵐ-assoc _ _ _) ⟩
+           (h ∘ᵐ sndᵐ)
+        ∘ᵐ sndᵐ
+      ≡⟨ ∘ᵐ-congˡ (≡ᵐ-sym (⟨⟩ᵐ-sndᵐ _ _)) ⟩
+           (   sndᵐ
+            ∘ᵐ ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ)
+        ∘ᵐ sndᵐ
+      ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
+           sndᵐ
+        ∘ᵐ ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ sndᵐ
+      ≡⟨ ∘ᵐ-congʳ (≡ᵐ-sym (⟨⟩ᵐ-sndᵐ _ _)) ⟩
+           sndᵐ
+        ∘ᵐ sndᵐ
+        ∘ᵐ ⟨ f ∘ᵐ fstᵐ , ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ≡ᵐ-sym (∘ᵐ-assoc _ _ _) ⟩
+           (sndᵐ ∘ᵐ sndᵐ)
+        ∘ᵐ ⟨ f ∘ᵐ fstᵐ , ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ sndᵐ ⟩ᵐ
       ∎) ⟩
-    ⟨    ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ
-      ∘ᵗ ⟨ f ∘ᵗ fstᵗ , ⟨ g ∘ᵗ fstᵗ , h ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ sndᵗ ⟩ᵗ ,
-         (sndᵗ ∘ᵗ sndᵗ)
-      ∘ᵗ ⟨ f ∘ᵗ fstᵗ , ⟨ g ∘ᵗ fstᵗ , h ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ sndᵗ ⟩ᵗ ⟩ᵗ
-  ≡⟨ ⟨⟩ᵗ-∘ᵗ _ _ _ ⟩
-       ⟨ ⟨ fstᵗ , fstᵗ ∘ᵗ sndᵗ ⟩ᵗ , sndᵗ ∘ᵗ sndᵗ ⟩ᵗ
-    ∘ᵗ ⟨ f ∘ᵗ fstᵗ , ⟨ g ∘ᵗ fstᵗ , h ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ sndᵗ ⟩ᵗ
+    ⟨    ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ f ∘ᵐ fstᵐ , ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ sndᵐ ⟩ᵐ ,
+         (sndᵐ ∘ᵐ sndᵐ)
+      ∘ᵐ ⟨ f ∘ᵐ fstᵐ , ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
+  ≡⟨ ⟨⟩ᵐ-∘ᵐ _ _ _ ⟩
+       ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+    ∘ᵐ ⟨ f ∘ᵐ fstᵐ , ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ sndᵐ ⟩ᵐ
   ≡⟨⟩
-    ×ᵗ-assoc ∘ᵗ mapˣᵗ f (mapˣᵗ g h)
+    ×ᵐ-assoc ∘ᵐ mapˣᵐ f (mapˣᵐ g h)
   ∎
 
-mapˣᵗ-∘ᵗ : ∀ {A A' A'' B B' B''} → (f : A →ᵗ A') (g : B →ᵗ B') (h : A' →ᵗ A'') (i : B' →ᵗ B'')
-         → mapˣᵗ (h ∘ᵗ f) (i ∘ᵗ g) ≡ᵗ mapˣᵗ h i ∘ᵗ mapˣᵗ f g
-mapˣᵗ-∘ᵗ f g h i = 
+mapˣᵐ-∘ᵐ : ∀ {A A' A'' B B' B''} → (f : A →ᵐ A') (g : B →ᵐ B') (h : A' →ᵐ A'') (i : B' →ᵐ B'')
+         → mapˣᵐ (h ∘ᵐ f) (i ∘ᵐ g) ≡ᵐ mapˣᵐ h i ∘ᵐ mapˣᵐ f g
+mapˣᵐ-∘ᵐ f g h i = 
   begin
-    mapˣᵗ (h ∘ᵗ f) (i ∘ᵗ g)
+    mapˣᵐ (h ∘ᵐ f) (i ∘ᵐ g)
   ≡⟨⟩
-    ⟨ (h ∘ᵗ f) ∘ᵗ fstᵗ , (i ∘ᵗ g) ∘ᵗ sndᵗ ⟩ᵗ
-  ≡⟨ ≡ᵗ-cong₂ ⟨_,_⟩ᵗ
-      (≡ᵗ-sym
-        (≡ᵗ-trans
-          (∘ᵗ-assoc _ _ _)
-          (≡ᵗ-trans
-            (∘ᵗ-congʳ (⟨⟩ᵗ-fstᵗ _ _))
-            (≡ᵗ-sym (∘ᵗ-assoc _ _ _)))))
-      (≡ᵗ-sym
-        (≡ᵗ-trans
-          (∘ᵗ-assoc _ _ _)
-          (≡ᵗ-trans
-            (∘ᵗ-congʳ (⟨⟩ᵗ-sndᵗ _ _))
-            (≡ᵗ-sym (∘ᵗ-assoc _ _ _))))) ⟩
-    ⟨ (h ∘ᵗ fstᵗ) ∘ᵗ ⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ ,
-      (i ∘ᵗ sndᵗ) ∘ᵗ ⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ ⟩ᵗ
-  ≡⟨ ⟨⟩ᵗ-∘ᵗ _ _ _ ⟩
-    ⟨ h ∘ᵗ fstᵗ , i ∘ᵗ sndᵗ ⟩ᵗ ∘ᵗ ⟨ f ∘ᵗ fstᵗ , g ∘ᵗ sndᵗ ⟩ᵗ
+    ⟨ (h ∘ᵐ f) ∘ᵐ fstᵐ , (i ∘ᵐ g) ∘ᵐ sndᵐ ⟩ᵐ
+  ≡⟨ ≡ᵐ-cong₂ ⟨_,_⟩ᵐ
+      (≡ᵐ-sym
+        (≡ᵐ-trans
+          (∘ᵐ-assoc _ _ _)
+          (≡ᵐ-trans
+            (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))
+            (≡ᵐ-sym (∘ᵐ-assoc _ _ _)))))
+      (≡ᵐ-sym
+        (≡ᵐ-trans
+          (∘ᵐ-assoc _ _ _)
+          (≡ᵐ-trans
+            (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))
+            (≡ᵐ-sym (∘ᵐ-assoc _ _ _))))) ⟩
+    ⟨ (h ∘ᵐ fstᵐ) ∘ᵐ ⟨ f ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ ,
+      (i ∘ᵐ sndᵐ) ∘ᵐ ⟨ f ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
+  ≡⟨ ⟨⟩ᵐ-∘ᵐ _ _ _ ⟩
+    ⟨ h ∘ᵐ fstᵐ , i ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ ⟨ f ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ
   ≡⟨⟩
-    mapˣᵗ h i ∘ᵗ mapˣᵗ f g
+    mapˣᵐ h i ∘ᵐ mapˣᵐ f g
   ∎

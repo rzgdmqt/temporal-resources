@@ -24,30 +24,30 @@ record Adjunction : Set₁ where
 
     -- Unit of the adjunction
 
-    η⊣ : ∀ {A τ} → A →ᵗ [ τ ]ᵒ (⟨ τ ⟩ᵒ A)
-    ε⊣ : ∀ {A τ} → ⟨ τ ⟩ᵒ ([ τ ]ᵒ A) →ᵗ A
+    η⊣ : ∀ {A τ} → A →ᵐ [ τ ]ᵒ (⟨ τ ⟩ᵒ A)
+    ε⊣ : ∀ {A τ} → ⟨ τ ⟩ᵒ ([ τ ]ᵒ A) →ᵐ A
 
     -- PROPERTIES
 
     -- η-⊣ is natural
 
-    η⊣-nat : ∀ {A B τ} → (f : A →ᵗ B)
-           → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵗ η⊣ ≡ᵗ η⊣ ∘ᵗ f
+    η⊣-nat : ∀ {A B τ} → (f : A →ᵐ B)
+           → [ τ ]ᶠ (⟨ τ ⟩ᶠ f) ∘ᵐ η⊣ ≡ᵐ η⊣ ∘ᵐ f
 
     -- ε-⊣ is natural
 
-    ε⊣-nat : ∀ {A B τ} → (f : A →ᵗ B)
-           → f ∘ᵗ ε⊣ ≡ᵗ ε⊣ ∘ᵗ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
+    ε⊣-nat : ∀ {A B τ} → (f : A →ᵐ B)
+           → f ∘ᵐ ε⊣ ≡ᵐ ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ([ τ ]ᶠ f)
 
     -- Triangle equations of the adjunction
   
-    ε⊣∘Fη≡id : ∀ {A τ} → ε⊣ {⟨ τ ⟩ᵒ A} ∘ᵗ ⟨ τ ⟩ᶠ (η⊣ {A}) ≡ᵗ idᵗ
-    Gε⊣∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε⊣ {A}) ∘ᵗ η⊣ {[ τ ]ᵒ A} ≡ᵗ idᵗ
+    ε⊣∘Fη≡id : ∀ {A τ} → ε⊣ {⟨ τ ⟩ᵒ A} ∘ᵐ ⟨ τ ⟩ᶠ (η⊣ {A}) ≡ᵐ idᵐ
+    Gε⊣∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε⊣ {A}) ∘ᵐ η⊣ {[ τ ]ᵒ A} ≡ᵐ idᵐ
 
     -- Interaction between η-⊣/ε-⊣ of the adjunction and η/ε of the modalities
 
-    η⊣≡ε⁻¹∘η : ∀ {A} → η⊣ {A} ≡ᵗ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵗ η {A}
-    ε⊣≡ε∘η⁻¹ : ∀ {A} → ε⊣ {A} ≡ᵗ ε {A} ∘ᵗ η⁻¹ {[ 0 ]ᵒ A}
+    η⊣≡ε⁻¹∘η : ∀ {A} → η⊣ {A} ≡ᵐ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵐ η {A}
+    ε⊣≡ε∘η⁻¹ : ∀ {A} → ε⊣ {A} ≡ᵐ ε {A} ∘ᵐ η⁻¹ {[ 0 ]ᵒ A}
 
     -- Interaction between η-⊣/ε-⊣ of the adjunction and μ/δ of the modalities
 

@@ -19,16 +19,16 @@ record BaseGroundTypes : Set₁ where
   
     -- constant TSET (TODO: change to an object for every base type)
     
-    ConstTSet : Set → TSet
+    ConstObj : Set → Obj
 
     -- interpretation of base-typed constants
     
-    constᵗ : ∀ {B} → BaseSet B → 𝟙ᵗ →ᵗ ConstTSet (BaseSet B)
+    constᵐ : ∀ {B} → BaseSet B → 𝟙ᵐ →ᵐ ConstObj (BaseSet B)
 
   -- extension of base type interpretation to ground types
   
-  ⟦_⟧ᵍ : GType → TSet
-  ⟦ Base B ⟧ᵍ   = ConstTSet (BaseSet B)
-  ⟦ Unit ⟧ᵍ     = 𝟙ᵗ
-  ⟦ Empty ⟧ᵍ    = 𝟘ᵗ
+  ⟦_⟧ᵍ : GType → Obj
+  ⟦ Base B ⟧ᵍ   = ConstObj (BaseSet B)
+  ⟦ Unit ⟧ᵍ     = 𝟙ᵐ
+  ⟦ Empty ⟧ᵍ    = 𝟘ᵐ
   ⟦ [ τ ]ᵍ A ⟧ᵍ = [ τ ]ᵒ ⟦ A ⟧ᵍ

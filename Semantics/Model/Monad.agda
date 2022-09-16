@@ -29,75 +29,75 @@ record Monad : Set₁ where
 
     -- Functor
     
-    Tᵒ : TSet → Time → TSet
-    Tᶠ : ∀ {A B τ} → A →ᵗ B → Tᵒ A τ →ᵗ Tᵒ B τ
+    Tᵒ : Obj → Time → Obj
+    Tᶠ : ∀ {A B τ} → A →ᵐ B → Tᵒ A τ →ᵐ Tᵒ B τ
 
     -- Unit and multiplication
 
-    ηᵀ : ∀ {A} → A →ᵗ Tᵒ A 0
-    μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵗ Tᵒ A (τ + τ')
+    ηᵀ : ∀ {A} → A →ᵐ Tᵒ A 0
+    μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵐ Tᵒ A (τ + τ')
 
     -- Equality coercion/substitutions
 
-    τ-substᵀ : ∀ {A τ τ'} → τ ≡ τ' → Tᵒ A τ →ᵗ Tᵒ A τ'
+    τ-substᵀ : ∀ {A τ τ'} → τ ≡ τ' → Tᵒ A τ →ᵐ Tᵒ A τ'
 
     -- Functoriality
 
-    Tᶠ-idᵗ : ∀ {A τ} → Tᶠ {A} {A} {τ} idᵗ ≡ᵗ idᵗ
-    Tᶠ-∘ᵗ : ∀ {A B C τ} → (g : B →ᵗ C) → (f : A →ᵗ B)
-          → Tᶠ {A} {C} {τ} (g ∘ᵗ f) ≡ᵗ Tᶠ g ∘ᵗ Tᶠ f
+    Tᶠ-idᵐ : ∀ {A τ} → Tᶠ {A} {A} {τ} idᵐ ≡ᵐ idᵐ
+    Tᶠ-∘ᵐ : ∀ {A B C τ} → (g : B →ᵐ C) → (f : A →ᵐ B)
+          → Tᶠ {A} {C} {τ} (g ∘ᵐ f) ≡ᵐ Tᶠ g ∘ᵐ Tᶠ f
 
     -- Unit and multiplication are natural
 
-    ηᵀ-nat : ∀ {A B} → (f : A →ᵗ B) → ηᵀ ∘ᵗ f ≡ᵗ Tᶠ f ∘ᵗ ηᵀ
-    μᵀ-nat : ∀ {A B τ τ'} → (f : A →ᵗ B) → μᵀ {τ = τ} {τ' = τ'} ∘ᵗ Tᶠ (Tᶠ f) ≡ᵗ Tᶠ f ∘ᵗ μᵀ
+    ηᵀ-nat : ∀ {A B} → (f : A →ᵐ B) → ηᵀ ∘ᵐ f ≡ᵐ Tᶠ f ∘ᵐ ηᵀ
+    μᵀ-nat : ∀ {A B τ τ'} → (f : A →ᵐ B) → μᵀ {τ = τ} {τ' = τ'} ∘ᵐ Tᶠ (Tᶠ f) ≡ᵐ Tᶠ f ∘ᵐ μᵀ
 
     -- Graded monad laws
 
-    μᵀ-identity₁ : ∀ {A τ} →  μᵀ {τ = 0} {τ' = τ} ∘ᵗ ηᵀ {Tᵒ A τ} ≡ᵗ idᵗ
-    μᵀ-identity₂ : ∀ {A τ} →  μᵀ {τ = τ} {τ' = 0} ∘ᵗ Tᶠ (ηᵀ {A}) ≡ᵗ τ-substᵀ (sym (+-identityʳ τ))
-    μᵀ-assoc : ∀ {A τ τ' τ''} →  μᵀ {A} {τ} {τ' + τ''} ∘ᵗ Tᶠ μᵀ ≡ᵗ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵗ (μᵀ ∘ᵗ μᵀ)
+    μᵀ-identity₁ : ∀ {A τ} →  μᵀ {τ = 0} {τ' = τ} ∘ᵐ ηᵀ {Tᵒ A τ} ≡ᵐ idᵐ
+    μᵀ-identity₂ : ∀ {A τ} →  μᵀ {τ = τ} {τ' = 0} ∘ᵐ Tᶠ (ηᵀ {A}) ≡ᵐ τ-substᵀ (sym (+-identityʳ τ))
+    μᵀ-assoc : ∀ {A τ τ' τ''} →  μᵀ {A} {τ} {τ' + τ''} ∘ᵐ Tᶠ μᵀ ≡ᵐ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵐ (μᵀ ∘ᵐ μᵀ)
 
     -- EFFECTS
 
     -- Operations
 
-    delayᵀ : ∀ {A} (τ : Time) {τ'} → [ τ ]ᵒ (Tᵒ A τ') →ᵗ Tᵒ A (τ + τ')
+    delayᵀ : ∀ {A} (τ : Time) {τ'} → [ τ ]ᵒ (Tᵒ A τ') →ᵐ Tᵒ A (τ + τ')
     opᵀ : ∀ {A τ} → (op : Op)
-        → ⟦ param op ⟧ᵍ ×ᵗ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ Tᵒ A τ) →ᵗ Tᵒ A (op-time op + τ)
+        → ⟦ param op ⟧ᵍ ×ᵐ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵐ Tᵒ A τ) →ᵐ Tᵒ A (op-time op + τ)
 
     -- Operations are natural
 
-    delayᵀ-nat : ∀ {A B} (τ : Time) {τ'} → (f : A →ᵗ B)
-               →  delayᵀ τ {τ' = τ'} ∘ᵗ [ τ ]ᶠ (Tᶠ f) ≡ᵗ Tᶠ f ∘ᵗ delayᵀ τ
-    opᵀ-nat : ∀ {A B τ} → (op : Op) → (f : A →ᵗ B)
-            →  opᵀ {τ = τ} op ∘ᵗ mapˣᵗ idᵗ ([ op-time op ]ᶠ (map⇒ᵗ idᵗ (Tᶠ f))) ≡ᵗ Tᶠ f ∘ᵗ opᵀ op
+    delayᵀ-nat : ∀ {A B} (τ : Time) {τ'} → (f : A →ᵐ B)
+               →  delayᵀ τ {τ' = τ'} ∘ᵐ [ τ ]ᶠ (Tᶠ f) ≡ᵐ Tᶠ f ∘ᵐ delayᵀ τ
+    opᵀ-nat : ∀ {A B τ} → (op : Op) → (f : A →ᵐ B)
+            →  opᵀ {τ = τ} op ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ (Tᶠ f))) ≡ᵐ Tᶠ f ∘ᵐ opᵀ op
 
     -- Operations are algebraic
 
     delayᵀ-algebraicity : ∀ {A} (τ : Time) {τ' τ''}
-                        → μᵀ {A} {τ + τ'} {τ''} ∘ᵗ delayᵀ τ {τ'}
-                       ≡ᵗ τ-substᵀ (sym (+-assoc τ τ' τ'')) ∘ᵗ delayᵀ τ ∘ᵗ [ τ ]ᶠ (μᵀ {A} {τ'} {τ''})
+                        → μᵀ {A} {τ + τ'} {τ''} ∘ᵐ delayᵀ τ {τ'}
+                       ≡ᵐ τ-substᵀ (sym (+-assoc τ τ' τ'')) ∘ᵐ delayᵀ τ ∘ᵐ [ τ ]ᶠ (μᵀ {A} {τ'} {τ''})
     opᵀ-algebraicity : ∀ {A τ τ'} → (op : Op)
-                     → μᵀ {A} {op-time op + τ} {τ'} ∘ᵗ opᵀ {τ = τ} op
-                    ≡ᵗ τ-substᵀ (sym (+-assoc (op-time op) τ τ')) ∘ᵗ opᵀ op ∘ᵗ mapˣᵗ idᵗ ([ op-time op ]ᶠ (map⇒ᵗ idᵗ μᵀ))
+                     → μᵀ {A} {op-time op + τ} {τ'} ∘ᵐ opᵀ {τ = τ} op
+                    ≡ᵐ τ-substᵀ (sym (+-assoc (op-time op) τ τ')) ∘ᵐ opᵀ op ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ μᵀ))
 
     -- STRENGTH
 
     -- Strength
 
-    strᵀ : ∀ {A B τ} → [ τ ]ᵒ A ×ᵗ Tᵒ B τ →ᵗ Tᵒ (A ×ᵗ B) τ
+    strᵀ : ∀ {A B τ} → [ τ ]ᵒ A ×ᵐ Tᵒ B τ →ᵐ Tᵒ (A ×ᵐ B) τ
 
     -- Strength is natural
     
-    strᵀ-nat : ∀ {A A' B B' τ} → (f : A →ᵗ A') → (g : B →ᵗ B')
-             → strᵀ {A'} {B'} ∘ᵗ mapˣᵗ ([ τ ]ᶠ f) (Tᶠ g) ≡ᵗ Tᶠ (mapˣᵗ f g) ∘ᵗ strᵀ {A} {B}
+    strᵀ-nat : ∀ {A A' B B' τ} → (f : A →ᵐ A') → (g : B →ᵐ B')
+             → strᵀ {A'} {B'} ∘ᵐ mapˣᵐ ([ τ ]ᶠ f) (Tᶠ g) ≡ᵐ Tᶠ (mapˣᵐ f g) ∘ᵐ strᵀ {A} {B}
     
     -- Operations are algebraic wrt strength
 
     strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ'}
-                             → strᵀ {A} {B} {τ + τ'} ∘ᵗ mapˣᵗ idᵗ ((delayᵀ τ {τ'}))
-                            ≡ᵗ delayᵀ τ ∘ᵗ [ τ ]ᶠ (strᵀ {A} {B} {τ'}) ∘ᵗ []-monoidal ∘ᵗ mapˣᵗ (δ {A} {τ} {τ'}) idᵗ
+                             → strᵀ {A} {B} {τ + τ'} ∘ᵐ mapˣᵐ idᵐ ((delayᵀ τ {τ'}))
+                            ≡ᵐ delayᵀ τ ∘ᵐ [ τ ]ᶠ (strᵀ {A} {B} {τ'}) ∘ᵐ []-monoidal ∘ᵐ mapˣᵐ (δ {A} {τ} {τ'}) idᵐ
 
     -- strᵀ-opᵀ-algebraicity : (TODO)
 
@@ -107,9 +107,9 @@ record Monad : Set₁ where
 
     T-alg-of-handlerᵀ : ∀ {A τ τ'}
                       → Π Op (λ op → Π Time (λ τ'' →
-                         ⟦ param op ⟧ᵍ ×ᵗ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵗ (Tᵒ A τ'')))
-                           ⇒ᵗ Tᵒ A (op-time op + τ'')))
-                      →ᵗ Tᵒ (Tᵒ A τ') τ ⇒ᵗ Tᵒ A (τ + τ')
+                         ⟦ param op ⟧ᵍ ×ᵐ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵐ (Tᵒ A τ'')))
+                           ⇒ᵐ Tᵒ A (op-time op + τ'')))
+                      →ᵐ Tᵒ (Tᵒ A τ') τ ⇒ᵐ Tᵒ A (τ + τ')
 
     -- Properties
 
