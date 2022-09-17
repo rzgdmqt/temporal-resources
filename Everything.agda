@@ -76,18 +76,10 @@ open import Semantics.Interpretation
 
 ---- Semantics of renamings
 
-open import Semantics.Renamings.Core
-open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality    -- TODO: finish typing up
-
--- open import Semantics.Renamings.Properties.env-ctx-time-⟨⟩-naturality     -- TODO: will this be needed?
-
-open import Semantics.Renamings.Properties.var-in-env-var-rename
-open import Semantics.Renamings.Properties.var-in-env-decompose
-open import Semantics.Renamings.Properties.VC-rename
 open import Semantics.Renamings
 
 
--- TIME-VARYING SEMANTICS
+-- TIME-VARYING SETS MODEL
 --------------------------
 
 ---- Time-varying sets
@@ -106,18 +98,8 @@ open import Semantics.Model.Examples.TSets.Modality.Adjunction
 
 ---- Free monad on algebraic operations
 
-open import Semantics.Model.Examples.TSets.Monad.Core
+open import Semantics.Model.Examples.TSets.Monad
 
-open import Semantics.Model.Examples.TSets.Monad.Strength
-open import Semantics.Model.Examples.TSets.Monad.Strength.Naturality
-open import Semantics.Model.Examples.TSets.Monad.Strength.Algebraicity
-
-open import Semantics.Model.Examples.TSets.Monad.Effects
-open import Semantics.Model.Examples.TSets.Monad.Effects.Naturality
-open import Semantics.Model.Examples.TSets.Monad.Effects.Algebraicity
-
-open import Semantics.Model.Examples.TSets.Monad.Handling
-
----- The time-varying sets model
+---- Time-varying sets model
 
 open import Semantics.Model.Examples.TSets.Model

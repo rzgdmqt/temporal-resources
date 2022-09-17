@@ -22,6 +22,15 @@ open Category Cat
 
 -- BINARY PRODUCTS
 
+×ᵐ-assoc : ∀ {A B C} → A ×ᵐ (B ×ᵐ C) →ᵐ (A ×ᵐ B) ×ᵐ C
+×ᵐ-assoc = ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+ 
+×ᵐ-assoc⁻¹ : ∀ {A B C} → (A ×ᵐ B) ×ᵐ C →ᵐ A ×ᵐ (B ×ᵐ C)
+×ᵐ-assoc⁻¹ = ⟨ fstᵐ ∘ᵐ fstᵐ , ⟨ sndᵐ ∘ᵐ fstᵐ , sndᵐ ⟩ᵐ ⟩ᵐ
+ 
+×ᵐ-swap : ∀ {A B} → A ×ᵐ B →ᵐ B ×ᵐ A
+×ᵐ-swap = ⟨ sndᵐ , fstᵐ ⟩ᵐ
+
 ⟨⟩ᵐ-∘ᵐ : ∀ {A B C D} → (f : A →ᵐ B) → (g : B →ᵐ C) → (h : B →ᵐ D)
        → ⟨ g ∘ᵐ f , h ∘ᵐ f ⟩ᵐ ≡ ⟨ g , h ⟩ᵐ ∘ᵐ f
 ⟨⟩ᵐ-∘ᵐ f g h = 
@@ -189,7 +198,7 @@ mapˣᵐ-∘ᵐ f g h i =
     ⟨ g ⟩ᵢᵐ ∘ᵐ f
   ∎
 
-mapⁱˣᵐ : ∀ {I A B} → ((i : I) → A i →ᵐ B i) → Π I A →ᵐ Π I B
+mapⁱˣᵐ : ∀ {I A B} → ((i : I) → A i →ᵐ B i) → Πᵐ I A →ᵐ Πᵐ I B
 mapⁱˣᵐ fs = ⟨ (λ i → fs i ∘ᵐ projᵐ i) ⟩ᵢᵐ
 
 mapⁱˣᵐ-identity : ∀ {I A} → mapⁱˣᵐ {I} {A} {A} (λ i → idᵐ) ≡ idᵐ

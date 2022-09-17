@@ -60,30 +60,21 @@ record Category : Set₂ where
 
   mapˣᵐ : ∀ {A B C D} → A →ᵐ C → B →ᵐ D → A ×ᵐ B →ᵐ C ×ᵐ D
   mapˣᵐ f g = ⟨ f ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ
-   
-  ×ᵐ-assoc : ∀ {A B C} → A ×ᵐ (B ×ᵐ C) →ᵐ (A ×ᵐ B) ×ᵐ C
-  ×ᵐ-assoc = ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
-   
-  ×ᵐ-assoc⁻¹ : ∀ {A B C} → (A ×ᵐ B) ×ᵐ C →ᵐ A ×ᵐ (B ×ᵐ C)
-  ×ᵐ-assoc⁻¹ = ⟨ fstᵐ ∘ᵐ fstᵐ , ⟨ sndᵐ ∘ᵐ fstᵐ , sndᵐ ⟩ᵐ ⟩ᵐ
-   
-  ×ᵐ-swap : ∀ {A B} → A ×ᵐ B →ᵐ B ×ᵐ A
-  ×ᵐ-swap = ⟨ sndᵐ , fstᵐ ⟩ᵐ
-
+  
   infixr 23 _×ᵐ_
 
   -- SET-INDEXED PRODUCTS
 
   field
-    Π : (I : Set) → (I → Obj) → Obj
+    Πᵐ : (I : Set) → (I → Obj) → Obj
     
-    projᵐ : ∀ {I A} → (i : I) → Π I A →ᵐ A i
-    ⟨_⟩ᵢᵐ : ∀ {I A B} → ((i : I) → A →ᵐ B i) → A →ᵐ Π I B
+    projᵐ : ∀ {I A} → (i : I) → Πᵐ I A →ᵐ A i
+    ⟨_⟩ᵢᵐ : ∀ {I A B} → ((i : I) → A →ᵐ B i) → A →ᵐ Πᵐ I B
 
     ⟨⟩ᵢᵐ-projᵐ : ∀ {I} {A} {B : I → Obj} → (f : ((i : I) → A →ᵐ B i)) → (i : I) → projᵐ i ∘ᵐ ⟨ f ⟩ᵢᵐ ≡ f i
     ⟨⟩ᵢᵐ-unique : ∀ {I} {A} {B : I → Obj}
                 → (f : (i : I) → A →ᵐ B i)
-                → (g : A →ᵐ Π I B)
+                → (g : A →ᵐ Πᵐ I B)
                 → ((i : I) → (projᵐ i ∘ᵐ g) ≡ f i)
                 → g ≡ ⟨ f ⟩ᵢᵐ
 

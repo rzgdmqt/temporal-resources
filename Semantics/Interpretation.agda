@@ -161,7 +161,7 @@ mutual
     opᵀ op ∘ᵐ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵐ ⟦ V ⟧ᵛᵗ , g ∘ᵐ f ⟩ᵐ
 
   ⟦_⟧ᶜᵗ {Γ} (handle_`with_`in {A} {B} {τ} {τ'} M H N) =
-    let f : ⟦ Γ ⟧ᵉ →ᵐ Π Op (λ op → Π Time (λ τ'' → ⟦ Γ ⟧ᵉ))
+    let f : ⟦ Γ ⟧ᵉ →ᵐ Πᵐ Op (λ op → Πᵐ Time (λ τ'' → ⟦ Γ ⟧ᵉ))
         f = ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ in
     let g : (op : Op) → (τ'' : Time)
           → ⟦ type-of-gtype (param op) ⟧ᵛ ×ᵐ [ op-time op ]ᵒ (⟦ type-of-gtype (arity op) ⟧ᵛ

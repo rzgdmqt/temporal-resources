@@ -57,7 +57,7 @@ record Monad : Set₁ where
 
     T-μ∘η≡id : ∀ {A τ} →  μᵀ {τ = 0} {τ' = τ} ∘ᵐ ηᵀ {Tᵒ A τ} ≡ idᵐ
     T-μ∘Tη≡id : ∀ {A τ} →  μᵀ {τ = τ} {τ' = 0} ∘ᵐ Tᶠ (ηᵀ {A}) ≡ τ-substᵀ (sym (+-identityʳ τ))
-    T-μ∘μ≡≤∘μ∘Tμ : ∀ {A τ τ' τ''} →  μᵀ {A} {τ} {τ' + τ''} ∘ᵐ Tᶠ μᵀ ≡ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵐ (μᵀ ∘ᵐ μᵀ)
+    T-μ∘μ≡μ∘Tμ : ∀ {A τ τ' τ''} →  μᵀ {A} {τ} {τ' + τ''} ∘ᵐ Tᶠ μᵀ ≡ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵐ (μᵀ ∘ᵐ μᵀ)
 
     -- EFFECTS
 
@@ -107,7 +107,7 @@ record Monad : Set₁ where
     -- Turning an object of operation clauses to a T-algebra
 
     T-alg-of-handlerᵀ : ∀ {A τ τ'}
-                      → Π Op (λ op → Π Time (λ τ'' →
+                      → Πᵐ Op (λ op → Πᵐ Time (λ τ'' →
                          ⟦ param op ⟧ᵍ ×ᵐ ([ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵐ (Tᵒ A τ'')))
                            ⇒ᵐ Tᵒ A (op-time op + τ'')))
                       →ᵐ Tᵒ (Tᵒ A τ') τ ⇒ᵐ Tᵒ A (τ + τ')

@@ -87,11 +87,11 @@ record Future : Set₁ where
     -- Graded comonad laws
 
     []-ε∘δ≡id : ∀ {A τ} → ε ∘ᵐ δ {A} {0} {τ} ≡ idᵐ
-    []-Dε∘δ≡≤ : ∀ {A τ} → [ τ ]ᶠ (ε {A}) ∘ᵐ δ {A} {τ} {0} ≡ []-≤ {A} (≤-reflexive (+-identityʳ τ))
-    []-δ∘δ≡Dδ∘δ∘≤ : ∀ {A τ₁ τ₂ τ₃}
+    []-Dε∘δ≡id : ∀ {A τ} → [ τ ]ᶠ (ε {A}) ∘ᵐ δ {A} {τ} {0} ≡ []-≤ {A} (≤-reflexive (+-identityʳ τ))
+    []-δ∘δ≡Dδ∘δ : ∀ {A τ₁ τ₂ τ₃}
                   → δ {[ τ₃ ]ᵒ A} {τ₁} {τ₂} ∘ᵐ δ {A} {τ₁ + τ₂} {τ₃}
                   ≡    [ τ₁ ]ᶠ (δ {A} {τ₂} {τ₃}) ∘ᵐ δ {A} {τ₁} {τ₂ + τ₃}
-                     ∘ᵐ []-≤ {A} (≤-reflexive (+-assoc τ₁ τ₂ τ₃))
+                    ∘ᵐ []-≤ {A} (≤-reflexive (+-assoc τ₁ τ₂ τ₃))
 
     -- [_]ᵒ is monoidal (with respect to ×ᵐ) (TODO: derive from adjunction)
 

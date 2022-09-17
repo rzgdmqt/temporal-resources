@@ -72,8 +72,8 @@ open import Util.Time
 
 -- Triangle equations of the adjunction
 
-ε⊣∘Fη≡id : ∀ {A τ} → ε⊣ {⟨ τ ⟩ᵒ A} ∘ᵗ ⟨ τ ⟩ᶠ (η⊣ {A}) ≡ᵗ idᵗ
-ε⊣∘Fη≡id {A} {τ} =
+ε⊣∘Fη⊣≡id : ∀ {A τ} → ε⊣ {⟨ τ ⟩ᵒ A} ∘ᵗ ⟨ τ ⟩ᶠ (η⊣ {A}) ≡ᵗ idᵗ
+ε⊣∘Fη⊣≡id {A} {τ} =
   eqᵗ (λ {t} x →
     (cong₂ _,_
       (≤-irrelevant _ _)
@@ -83,8 +83,8 @@ open import Util.Time
           (cong (λ p → monotone A p (proj₂ x)) (≤-irrelevant _ _))
           (monotone-refl A (proj₂ x))))))
 
-Gε⊣∘η≡id : ∀ {A τ} → [ τ ]ᶠ (ε⊣ {A}) ∘ᵗ η⊣ {[ τ ]ᵒ A} ≡ᵗ idᵗ
-Gε⊣∘η≡id {A} {τ} =
+Gε⊣∘η⊣≡id : ∀ {A τ} → [ τ ]ᶠ (ε⊣ {A}) ∘ᵗ η⊣ {[ τ ]ᵒ A} ≡ᵗ idᵗ
+Gε⊣∘η⊣≡id {A} {τ} =
   eqᵗ (λ {t} x →
     (trans
       (monotone-trans A _ _ _)
@@ -115,12 +115,12 @@ open import Semantics.Model.Modality.Adjunction
 
 TSetAdj : Adjunction TSetCat TSetFut TSetPas
 TSetAdj = record
-  { η⊣       = η⊣
-  ; ε⊣       = ε⊣
-  ; η⊣-nat   = λ f → ≡ᵗ-≡ (η⊣-nat f)
-  ; ε⊣-nat   = λ f → ≡ᵗ-≡ (ε⊣-nat f)
-  ; ε⊣∘Fη≡id = λ {A} → ≡ᵗ-≡ (ε⊣∘Fη≡id {A})
-  ; Gε⊣∘η≡id = λ {A} → ≡ᵗ-≡ (Gε⊣∘η≡id {A})
-  ; η⊣≡ε⁻¹∘η = λ {A} → ≡ᵗ-≡ (η⊣≡ε⁻¹∘η {A})
-  ; ε⊣≡ε∘η⁻¹ = λ {A} → ≡ᵗ-≡ (ε⊣≡ε∘η⁻¹ {A})
+  { η⊣        = η⊣
+  ; ε⊣        = ε⊣
+  ; η⊣-nat    = λ f → ≡ᵗ-≡ (η⊣-nat f)
+  ; ε⊣-nat    = λ f → ≡ᵗ-≡ (ε⊣-nat f)
+  ; ε⊣∘Fη⊣≡id = λ {A} → ≡ᵗ-≡ (ε⊣∘Fη⊣≡id {A})
+  ; Gε⊣∘η⊣≡id = λ {A} → ≡ᵗ-≡ (Gε⊣∘η⊣≡id {A})
+  ; η⊣≡ε⁻¹∘η  = λ {A} → ≡ᵗ-≡ (η⊣≡ε⁻¹∘η {A})
+  ; ε⊣≡ε∘η⁻¹  = λ {A} → ≡ᵗ-≡ (ε⊣≡ε∘η⁻¹ {A})
   }
