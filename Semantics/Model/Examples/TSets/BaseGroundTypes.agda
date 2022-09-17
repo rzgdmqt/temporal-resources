@@ -7,6 +7,7 @@ module Semantics.Model.Examples.TSets.BaseGroundTypes where
 open import Function
 
 open import Semantics.Model.Examples.TSets.TSets
+open import Semantics.Model.Examples.TSets.Modality.Future
 
 open import Util.Operations
 open import Util.Equality
@@ -23,3 +24,14 @@ constᵗ c =
   tset-map
     (λ _ → c)
     (λ p _ → refl)
+
+
+-- Packaging the base and ground types interpretation up in the model
+
+open import Semantics.Model.BaseGroundTypes
+
+TSetTyp : BaseGroundTypes TSetCat TSetFut
+TSetTyp = record
+  { ConstObj = λ B → ConstTSet (BaseSet B)
+  ; constᵐ   = λ c → constᵗ c
+  }

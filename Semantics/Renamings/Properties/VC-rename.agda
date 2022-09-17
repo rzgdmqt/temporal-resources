@@ -542,7 +542,7 @@ mutual
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
       ∘ᵐ mapˣᵐ idᵐ strᵀ
       ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵐ ⟦ ρ ⟧ʳ ⟩ᵐ ⟩ᵐ
-    ≡⟨ ∘ᵐ-congˡ (uncurryᵐ-mapˣᵐʳ _ _) ⟩
+    ≡⟨ ∘ᵐ-congˡ (uncurryᵐ-nat _ _) ⟩
       (uncurryᵐ
          (    T-alg-of-handlerᵀ
           ∘ᵐ (mapⁱˣᵐ
@@ -776,7 +776,7 @@ mutual
        ∘ᵐ mapˣᵐ idᵐ strᵀ)
        ∘ᵐ mapˣᵐ ⟦ ρ ⟧ʳ (mapˣᵐ ([ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ)) idᵐ)
        ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵐ ⟦ ρ ⟧ʳ ⟩ᵐ ⟩ᵐ
-    ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congˡ (sym (uncurryᵐ-mapˣᵐʳ _ _))) ⟩
+    ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congˡ (sym (uncurryᵐ-nat _ _))) ⟩
       (uncurryᵐ
        ((   T-alg-of-handlerᵀ
         ∘ᵐ mapⁱˣᵐ

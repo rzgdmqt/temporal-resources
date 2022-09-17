@@ -270,3 +270,38 @@ open import Util.Time
   tset-map
     (λ xy → xy)
     (λ p xy → refl)
+
+
+-- Packaging the future modality up in the model
+
+open import Semantics.Model.Modality.Future
+
+TSetFut : Future TSetCat
+TSetFut = record
+  { [_]ᵒ          = [_]ᵒ
+  ; [_]ᶠ          = [_]ᶠ
+  ; []-≤          = λ {A} → []-≤ {A}
+  ; ε             = ε
+  ; ε⁻¹           = ε⁻¹
+  ; δ             = λ {A} → δ {A}
+  ; δ⁻¹           = λ {A} → δ⁻¹ {A}
+  ; []-idᵐ        = λ {A} → ≡ᵗ-≡ ([]-idᵗ {A})
+  ; []-∘ᵐ         = λ f g → ≡ᵗ-≡ ([]-∘ᵗ f g)
+  ; []-≤-nat      = λ f p → ≡ᵗ-≡ ([]-≤-nat f p)
+  ; []-≤-refl     = λ {A} → ≡ᵗ-≡ ([]-≤-refl {A})
+  ; []-≤-trans    = λ {A} p q → ≡ᵗ-≡ ([]-≤-trans {A} p q)
+  ; []-ε-nat      = λ f → ≡ᵗ-≡ ([]-ε-nat f)
+  ; []-ε⁻¹-nat    = λ f → ≡ᵗ-≡ ([]-ε⁻¹-nat f)
+  ; []-δ-nat      = λ f → ≡ᵗ-≡ ([]-δ-nat f)
+  ; []-δ⁻¹-nat    = λ f → ≡ᵗ-≡ ([]-δ⁻¹-nat f)
+  ; []-δ-≤        = λ {A} p q → ≡ᵗ-≡ ([]-δ-≤ {A} p q)
+  ; []-ε∘ε⁻¹≡id   = λ {A} → ≡ᵗ-≡ ([]-ε∘ε⁻¹≡id {A})
+  ; []-ε⁻¹∘ε≡id   = λ {A} → ≡ᵗ-≡ ([]-ε⁻¹∘ε≡id {A})
+  ; []-δ∘δ⁻¹≡id   = λ {A} → ≡ᵗ-≡ ([]-δ∘δ⁻¹≡id {A})
+  ; []-δ⁻¹∘δ≡id   = λ {A} → ≡ᵗ-≡ ([]-δ⁻¹∘δ≡id {A})
+  ; []-ε∘δ≡id     = λ {A} → ≡ᵗ-≡ ([]-ε∘δ≡id {A})
+  ; []-Dε∘δ≡≤     = λ {A} → ≡ᵗ-≡ ([]-Dε∘δ≡≤ {A})
+  ; []-δ∘δ≡Dδ∘δ∘≤ = λ {A} → ≡ᵗ-≡ ([]-δ∘δ≡Dδ∘δ∘≤ {A})
+  ; []-monoidal   = λ {A} {B} → []-monoidal {A} {B}
+  }
+

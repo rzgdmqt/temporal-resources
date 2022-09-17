@@ -243,3 +243,88 @@ mapⁱˣᵐ-∘ᵐ f g =
   ≡⟨⟩
     mapⁱˣᵐ g ∘ᵐ mapⁱˣᵐ f
   ∎
+
+-- EXPONENTIALS
+
+appᵐ : ∀ {A B} → (A ⇒ᵐ B) ×ᵐ A →ᵐ B
+appᵐ = uncurryᵐ idᵐ
+
+map⇒ᵐ : ∀ {A B C D} → (A →ᵐ B) → (C →ᵐ D) → B ⇒ᵐ C →ᵐ A ⇒ᵐ D
+map⇒ᵐ f g = curryᵐ (g ∘ᵐ appᵐ ∘ᵐ mapˣᵐ idᵐ f)
+
+map⇒ᵐ-identity : ∀ {A B} → map⇒ᵐ {A} {A} {B} {B} idᵐ idᵐ ≡ idᵐ
+map⇒ᵐ-identity = 
+  begin
+    curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)
+  ≡⟨ cong curryᵐ (∘ᵐ-identityˡ _) ⟩
+    curryᵐ (uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (sym (⟨⟩ᵐ-unique _ _ _
+       (trans (∘ᵐ-identityʳ _) (sym (∘ᵐ-identityˡ _)))
+       (trans (∘ᵐ-identityʳ _) (sym (∘ᵐ-identityˡ _)))))) ⟩
+    curryᵐ (uncurryᵐ idᵐ ∘ᵐ idᵐ)
+  ≡⟨ cong curryᵐ (∘ᵐ-identityʳ _) ⟩
+    curryᵐ (uncurryᵐ idᵐ)
+  ≡⟨ uncurryᵐ-curryᵐ-iso _ ⟩
+    idᵐ
+  ∎
+
+curryᵐ-mapˣᵐ : ∀ {A B C D E} → (f : C ×ᵐ D →ᵐ E) → (g : A →ᵐ C) → (h : B →ᵐ D)
+             → curryᵐ (f ∘ᵐ mapˣᵐ g h) ≡ map⇒ᵐ h idᵐ ∘ᵐ curryᵐ f ∘ᵐ g
+curryᵐ-mapˣᵐ f g h = 
+  begin
+    curryᵐ (f ∘ᵐ ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ)
+  ≡⟨ cong curryᵐ (
+      begin
+           f
+        ∘ᵐ ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congˡ (sym (curryᵐ-uncurryᵐ-iso _)) ⟩
+           uncurryᵐ (curryᵐ f)
+        ∘ᵐ ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congˡ (cong uncurryᵐ (sym (∘ᵐ-identityˡ _))) ⟩
+           uncurryᵐ (idᵐ ∘ᵐ curryᵐ f)
+        ∘ᵐ ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congˡ (uncurryᵐ-nat _ _) ⟩
+           (   uncurryᵐ idᵐ
+            ∘ᵐ ⟨ curryᵐ f ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)
+        ∘ᵐ ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
+           uncurryᵐ idᵐ
+        ∘ᵐ ⟨ curryᵐ f ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+        ∘ᵐ ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congʳ (sym (mapˣᵐ-∘ᵐ _ _ _ _)) ⟩
+           uncurryᵐ idᵐ
+        ∘ᵐ ⟨ (curryᵐ f ∘ᵐ g) ∘ᵐ fstᵐ , (idᵐ ∘ᵐ h) ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congʳ (cong ⟨ (curryᵐ f ∘ᵐ g) ∘ᵐ fstᵐ ,_⟩ᵐ
+          (∘ᵐ-congˡ (trans (∘ᵐ-identityˡ _) (sym (∘ᵐ-identityʳ _))))) ⟩
+           uncurryᵐ idᵐ
+        ∘ᵐ ⟨ (curryᵐ f ∘ᵐ g) ∘ᵐ fstᵐ ,
+             (h ∘ᵐ idᵐ) ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congʳ (cong ⟨_,(h ∘ᵐ idᵐ) ∘ᵐ sndᵐ ⟩ᵐ (∘ᵐ-congˡ (sym (curryᵐ-nat _ _)))) ⟩
+           uncurryᵐ idᵐ
+        ∘ᵐ ⟨ (curryᵐ (f ∘ᵐ ⟨ g ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ fstᵐ ,
+             (h ∘ᵐ idᵐ) ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congʳ (cong (⟨_, (h ∘ᵐ idᵐ) ∘ᵐ sndᵐ ⟩ᵐ) (∘ᵐ-congˡ (sym (∘ᵐ-identityˡ _)))) ⟩
+           uncurryᵐ idᵐ
+        ∘ᵐ ⟨ (idᵐ ∘ᵐ curryᵐ (f ∘ᵐ ⟨ g ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ fstᵐ ,
+             (h ∘ᵐ idᵐ) ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congʳ (mapˣᵐ-∘ᵐ _ _ _ _) ⟩
+           uncurryᵐ idᵐ
+        ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ
+        ∘ᵐ ⟨ curryᵐ (f ∘ᵐ ⟨ g ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+           (uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ)
+        ∘ᵐ ⟨ curryᵐ (f ∘ᵐ ⟨ g ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congˡ (sym (∘ᵐ-identityˡ _)) ⟩
+           (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ)
+        ∘ᵐ ⟨ curryᵐ (f ∘ᵐ ⟨ g ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ∎) ⟩
+    curryᵐ (   (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ)
+            ∘ᵐ ⟨ curryᵐ (f ∘ᵐ ⟨ g ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)
+  ≡⟨ curryᵐ-nat _ _ ⟩
+       curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ)
+    ∘ᵐ curryᵐ (f ∘ᵐ ⟨ g ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)
+  ≡⟨ ∘ᵐ-congʳ (curryᵐ-nat _ _) ⟩
+       curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ)
+    ∘ᵐ curryᵐ f
+    ∘ᵐ g
+  ∎

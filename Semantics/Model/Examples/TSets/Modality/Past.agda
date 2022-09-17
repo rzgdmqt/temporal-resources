@@ -315,3 +315,40 @@ open import Util.Time
             (cong (λ s → monotone A s x) (≤-irrelevant _ _))
             (sym (monotone-trans A _ _ _)))
           (sym (monotone-trans A _ _ _))))) })
+
+
+-- Packaging the past modality up in the future
+
+open import Semantics.Model.Modality.Past
+
+TSetPas : Past TSetCat
+TSetPas = record
+  { ⟨_⟩ᵒ           = ⟨_⟩ᵒ
+  ; ⟨_⟩ᶠ           = ⟨_⟩ᶠ
+  ; ⟨⟩-≤           = λ {A} → ⟨⟩-≤ {A}
+  ; η              = η
+  ; η⁻¹            = η⁻¹
+  ; μ              = λ {A} → μ {A}
+  ; μ⁻¹            = λ {A} → μ⁻¹ {A}
+  ; ⟨⟩-idᵐ         = λ {A} → ≡ᵗ-≡ (⟨⟩-idᵗ {A})
+  ; ⟨⟩-∘ᵐ          = λ f g → ≡ᵗ-≡ (⟨⟩-∘ᵗ f g)
+  ; ⟨⟩-≤-nat       = λ f p → ≡ᵗ-≡ (⟨⟩-≤-nat f p)
+  ; ⟨⟩-≤-refl      = λ {A} → ≡ᵗ-≡ (⟨⟩-≤-refl {A})
+  ; ⟨⟩-≤-trans     = λ {A} p q → ≡ᵗ-≡ (⟨⟩-≤-trans {A} p q)
+  ; ⟨⟩-η-nat       = λ f → ≡ᵗ-≡ (⟨⟩-η-nat f)
+  ; ⟨⟩-η⁻¹-nat     = λ f → ≡ᵗ-≡ (⟨⟩-η⁻¹-nat f)
+  ; ⟨⟩-μ-nat       = λ f → ≡ᵗ-≡ (⟨⟩-μ-nat f)
+  ; ⟨⟩-μ⁻¹-nat     = λ f → ≡ᵗ-≡ (⟨⟩-μ⁻¹-nat f)
+  ; ⟨⟩-μ-≤         = λ {A} p q → ≡ᵗ-≡ (⟨⟩-μ-≤ {A} p q)
+  ; ⟨⟩-μ-≤₁        = λ {A} p → ≡ᵗ-≡ (⟨⟩-μ-≤₁ {A} p)
+  ; ⟨⟩-μ-≤₂        = λ {A} p → ≡ᵗ-≡ (⟨⟩-μ-≤₂ {A} p)
+  ; ⟨⟩-μ⁻¹-≤₂      = λ {A} p → ≡ᵗ-≡ (⟨⟩-μ⁻¹-≤₂ {A} p)
+  ; ⟨⟩-η∘η⁻¹≡id    = λ {A} → ≡ᵗ-≡ (⟨⟩-η∘η⁻¹≡id {A})
+  ; ⟨⟩-η⁻¹∘η≡id    = λ {A} → ≡ᵗ-≡ (⟨⟩-η⁻¹∘η≡id {A})
+  ; ⟨⟩-μ∘μ⁻¹≡id    = λ {A} → ≡ᵗ-≡ (⟨⟩-μ∘μ⁻¹≡id {A})
+  ; ⟨⟩-μ⁻¹∘μ≡id    = λ {A} → ≡ᵗ-≡ (⟨⟩-μ⁻¹∘μ≡id {A})
+  ; ⟨⟩-μ∘η≡id      = λ {A} → ≡ᵗ-≡ (⟨⟩-μ∘η≡id {A})
+  ; ⟨⟩-μ∘Tη≡id     = λ {A} → ≡ᵗ-≡ (⟨⟩-μ∘Tη≡id {A})
+  ; ⟨⟩-μ∘μ≡≤∘μ∘Tμ  = λ {A} → ≡ᵗ-≡ (⟨⟩-μ∘μ≡≤∘μ∘Tμ {A})
+  }
+

@@ -108,3 +108,19 @@ Gε⊣∘η≡id {A} {τ} =
 
 -- ...
 
+
+-- Packaging the modality adjunction in the model
+
+open import Semantics.Model.Modality.Adjunction
+
+TSetAdj : Adjunction TSetCat TSetFut TSetPas
+TSetAdj = record
+  { η⊣       = η⊣
+  ; ε⊣       = ε⊣
+  ; η⊣-nat   = λ f → ≡ᵗ-≡ (η⊣-nat f)
+  ; ε⊣-nat   = λ f → ≡ᵗ-≡ (ε⊣-nat f)
+  ; ε⊣∘Fη≡id = λ {A} → ≡ᵗ-≡ (ε⊣∘Fη≡id {A})
+  ; Gε⊣∘η≡id = λ {A} → ≡ᵗ-≡ (Gε⊣∘η≡id {A})
+  ; η⊣≡ε⁻¹∘η = λ {A} → ≡ᵗ-≡ (η⊣≡ε⁻¹∘η {A})
+  ; ε⊣≡ε∘η⁻¹ = λ {A} → ≡ᵗ-≡ (ε⊣≡ε∘η⁻¹ {A})
+  }

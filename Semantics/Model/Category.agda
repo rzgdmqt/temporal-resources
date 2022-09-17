@@ -92,15 +92,17 @@ record Category : Set₂ where
   field
     _⇒ᵐ_ : Obj → Obj → Obj
 
-    appᵐ : ∀ {A B} → (A ⇒ᵐ B) ×ᵐ A →ᵐ B
-    map⇒ᵐ : ∀ {A B C D} → (A →ᵐ B) → (C →ᵐ D) → B ⇒ᵐ C →ᵐ A ⇒ᵐ D
     curryᵐ : ∀ {A B C} → A ×ᵐ B →ᵐ C → A →ᵐ B ⇒ᵐ C
-    uncurryᵐ : ∀ {A B C} → A →ᵐ B ⇒ᵐ C → A ×ᵐ B →ᵐ C
+    curryᵐ-nat : ∀ {A B C D} → (f : A →ᵐ B) → (g : B ×ᵐ C →ᵐ D)
+               → curryᵐ (g ∘ᵐ mapˣᵐ f idᵐ) ≡ curryᵐ g ∘ᵐ f
 
-    map⇒ᵐ-identity : ∀ {A B} → map⇒ᵐ {A} {A} {B} {B} idᵐ idᵐ ≡ idᵐ
-    
-    curryᵐ-mapˣᵐ : ∀ {A B C D E} → (f : C ×ᵐ D →ᵐ E) → (g : A →ᵐ C) → (h : B →ᵐ D)
-                 → curryᵐ (f ∘ᵐ mapˣᵐ g h) ≡ map⇒ᵐ h idᵐ ∘ᵐ curryᵐ f ∘ᵐ g
-    uncurryᵐ-mapˣᵐʳ : ∀ {A B C D} → (f : A →ᵐ B) → (g : B →ᵐ C ⇒ᵐ D) → uncurryᵐ (g ∘ᵐ f) ≡ uncurryᵐ g ∘ᵐ mapˣᵐ f idᵐ
+    uncurryᵐ : ∀ {A B C} → A →ᵐ B ⇒ᵐ C → A ×ᵐ B →ᵐ C
+    uncurryᵐ-nat : ∀ {A B C D} → (f : A →ᵐ B) → (g : B →ᵐ C ⇒ᵐ D)
+                 → uncurryᵐ (g ∘ᵐ f) ≡ uncurryᵐ g ∘ᵐ mapˣᵐ f idᵐ
+
+    curryᵐ-uncurryᵐ-iso : ∀ {A B C} → (f : A ×ᵐ B →ᵐ C)
+                        → uncurryᵐ (curryᵐ f) ≡ f
+    uncurryᵐ-curryᵐ-iso : ∀ {A B C} → (f : A →ᵐ B ⇒ᵐ C)
+                        → curryᵐ (uncurryᵐ f) ≡ f
 
   infixr 22 _⇒ᵐ_

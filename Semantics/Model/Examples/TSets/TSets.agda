@@ -314,21 +314,6 @@ A ⇒ᵗ B =
 
 infixr 22 _⇒ᵗ_
 
-appᵗ : ∀ {A B} → (A ⇒ᵗ B) ×ᵗ A →ᵗ B
-appᵗ {A} {B} =
-  tset-map
-    (λ { (f , x) → map-carrier f (≤-refl , x) })
-    (λ { p (f , x) →
-      trans
-        (cong (λ q → map-carrier f (q , monotone A p x)) (≤-irrelevant _ _))
-        (map-nat f p (≤-reflexive refl , x)) })
- 
-map⇒ᵗ : ∀ {A B C D} → (A →ᵗ B) → (C →ᵗ D) → B ⇒ᵗ C →ᵗ A ⇒ᵗ D
-map⇒ᵗ f g =
-  tset-map
-    (λ h → g ∘ᵗ h ∘ᵗ mapˣᵗ idᵗ f)
-    (λ p h → ≡ᵗ-≡ (eqᵗ (λ { (q , x) → refl })))
- 
 curryᵗ : ∀ {A B C} → A ×ᵗ B →ᵗ C → A →ᵗ B ⇒ᵗ C
 curryᵗ {A} f =
   tset-map
@@ -338,7 +323,7 @@ curryᵗ {A} f =
         cong
           (map-carrier f)
           (cong (_, y) (monotone-trans A p q x)) })))
- 
+
 uncurryᵗ : ∀ {A B C} → A →ᵗ B ⇒ᵗ C → A ×ᵗ B →ᵗ C
 uncurryᵗ {A} {B} {C} f =
   tset-map
@@ -353,23 +338,77 @@ uncurryᵗ {A} {B} {C} f =
             (λ q → map-carrier (map-carrier f x) (q , monotone B p y))
             (≤-irrelevant _ _))
           (map-nat (map-carrier f x) p (≤-reflexive refl , y))) })
- 
-map⇒ᵗ-identity : ∀ {A B} → map⇒ᵗ {A} {A} {B} {B} idᵗ idᵗ ≡ᵗ idᵗ
-map⇒ᵗ-identity = eqᵗ (λ f → ≡ᵗ-≡ (eqᵗ (λ x → refl)))
 
-curryᵗ-mapˣᵗ : ∀ {A B C D E}
-             → (f : C ×ᵗ D →ᵗ E) → (g : A →ᵗ C) → (h : B →ᵗ D)
-             → curryᵗ (f ∘ᵗ mapˣᵗ g h) ≡ᵗ map⇒ᵗ h idᵗ ∘ᵗ curryᵗ f ∘ᵗ g
-curryᵗ-mapˣᵗ f g h =
+curryᵗ-nat : ∀ {A B C D} → (f : A →ᵗ B) → (g : B ×ᵗ C →ᵗ D)
+           → curryᵗ (g ∘ᵗ mapˣᵗ f idᵗ) ≡ᵗ curryᵗ g ∘ᵗ f
+curryᵗ-nat f g =
   eqᵗ (λ x →
-    ≡ᵗ-≡ (eqᵗ (λ y →
-      cong (map-carrier f)
-        (cong₂ _,_ (map-nat g _ x) refl))))
- 
-uncurryᵗ-mapˣᵗʳ : ∀ {A B C D}
-                → (f : A →ᵗ B)
-                → (g : B →ᵗ C ⇒ᵗ D)
-                → uncurryᵗ (g ∘ᵗ f)
-               ≡ᵗ uncurryᵗ g ∘ᵗ mapˣᵗ f idᵗ
-uncurryᵗ-mapˣᵗʳ f g =
+    dcong₂ tset-map
+      (ifun-ext (fun-ext (λ px →
+        cong (map-carrier g) (cong (_, proj₂ px) (map-nat f _ _)))))
+      (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ px → uip))))))
+
+uncurryᵗ-nat : ∀ {A B C D} → (f : A →ᵗ B) → (g : B →ᵗ C ⇒ᵗ D)
+             → uncurryᵗ (g ∘ᵗ f) ≡ᵗ uncurryᵗ g ∘ᵗ mapˣᵗ f idᵗ
+uncurryᵗ-nat f g =
   eqᵗ (λ xy → refl)
+
+curryᵗ-uncurryᵗ-iso : ∀ {A B C} → (f : A ×ᵗ B →ᵗ C)
+                    → uncurryᵗ (curryᵗ f) ≡ᵗ f
+curryᵗ-uncurryᵗ-iso {A} f =
+  eqᵗ (λ xy →
+    cong (map-carrier f) (cong (_, proj₂ xy) (monotone-refl A _)))
+
+uncurryᵗ-curryᵗ-iso : ∀ {A B C} → (f : A →ᵗ B ⇒ᵗ C)
+                    → curryᵗ (uncurryᵗ f) ≡ᵗ f
+uncurryᵗ-curryᵗ-iso {A} {B} {C} f =
+  eqᵗ (λ x →
+    dcong₂ tset-map
+      (ifun-ext (λ {τ} → fun-ext (λ px →
+        trans
+          (cong (λ (g : carrier (B ⇒ᵗ C) τ) → map-carrier g (≤-reflexive refl , proj₂ px))
+            (map-nat f _ _))
+          (cong (map-carrier (map-carrier f x))
+            (cong (_, proj₂ px) (≤-irrelevant _ _))))))
+      (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ qx → uip))))))
+
+
+-- Packaging TSets up in the model
+
+open import Semantics.Model.Category
+
+TSetCat : Category
+TSetCat = record
+  { Obj                 = TSet
+  ; _→ᵐ_                = _→ᵗ_
+  ; idᵐ                 = idᵗ
+  ; _∘ᵐ_                = _∘ᵗ_
+  ; ∘ᵐ-identityˡ        = λ f → ≡ᵗ-≡ (∘ᵗ-identityˡ f)
+  ; ∘ᵐ-identityʳ        = λ f → ≡ᵗ-≡ (∘ᵗ-identityʳ f)
+  ; ∘ᵐ-assoc            = λ h g f → ≡ᵗ-≡ (∘ᵗ-assoc h g f)
+  ; 𝟙ᵐ                  = 𝟙ᵗ
+  ; terminalᵐ           = terminalᵗ
+  ; terminalᵐ-unique    = ≡ᵗ-≡ terminalᵗ-unique
+  ; 𝟘ᵐ                  = 𝟘ᵗ
+  ; initialᵐ            = initialᵗ
+  ; initialᵐ-unique     = ≡ᵗ-≡ initialᵗ-unique
+  ; _×ᵐ_                = _×ᵗ_
+  ; fstᵐ                = fstᵗ
+  ; sndᵐ                = sndᵗ
+  ; ⟨_,_⟩ᵐ              = ⟨_,_⟩ᵗ
+  ; ⟨⟩ᵐ-fstᵐ            = λ f g → ≡ᵗ-≡ (⟨⟩ᵗ-fstᵗ f g)
+  ; ⟨⟩ᵐ-sndᵐ            = λ f g → ≡ᵗ-≡ (⟨⟩ᵗ-sndᵗ f g)
+  ; ⟨⟩ᵐ-unique          = λ f g h p q → ≡ᵗ-≡ (⟨⟩ᵗ-unique f g h (≡-≡ᵗ p) (≡-≡ᵗ q))
+  ; Π                   = Πᵗ
+  ; projᵐ               = projᵗ
+  ; ⟨_⟩ᵢᵐ               = ⟨_⟩ᵢᵗ
+  ; ⟨⟩ᵢᵐ-projᵐ          = λ f i → ≡ᵗ-≡ (⟨⟩ᵢᵗ-projᵗ f i)
+  ; ⟨⟩ᵢᵐ-unique         = λ f g p → ≡ᵗ-≡ (⟨⟩ᵢᵗ-unique f g (λ i → ≡-≡ᵗ (p i)))
+  ; _⇒ᵐ_                = _⇒ᵗ_
+  ; curryᵐ              = curryᵗ
+  ; curryᵐ-nat          = λ f g → ≡ᵗ-≡ (curryᵗ-nat f g)
+  ; uncurryᵐ            = uncurryᵗ
+  ; uncurryᵐ-nat        = λ f g → ≡ᵗ-≡ (uncurryᵗ-nat f g)
+  ; curryᵐ-uncurryᵐ-iso = λ f → ≡ᵗ-≡ (curryᵗ-uncurryᵗ-iso f)
+  ; uncurryᵐ-curryᵐ-iso = λ f → ≡ᵗ-≡ (uncurryᵗ-curryᵗ-iso f)
+  }

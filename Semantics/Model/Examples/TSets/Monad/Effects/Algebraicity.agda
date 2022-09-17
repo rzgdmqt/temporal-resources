@@ -16,6 +16,8 @@ open import Semantics.Model.Examples.TSets.Modality.Past
 open import Semantics.Model.Examples.TSets.Monad.Core
 open import Semantics.Model.Examples.TSets.Monad.Effects
 
+open import Semantics.Model.Category.Derived TSetCat
+
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
@@ -42,6 +44,15 @@ opᵀ-algebraicity : ∀ {A τ τ'} → (op : Op)
                     ∘ᵗ opᵀ {τ = τ} op
                  ≡ᵗ    τ-substᵀ (sym (+-assoc (op-time op) τ τ'))
                     ∘ᵗ opᵀ op
-                    ∘ᵗ mapˣᵗ idᵗ ([ op-time op ]ᶠ (map⇒ᵗ idᵗ μᵀ))
+                    ∘ᵗ mapˣᵗ idᵗ ([ op-time op ]ᶠ (map⇒ᵐ idᵗ μᵀ))
 opᵀ-algebraicity {A} {τ} {τ'} op =
-  eqᵗ (λ {t} c → refl)
+  eqᵗ (λ {t} c → 
+    cong (τ-substˢ (sym (+-assoc (op-time op) τ τ')))
+      (dcong₂ (op-node op (proj₁ c))
+        (ifun-ext (fun-ext (λ p → fun-ext λ y →
+          cong (μˢ {A})
+            {map-carrier (proj₂ c) (p , y)}
+            {map-carrier (proj₂ c) (≤-trans p (≤-reflexive refl) , y)}
+            (cong (map-carrier (proj₂ c))
+              (cong (_, y) (≤-irrelevant _ _))))))
+        (ifun-ext (ifun-ext (fun-ext λ p → fun-ext (λ q → fun-ext (λ y → uip)))))))

@@ -18,6 +18,7 @@ open import Util.Operations
 open import Util.Time
 
 open Category Cat
+open import Semantics.Model.Category.Derived Cat
 open Future Fut
 open BaseGroundTypes Typ
 
