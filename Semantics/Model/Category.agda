@@ -80,16 +80,12 @@ record Category : Set₂ where
     projᵐ : ∀ {I A} → (i : I) → Π I A →ᵐ A i
     ⟨_⟩ᵢᵐ : ∀ {I A B} → ((i : I) → A →ᵐ B i) → A →ᵐ Π I B
 
-  mapⁱˣᵐ : ∀ {I A B} → ((i : I) → A i →ᵐ B i) → Π I A →ᵐ Π I B
-  mapⁱˣᵐ fs = ⟨ (λ i → fs i ∘ᵐ projᵐ i) ⟩ᵢᵐ
-
-  field
-    mapⁱˣᵐ-identity : ∀ {I A} → mapⁱˣᵐ {I} {A} {A} (λ i → idᵐ) ≡ idᵐ
-    mapⁱˣᵐ-∘ᵐ : ∀ {I} {A B C : I → Obj} → (f : ((i : I) → A i →ᵐ B i)) → (g : ((i : I) → B i →ᵐ C i))
-              → mapⁱˣᵐ (λ i → g i ∘ᵐ f i) ≡ mapⁱˣᵐ g ∘ᵐ mapⁱˣᵐ f
-
     ⟨⟩ᵢᵐ-projᵐ : ∀ {I} {A} {B : I → Obj} → (f : ((i : I) → A →ᵐ B i)) → (i : I) → projᵐ i ∘ᵐ ⟨ f ⟩ᵢᵐ ≡ f i
-    ⟨⟩ᵢᵐ-∘ᵐ : ∀ {I} {A B} {C : I → Obj} → (f : A →ᵐ B) → (g : ((i : I) → B →ᵐ C i)) → ⟨ (λ i → g i ∘ᵐ f) ⟩ᵢᵐ ≡ ⟨ g ⟩ᵢᵐ ∘ᵐ f
+    ⟨⟩ᵢᵐ-unique : ∀ {I} {A} {B : I → Obj}
+                → (f : (i : I) → A →ᵐ B i)
+                → (g : A →ᵐ Π I B)
+                → ((i : I) → (projᵐ i ∘ᵐ g) ≡ f i)
+                → g ≡ ⟨ f ⟩ᵢᵐ
 
   -- EXPONENTIALS
 

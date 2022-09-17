@@ -169,3 +169,77 @@ mapˣᵐ-∘ᵐ f g h i =
   ≡⟨⟩
     mapˣᵐ h i ∘ᵐ mapˣᵐ f g
   ∎
+
+-- SET-INDEXED PRODUCTS
+
+⟨⟩ᵢᵐ-∘ᵐ : ∀ {I} {A B} {C : I → Obj}
+        → (f : A →ᵐ B) → (g : ((i : I) → B →ᵐ C i))
+        → ⟨ (λ i → g i ∘ᵐ f) ⟩ᵢᵐ ≡ ⟨ g ⟩ᵢᵐ ∘ᵐ f
+⟨⟩ᵢᵐ-∘ᵐ f g = 
+  begin
+    ⟨ (λ i → g i ∘ᵐ f) ⟩ᵢᵐ
+  ≡⟨ sym (⟨⟩ᵢᵐ-unique _ _ (λ i →
+      begin
+        projᵐ i ∘ᵐ ⟨ g ⟩ᵢᵐ ∘ᵐ f
+      ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+        (projᵐ i ∘ᵐ ⟨ g ⟩ᵢᵐ) ∘ᵐ f
+      ≡⟨ ∘ᵐ-congˡ (⟨⟩ᵢᵐ-projᵐ _ _) ⟩
+        g i ∘ᵐ f
+      ∎)) ⟩
+    ⟨ g ⟩ᵢᵐ ∘ᵐ f
+  ∎
+
+mapⁱˣᵐ : ∀ {I A B} → ((i : I) → A i →ᵐ B i) → Π I A →ᵐ Π I B
+mapⁱˣᵐ fs = ⟨ (λ i → fs i ∘ᵐ projᵐ i) ⟩ᵢᵐ
+
+mapⁱˣᵐ-identity : ∀ {I A} → mapⁱˣᵐ {I} {A} {A} (λ i → idᵐ) ≡ idᵐ
+mapⁱˣᵐ-identity = 
+  begin
+    mapⁱˣᵐ (λ i → idᵐ)
+  ≡⟨ sym (⟨⟩ᵢᵐ-unique _ _ (λ i → 
+      begin
+        projᵐ i ∘ᵐ idᵐ
+      ≡⟨ ∘ᵐ-identityʳ _ ⟩
+        projᵐ i
+      ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
+        idᵐ ∘ᵐ projᵐ i
+      ∎)) ⟩
+    idᵐ
+  ∎
+
+mapⁱˣᵐ-∘ᵐ : ∀ {I} {A B C : I → Obj}
+          → (f : ((i : I) → A i →ᵐ B i))
+          → (g : ((i : I) → B i →ᵐ C i))
+          → mapⁱˣᵐ (λ i → g i ∘ᵐ f i) ≡ mapⁱˣᵐ g ∘ᵐ mapⁱˣᵐ f
+mapⁱˣᵐ-∘ᵐ f g = 
+  begin
+    mapⁱˣᵐ (λ i → g i ∘ᵐ f i)
+  ≡⟨⟩
+    ⟨ (λ i → (g i ∘ᵐ f i) ∘ᵐ projᵐ i) ⟩ᵢᵐ
+  ≡⟨ sym (⟨⟩ᵢᵐ-unique _ _ (λ i →
+      begin
+           projᵐ i
+        ∘ᵐ ⟨ (λ i₁ → g i₁ ∘ᵐ projᵐ i₁) ⟩ᵢᵐ
+        ∘ᵐ ⟨ (λ i₁ → f i₁ ∘ᵐ projᵐ i₁) ⟩ᵢᵐ
+      ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+           (   projᵐ i
+            ∘ᵐ ⟨ (λ i₁ → g i₁ ∘ᵐ projᵐ i₁) ⟩ᵢᵐ)
+        ∘ᵐ ⟨ (λ i₁ → f i₁ ∘ᵐ projᵐ i₁) ⟩ᵢᵐ
+      ≡⟨ ∘ᵐ-congˡ (⟨⟩ᵢᵐ-projᵐ _ _) ⟩
+           (g i ∘ᵐ projᵐ i)
+        ∘ᵐ ⟨ (λ i₁ → f i₁ ∘ᵐ projᵐ i₁) ⟩ᵢᵐ
+      ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
+           g i
+        ∘ᵐ projᵐ i
+        ∘ᵐ ⟨ (λ i₁ → f i₁ ∘ᵐ projᵐ i₁) ⟩ᵢᵐ
+      ≡⟨ ∘ᵐ-congʳ (⟨⟩ᵢᵐ-projᵐ _ _) ⟩
+           g i
+        ∘ᵐ f i
+        ∘ᵐ projᵐ i
+      ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+        (g i ∘ᵐ f i) ∘ᵐ projᵐ i
+      ∎)) ⟩
+    ⟨ (λ i → g i ∘ᵐ projᵐ i) ⟩ᵢᵐ ∘ᵐ ⟨ (λ i → f i ∘ᵐ projᵐ i) ⟩ᵢᵐ
+  ≡⟨⟩
+    mapⁱˣᵐ g ∘ᵐ mapⁱˣᵐ f
+  ∎

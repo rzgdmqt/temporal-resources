@@ -245,37 +245,24 @@ projᵗ i =
   tset-map
     (λ x i → map-carrier (fs i) x)
     (λ p x → fun-ext (λ i → map-nat (fs i) p x))
-   
-mapⁱˣᵗ : ∀ {I A B} → ((i : I) → A i →ᵗ B i) → Πᵗ I A →ᵗ Πᵗ I B
-mapⁱˣᵗ fs = ⟨ (λ i → fs i ∘ᵗ projᵗ i) ⟩ᵢᵗ
 
-mapⁱˣᵗ-identity : ∀ {I A}
-                → mapⁱˣᵗ {I} {A} {A} (λ i → idᵗ) ≡ᵗ idᵗ
-mapⁱˣᵗ-identity =
-  eqᵗ (λ f → refl)
- 
-mapⁱˣᵗ-∘ᵗ : ∀ {I} {A B C : I → TSet}
-          → (f : ((i : I) → A i →ᵗ B i))
-          → (g : ((i : I) → B i →ᵗ C i))
-          → mapⁱˣᵗ (λ i → g i ∘ᵗ f i)
-         ≡ᵗ mapⁱˣᵗ g ∘ᵗ mapⁱˣᵗ f
-mapⁱˣᵗ-∘ᵗ f g =
-  eqᵗ (λ h → refl)
- 
 ⟨⟩ᵢᵗ-projᵗ : ∀ {I} {A} {B : I → TSet}
            → (f : ((i : I) → A →ᵗ B i))
            → (i : I)
            → projᵗ i ∘ᵗ ⟨ f ⟩ᵢᵗ ≡ᵗ f i
 ⟨⟩ᵢᵗ-projᵗ f i = eqᵗ (λ x → refl)
- 
-⟨⟩ᵢᵗ-∘ᵗ : ∀ {I} {A B} {C : I → TSet}
-        → (f : A →ᵗ B)
-        → (g : ((i : I) → B →ᵗ C i))
-        → ⟨ (λ i → g i ∘ᵗ f) ⟩ᵢᵗ
-       ≡ᵗ ⟨ g ⟩ᵢᵗ ∘ᵗ f
-⟨⟩ᵢᵗ-∘ᵗ f g =
-  eqᵗ (λ x → refl)
 
+⟨⟩ᵢᵗ-unique : ∀ {I} {A} {B : I → TSet}
+            → (f : (i : I) → A →ᵗ B i)
+            → (g : A →ᵗ Πᵗ I B)
+            → ((i : I) → projᵗ i ∘ᵗ g ≡ᵗ f i)
+            → g ≡ᵗ ⟨ f ⟩ᵢᵗ
+⟨⟩ᵢᵗ-unique {I} {A} {B} f g p =
+  eqᵗ (λ x → fun-ext (λ i →
+    cong (λ h → map-carrier h x) (≡ᵗ-≡ (p i))))
+
+mapⁱˣᵗ : ∀ {I A B} → ((i : I) → A i →ᵗ B i) → Πᵗ I A →ᵗ Πᵗ I B
+mapⁱˣᵗ fs = ⟨ (λ i → fs i ∘ᵗ projᵗ i) ⟩ᵢᵗ
 
 ---- covariant hom-functor
 
