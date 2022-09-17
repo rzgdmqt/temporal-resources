@@ -44,7 +44,7 @@ record Model : Set₂ where
   open Future Fut public
   
   open Past Pas public
-  open import Semantics.Model.Modality.Past.Derived Cat Pas
+  open import Semantics.Model.Modality.Past.Derived Cat Pas public
 
   open Adjunction Adj public
 
