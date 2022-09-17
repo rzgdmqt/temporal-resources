@@ -315,15 +315,3 @@ open import Util.Time
             (cong (λ s → monotone A s x) (≤-irrelevant _ _))
             (sym (monotone-trans A _ _ _)))
           (sym (monotone-trans A _ _ _))))) })
-
--- Graded monad laws (for inverses)
-
-⟨⟩-Tη⁻¹∘μ⁻¹≡id : ∀ {A τ}
-    →  ⟨ τ ⟩ᶠ (η⁻¹ {A}) ∘ᵗ μ⁻¹ {A} {τ} {0}
-    ≡ᵗ ⟨⟩-≤ {A} (≤-reflexive (sym (+-identityʳ _)))
-⟨⟩-Tη⁻¹∘μ⁻¹≡id {A} =
-  eqᵗ (λ { {t} (p , x) →
-    (cong₂ _,_
-      (≤-irrelevant _ _)
-      (cong (λ p → monotone A p x) (≤-irrelevant _ _)))})
-

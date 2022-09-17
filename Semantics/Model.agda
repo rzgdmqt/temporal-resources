@@ -42,7 +42,10 @@ record Model : Set₂ where
   open import Semantics.Model.Category.Derived Cat public
 
   open Future Fut public
+  
   open Past Pas public
+  open import Semantics.Model.Modality.Past.Derived Cat Pas
+
   open Adjunction Adj public
 
   open BaseGroundTypes Typ public
