@@ -33,4 +33,3 @@ postulate
   param    : Op → GType                   -- parameter type of each operation
   arity    : Op → GType                   -- arity type of each operation
   op-time  : Op → Time                    -- each operation's (maximal) time duration
-  op-time+ : (op : Op) → 0 < op-time op   -- each operation takes non-zero amount of time
