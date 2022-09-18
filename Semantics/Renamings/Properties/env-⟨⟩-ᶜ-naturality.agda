@@ -549,7 +549,7 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ τ' ⟩} (suc τ) p ⟨⟩-η⁻¹-ren with suc τ �
                                 (≤-trans
                                   (∸-mono {u = 0}
                                     (≤-trans p (≤-reflexive (sym (+-identityʳ (ctx-time Γ + τ'))))) z≤n)
-                                  (≤-reflexive ((λ { refl → refl }) (+-identityʳ (ctx-time Γ + τ'))))))     -- TODO: where does this λ come from?
+                                  (≤-reflexive _)))
                               (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ')))))
   ∎
 env-⟨⟩-ᶜ-nat {Γ ⟨ .(τ' + τ'') ⟩} (suc τ) p (⟨⟩-μ-ren {τ = τ'} {τ' = τ''}) = {!!}
