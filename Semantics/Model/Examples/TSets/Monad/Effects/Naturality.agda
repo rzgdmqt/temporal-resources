@@ -16,7 +16,7 @@ open import Semantics.Model.Examples.TSets.Modality.Past
 open import Semantics.Model.Examples.TSets.Monad.Core
 open import Semantics.Model.Examples.TSets.Monad.Effects
 
-open import Semantics.Model.Category.Derived TSetCat
+open import Semantics.Model.Category.Derived TSetCat renaming (map⇒ᵐ to map⇒ᵗ)
 
 open import Util.Equality
 open import Util.Operations
@@ -38,7 +38,7 @@ delayᵀ-nat τ f =
 
 opᵀ-nat : ∀ {A B τ} → (op : Op)
         → (f : A →ᵗ B)
-        →  opᵀ {τ = τ} op ∘ᵗ mapˣᵗ idᵗ ([ op-time op ]ᶠ (map⇒ᵐ idᵗ (Tᶠ f)))
+        →  opᵀ {τ = τ} op ∘ᵗ mapˣᵗ idᵗ ([ op-time op ]ᶠ (map⇒ᵗ idᵗ (Tᶠ f)))
         ≡ᵗ Tᶠ f ∘ᵗ opᵀ op
 opᵀ-nat {A} {B} {τ} op f =
   eqᵗ (λ {t} c → 

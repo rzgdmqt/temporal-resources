@@ -45,7 +45,7 @@ record Category : Set₂ where
     initialᵐ : ∀ {A} → 𝟘ᵐ →ᵐ A
     initialᵐ-unique : ∀ {A} {f : 𝟘ᵐ →ᵐ A} → f ≡ initialᵐ
 
-  -- BINARY PRODUCTS
+  -- BINARY PRODUCTS (should be derived from set-indexed products below)
 
   field
     _×ᵐ_ : Obj → Obj → Obj

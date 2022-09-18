@@ -59,8 +59,8 @@ open import Syntax.Substitutions
 open import Syntax.EquationalTheory
 
 
--- ABSTRACT SEMANTICS
----------------------
+-- SEMANTICS
+------------
 
 ---- Models
 
@@ -77,25 +77,5 @@ open import Semantics.Renamings
 
 -- TIME-VARYING SETS MODEL
 --------------------------
-
----- Time-varying sets
-
-open import Semantics.Model.Examples.TSets.TSets
-
----- Semantics of base types
-
-open import Semantics.Model.Examples.TSets.BaseGroundTypes
-
----- Temporal modalities
-
-open import Semantics.Model.Examples.TSets.Modality.Future
-open import Semantics.Model.Examples.TSets.Modality.Past
-open import Semantics.Model.Examples.TSets.Modality.Adjunction
-
----- Free monad on algebraic operations
-
-open import Semantics.Model.Examples.TSets.Monad
-
----- Time-varying sets model
 
 open import Semantics.Model.Examples.TSets.Model

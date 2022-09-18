@@ -16,7 +16,7 @@ open import Semantics.Model.Examples.TSets.Modality.Past
 open import Semantics.Model.Examples.TSets.Monad.Core
 open import Semantics.Model.Examples.TSets.Monad.Effects
 
-open import Semantics.Model.Category.Derived TSetCat
+open import Semantics.Model.Category.Derived TSetCat renaming (map⇒ᵐ to map⇒ᵗ)
 
 open import Util.Equality
 open import Util.Operations
@@ -44,7 +44,7 @@ opᵀ-algebraicity : ∀ {A τ τ'} → (op : Op)
                     ∘ᵗ opᵀ {τ = τ} op
                  ≡ᵗ    τ-substᵀ (sym (+-assoc (op-time op) τ τ'))
                     ∘ᵗ opᵀ op
-                    ∘ᵗ mapˣᵗ idᵗ ([ op-time op ]ᶠ (map⇒ᵐ idᵗ μᵀ))
+                    ∘ᵗ mapˣᵗ idᵗ ([ op-time op ]ᶠ (map⇒ᵗ idᵗ μᵀ))
 opᵀ-algebraicity {A} {τ} {τ'} op =
   eqᵗ (λ {t} c → 
     cong (τ-substˢ (sym (+-assoc (op-time op) τ τ')))
