@@ -79,3 +79,33 @@ open import Semantics.Model.Category.Derived Cat
   ≡⟨ ∘ᵐ-identityˡ _ ⟩
     ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ τ)))
   ∎
+
+⟨⟩-η⁻¹∘μ⁻¹≡id : ∀ {A τ} → η⁻¹ ∘ᵐ μ⁻¹ {A} {0} {τ} ≡ idᵐ
+⟨⟩-η⁻¹∘μ⁻¹≡id = 
+  begin
+       η⁻¹
+    ∘ᵐ μ⁻¹
+  ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
+       idᵐ
+    ∘ᵐ η⁻¹
+    ∘ᵐ μ⁻¹
+  ≡⟨ ∘ᵐ-congˡ (sym ⟨⟩-μ∘η≡id) ⟩
+       (   μ
+        ∘ᵐ η)
+    ∘ᵐ η⁻¹
+    ∘ᵐ μ⁻¹
+  ≡⟨ trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (sym (∘ᵐ-assoc _ _ _))) ⟩
+       μ
+    ∘ᵐ (   η
+        ∘ᵐ η⁻¹)
+    ∘ᵐ μ⁻¹
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ ⟨⟩-η∘η⁻¹≡id) ⟩
+       μ
+    ∘ᵐ idᵐ
+    ∘ᵐ μ⁻¹
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-identityˡ _) ⟩
+       μ
+    ∘ᵐ μ⁻¹
+  ≡⟨ ⟨⟩-μ∘μ⁻¹≡id ⟩
+    idᵐ
+  ∎

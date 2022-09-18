@@ -97,11 +97,7 @@ record Past : Set₁ where
 
     -- Graded monad laws
 
-    ⟨⟩-μ∘η≡id : ∀ {A τ} → μ {A} {0} {τ} ∘ᵐ η {⟨ τ ⟩ᵒ A} ≡ idᵐ
-    ⟨⟩-μ∘Tη≡id : ∀ {A τ} → μ {A} {τ} {0} ∘ᵐ ⟨ τ ⟩ᶠ (η {A}) ≡ ⟨⟩-≤ (≤-reflexive (+-identityʳ τ))
+    ⟨⟩-μ∘η≡id : ∀ {A τ} → μ {A} {0} {τ} ∘ᵐ η ≡ idᵐ
+    ⟨⟩-μ∘Tη≡id : ∀ {A τ} → μ {A} {τ} {0} ∘ᵐ ⟨ τ ⟩ᶠ η ≡ ⟨⟩-≤ (≤-reflexive (+-identityʳ τ))
     ⟨⟩-μ∘μ≡μ∘Tμ : ∀ {A τ₁ τ₂ τ₃}
                   → μ {A} ∘ᵐ μ ≡ ⟨⟩-≤ (≤-reflexive (+-assoc τ₁ τ₂ τ₃)) ∘ᵐ μ ∘ᵐ ⟨ τ₁ ⟩ᶠ μ
-
-    -- Graded monad laws (for inverses) (TODO: derive from above)
-
-    --⟨⟩-Tη⁻¹∘μ⁻¹≡id : ∀ {A τ} →  ⟨ τ ⟩ᶠ (η⁻¹ {A}) ∘ᵐ μ⁻¹ {A} {τ} {0} ≡ ⟨⟩-≤ {A} (≤-reflexive (sym (+-identityʳ _)))
