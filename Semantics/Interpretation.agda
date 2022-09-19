@@ -67,6 +67,16 @@ mutual
 
 infix 25 ⟦_⟧ᵉ
 
+-- Splitting an environment according to context splitting
+
+split-env : ∀ {Γ Γ' Γ''}
+          → Γ' , Γ'' split Γ
+          → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵐ ⟦ Γ'' ⟧ᵉᵒ (⟦ Γ' ⟧ᵉᵒ A)
+          
+split-env split-[]             = idᵐ
+split-env (split-∷ p)          = mapˣᵐ (split-env p) idᵐ
+split-env (split-⟨⟩ {τ = τ} p) = ⟨ τ ⟩ᶠ (split-env p)
+
 -- Interaction of ⟨_⟩ modality and the time-travelling operation on contexts
 
 env-⟨⟩-ᶜ : ∀ {Γ}

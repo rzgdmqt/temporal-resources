@@ -23,16 +23,6 @@ open import Util.Time
 
 open Model Mod
 
--- Splitting an environment according to context splitting
-
-split-env : ∀ {Γ Γ' Γ''}
-          → Γ' , Γ'' split Γ
-          → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵐ ⟦ Γ'' ⟧ᵉᵒ (⟦ Γ' ⟧ᵉᵒ A)
-          
-split-env split-[]             = idᵐ
-split-env (split-∷ p)          = mapˣᵐ (split-env p) idᵐ
-split-env (split-⟨⟩ {τ = τ} p) = ⟨ τ ⟩ᶠ (split-env p)
-
 -- Total time-passage of an environment as a single ⟨_⟩ modality
 
 env-ctx-time-⟨⟩ : (Γ : Ctx)
