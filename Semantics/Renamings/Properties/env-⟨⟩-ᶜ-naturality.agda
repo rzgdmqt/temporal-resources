@@ -801,6 +801,20 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ τ' ⟩} (suc τ) p (⟨⟩-≤-ren {τ' = τ''} q) w
                   (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
     ∘ᵐ ⟨⟩-≤ q
   ≡⟨ {!!} ⟩
+       ⟨⟩-≤ s
+    ∘ᵐ ⟨ τ'' ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
+  ≡⟨ ∘ᵐ-congˡ (cong ⟨⟩-≤ (≤-irrelevant _ _)) ⟩
+       ⟨⟩-≤ (≤-trans (≤-reflexive (sym (+-identityʳ _))) (≤-trans (+-monoʳ-≤ (suc τ) z≤n) (≤-reflexive (m+[n∸m]≡n s))))
+    ∘ᵐ ⟨ τ'' ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
+  ≡⟨ {!!} ⟩
+       ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
+    ∘ᵐ ⟨⟩-≤ (≤-trans (+-monoʳ-≤ (suc τ) z≤n) (≤-reflexive (m+[n∸m]≡n s)))
+    ∘ᵐ ⟨ τ'' ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
+  ≡⟨ {!!} ⟩
+       ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
+    ∘ᵐ ⟨ suc τ + 0 ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
+    ∘ᵐ ⟨⟩-≤ (≤-trans (+-monoʳ-≤ (suc τ) z≤n) (≤-reflexive (m+[n∸m]≡n s)))
+  ≡⟨ {!!} ⟩
        ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
     ∘ᵐ ⟨ suc τ + 0 ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
     ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
