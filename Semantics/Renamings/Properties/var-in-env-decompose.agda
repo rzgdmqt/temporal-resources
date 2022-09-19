@@ -23,13 +23,38 @@ open import Util.Time
 
 open Model Mod
 
+-- Splitting an environment according to context splitting
+
+split-env : ∀ {Γ Γ' Γ''}
+          → Γ' , Γ'' split Γ
+          → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵐ ⟦ Γ'' ⟧ᵉᵒ (⟦ Γ' ⟧ᵉᵒ A)
+          
+split-env split-[]             = idᵐ
+split-env (split-∷ p)          = mapˣᵐ (split-env p) idᵐ
+split-env (split-⟨⟩ {τ = τ} p) = ⟨ τ ⟩ᶠ (split-env p)
+
+-- Total time-passage of an environment as a single ⟨_⟩ modality
+
+env-ctx-time-⟨⟩ : (Γ : Ctx)
+                → ∀ {A} → ⟦ Γ ⟧ᵉᵒ A →ᵐ ⟨ ctx-time Γ ⟩ᵒ A
+
+env-ctx-time-⟨⟩ []            = η
+env-ctx-time-⟨⟩ (Γ ∷ A)       = env-ctx-time-⟨⟩ Γ ∘ᵐ fstᵐ
+env-ctx-time-⟨⟩ (Γ ⟨ τ ⟩) {A} =
+     ⟨⟩-≤ {A} (≤-reflexive (+-comm (ctx-time Γ) τ))
+  ∘ᵐ μ {A}
+  ∘ᵐ ⟨ τ ⟩ᶠ (env-ctx-time-⟨⟩ Γ)
+
+-- Decomposing var-in-env in terms of the context splitting given by variable x
+
 var-in-env-decompose : ∀ {Γ A τ}
                      → (x : A ∈[ τ ] Γ)
                      → var-in-env x
-                    ≡    sndᵐ
+                     ≡    sndᵐ
                        ∘ᵐ ε-⟨⟩ {(⟦ proj₁ (var-split x) ⟧ᵉᵒ 𝟙ᵐ ×ᵐ ⟦ A ⟧ᵛ)}
                        ∘ᵐ env-ctx-time-⟨⟩ (proj₁ (proj₂ (var-split x)))
                        ∘ᵐ split-env (proj₁ (proj₂ (proj₂ (var-split x))))
+                       
 var-in-env-decompose {Γ ∷ A} {.A} {.0} Hd = 
   begin
     sndᵐ

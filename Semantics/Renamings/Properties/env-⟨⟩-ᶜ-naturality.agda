@@ -1,11 +1,10 @@
-----------------------------------------------------------------------------------
--- Relating the syntactic actions of renamings to semantic morphism composition --
-----------------------------------------------------------------------------------
+-------------------------------------------------------
+-- Naturality of the minus operation on environments --
+-------------------------------------------------------
 
 open import Semantics.Model
 
 module Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality (Mod : Model) where
-
 
 open import Relation.Nullary
 
