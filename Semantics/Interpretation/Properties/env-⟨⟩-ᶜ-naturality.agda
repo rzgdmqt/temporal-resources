@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Renamings.Properties.env-⟨⟩-ᶜ-naturality (Mod : Model) where
+module Semantics.Interpretation.Properties.env-⟨⟩-ᶜ-naturality (Mod : Model) where
 
 open import Data.Empty
 
@@ -23,19 +23,20 @@ open import Util.Time
 
 open Model Mod
 
-open import Semantics.Renamings.Properties.-ᶜ-wk-ren-sem-decompose Mod -- TODO: this proof needs typing up
+open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose Mod -- TODO: this proof needs typing up
 
 -- TODO: finish typing up the proof later
 
-env-⟨⟩-ᶜ-nat : ∀ {Γ Γ'}
-             → (τ : Time)
-             → (p : τ ≤ ctx-time Γ)
-             → (ρ : Ren Γ Γ')
-             →    env-⟨⟩-ᶜ {Γ} τ p
-               ∘ᵐ ⟦ ρ ⟧ʳ
-             ≡    ⟨ τ ⟩ᶠ ⟦ ρ -ʳ τ ⟧ʳ
-               ∘ᵐ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ))
-
+postulate
+  env-⟨⟩-ᶜ-nat : ∀ {Γ Γ'}
+               → (τ : Time)
+               → (p : τ ≤ ctx-time Γ)
+               → (ρ : Ren Γ Γ')
+               →    env-⟨⟩-ᶜ {Γ} τ p
+                 ∘ᵐ ⟦ ρ ⟧ʳ
+               ≡    ⟨ τ ⟩ᶠ ⟦ ρ -ʳ τ ⟧ʳ
+                 ∘ᵐ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ))
+{-
 env-⟨⟩-ᶜ-nat zero p ρ = 
   begin
     η ∘ᵐ ⟦ ρ ⟧ʳ
@@ -937,3 +938,5 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ τ' ⟩} (suc τ) p (⟨⟩-≤-ren {τ' = τ''} q) w
   ∎
 ... | no ¬r | no ¬s = {!!}
 env-⟨⟩-ᶜ-nat {Γ ⟨ τ' ⟩} (suc τ) p (cong-⟨⟩-ren ρ) = {!!}
+
+-}

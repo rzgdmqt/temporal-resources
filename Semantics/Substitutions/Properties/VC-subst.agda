@@ -16,7 +16,7 @@ open import Syntax.Substitutions
 open import Semantics.Interpretation Mod
 open import Semantics.Renamings.Core Mod
 
-open import Semantics.Properties.split-env Mod
+open import Semantics.Interpretation.Properties.split-env Mod
 
 open import Util.Equality
 open import Util.Operations

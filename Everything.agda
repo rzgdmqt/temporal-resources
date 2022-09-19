@@ -70,9 +70,17 @@ open import Semantics.Model
 
 open import Semantics.Interpretation
 
+open import Semantics.Interpretation.Properties.split-env-isomorphism
+open import Semantics.Interpretation.Properties.split-env-naturality
+open import Semantics.Interpretation.Properties.var-in-env-decompose
+open import Semantics.Interpretation.Properties.var-in-env-var-rename
+open import Semantics.Interpretation.Properties.env-⟨⟩-ᶜ-naturality
+
 ---- Semantics of renamings
 
 open import Semantics.Renamings
+
+open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose
 
 
 -- TIME-VARYING SETS MODEL

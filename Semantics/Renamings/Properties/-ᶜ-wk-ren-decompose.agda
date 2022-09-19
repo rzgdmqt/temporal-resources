@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Renamings.Properties.-ᶜ-wk-ren-sem-decompose (Mod : Model) where
+module Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose (Mod : Model) where
 
 open import Data.Empty
 

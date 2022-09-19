@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Renamings.Properties.var-in-env-var-rename (Mod : Model) where
+module Semantics.Interpretation.Properties.var-in-env-var-rename (Mod : Model) where
 
 open import Data.Product
 

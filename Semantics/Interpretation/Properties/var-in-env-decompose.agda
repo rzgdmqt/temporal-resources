@@ -1,10 +1,10 @@
-----------------------------------------------------------------------------------
--- Relating the syntactic actions of renamings to semantic morphism composition --
-----------------------------------------------------------------------------------
+-------------------------------------------------
+-- Decomposing the variable in environment map --
+-------------------------------------------------
 
 open import Semantics.Model
 
-module Semantics.Renamings.Properties.var-in-env-decompose (Mod : Model) where
+module Semantics.Interpretation.Properties.var-in-env-decompose (Mod : Model) where
 
 open import Data.Product
 
