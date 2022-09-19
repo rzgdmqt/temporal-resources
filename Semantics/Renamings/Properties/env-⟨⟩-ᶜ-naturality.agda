@@ -23,6 +23,8 @@ open import Util.Time
 
 open Model Mod
 
+open import Semantics.Renamings.Properties.-ᶜ-wk-ren-sem-decompose Mod -- TODO: this proof needs typing up
+
 -- TODO: finish typing up the proof later
 
 env-⟨⟩-ᶜ-nat : ∀ {Γ Γ'}
@@ -800,44 +802,121 @@ env-⟨⟩-ᶜ-nat {Γ ⟨ τ' ⟩} (suc τ) p (⟨⟩-≤-ren {τ' = τ''} q) w
                  (≤-trans (∸-monoˡ-≤ τ' p)
                   (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
     ∘ᵐ ⟨⟩-≤ q
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (⟨⟩-≤-nat _ _)) ⟩
+       ⟨⟩-≤ (m≤n+m∸n (suc τ) τ')
+    ∘ᵐ μ
+    ∘ᵐ ⟨⟩-≤ q
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
+                  (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
   ≡⟨ {!!} ⟩
+       ⟨⟩-≤ s
+    ∘ᵐ ⟨ τ'' ⟩ᶠ η⁻¹
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (⟨⟩-≤ z≤n)
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
+                  (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ ∘ᵐ-congʳ (sym (trans (⟨⟩-∘ᵐ _ _) (trans (∘ᵐ-congˡ (⟨⟩-∘ᵐ _ _)) (∘ᵐ-assoc _ _ _)))) ⟩
+       ⟨⟩-≤ s
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (   (η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n)
+                 ∘ᵐ env-⟨⟩-ᶜ (suc τ ∸ τ')
+                      (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ ∘ᵐ-congʳ (cong ⟨ τ'' ⟩ᶠ (sym (⟦-ᶜ-wk-ren⟧ʳ≡ε∘env-⟨⟩-ᶜ _))) ⟩
        ⟨⟩-≤ s
     ∘ᵐ ⟨ τ'' ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
   ≡⟨ ∘ᵐ-congˡ (cong ⟨⟩-≤ (≤-irrelevant _ _)) ⟩
-       ⟨⟩-≤ (≤-trans (≤-reflexive (sym (+-identityʳ _))) (≤-trans (+-monoʳ-≤ (suc τ) z≤n) (≤-reflexive (m+[n∸m]≡n s))))
+       ⟨⟩-≤ (≤-trans
+              (≤-reflexive (sym (+-identityʳ _)))
+              (≤-trans (+-monoʳ-≤ (suc τ) z≤n) (≤-reflexive (m+[n∸m]≡n s))))
     ∘ᵐ ⟨ τ'' ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congˡ (sym (⟨⟩-≤-trans _ _)) ⟩
+       (   ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
+        ∘ᵐ ⟨⟩-≤ (≤-trans (+-monoʳ-≤ (suc τ) z≤n) (≤-reflexive (m+[n∸m]≡n s))))
+    ∘ᵐ ⟨ τ'' ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
+  ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
        ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
     ∘ᵐ ⟨⟩-≤ (≤-trans (+-monoʳ-≤ (suc τ) z≤n) (≤-reflexive (m+[n∸m]≡n s)))
     ∘ᵐ ⟨ τ'' ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congʳ (sym (⟨⟩-≤-nat _ _)) ⟩
        ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
     ∘ᵐ ⟨ suc τ + 0 ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
     ∘ᵐ ⟨⟩-≤ (≤-trans (+-monoʳ-≤ (suc τ) z≤n) (≤-reflexive (m+[n∸m]≡n s)))
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym (⟨⟩-≤-trans _ _))) ⟩
        ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
     ∘ᵐ ⟨ suc τ + 0 ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
     ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
     ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congˡ (sym ⟨⟩-Tη⁻¹∘μ⁻¹≡id) ⟩
+       (   ⟨ suc τ ⟩ᶠ η⁻¹
+        ∘ᵐ μ⁻¹)
+    ∘ᵐ ⟨ suc τ + 0 ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
+    ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
+  ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
        ⟨ suc τ ⟩ᶠ η⁻¹
     ∘ᵐ μ⁻¹
     ∘ᵐ ⟨ suc τ + 0 ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
     ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
     ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congʳ (sym (∘ᵐ-assoc _ _ _)) ⟩
+       ⟨ suc τ ⟩ᶠ η⁻¹
+    ∘ᵐ (   μ⁻¹
+        ∘ᵐ ⟨ suc τ + 0 ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ)
+    ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (sym (⟨⟩-μ⁻¹-nat _))) ⟩
+       ⟨ suc τ ⟩ᶠ η⁻¹
+    ∘ᵐ (   ⟨ suc τ ⟩ᶠ (⟨ 0 ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ)
+        ∘ᵐ μ⁻¹)
+    ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-assoc _ _ _) ⟩
        ⟨ suc τ ⟩ᶠ η⁻¹
     ∘ᵐ ⟨ suc τ ⟩ᶠ (⟨ 0 ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ)
     ∘ᵐ μ⁻¹
     ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
     ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
-  ≡⟨ {!!} ⟩
+  ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+       (   ⟨ suc τ ⟩ᶠ η⁻¹
+        ∘ᵐ ⟨ suc τ ⟩ᶠ (⟨ 0 ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ))
+    ∘ᵐ μ⁻¹
+    ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
+  ≡⟨ ∘ᵐ-congˡ (sym (⟨⟩-∘ᵐ _ _)) ⟩
+       ⟨ suc τ ⟩ᶠ (   η⁻¹
+                   ∘ᵐ ⟨ 0 ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ)
+    ∘ᵐ μ⁻¹
+    ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
+  ≡⟨ ∘ᵐ-congˡ (cong ⟨ suc τ ⟩ᶠ (sym (⟨⟩-η⁻¹-nat _))) ⟩
+       ⟨ suc τ ⟩ᶠ (   ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
+                   ∘ᵐ η⁻¹)
+    ∘ᵐ μ⁻¹
+    ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
+  ≡⟨ ∘ᵐ-congˡ (⟨⟩-∘ᵐ _ _) ⟩
+       (   ⟨ suc τ ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
+        ∘ᵐ ⟨ suc τ ⟩ᶠ η⁻¹)
+    ∘ᵐ μ⁻¹
+    ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
+  ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
        ⟨ suc τ ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
     ∘ᵐ ⟨ suc τ ⟩ᶠ η⁻¹
     ∘ᵐ μ⁻¹
     ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n)
     ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym (∘ᵐ-assoc _ _ _))) ⟩
+       ⟨ suc τ ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
+    ∘ᵐ ⟨ suc τ ⟩ᶠ η⁻¹
+    ∘ᵐ (   μ⁻¹
+        ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ (suc τ) z≤n))
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congˡ (⟨⟩-μ⁻¹-≤₂ _))) ⟩
+       ⟨ suc τ ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
+    ∘ᵐ ⟨ suc τ ⟩ᶠ η⁻¹
+    ∘ᵐ (   ⟨ suc τ ⟩ᶠ (⟨⟩-≤ z≤n)
+        ∘ᵐ μ⁻¹)
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)) ⟩
        ⟨ suc τ ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
     ∘ᵐ ⟨ suc τ ⟩ᶠ η⁻¹
     ∘ᵐ ⟨ suc τ ⟩ᶠ (⟨⟩-≤ z≤n)

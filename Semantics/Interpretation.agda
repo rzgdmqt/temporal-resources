@@ -77,6 +77,14 @@ split-env split-[]             = idᵐ
 split-env (split-∷ p)          = mapˣᵐ (split-env p) idᵐ
 split-env (split-⟨⟩ {τ = τ} p) = ⟨ τ ⟩ᶠ (split-env p)
 
+split-env⁻¹ : ∀ {Γ Γ' Γ''}
+            → Γ' , Γ'' split Γ
+            → ∀ {A} → ⟦ Γ'' ⟧ᵉᵒ (⟦ Γ' ⟧ᵉᵒ A) →ᵐ ⟦ Γ ⟧ᵉᵒ A
+
+split-env⁻¹ split-[]             = idᵐ
+split-env⁻¹ (split-∷ p)          = mapˣᵐ (split-env⁻¹ p) idᵐ
+split-env⁻¹ (split-⟨⟩ {τ = τ} p) = ⟨ τ ⟩ᶠ (split-env⁻¹ p)
+
 -- Interaction of ⟨_⟩ modality and the time-travelling operation on contexts
 
 env-⟨⟩-ᶜ : ∀ {Γ}
