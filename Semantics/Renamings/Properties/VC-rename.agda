@@ -30,7 +30,7 @@ mutual
               → (ρ : Ren Γ Γ')
               → (V : Γ ⊢V⦂ A)
               → ⟦ V-rename ρ V ⟧ᵛᵗ
-             ≡ ⟦ V ⟧ᵛᵗ ∘ᵐ ⟦ ρ ⟧ʳ
+              ≡ ⟦ V ⟧ᵛᵗ ∘ᵐ ⟦ ρ ⟧ʳ
 
   V-rename≡∘ᵐ {Γ} {Γ'} {A} ρ (var {τ = τ} x) =
     begin

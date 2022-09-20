@@ -14,7 +14,8 @@ open import Syntax.Language
 open import Syntax.Substitutions
 
 open import Semantics.Interpretation Mod
-open import Semantics.Renamings.Core Mod
+open import Semantics.Renamings Mod
+open import Semantics.Substitutions.Properties.var-subst Mod
 
 open import Util.Equality
 open import Util.Operations
@@ -24,18 +25,26 @@ open Model Mod
 
 mutual
 
-  V-subst : ∀ {Γ A B τ}
-          → (V : Γ ⊢V⦂ B)
-          → (x : A ∈[ τ ] Γ)
-          → (W : proj₁ (var-split x) ⊢V⦂ A)
-          → ⟦ V [ x ↦ W ]v ⟧ᵛᵗ
-          ≡    ⟦ V ⟧ᵛᵗ
-            ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
-            ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
-            ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) 
+  V-subst≡∘ᵐ : ∀ {Γ A B τ}
+             → (V : Γ ⊢V⦂ B)
+             → (x : A ∈[ τ ] Γ)
+             → (W : proj₁ (var-split x) ⊢V⦂ A)
+             → ⟦ V [ x ↦ W ]v ⟧ᵛᵗ
+             ≡    ⟦ V ⟧ᵛᵗ
+               ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) 
 
-  V-subst (var y) x W = {!!}
-  V-subst (const c) x W = 
+  V-subst≡∘ᵐ (var y) x W = 
+    begin
+      ⟦ y [ x ↦ W ]var ⟧ᵛᵗ
+    ≡⟨ var-subst≡∘ᵐ y x W ⟩
+         var-in-env y
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ∎
+  V-subst≡∘ᵐ (const c) x W = 
     begin
          constᵐ c
       ∘ᵐ terminalᵐ
@@ -51,7 +60,7 @@ mutual
       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
-  V-subst ⋆ x W = 
+  V-subst≡∘ᵐ ⋆ x W = 
     begin
       terminalᵐ
     ≡⟨ sym terminalᵐ-unique ⟩
@@ -60,10 +69,10 @@ mutual
       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
-  V-subst (lam {A = A} M) x W = 
+  V-subst≡∘ᵐ (lam {A = A} M) x W = 
     begin
       curryᵐ ⟦ M [ Tl-∷ x ↦ W ]c ⟧ᶜᵗ
-    ≡⟨ cong curryᵐ (C-subst M (Tl-∷ x) W) ⟩
+    ≡⟨ cong curryᵐ (C-subst≡∘ᵐ M (Tl-∷ x) W) ⟩
       curryᵐ (   ⟦ M ⟧ᶜᵗ
               ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split (Tl-∷ {B = A} x)))))
               ∘ᵐ ⟦ proj₁ (proj₂ (var-split (Tl-∷ {B = A} x))) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
@@ -93,13 +102,13 @@ mutual
       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
-  V-subst {A = A} (box {B} {τ} V) x W =
+  V-subst≡∘ᵐ {A = A} (box {B} {τ} V) x W =
     {!!}
   {-
     begin
          [ τ ]ᶠ ⟦ V [ Tl-⟨⟩ x ↦ W ]v ⟧ᵛᵗ
       ∘ᵐ η⊣
-    ≡⟨ ∘ᵐ-congˡ (cong [ τ ]ᶠ (V-subst V (Tl-⟨⟩ x) W)) ⟩
+    ≡⟨ ∘ᵐ-congˡ (cong [ τ ]ᶠ (V-subst≡∘ᵐ V (Tl-⟨⟩ x) W)) ⟩
          [ τ ]ᶠ (   ⟦ V ⟧ᵛᵗ
                  ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split (Tl-⟨⟩ x)))))
                  ∘ᵐ ⟦ proj₁ (proj₂ (var-split (Tl-⟨⟩ x))) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
@@ -166,21 +175,21 @@ mutual
     ∎
   -}
 
-  C-subst : ∀ {Γ A C τ}
-          → (M : Γ ⊢C⦂ C)
-          → (x : A ∈[ τ ] Γ)
-          → (W : proj₁ (var-split x) ⊢V⦂ A)
-          → ⟦ M [ x ↦ W ]c ⟧ᶜᵗ
-          ≡    ⟦ M ⟧ᶜᵗ
-            ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
-            ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
-            ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) 
+  C-subst≡∘ᵐ : ∀ {Γ A C τ}
+             → (M : Γ ⊢C⦂ C)
+             → (x : A ∈[ τ ] Γ)
+             → (W : proj₁ (var-split x) ⊢V⦂ A)
+             → ⟦ M [ x ↦ W ]c ⟧ᶜᵗ
+             ≡    ⟦ M ⟧ᶜᵗ
+               ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) 
 
-  C-subst (return V) x W = 
+  C-subst≡∘ᵐ (return V) x W = 
     begin
          ηᵀ
       ∘ᵐ ⟦ V [ x ↦ W ]v ⟧ᵛᵗ
-    ≡⟨ ∘ᵐ-congʳ (V-subst V x W) ⟩
+    ≡⟨ ∘ᵐ-congʳ (V-subst≡∘ᵐ V x W) ⟩
          ηᵀ
       ∘ᵐ ⟦ V ⟧ᵛᵗ
       ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
@@ -192,14 +201,14 @@ mutual
       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
-  C-subst (_;_ {A = A} {τ = τ} M N) x W =
+  C-subst≡∘ᵐ (_;_ {A = A} {τ = τ} M N) x W =
     {!!}
   {-
     begin
          μᵀ
       ∘ᵐ Tᶠ ⟦ N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c ⟧ᶜᵗ
       ∘ᵐ strᵀ ∘ᵐ ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ
-    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (cong ⟨ η⊣ ,_⟩ᵐ (C-subst M x W)))) ⟩
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (cong ⟨ η⊣ ,_⟩ᵐ (C-subst≡∘ᵐ M x W)))) ⟩
          μᵀ
       ∘ᵐ Tᶠ ⟦ N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c ⟧ᶜᵗ
       ∘ᵐ strᵀ
@@ -207,7 +216,7 @@ mutual
                ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
                ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
                ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) ⟩ᵐ
-    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong Tᶠ (C-subst N (Tl-∷ (Tl-⟨⟩ x)) W))) ⟩
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong Tᶠ (C-subst≡∘ᵐ N (Tl-∷ (Tl-⟨⟩ x)) W))) ⟩
          μᵀ
       ∘ᵐ Tᶠ (   ⟦ N ⟧ᶜᵗ
              ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split (Tl-∷ {B = A} (Tl-⟨⟩ x))))))
@@ -406,13 +415,13 @@ mutual
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
   -}
-  C-subst (V · V') x W =
+  C-subst≡∘ᵐ (V · V') x W =
     {!!}
   {-
     begin
          uncurryᵐ idᵐ
       ∘ᵐ ⟨ ⟦ V [ x ↦ W ]v ⟧ᵛᵗ , ⟦ V' [ x ↦ W ]v ⟧ᵛᵗ ⟩ᵐ
-    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ (V-subst V x W) (V-subst V' x W)) ⟩
+    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ (V-subst≡∘ᵐ V x W) (V-subst≡∘ᵐ V' x W)) ⟩
          uncurryᵐ idᵐ
       ∘ᵐ ⟨   ⟦ V ⟧ᵛᵗ
           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
@@ -437,13 +446,13 @@ mutual
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
   -}
-  C-subst (absurd V) x W =
+  C-subst≡∘ᵐ (absurd V) x W =
     {!!}
   {-
     begin
          initialᵐ
       ∘ᵐ ⟦ V [ x ↦ W ]v ⟧ᵛᵗ
-    ≡⟨ ∘ᵐ-congʳ (V-subst V x W) ⟩
+    ≡⟨ ∘ᵐ-congʳ (V-subst≡∘ᵐ V x W) ⟩
          initialᵐ
       ∘ᵐ ⟦ V ⟧ᵛᵗ
       ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
@@ -456,7 +465,7 @@ mutual
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
   -}
-  C-subst (perform op V M) x W =
+  C-subst≡∘ᵐ (perform op V M) x W =
     {!!}
   {-
     begin
@@ -469,8 +478,8 @@ mutual
            ∘ᵐ η⊣ ⟩ᵐ
     ≡⟨ ∘ᵐ-congʳ
         (cong₂ ⟨_,_⟩ᵐ
-          (∘ᵐ-congʳ (V-subst V x W))
-          (∘ᵐ-congʳ (∘ᵐ-congˡ (cong [ op-time op ]ᶠ (cong curryᵐ (C-subst M (Tl-∷ (Tl-⟨⟩ x)) W)))))) ⟩
+          (∘ᵐ-congʳ (V-subst≡∘ᵐ V x W))
+          (∘ᵐ-congʳ (∘ᵐ-congˡ (cong [ op-time op ]ᶠ (cong curryᵐ (C-subst≡∘ᵐ M (Tl-∷ (Tl-⟨⟩ x)) W)))))) ⟩
          opᵀ op
       ∘ᵐ ⟨    ⟦⟧ᵛ-⟦⟧ᵍ (param op)
            ∘ᵐ ⟦ V ⟧ᵛᵗ
@@ -636,7 +645,7 @@ mutual
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
   -}
-  C-subst (handle M `with H `in N) x W =
+  C-subst≡∘ᵐ (handle M `with H `in N) x W =
     {!!}
   {-
     begin
@@ -685,15 +694,15 @@ mutual
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
   -}
-  C-subst (unbox p V M) x W = {!!}
-  C-subst (delay τ M) x W =
+  C-subst≡∘ᵐ (unbox p V M) x W = {!!}
+  C-subst≡∘ᵐ (delay τ M) x W =
     {!!}
   {-
     begin
          delayᵀ τ
       ∘ᵐ [ τ ]ᶠ ⟦ M [ Tl-⟨⟩ x ↦ W ]c ⟧ᶜᵗ
       ∘ᵐ η⊣
-    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong [ τ ]ᶠ (C-subst M (Tl-⟨⟩ x) W))) ⟩
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong [ τ ]ᶠ (C-subst≡∘ᵐ M (Tl-⟨⟩ x) W))) ⟩
          delayᵀ τ
       ∘ᵐ [ τ ]ᶠ (   ⟦ M ⟧ᶜᵗ
                  ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split (Tl-⟨⟩ x)))))
