@@ -44,9 +44,9 @@ record Monad : Set₁ where
 
     -- Functoriality
 
-    Tᶠ-idᵐ : ∀ {A τ} → Tᶠ {A} {A} {τ} idᵐ ≡ idᵐ
-    Tᶠ-∘ᵐ : ∀ {A B C τ} → (g : B →ᵐ C) → (f : A →ᵐ B)
-          → Tᶠ {A} {C} {τ} (g ∘ᵐ f) ≡ Tᶠ g ∘ᵐ Tᶠ f
+    T-idᵐ : ∀ {A τ} → Tᶠ {A} {A} {τ} idᵐ ≡ idᵐ
+    T-∘ᵐ : ∀ {A B C τ} → (g : B →ᵐ C) → (f : A →ᵐ B)
+         → Tᶠ {A} {C} {τ} (g ∘ᵐ f) ≡ Tᶠ g ∘ᵐ Tᶠ f
 
     -- Unit and multiplication are natural
 

@@ -113,7 +113,7 @@ mutual
       ∘ᵐ Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ ⟦ cong-∷-ren {A = A} (cong-⟨⟩-ren ρ) ⟧ʳ)
       ∘ᵐ strᵀ {⟨ τ ⟩ᵒ ⟦ Γ' ⟧ᵉ} {⟦ A ⟧ᵛ}
       ∘ᵐ ⟨ η⊣ {⟦ Γ' ⟧ᵉ} {τ} , ⟦ M ⟧ᶜᵗ ∘ᵐ ⟦ ρ ⟧ʳ ⟩ᵐ
-    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (Tᶠ-∘ᵐ _ _)) ⟩
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (T-∘ᵐ _ _)) ⟩
          μᵀ
       ∘ᵐ (   Tᶠ (⟦ N ⟧ᶜᵗ)
           ∘ᵐ Tᶠ ⟦ cong-∷-ren {A = A} (cong-⟨⟩-ren ρ) ⟧ʳ)
@@ -142,7 +142,7 @@ mutual
                 strᵀ
              ∘ᵐ mapˣᵐ ([ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ)) (Tᶠ idᵐ)
              ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵐ ⟦ ρ ⟧ʳ ⟩ᵐ
-           ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong (mapˣᵐ ([ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ))) Tᶠ-idᵐ)) ⟩
+           ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong (mapˣᵐ ([ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ))) T-idᵐ)) ⟩
                 strᵀ
              ∘ᵐ mapˣᵐ ([ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ)) idᵐ
              ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵐ ⟦ ρ ⟧ʳ ⟩ᵐ
@@ -574,7 +574,7 @@ mutual
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
       ∘ᵐ mapˣᵐ idᵐ strᵀ
       ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ∘ᵐ ⟦ ρ ⟧ʳ ⟩ᵐ ⟩ᵐ
-    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congˡ (cong (mapˣᵐ idᵐ) (Tᶠ-∘ᵐ _ _)))) ⟩
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congˡ (cong (mapˣᵐ idᵐ) (T-∘ᵐ _ _)))) ⟩
       uncurryᵐ
          (    T-alg-of-handlerᵀ
           ∘ᵐ (mapⁱˣᵐ
@@ -680,7 +680,7 @@ mutual
                 (trans
                   (∘ᵐ-congʳ (sym
                     (trans
-                      (∘ᵐ-congʳ (cong (mapˣᵐ ([ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ))) (sym Tᶠ-idᵐ)))
+                      (∘ᵐ-congʳ (cong (mapˣᵐ ([ τ ]ᶠ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ))) (sym T-idᵐ)))
                       (strᵀ-nat _ _))))
                   (sym (∘ᵐ-identityˡ _)))) ⟩
            mapˣᵐ
