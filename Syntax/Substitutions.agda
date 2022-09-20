@@ -137,12 +137,14 @@ mutual
   _[_↦_]c {τ = τ} (unbox {τ = τ'} s V M) x W | yes p with var-in-ctx-after-ᶜ x p
   ... | y , q , r =
     unbox
-      (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) s)
+      (≤-trans s (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))))))
+      --(var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) s)
       (V-rename (eq-ren r) (V [ y ↦ V-rename (eq-ren q) W ]v))
       (M [ Tl-∷ x ↦ W ]c)
   _[_↦_]c {τ = τ} (unbox {τ = τ'} s V M) x W | no ¬p =
     unbox
-      (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) s)
+      (≤-trans s (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))))))
+      --(var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) s)
       (V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬p)) V)
       (M [ Tl-∷ x ↦ W ]c)
   delay τ M [ x ↦ W ]c =

@@ -118,21 +118,16 @@ var-split {Γ ⟨ τ ⟩} (Tl-⟨⟩ x) with var-split x
 
 -- Variable splitting preserves time-passage modelled by a context
 
-var-split-pres-ctx-time : ∀ {Γ Γ₁ Γ₂ A τ}
-                        → Γ₁ ∷ A , Γ₂ split Γ
-                        → τ ≤ ctx-time Γ
-                        → τ ≤ ctx-time (Γ₁ ++ᶜ Γ₂)
-                        
-var-split-pres-ctx-time split-[] q =
-  q
-var-split-pres-ctx-time (split-∷ p) q =
-  var-split-pres-ctx-time p q
-var-split-pres-ctx-time (split-⟨⟩ {τ = τ} p) q =
-  ≤-trans
-    (n≤n∸m+m _ τ)
-    (+-monoˡ-≤ τ
-      (var-split-pres-ctx-time p
-        (≤-trans (∸-monoˡ-≤ τ q) (≤-reflexive (m+n∸n≡m _ τ)))))
+split-pres-ctx-time : ∀ {Γ Γ₁ Γ₂ A}
+                    → Γ₁ ∷ A , Γ₂ split Γ
+                    → ctx-time Γ ≡ ctx-time (Γ₁ ++ᶜ Γ₂)
+                           
+split-pres-ctx-time split-[] =
+  refl
+split-pres-ctx-time (split-∷ p) =
+  split-pres-ctx-time p
+split-pres-ctx-time (split-⟨⟩ {τ = τ} p) =
+  cong (_+ τ) (split-pres-ctx-time p) 
 
 -- Variable in context is in one of the two contexts splitting it
 
