@@ -16,9 +16,6 @@ open import Syntax.Substitutions
 open import Semantics.Interpretation Mod
 open import Semantics.Renamings.Core Mod
 
-open import Semantics.Interpretation.Properties.split-env-isomorphism Mod
-open import Semantics.Interpretation.Properties.split-env-naturality Mod
-
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
@@ -639,7 +636,55 @@ mutual
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
   -}
-  C-subst (handle M `with H `in M₁) x W = {!!}
+  C-subst (handle M `with H `in N) x W =
+    {!!}
+  {-
+    begin
+         uncurryᵐ (   T-alg-of-handlerᵀ
+                   ∘ᵐ ⟨ (λ op →
+                          ⟨ (λ τ'' →
+                              (   curryᵐ (   idᵐ
+                                          ∘ᵐ uncurryᵐ idᵐ
+                                          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                                 ⟨    ⟦⟧ᵍ-⟦⟧ᵛ (param op)
+                                                   ∘ᵐ fstᵐ ,
+                                                      [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ))
+                                                   ∘ᵐ sndᵐ ⟩ᵐ
+                                              ∘ᵐ sndᵐ ⟩ᵐ)
+                               ∘ᵐ curryᵐ (   ⟦ H op τ'' [ Tl-∷ (Tl-∷ x) ↦ W ]c ⟧ᶜᵗ
+                                          ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                           ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                       ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                   ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+      ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , Tᶠ ⟦ N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c ⟧ᶜᵗ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , strᵀ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ {!!} ⟩
+         (  uncurryᵐ (   T-alg-of-handlerᵀ
+                      ∘ᵐ ⟨ (λ op →
+                             ⟨ (λ τ'' →
+                                    (  curryᵐ (   idᵐ
+                                               ∘ᵐ uncurryᵐ idᵐ
+                                               ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ
+                                               ,
+                                                  ⟨   ⟦⟧ᵍ-⟦⟧ᵛ (param op)
+                                                   ∘ᵐ fstᵐ
+                                                   ,
+                                                      [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ))
+                                                   ∘ᵐ sndᵐ ⟩ᵐ
+                                               ∘ᵐ sndᵐ ⟩ᵐ)
+                                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                                 ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                              ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                      ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+         ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵐ sndᵐ ⟩ᵐ
+         ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , strᵀ ∘ᵐ sndᵐ ⟩ᵐ
+         ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ)
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ∎
+  -}
   C-subst (unbox p V M) x W = {!!}
   C-subst (delay τ M) x W =
     {!!}
