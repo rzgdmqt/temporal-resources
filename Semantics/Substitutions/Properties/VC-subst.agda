@@ -698,7 +698,7 @@ mutual
     ∎
   -}
   C-subst≡∘ᵐ {τ = τ} (unbox {τ = τ'} p V M) x W with τ' ≤? τ
-  C-subst≡∘ᵐ {τ = τ} (unbox {A = A} {τ = τ'} p V M) x W | yes q with var-in-ctx-after-ᶜ x q
+  C-subst≡∘ᵐ {Γ = Γ} {τ = τ} (unbox {A = A} {τ = τ'} p V M) x W | yes q with var-in-ctx-after-ᶜ x q
   ... | y , r , s = 
     begin
          ⟦ M [ Tl-∷ x ↦ W ]c ⟧ᶜᵗ
@@ -779,7 +779,221 @@ mutual
                            ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl))
                        ∘ᵐ ⟦ eq-ren s ⟧ʳ)
            ∘ᵐ env-⟨⟩-ᶜ {proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x))} τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p) ⟩ᵐ
-    ≡⟨ {!!} ⟩
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (cong ⟨ idᵐ ,_⟩ᵐ (∘ᵐ-congʳ (∘ᵐ-congˡ
+        (cong ⟨ τ' ⟩ᶠ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))))))))) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split (Tl-∷ {B = A} x)))))
+          ∘ᵐ ⟦ proj₁ (proj₂ (var-split (Tl-∷ {B = A} x))) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+          ∘ᵐ split-env
+               {Γ' = proj₁ (var-split (Tl-∷ {B = A} x))}
+               {Γ'' = proj₁ (proj₂ (var-split (Tl-∷ {B = A} x)))}
+               (split-∷ (≡-split refl)))
+      ∘ᵐ ⟨ idᵐ ,
+              ε⊣
+           ∘ᵐ ⟨ τ' ⟩ᶠ (   ⟦ V ⟧ᵛᵗ
+                       ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                       ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                       ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                       ∘ᵐ ⟦ eq-ren s ⟧ʳ)
+           ∘ᵐ env-⟨⟩-ᶜ {proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x))} τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (trans (∘ᵐ-congʳ (sym (mapˣᵐ-∘ᵐ _ _ _ _))) (sym (mapˣᵐ-∘ᵐ _ _ _ _)))) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ mapˣᵐ
+           (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+            ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+            ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+           (idᵐ ∘ᵐ idᵐ ∘ᵐ idᵐ)
+      ∘ᵐ ⟨ idᵐ ,
+              ε⊣
+           ∘ᵐ ⟨ τ' ⟩ᶠ (   ⟦ V ⟧ᵛᵗ
+                       ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                       ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                       ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                       ∘ᵐ ⟦ eq-ren s ⟧ʳ)
+           ∘ᵐ env-⟨⟩-ᶜ {proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x))} τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (sym (⟨⟩ᵐ-∘ᵐ _ _ _)) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨   (  (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                 ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                 ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+             ∘ᵐ fstᵐ)
+          ∘ᵐ ⟨ idᵐ ,
+                  ε⊣
+               ∘ᵐ ⟨ τ' ⟩ᶠ (   ⟦ V ⟧ᵛᵗ
+                           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                           ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                           ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                           ∘ᵐ ⟦ eq-ren s ⟧ʳ)
+               ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p) ⟩ᵐ
+          ,
+             ((idᵐ ∘ᵐ idᵐ ∘ᵐ idᵐ) ∘ᵐ sndᵐ)
+          ∘ᵐ ⟨ idᵐ ,
+                  ε⊣
+               ∘ᵐ ⟨ τ' ⟩ᶠ (   ⟦ V ⟧ᵛᵗ
+                           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                           ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                           ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                           ∘ᵐ ⟦ eq-ren s ⟧ʳ)
+               ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p) ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ
+        (∘ᵐ-assoc _ _ _)
+        (∘ᵐ-assoc _ _ _)) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨   (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+              ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+              ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+          ∘ᵐ fstᵐ
+          ∘ᵐ ⟨ idᵐ ,
+                  ε⊣
+               ∘ᵐ ⟨ τ' ⟩ᶠ (   ⟦ V ⟧ᵛᵗ
+                           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                           ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                           ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                           ∘ᵐ ⟦ eq-ren s ⟧ʳ)
+               ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p) ⟩ᵐ
+          ,
+             (idᵐ ∘ᵐ idᵐ ∘ᵐ idᵐ)
+          ∘ᵐ sndᵐ
+          ∘ᵐ ⟨ idᵐ ,
+                  ε⊣
+               ∘ᵐ ⟨ τ' ⟩ᶠ (   ⟦ V ⟧ᵛᵗ
+                           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                           ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                           ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                           ∘ᵐ ⟦ eq-ren s ⟧ʳ)
+               ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p) ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ
+        (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))
+        (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨   (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+              ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+              ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+          ∘ᵐ idᵐ
+          ,
+             (idᵐ ∘ᵐ idᵐ ∘ᵐ idᵐ)
+          ∘ᵐ (   ε⊣
+              ∘ᵐ ⟨ τ' ⟩ᶠ (   ⟦ V ⟧ᵛᵗ
+                          ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                          ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                          ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                          ∘ᵐ ⟦ eq-ren s ⟧ʳ)
+              ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p)) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ refl (∘ᵐ-congˡ (trans (∘ᵐ-identityˡ _) (∘ᵐ-identityˡ _)))) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨   (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+              ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+              ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+          ∘ᵐ idᵐ
+          ,
+             idᵐ
+          ∘ᵐ (   ε⊣
+              ∘ᵐ ⟨ τ' ⟩ᶠ (   ⟦ V ⟧ᵛᵗ
+                          ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                          ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                          ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                          ∘ᵐ ⟦ eq-ren s ⟧ʳ)
+              ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p)) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ (∘ᵐ-identityʳ _) (∘ᵐ-identityˡ _)) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨    split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+           ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+           ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+          ,
+              ε⊣
+           ∘ᵐ ⟨ τ' ⟩ᶠ (   ⟦ V ⟧ᵛᵗ
+                       ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                       ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                       ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                       ∘ᵐ ⟦ eq-ren s ⟧ʳ)
+           ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ (sym (∘ᵐ-identityˡ _)) (∘ᵐ-congʳ (∘ᵐ-congˡ (⟨⟩-∘ᵐ _ _)))) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨    idᵐ
+           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+           ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+           ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+          ,
+              ε⊣
+           ∘ᵐ (   ⟨ τ' ⟩ᶠ ⟦ V ⟧ᵛᵗ
+               ∘ᵐ ⟨ τ' ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                           ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                           ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                           ∘ᵐ ⟦ eq-ren s ⟧ʳ))
+           ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ refl (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨    idᵐ
+           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+           ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+           ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+          ,
+              ε⊣
+           ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V ⟧ᵛᵗ
+           ∘ᵐ ⟨ τ' ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                       ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                       ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                       ∘ᵐ ⟦ eq-ren s ⟧ʳ)
+           ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ refl (∘ᵐ-congʳ (∘ᵐ-congʳ (
+        begin
+             ⟨ τ' ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                      ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                      ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                      ∘ᵐ ⟦ eq-ren s ⟧ʳ)
+          ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p)
+        ≡⟨ ∘ᵐ-congˡ (trans (cong ⟨ τ' ⟩ᶠ (sym (∘ᵐ-assoc _ _ _)))
+            (trans (cong ⟨ τ' ⟩ᶠ (sym (∘ᵐ-assoc _ _ _)))
+              (trans (⟨⟩-∘ᵐ _ _) (∘ᵐ-congˡ (cong ⟨ τ' ⟩ᶠ (∘ᵐ-assoc _ _ _)))))) ⟩
+             (  ⟨ τ' ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                         ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                         ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl))
+             ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren s ⟧ʳ)
+          ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p)
+        ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
+             ⟨ τ' ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                      ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                      ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl))
+          ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren s ⟧ʳ
+          ∘ᵐ env-⟨⟩-ᶜ τ' (var-split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))) p)
+        ≡⟨ {!!} ⟩
+             env-⟨⟩-ᶜ τ' p
+          ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+          ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+          ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+        ∎)))) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨    idᵐ
+           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+           ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+           ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+          ,
+              ε⊣
+           ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V ⟧ᵛᵗ
+           ∘ᵐ env-⟨⟩-ᶜ τ' p
+           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+           ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+           ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ refl (sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))))) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨    idᵐ
+           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+           ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+           ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+          ,
+              (   ε⊣
+               ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V ⟧ᵛᵗ
+               ∘ᵐ env-⟨⟩-ᶜ τ' p)
+           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+           ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+           ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (⟨⟩ᵐ-∘ᵐ _ _ _) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ' p ⟩ᵐ
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
          (   ⟦ M ⟧ᶜᵗ
           ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ' p ⟩ᵐ)
       ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
