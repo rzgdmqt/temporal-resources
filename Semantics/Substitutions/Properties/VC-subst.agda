@@ -27,6 +27,43 @@ open import Util.Time
 
 open Model Mod
 
+{-
+C-subst≡∘ᵐ-aux-unbox : ∀ {Γ A τ τ'}
+                     → (x : A ∈[ τ ] Γ)
+                     → (y : A ∈[ τ ∸ τ' ] Γ -ᶜ τ')
+                     → (W : proj₁ (var-split x) ⊢V⦂ A)
+                     → (p : τ' ≤ ctx-time Γ)
+                     → (r : proj₁ (var-split x) ≡ proj₁ (var-split y))
+                     → (s : proj₁ (var-split y) ++ᶜ proj₁ (proj₂ (var-split y))
+                          ≡ proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) -ᶜ τ')
+                     →    ⟨ τ' ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                                   ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                                   ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl))
+                       ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren s ⟧ʳ
+                       ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))))))
+                     ≡
+                          env-⟨⟩-ᶜ τ' p
+                       ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+
+C-subst≡∘ᵐ-aux-unbox {Γ} {A} {τ} {τ'} x y W p r s = 
+  begin
+       ⟨ τ' ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y))))
+                ∘ᵐ ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren r ⟧ʳ ⟩ᵐ
+                ∘ᵐ split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl))
+    ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren s ⟧ʳ
+    ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))))))
+  ≡⟨ {!!} ⟩
+       env-⟨⟩-ᶜ τ' p
+    ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+    ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+    ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+  ∎
+-}
+
+{-
+
 mutual
 
   V-subst≡∘ᵐ : ∀ {Γ A B τ}
@@ -1080,3 +1117,5 @@ mutual
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
   -}
+
+-}

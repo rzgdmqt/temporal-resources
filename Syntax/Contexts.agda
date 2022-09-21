@@ -202,5 +202,23 @@ _-ᶜ_ : Ctx → Time → Ctx
 infixl 30 _-ᶜ_
 
 -ᶜ-[]-id : ∀ {τ} → [] -ᶜ τ ≡ []
--ᶜ-[]-id {zero} = refl
--ᶜ-[]-id {suc τ} = refl
+-ᶜ-[]-id {zero} =
+  refl
+-ᶜ-[]-id {suc τ} =
+  refl
+
+++ᶜ-ᶜ : ∀ {Γ Γ' τ}
+      → τ ≤ ctx-time Γ'
+      → Γ ++ᶜ (Γ' -ᶜ τ) ≡ (Γ ++ᶜ Γ') -ᶜ τ
+++ᶜ-ᶜ {Γ} {Γ'} {zero} p =
+  refl
+++ᶜ-ᶜ {Γ} {Γ' ∷ A} {suc τ} p =
+  ++ᶜ-ᶜ {Γ} {Γ'} {suc τ} p
+++ᶜ-ᶜ {Γ} {Γ' ⟨ τ' ⟩} {suc τ} p with suc τ ≤? τ'
+... | yes q =
+  refl
+... | no ¬q =
+  ++ᶜ-ᶜ {Γ} {Γ'} {suc τ ∸ τ'}
+    (≤-trans
+      (∸-monoˡ-≤ τ' p)
+      (≤-reflexive (m+n∸n≡m (ctx-time Γ') τ')))
