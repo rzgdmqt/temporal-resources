@@ -145,6 +145,16 @@ mapˣᵐ-×ᵐ-assoc f g h =
     ×ᵐ-assoc ∘ᵐ mapˣᵐ f (mapˣᵐ g h)
   ∎
 
+mapˣᵐ-identity : ∀ {A B} → mapˣᵐ {A} {B} {A} {B} idᵐ idᵐ ≡ idᵐ
+mapˣᵐ-identity = 
+  begin
+    ⟨ idᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+  ≡⟨ sym (⟨⟩ᵐ-unique _ _ _
+       (trans (∘ᵐ-identityʳ _) (sym (∘ᵐ-identityˡ _)))
+       (trans (∘ᵐ-identityʳ _) (sym (∘ᵐ-identityˡ _)))) ⟩
+    idᵐ
+  ∎
+
 mapˣᵐ-∘ᵐ : ∀ {A A' A'' B B' B''} → (f : A →ᵐ A') (g : B →ᵐ B') (h : A' →ᵐ A'') (i : B' →ᵐ B'')
          → mapˣᵐ (h ∘ᵐ f) (i ∘ᵐ g) ≡ mapˣᵐ h i ∘ᵐ mapˣᵐ f g
 mapˣᵐ-∘ᵐ f g h i = 

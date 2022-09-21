@@ -24,9 +24,10 @@ open import Util.Time
 open Model Mod
 
 postulate
-  ⟦-ᶜ-wk-ren⟧ʳ≡ε∘env-⟨⟩-ᶜ : ∀ {Γ τ}
+  ⟦-ᶜ-wk-ren⟧ʳ≡ε∘env-⟨⟩-ᶜ : ∀ {Γ τ A}
                           → (p : τ ≤ ctx-time Γ)
-                          → ⟦ -ᶜ-wk-ren {Γ} τ ⟧ʳ ≡ ε-⟨⟩ ∘ᵐ env-⟨⟩-ᶜ τ p
+                          → ⟦ -ᶜ-wk-ren {Γ} τ ⟧ʳ {A}
+                          ≡ ε-⟨⟩ ∘ᵐ env-⟨⟩-ᶜ τ p
                        
 --⟦-ᶜ-wk-ren⟧ʳ≡ε∘env-⟨⟩-ᶜ p = {!!}
 

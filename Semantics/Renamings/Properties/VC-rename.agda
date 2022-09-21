@@ -940,7 +940,7 @@ mutual
                          (trans
                            (∘ᵐ-assoc _ _ _)
                            (trans
-                             (∘ᵐ-congʳ (sym (env-⟨⟩-ᶜ-nat τ p ρ)))
+                             (∘ᵐ-congʳ (sym (env-⟨⟩-ᶜ-ren-nat τ p ρ)))
                              (sym (∘ᵐ-assoc _ _ _))))))
                      (sym (∘ᵐ-assoc _ _ _)))))) ⟩
           ⟨ idᵐ ∘ᵐ ⟦ ρ ⟧ʳ , (ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p) ∘ᵐ ⟦ ρ ⟧ʳ ⟩ᵐ

@@ -12,6 +12,7 @@ open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Language
 
+open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
@@ -60,6 +61,66 @@ mutual
 ⟦ Γ ∷ A ⟧ᵉᶠ   f = mapˣᵐ (⟦ Γ ⟧ᵉᶠ f) idᵐ
 ⟦ Γ ⟨ τ ⟩ ⟧ᵉᶠ f = ⟨ τ ⟩ᶠ (⟦ Γ ⟧ᵉᶠ f)
 
+⟦⟧ᵉ-idᵐ : ∀ {Γ A} → ⟦ Γ ⟧ᵉᶠ (idᵐ {A = A}) ≡ idᵐ
+⟦⟧ᵉ-idᵐ {[]} =
+  begin
+    idᵐ
+  ≡⟨⟩
+    idᵐ
+  ∎
+⟦⟧ᵉ-idᵐ {Γ ∷ A} =
+  begin
+    ⟨ ⟦ Γ ⟧ᵉᶠ idᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+  ≡⟨ sym (⟨⟩ᵐ-unique _ _ _
+       (begin
+         fstᵐ ∘ᵐ idᵐ
+       ≡⟨ ∘ᵐ-identityʳ _ ⟩
+         fstᵐ
+       ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
+         idᵐ ∘ᵐ fstᵐ
+       ≡⟨ ∘ᵐ-congˡ (sym (⟦⟧ᵉ-idᵐ {Γ})) ⟩
+         ⟦ Γ ⟧ᵉᶠ idᵐ ∘ᵐ fstᵐ
+       ∎)
+       (trans (∘ᵐ-identityʳ _) (sym (∘ᵐ-identityˡ _)))) ⟩
+    idᵐ
+  ∎
+⟦⟧ᵉ-idᵐ {Γ ⟨ τ ⟩} = 
+  begin
+    ⟨ τ ⟩ᶠ (⟦ Γ ⟧ᵉᶠ idᵐ)
+  ≡⟨ cong ⟨ τ ⟩ᶠ (⟦⟧ᵉ-idᵐ {Γ}) ⟩
+    ⟨ τ ⟩ᶠ idᵐ
+  ≡⟨ ⟨⟩-idᵐ ⟩
+    idᵐ
+  ∎
+
+⟦⟧ᵉ-∘ᵐ : ∀ {Γ A B C} → (g : B →ᵐ C) → (f : A →ᵐ B)
+       → ⟦ Γ ⟧ᵉᶠ (g ∘ᵐ f) ≡ ⟦ Γ ⟧ᵉᶠ g ∘ᵐ ⟦ Γ ⟧ᵉᶠ f
+⟦⟧ᵉ-∘ᵐ {[]} g f = 
+  begin
+    g ∘ᵐ f
+  ≡⟨⟩
+    g ∘ᵐ f
+  ∎
+⟦⟧ᵉ-∘ᵐ {Γ ∷ A} g f = 
+  begin
+    ⟨ ⟦ Γ ⟧ᵉᶠ (g ∘ᵐ f) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+  ≡⟨ cong₂ ⟨_,_⟩ᵐ
+       (∘ᵐ-congˡ (⟦⟧ᵉ-∘ᵐ {Γ} g f))
+       (∘ᵐ-congˡ (sym (∘ᵐ-identityˡ _))) ⟩
+    ⟨ (⟦ Γ ⟧ᵉᶠ g ∘ᵐ ⟦ Γ ⟧ᵉᶠ f) ∘ᵐ fstᵐ , (idᵐ ∘ᵐ idᵐ) ∘ᵐ sndᵐ ⟩ᵐ
+  ≡⟨ mapˣᵐ-∘ᵐ _ _ _ _ ⟩
+       ⟨ ⟦ Γ ⟧ᵉᶠ g ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+    ∘ᵐ ⟨ ⟦ Γ ⟧ᵉᶠ f ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+  ∎
+⟦⟧ᵉ-∘ᵐ {Γ ⟨ τ ⟩} g f = 
+  begin
+    ⟨ τ ⟩ᶠ (⟦ Γ ⟧ᵉᶠ (g ∘ᵐ f))
+  ≡⟨ cong ⟨ τ ⟩ᶠ (⟦⟧ᵉ-∘ᵐ {Γ} g f) ⟩
+    ⟨ τ ⟩ᶠ (⟦ Γ ⟧ᵉᶠ g ∘ᵐ ⟦ Γ ⟧ᵉᶠ f)
+  ≡⟨ ⟨⟩-∘ᵐ _ _ ⟩
+    ⟨ τ ⟩ᶠ (⟦ Γ ⟧ᵉᶠ g) ∘ᵐ ⟨ τ ⟩ᶠ (⟦ Γ ⟧ᵉᶠ f)
+  ∎
+
 -- Environments are such functors applied to the terminal object
 
 ⟦_⟧ᵉ : Ctx → Obj
@@ -87,9 +148,9 @@ split-env⁻¹ (split-⟨⟩ {τ = τ} p) = ⟨ τ ⟩ᶠ (split-env⁻¹ p)
 
 -- Interaction of ⟨_⟩ modality and the time-travelling operation on contexts
 
-env-⟨⟩-ᶜ : ∀ {Γ}
+env-⟨⟩-ᶜ : ∀ {Γ A}
          → (τ : Time) → τ ≤ ctx-time Γ
-         → ⟦ Γ ⟧ᵉ →ᵐ ⟨ τ ⟩ᵒ (⟦ Γ -ᶜ τ ⟧ᵉ)
+         → ⟦ Γ ⟧ᵉᵒ A →ᵐ ⟨ τ ⟩ᵒ (⟦ Γ -ᶜ τ ⟧ᵉᵒ A)
          
 env-⟨⟩-ᶜ {Γ} zero p =
   η
@@ -98,11 +159,11 @@ env-⟨⟩-ᶜ {Γ ∷ B} (suc τ) p =
   ∘ᵐ fstᵐ
 env-⟨⟩-ᶜ {Γ ⟨ τ' ⟩} (suc τ) p with suc τ ≤? τ'
 ... | yes q =
-     μ⁻¹ {⟦ Γ ⟧ᵉ} {suc τ} {τ' ∸ suc τ}
-  ∘ᵐ ⟨⟩-≤ {⟦ Γ ⟧ᵉ} (≤-reflexive (m+[n∸m]≡n q))
+     μ⁻¹
+  ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n q))
 ... | no ¬q =
-     ⟨⟩-≤ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ} (m≤n+m∸n (suc τ) τ')
-  ∘ᵐ μ {⟦ Γ -ᶜ (suc τ ∸ τ') ⟧ᵉ} {τ'} {suc τ ∸ τ'}
+     ⟨⟩-≤ (m≤n+m∸n (suc τ) τ')
+  ∘ᵐ μ
   ∘ᵐ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ {Γ} (suc τ ∸ τ')
        (≤-trans
          (∸-monoˡ-≤ τ' p)

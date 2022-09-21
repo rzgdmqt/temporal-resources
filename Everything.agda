@@ -82,6 +82,10 @@ open import Semantics.Renamings
 
 open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose
 
+---- Semantics of substitutions
+
+-- open import Semantics.Substitutions.Properties.VC-subst
+
 
 -- TIME-VARYING SETS MODEL
 --------------------------

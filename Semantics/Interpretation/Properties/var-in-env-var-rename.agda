@@ -26,7 +26,7 @@ var-in-env∘var-rename≡var-rename∘ᵐ⟦⟧ʳ : ∀ {Γ Γ' A τ}
                                       → (ρ : Ren Γ Γ')
                                       → (x : A ∈[ τ ] Γ)
                                       → var-in-env (proj₂ (proj₂ (var-rename ρ x)))
-                                     ≡ var-in-env x ∘ᵐ ⟦ ρ ⟧ʳ
+                                      ≡ var-in-env x ∘ᵐ ⟦ ρ ⟧ʳ
                
 var-in-env∘var-rename≡var-rename∘ᵐ⟦⟧ʳ id-ren x = 
   begin
@@ -46,21 +46,31 @@ var-in-env∘var-rename≡var-rename∘ᵐ⟦⟧ʳ (ρ ∘ʳ ρ') x =
   ∎
 var-in-env∘var-rename≡var-rename∘ᵐ⟦⟧ʳ wk-ren x =
   refl
-var-in-env∘var-rename≡var-rename∘ᵐ⟦⟧ʳ (var-ren y) Hd = 
+var-in-env∘var-rename≡var-rename∘ᵐ⟦⟧ʳ (var-ren {Γ = Γ} y) Hd =
   begin
     var-in-env y
+  ≡⟨ sym (∘ᵐ-identityʳ _) ⟩
+    var-in-env y ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-congʳ (sym (⟦⟧ᵉ-idᵐ {Γ})) ⟩
+    var-in-env y ∘ᵐ ⟦ Γ ⟧ᵉᶠ idᵐ
+  ≡⟨ ∘ᵐ-congʳ (cong ⟦ Γ ⟧ᵉᶠ terminalᵐ-unique) ⟩
+    var-in-env y ∘ᵐ ⟦ Γ ⟧ᵉᶠ terminalᵐ
   ≡⟨ sym (⟨⟩ᵐ-sndᵐ _ _) ⟩
-    sndᵐ ∘ᵐ ⟨ idᵐ , var-in-env y ⟩ᵐ
+    sndᵐ ∘ᵐ ⟨ idᵐ , var-in-env y ∘ᵐ ⟦ Γ ⟧ᵉᶠ terminalᵐ ⟩ᵐ
   ∎
-var-in-env∘var-rename≡var-rename∘ᵐ⟦⟧ʳ (var-ren y) (Tl-∷ x) =
+var-in-env∘var-rename≡var-rename∘ᵐ⟦⟧ʳ (var-ren {Γ = Γ} y) (Tl-∷ x) =
   begin
     var-in-env x
   ≡⟨ sym (∘ᵐ-identityʳ _) ⟩
-    var-in-env x ∘ᵐ idᵐ
+       var-in-env x
+    ∘ᵐ idᵐ
   ≡⟨ ∘ᵐ-congʳ (sym (⟨⟩ᵐ-fstᵐ _ _)) ⟩
-    var-in-env x ∘ᵐ (fstᵐ ∘ᵐ ⟨ idᵐ , var-in-env y ⟩ᵐ)
+       var-in-env x
+    ∘ᵐ fstᵐ
+    ∘ᵐ ⟨ idᵐ , var-in-env y ∘ᵐ ⟦ Γ ⟧ᵉᶠ terminalᵐ ⟩ᵐ
   ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
-    (var-in-env x ∘ᵐ fstᵐ) ∘ᵐ ⟨ idᵐ , var-in-env y ⟩ᵐ
+       (var-in-env x ∘ᵐ fstᵐ)
+    ∘ᵐ ⟨ idᵐ , var-in-env y ∘ᵐ ⟦ Γ ⟧ᵉᶠ terminalᵐ ⟩ᵐ
   ∎
 var-in-env∘var-rename≡var-rename∘ᵐ⟦⟧ʳ {A = A} ⟨⟩-η-ren (Tl-⟨⟩ x) =
   begin
