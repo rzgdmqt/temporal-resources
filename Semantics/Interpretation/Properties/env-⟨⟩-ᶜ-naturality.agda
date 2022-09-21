@@ -23,16 +23,14 @@ open import Util.Time
 
 open Model Mod
 
-open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose Mod -- TODO: this proof needs typing up
-
 -- TODO: finish typing up the proof later
 
 postulate
-  env-⟨⟩-ᶜ-ren-nat : ∀ {Γ A B}
-                   → (τ : Time)
-                   → (p : τ ≤ ctx-time Γ)
-                   → (f : A →ᵐ B)
-                   →    env-⟨⟩-ᶜ {Γ} τ p 
-                     ∘ᵐ ⟦ Γ ⟧ᵉᶠ f
-                   ≡    ⟨ τ ⟩ᶠ (⟦ Γ -ᶜ τ ⟧ᵉᶠ f)
-                     ∘ᵐ env-⟨⟩-ᶜ {Γ} τ p 
+  env-⟨⟩-ᶜ-nat : ∀ {Γ A B}
+               → (τ : Time)
+               → (p : τ ≤ ctx-time Γ)
+               → (f : A →ᵐ B)
+               →    env-⟨⟩-ᶜ {Γ} τ p 
+                 ∘ᵐ ⟦ Γ ⟧ᵉᶠ f
+               ≡    ⟨ τ ⟩ᶠ (⟦ Γ -ᶜ τ ⟧ᵉᶠ f)
+                 ∘ᵐ env-⟨⟩-ᶜ {Γ} τ p 
