@@ -16,7 +16,8 @@ open import Semantics.Interpretation Mod
 open import Semantics.Renamings.Core Mod
 
 open import Semantics.Interpretation.Properties.var-in-env-var-rename Mod
-open import Semantics.Interpretation.Properties.env-⟨⟩-ᶜ-naturality Mod
+
+open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-ren-naturality Mod
 
 open import Util.Equality
 open import Util.Operations

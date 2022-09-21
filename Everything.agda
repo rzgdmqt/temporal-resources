@@ -81,6 +81,7 @@ open import Semantics.Interpretation.Properties.env-⟨⟩-ᶜ-naturality
 open import Semantics.Renamings
 
 open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose
+open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-ren-naturality
 
 ---- Semantics of substitutions
 

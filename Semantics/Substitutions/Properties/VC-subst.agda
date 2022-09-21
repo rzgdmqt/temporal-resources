@@ -18,6 +18,7 @@ open import Syntax.Substitutions
 
 open import Semantics.Interpretation Mod
 open import Semantics.Renamings Mod
+
 open import Semantics.Substitutions.Properties.var-subst Mod
 
 open import Util.Equality
