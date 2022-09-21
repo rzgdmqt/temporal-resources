@@ -23,6 +23,7 @@ open import Semantics.Interpretation.Properties.env-⟨⟩-ᶜ-naturality Mod
 
 open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-split-env-naturality Mod
 open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-eq-ren-naturality Mod
+open import Semantics.Renamings.Properties.split-env-eq-ren Mod
 
 open import Semantics.Substitutions.Properties.var-subst Mod
 
@@ -148,7 +149,10 @@ C-subst≡∘ᵐ-aux-unbox {Γ} {A} {τ} {τ'} x y W p q r s =
     ∘ᵐ split-env⁻¹ {Γ' = proj₁ (var-split x) ∷ A} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
     ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
-  ≡⟨ {!!} ⟩ -- (b)
+  ≡⟨ ∘ᵐ-congʳ
+      (trans
+        (sym (∘ᵐ-assoc _ _ _))
+        (∘ᵐ-congˡ (sym (split-env⁻¹-eq-ren (proj₁ (proj₂ (proj₂ (var-split x)))))))) ⟩
        env-⟨⟩-ᶜ τ' p
     ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
     ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
