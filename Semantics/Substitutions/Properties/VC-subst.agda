@@ -34,6 +34,8 @@ open import Util.Time
 
 open Model Mod
 
+-- Auxiliary substitution lemma for the unbox case
+
 C-subst≡∘ᵐ-aux-unbox : ∀ {Γ A τ τ'}
                      → (x : A ∈[ τ ] Γ)
                      → (y : A ∈[ τ ∸ τ' ] Γ -ᶜ τ')
@@ -156,7 +158,71 @@ C-subst≡∘ᵐ-aux-unbox {Γ} {A} {τ} {τ'} x y W p q r s =
         ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ)
         ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren s ⟧ʳ
         ∘ᵐ ⟨ τ' ⟩ᶠ (split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
-      ≡⟨ {!!} ⟩
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans
+          (∘ᵐ-congˡ (trans (sym (⟨⟩-∘ᵐ _ _))
+            (trans (cong ⟨ τ' ⟩ᶠ (⟦⟧ʳ-nat (eq-ren s) ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ)) (⟨⟩-∘ᵐ _ _)))) (∘ᵐ-assoc _ _ _))))) ⟩
+           ⟨ τ' ⟩ᶠ ⟦ eq-ren (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split y)))))) ⟧ʳ
+        ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren (cong (_++ᶜ proj₁ (proj₂ (var-split y))) (cong (_∷ A) r)) ⟧ʳ
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env⁻¹ {Γ' = proj₁ (var-split x) ∷ A} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl))
+        ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren s ⟧ʳ
+        ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split x)) -ᶜ τ' ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _))
+          (trans (∘ᵐ-congˡ (trans (sym (⟨⟩-∘ᵐ _ _))
+            (trans (cong ⟨ τ' ⟩ᶠ (split-env⁻¹-eq-renʳ s)) (⟨⟩-∘ᵐ _ _)))) (∘ᵐ-assoc _ _ _)))) ⟩
+           ⟨ τ' ⟩ᶠ ⟦ eq-ren (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split y)))))) ⟧ʳ
+        ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren (cong (λ Γ → Γ ++ᶜ proj₁ (proj₂ (var-split y))) (cong (_∷ A) r)) ⟧ʳ
+        ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren (cong (proj₁ (var-split x) ∷ A ++ᶜ_) s) ⟧ʳ
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env⁻¹ {Γ' = proj₁ (var-split x) ∷ A} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+        ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split x)) -ᶜ τ' ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+      ≡⟨ sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))) ⟩
+           (   ⟨ τ' ⟩ᶠ ⟦ eq-ren (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split y)))))) ⟧ʳ
+            ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren (cong (λ Γ → Γ ++ᶜ proj₁ (proj₂ (var-split y))) (cong (_∷ A) r)) ⟧ʳ
+            ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren (cong (proj₁ (var-split x) ∷ A ++ᶜ_) s) ⟧ʳ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env⁻¹ {Γ' = proj₁ (var-split x) ∷ A} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+        ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split x)) -ᶜ τ' ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+      ≡⟨ ∘ᵐ-congˡ (sym (trans (⟨⟩-∘ᵐ _ _) (∘ᵐ-congʳ (⟨⟩-∘ᵐ _ _)))) ⟩
+           ⟨ τ' ⟩ᶠ (   ⟦ eq-ren (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split y)))))) ⟧ʳ
+                    ∘ᵐ ⟦ eq-ren (cong (λ Γ → Γ ++ᶜ proj₁ (proj₂ (var-split y))) (cong (_∷ A) r)) ⟧ʳ
+                    ∘ᵐ ⟦ eq-ren (cong (proj₁ (var-split x) ∷ A ++ᶜ_) s) ⟧ʳ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env⁻¹ {Γ' = proj₁ (var-split x) ∷ A} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+        ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split x)) -ᶜ τ' ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+      ≡⟨ ∘ᵐ-congˡ (cong ⟨ τ' ⟩ᶠ (
+          trans
+            (∘ᵐ-congʳ (eq-ren-trans (cong (_++ᶜ proj₁ (proj₂ (var-split y))) (cong (_∷ A) r)) (cong (proj₁ (var-split x) ∷ A ++ᶜ_) s)))
+            (trans
+              (eq-ren-trans
+                (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split y))))))
+                (trans (cong (_++ᶜ proj₁ (proj₂ (var-split y))) (cong (_∷ A) r)) (cong (proj₁ (var-split x) ∷ A ++ᶜ_) s)))
+              (trans
+                (cong (λ p → ⟦ eq-ren p ⟧ʳ)
+                  {trans
+                    (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split y))))))
+                    (trans (cong (_++ᶜ proj₁ (proj₂ (var-split y))) (cong (_∷ A) r)) (cong (proj₁ (var-split x) ∷ A ++ᶜ_) s))}
+                  {trans
+                    (cong (_-ᶜ τ') (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x)))))))
+                    (sym (++ᶜ-ᶜ (≤-trans q (≤-reflexive (sym (proj₂ (proj₂ (proj₂ (var-split x)))))))))}
+                  uip)
+                (sym (eq-ren-trans
+                       (cong (_-ᶜ τ') (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x)))))))
+                       (sym (++ᶜ-ᶜ (≤-trans q (≤-reflexive (sym (proj₂ (proj₂ (proj₂ (var-split x))))))))))))))) ⟩
+           ⟨ τ' ⟩ᶠ (    ⟦ eq-ren (cong (_-ᶜ τ') (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟧ʳ
+                    ∘ᵐ  ⟦ eq-ren (sym (++ᶜ-ᶜ {proj₁ (var-split x) ∷ A} {proj₁ (proj₂ (var-split x))} {τ'}
+                                        (≤-trans q (≤-reflexive (sym (proj₂ (proj₂ (proj₂ (var-split x))))))))) ⟧ʳ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env⁻¹ {Γ' = proj₁ (var-split x) ∷ A} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+        ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split x)) -ᶜ τ' ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+      ≡⟨ ∘ᵐ-congˡ (⟨⟩-∘ᵐ _ _) ⟩
+           (   ⟨ τ' ⟩ᶠ ⟦ eq-ren (cong (_-ᶜ τ') (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟧ʳ
+            ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren (sym (++ᶜ-ᶜ {proj₁ (var-split x) ∷ A} {proj₁ (proj₂ (var-split x))} {τ'}
+                                       (≤-trans q (≤-reflexive (sym (proj₂ (proj₂ (proj₂ (var-split x))))))))) ⟧ʳ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env⁻¹ {Γ' = proj₁ (var-split x) ∷ A} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+        ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split x)) -ᶜ τ' ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+      ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
            ⟨ τ' ⟩ᶠ ⟦ eq-ren (cong (_-ᶜ τ') (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟧ʳ
         ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren (sym (++ᶜ-ᶜ {proj₁ (var-split x) ∷ A} {proj₁ (proj₂ (var-split x))} {τ'}
                                    (≤-trans q (≤-reflexive (sym (proj₂ (proj₂ (proj₂ (var-split x))))))))) ⟧ʳ
@@ -273,8 +339,9 @@ C-subst≡∘ᵐ-aux-unbox {Γ} {A} {τ} {τ'} x y W p q r s =
 
 
 
-
 {-
+
+-- Main substitution lemmas
 
 mutual
 

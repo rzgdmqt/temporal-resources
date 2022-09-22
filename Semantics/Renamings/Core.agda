@@ -11,6 +11,7 @@ open import Syntax.Renamings
 
 open import Semantics.Interpretation Mod
 
+open import Util.Equality
 open import Util.Time
 
 open Model Mod
@@ -41,3 +42,14 @@ open Model Mod
 ⟦ cong-⟨⟩-ren {τ = τ} ρ ⟧ʳ =
   ⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ
 
+
+-- Semantics of renamings is a natural transformation
+
+postulate
+  ⟦⟧ʳ-nat : ∀ {Γ Γ' A B}
+          → (ρ : Ren Γ Γ')
+          → (f : A →ᵐ B)
+          → ⟦ Γ ⟧ᵉᶠ f ∘ᵐ ⟦ ρ ⟧ʳ
+          ≡ ⟦ ρ ⟧ʳ ∘ᵐ ⟦ Γ' ⟧ᵉᶠ f
+        
+-- ⟦⟧ʳ-nat ρ f = {!!}

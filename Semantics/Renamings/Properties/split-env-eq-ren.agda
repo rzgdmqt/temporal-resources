@@ -237,3 +237,20 @@ split-env⁻¹-eq-renˡ {Γ} {_} {Γ''} refl =
        idᵐ
     ∘ᵐ split-env⁻¹ {Γ' = Γ} {Γ'' = Γ''} (≡-split refl)
   ∎
+
+
+split-env⁻¹-eq-renʳ : ∀ {Γ Γ' Γ'' A}
+                    → (p : Γ' ≡ Γ'')
+                    →    split-env⁻¹ {Γ' = Γ} {Γ'' = Γ'} (≡-split refl)
+                      ∘ᵐ ⟦ eq-ren p ⟧ʳ {⟦ Γ ⟧ᵉᵒ A}
+                    ≡    ⟦ eq-ren (cong (Γ ++ᶜ_) p) ⟧ʳ
+                      ∘ᵐ split-env⁻¹ {Γ' = Γ} {Γ'' = Γ''} (≡-split refl) 
+
+split-env⁻¹-eq-renʳ {Γ} {Γ'} refl = 
+  begin
+    split-env⁻¹ {Γ' = Γ} {Γ'' = Γ'} (≡-split refl) ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-identityʳ _ ⟩
+    split-env⁻¹ {Γ' = Γ} {Γ'' = Γ'} (≡-split refl)
+  ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
+    idᵐ ∘ᵐ split-env⁻¹ {Γ' = Γ} {Γ'' = Γ'} (≡-split refl)
+  ∎
