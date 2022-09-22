@@ -86,6 +86,7 @@ open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-split-env-naturality
 open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-eq-ren-naturality
 open import Semantics.Renamings.Properties.split-env-eq-ren
 open import Semantics.Renamings.Properties.eq-ren
+open import Semantics.Renamings.Properties.split-env-wk-ren
 
 ---- Semantics of substitutions
 

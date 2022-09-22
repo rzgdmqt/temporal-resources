@@ -51,50 +51,19 @@ var-in-ctx-after-ᶜ {Γ ⟨ τ'' ⟩} {A} {.(τ'' + _)} {suc τ'} (Tl-⟨⟩ {�
       (∸-monoˡ-≤ τ'' p)
       (≤-reflexive (m+n∸m≡n τ'' τ''')))
 
-{-
-var-in-ctx-after-ᶜ : ∀ {Γ A τ τ'}
-                   → (x : A ∈[ τ ] Γ)
-                   → τ' ≤ τ
-                   → Σ[ y ∈ A ∈[ τ ∸ τ' ] Γ -ᶜ τ' ]
-                       (  proj₁ (var-split x) ≡ proj₁ (var-split y)
-                        × proj₁ (var-split y) ++ᶜ proj₁ (proj₂ (var-split y))
-                          ≡ (proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) -ᶜ τ'))
-                          
-var-in-ctx-after-ᶜ {Γ} {A} {τ} {zero} x p = x , refl , refl
-var-in-ctx-after-ᶜ {Γ ∷ B} {A} {τ} {suc τ'} (Tl-∷ x) p with var-in-ctx-after-ᶜ x p
-... | y , q , r = y , q , r
-var-in-ctx-after-ᶜ {Γ ⟨ τ'' ⟩} {A} {.(τ'' + _)} {suc τ'} (Tl-⟨⟩ x) p with suc τ' ≤? τ''
-var-in-ctx-after-ᶜ {Γ ⟨ τ'' ⟩} {A} {.(τ'' + _)} {suc τ'} (Tl-⟨⟩ {τ' = τ'''} x) p | yes q
-  rewrite trans                                              -- : τ'' + τ''' ∸ suc τ' ≡ (τ'' ∸ suc τ') + τ'''
-            (cong (_∸ suc τ') (+-comm τ'' τ'''))
-            (trans
-              (+-∸-assoc τ''' q)
-              (+-comm τ''' (τ'' ∸ suc τ'))) =
-  Tl-⟨⟩ x , refl , refl
-var-in-ctx-after-ᶜ {Γ ⟨ τ'' ⟩} {A} {.(τ'' + _)} {suc τ'} (Tl-⟨⟩ {τ' = τ'''} x) p | no ¬q
-  rewrite trans                                              -- : τ'' + τ''' ∸ suc τ' ≡ τ''' ∸ (suc τ' ∸ τ'')
-            (cong (_∸ suc τ') (+-comm τ'' τ'''))
-            (¬k≤m⇒k∸m≤n⇒n+m∸k≤n∸k∸m {τ'''} {τ''} {suc τ'} ¬q
-              (≤-trans (∸-monoˡ-≤ τ'' p) (≤-reflexive (m+n∸m≡n τ'' τ''')))) =
-  var-in-ctx-after-ᶜ {Γ} {τ' = suc τ' ∸ τ''} x
-    (≤-trans
-      (∸-monoˡ-≤ τ'' p)
-      (≤-reflexive (m+n∸m≡n τ'' τ''')))
--}
-
 ---- When the variable is not in the resulting context
 
 var-not-in-ctx-after-ᶜ : ∀ {Γ A τ τ'}
                        → (x : A ∈[ τ ] Γ)
                        → τ' > τ
-                       → Ren (Γ -ᶜ τ') (proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) -ᶜ τ')
+                       → Γ -ᶜ τ' ≡ proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) -ᶜ τ'
 
 var-not-in-ctx-after-ᶜ {Γ ∷ B} {.B} {.0} {suc τ'} Hd p =
-  id-ren
+  refl
 var-not-in-ctx-after-ᶜ {Γ ∷ B} {A} {τ} {suc τ'} (Tl-∷ x) p =
   var-not-in-ctx-after-ᶜ {Γ} {τ' = suc τ'} x p
 var-not-in-ctx-after-ᶜ {Γ ⟨ τ'' ⟩} {A} {.(τ'' + _)} {suc τ'} (Tl-⟨⟩ {τ' = τ'''} x) (s≤s p) with suc τ' ≤? τ''
-... | yes q =
+... | yes q = 
   ⊥-elim (sucn≤m⇒m+k≤n-contradiction q p)
 ... | no ¬q =
   var-not-in-ctx-after-ᶜ {Γ} {τ' = suc τ' ∸ τ''} x
@@ -177,7 +146,7 @@ mutual
   _[_↦_]c {τ = τ} (unbox {τ = τ'} s V M) x W | no ¬p =
     unbox
       (≤-trans s (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))))))
-      (V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬p)) V)
+      (V-rename (eq-ren (var-not-in-ctx-after-ᶜ x (≰⇒> ¬p))) V)
       (M [ Tl-∷ x ↦ W ]c)
   delay τ M [ x ↦ W ]c =
     delay τ (M [ Tl-⟨⟩ x ↦ W ]c)
