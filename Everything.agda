@@ -80,6 +80,8 @@ open import Semantics.Interpretation.Properties.env-⟨⟩-ᶜ-naturality
 
 open import Semantics.Renamings
 
+open import Semantics.Renamings.Properties.VC-rename
+
 open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose
 open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-ren-naturality
 open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-split-env-naturality
@@ -87,6 +89,7 @@ open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-eq-ren-naturality
 open import Semantics.Renamings.Properties.split-env-eq-ren
 open import Semantics.Renamings.Properties.eq-ren
 open import Semantics.Renamings.Properties.split-env-wk-ren
+open import Semantics.Renamings.Properties.var-not-in-ctx-after-ᶜ-wk-ren
 
 ---- Semantics of substitutions
 

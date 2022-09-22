@@ -20,7 +20,7 @@ open import Syntax.Renamings
 open import Syntax.Substitutions
 
 open import Semantics.Interpretation Mod
-open import Semantics.Renamings.Core Mod
+open import Semantics.Renamings Mod
 
 open import Util.Equality
 open import Util.Time

@@ -13,7 +13,7 @@ open import Syntax.Language
 open import Syntax.Renamings
 
 open import Semantics.Interpretation Mod
-open import Semantics.Renamings.Core Mod
+open import Semantics.Renamings Mod
 
 open import Semantics.Interpretation.Properties.var-in-env-var-rename Mod
 

@@ -14,7 +14,7 @@ open import Syntax.Contexts
 open import Syntax.Renamings
 
 open import Semantics.Interpretation Mod
-open import Semantics.Renamings.Core Mod
+open import Semantics.Renamings Mod
 
 open import Util.Equality
 open import Util.Operations

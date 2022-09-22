@@ -20,6 +20,8 @@ open import Semantics.Renamings Mod
 open import Semantics.Interpretation.Properties.split-env-isomorphism Mod
 open import Semantics.Interpretation.Properties.split-env-naturality Mod
 
+open import Semantics.Renamings.Properties.VC-rename Mod
+
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
