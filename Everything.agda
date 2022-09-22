@@ -82,11 +82,15 @@ open import Semantics.Renamings
 
 open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose
 open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-ren-naturality
-open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-split-env
+open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-split-env-naturality
+open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-eq-ren-naturality
+open import Semantics.Renamings.Properties.split-env-eq-ren
 
 ---- Semantics of substitutions
 
 -- open import Semantics.Substitutions.Properties.VC-subst
+
+open import Semantics.Substitutions.Properties.var-subst
 
 
 -- TIME-VARYING SETS MODEL

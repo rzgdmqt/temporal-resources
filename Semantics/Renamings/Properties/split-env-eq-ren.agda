@@ -251,3 +251,4 @@ split-env⁻¹-eq-ren {.(_ ⟨ _ ⟩)} {Γ'} {Γ'' ⟨ τ ⟩} {A} (split-⟨⟩
        ⟦ eq-ren (sym (cong (_⟨ τ ⟩) (split-≡ p))) ⟧ʳ
     ∘ᵐ ⟨ τ ⟩ᶠ (split-env⁻¹ {Γ' = Γ'} {Γ'' = Γ''} (≡-split refl))
   ∎
+
