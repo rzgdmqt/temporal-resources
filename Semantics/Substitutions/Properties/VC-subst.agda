@@ -36,6 +36,7 @@ open Model Mod
 
 -- Auxiliary substitution lemma for the unbox case
 
+{-
 C-subst≡∘ᵐ-aux-unbox : ∀ {Γ A τ τ'}
                      → (x : A ∈[ τ ] Γ)
                      → (y : A ∈[ τ ∸ τ' ] Γ -ᶜ τ')
@@ -101,7 +102,18 @@ C-subst≡∘ᵐ-aux-unbox {Γ} {A} {τ} {τ'} x y W p q r s =
         ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren (sym r) ⟧ʳ ⟩ᵐ)
         ∘ᵐ ⟨ τ' ⟩ᶠ (split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl))
         ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ eq-ren (cong₂ _++ᶜ_ r s) ⟧ʳ
-      ≡⟨ {!!} ⟩ -- (a)
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym (⟨⟩-∘ᵐ _ _))) ⟩
+           ⟨ τ' ⟩ᶠ (split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y)))))
+        ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren (sym r) ⟧ʳ ⟩ᵐ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (   split-env {Γ' = proj₁ (var-split y)} {Γ'' = proj₁ (proj₂ (var-split y))} (≡-split refl)
+                    ∘ᵐ ⟦ eq-ren (cong₂ _++ᶜ_ r s) ⟧ʳ)
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (cong ⟨ τ' ⟩ᶠ (split-env-eq-renˡʳ r s))) ⟩
+           ⟨ τ' ⟩ᶠ (split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y)))))
+        ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren (sym r) ⟧ʳ ⟩ᵐ)
+        ∘ᵐ ⟨ τ' ⟩ᶠ (   ⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟦ eq-ren r ⟧ʳ
+                    ∘ᵐ ⟦ eq-ren s ⟧ʳ
+                    ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x)) -ᶜ τ'} (≡-split refl))
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (⟨⟩-∘ᵐ _ _) (∘ᵐ-congʳ (⟨⟩-∘ᵐ _ _)))) ⟩
            ⟨ τ' ⟩ᶠ (split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split y)))))
         ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ eq-ren (sym r) ⟧ʳ ⟩ᵐ)
         ∘ᵐ ⟨ τ' ⟩ᶠ (⟦ proj₁ (proj₂ (var-split y)) ⟧ᵉᶠ ⟦ eq-ren r ⟧ʳ)
@@ -336,10 +348,9 @@ C-subst≡∘ᵐ-aux-unbox {Γ} {A} {τ} {τ'} x y W p q r s =
     ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
     ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
   ∎
+-}
 
 
-
-{-
 
 -- Main substitution lemmas
 
@@ -1017,6 +1028,8 @@ mutual
   C-subst≡∘ᵐ {τ = τ} (unbox {τ = τ'} p V M) x W with τ' ≤? τ
   C-subst≡∘ᵐ {Γ = Γ} {τ = τ} (unbox {A = A} {τ = τ'} p V M) x W | yes q with var-in-ctx-after-ᶜ x q
   ... | y , r , s =
+    {!!}
+  {-
     begin
          ⟦ M [ Tl-∷ x ↦ W ]c ⟧ᶜᵗ
       ∘ᵐ ⟨ idᵐ ,
@@ -1263,7 +1276,7 @@ mutual
                       ∘ᵐ ⟦   eq-ren (++ᶜ-ᶜ (≤-trans q (≤-reflexive (sym (proj₂ (proj₂ (proj₂ (var-split x))))))))
                           ∘ʳ eq-ren (cong₂ _++ᶜ_ r s) ⟧ʳ)
           ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))))))
-        ≡⟨ {!!} ⟩
+        ≡⟨ C-subst≡∘ᵐ-aux-unbox x y W p q r s ⟩
              env-⟨⟩-ᶜ τ' p
           ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
           ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
@@ -1310,6 +1323,7 @@ mutual
       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
+  -}
   C-subst≡∘ᵐ {τ = τ} (unbox {τ = τ'} p V M) x W | no ¬q = {!!}
   C-subst≡∘ᵐ (delay τ M) x W =
     {!!}
@@ -1380,5 +1394,3 @@ mutual
     ∎
   -}
 
-
--}

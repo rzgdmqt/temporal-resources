@@ -217,6 +217,35 @@ split-env⁻¹-eq-ren {.(_ ⟨ _ ⟩)} {Γ'} {Γ'' ⟨ τ ⟩} {A} (split-⟨⟩
 
 -- Environment splitting morphisms interaction with equality renamings (ctd)
 
+split-env-eq-renˡʳ : ∀ {Γ Γ' Γ'' Γ''' A}
+                   → (p : Γ ≡ Γ')
+                   → (q : Γ'' ≡ Γ''')
+                   →    split-env {Γ' = Γ} {Γ'' = Γ''} (≡-split refl)
+                     ∘ᵐ ⟦ eq-ren (cong₂ _++ᶜ_ p q) ⟧ʳ {A}
+                   ≡    ⟦ Γ'' ⟧ᵉᶠ ⟦ eq-ren p ⟧ʳ
+                     ∘ᵐ ⟦ eq-ren q ⟧ʳ
+                     ∘ᵐ split-env {Γ' = Γ'} {Γ'' = Γ'''} (≡-split refl) 
+
+split-env-eq-renˡʳ {Γ} {_} {Γ''} refl refl = 
+  begin
+       split-env {Γ' = Γ} {Γ'' = Γ''} (≡-split refl)
+    ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-identityʳ _ ⟩
+    split-env {Γ' = Γ} {Γ'' = Γ''} (≡-split refl)
+  ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
+       idᵐ
+    ∘ᵐ split-env {Γ' = Γ} {Γ'' = Γ''} (≡-split refl)
+  ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
+       idᵐ
+    ∘ᵐ idᵐ
+    ∘ᵐ split-env {Γ' = Γ} {Γ'' = Γ''} (≡-split refl)
+  ≡⟨ ∘ᵐ-congˡ (sym (⟦⟧ᵉ-idᵐ {Γ''})) ⟩
+       ⟦ Γ'' ⟧ᵉᶠ idᵐ
+    ∘ᵐ idᵐ
+    ∘ᵐ split-env {Γ' = Γ} {Γ'' = Γ''} (≡-split refl)
+  ∎
+  
+
 split-env⁻¹-eq-renˡ : ∀ {Γ Γ' Γ'' A}
                     → (p : Γ ≡ Γ')
                     →    split-env⁻¹ {Γ' = Γ} {Γ'' = Γ''} (≡-split refl)
