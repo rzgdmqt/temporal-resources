@@ -1324,7 +1324,107 @@ mutual
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
   -}
-  C-subst≡∘ᵐ {τ = τ} (unbox {τ = τ'} p V M) x W | no ¬q = {!!}
+  C-subst≡∘ᵐ {τ = τ} (unbox {A = A} {τ = τ'} p V M) x W | no ¬q = 
+    begin
+         ⟦ M [ Tl-∷ x ↦ W ]c ⟧ᶜᵗ
+      ∘ᵐ ⟨ idᵐ ,
+              ε⊣
+           ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬q)) V ⟧ᵛᵗ
+           ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congˡ (C-subst≡∘ᵐ M (Tl-∷ x) W) ⟩
+         (   ⟦ M ⟧ᶜᵗ
+          ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split (Tl-∷ {B = A} x)))))
+          ∘ᵐ ⟦ proj₁ (proj₂ (var-split (Tl-∷ {B = A} x))) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+          ∘ᵐ split-env
+               {Γ' = proj₁ (var-split (Tl-∷ {B = A} x))}
+               {Γ'' = proj₁ (proj₂ (var-split (Tl-∷ {B = A} x)))}
+               (split-∷ (≡-split refl)))
+      ∘ᵐ ⟨ idᵐ ,
+              ε⊣
+           ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬q)) V ⟧ᵛᵗ
+           ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟩ᵐ
+    ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split (Tl-∷ {B = A} x)))))
+          ∘ᵐ ⟦ proj₁ (proj₂ (var-split (Tl-∷ {B = A} x))) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+          ∘ᵐ split-env
+               {Γ' = proj₁ (var-split (Tl-∷ {B = A} x))}
+               {Γ'' = proj₁ (proj₂ (var-split (Tl-∷ {B = A} x)))}
+               (split-∷ (≡-split refl)))
+      ∘ᵐ ⟨ idᵐ ,
+              ε⊣
+           ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬q)) V ⟧ᵛᵗ
+           ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (trans (∘ᵐ-congʳ (sym (mapˣᵐ-∘ᵐ _ _ _ _))) (sym (mapˣᵐ-∘ᵐ _ _ _ _)))) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ mapˣᵐ
+           (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+            ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+            ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+           (idᵐ ∘ᵐ idᵐ ∘ᵐ idᵐ)
+      ∘ᵐ ⟨ idᵐ ,
+              ε⊣
+           ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬q)) V ⟧ᵛᵗ
+           ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (sym (⟨⟩ᵐ-∘ᵐ _ _ _)) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨  (   (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                 ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                 ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+             ∘ᵐ fstᵐ)
+          ∘ᵐ ⟨ idᵐ ,
+                  ε⊣
+               ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬q)) V ⟧ᵛᵗ
+               ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟩ᵐ
+          ,
+             ((idᵐ ∘ᵐ idᵐ ∘ᵐ idᵐ) ∘ᵐ sndᵐ)
+          ∘ᵐ ⟨ idᵐ ,
+                  ε⊣
+               ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬q)) V ⟧ᵛᵗ
+               ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ (∘ᵐ-assoc _ _ _) (∘ᵐ-assoc _ _ _)) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨   (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+          ∘ᵐ fstᵐ
+          ∘ᵐ ⟨ idᵐ ,
+                  ε⊣
+               ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬q)) V ⟧ᵛᵗ
+               ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟩ᵐ
+          ,
+             (idᵐ ∘ᵐ idᵐ ∘ᵐ idᵐ)
+          ∘ᵐ sndᵐ
+          ∘ᵐ ⟨ idᵐ ,
+                  ε⊣
+               ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬q)) V ⟧ᵛᵗ
+               ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)) (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨   (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+          ∘ᵐ idᵐ
+          ,
+             (idᵐ ∘ᵐ idᵐ ∘ᵐ idᵐ)
+          ∘ᵐ ε⊣
+          ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V-rename (var-not-in-ctx-after-ᶜ x (≰⇒> ¬q)) V ⟧ᵛᵗ
+          ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟩ᵐ
+    ≡⟨ {!!} ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨ idᵐ ,
+           ε⊣ ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ' p ⟩ᵐ 
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+         (   ⟦ M ⟧ᶜᵗ
+          ∘ᵐ ⟨ idᵐ ,
+               ε⊣ ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ' p ⟩ᵐ)
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ∎
   C-subst≡∘ᵐ (delay τ M) x W =
     {!!}
   {-
