@@ -27,6 +27,7 @@ open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-ren-naturality Mod
 open import Semantics.Renamings.Properties.split-env-eq-ren Mod
 open import Semantics.Renamings.Properties.split-env-wk-ren Mod
 open import Semantics.Renamings.Properties.eq-ren Mod
+open import Semantics.Renamings.Properties.var-not-in-ctx-after-ᶜ-wk-ren Mod
 
 open import Semantics.Substitutions.Properties.var-subst Mod
 
@@ -1326,7 +1327,9 @@ mutual
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
   -}
-  C-subst≡∘ᵐ {A = B} {τ = τ} (unbox {A = A} {τ = τ'} p V M) x W | no ¬q = 
+  C-subst≡∘ᵐ {A = B} {τ = τ} (unbox {A = A} {τ = τ'} p V M) x W | no ¬q =
+    {!!}
+  {-
     begin
          ⟦ M [ Tl-∷ x ↦ W ]c ⟧ᶜᵗ
       ∘ᵐ ⟨ idᵐ ,
@@ -1486,7 +1489,14 @@ mutual
           ∘ᵐ split-env⁻¹ {Γ' = proj₁ (var-split x) ∷ B} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
           ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
           ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
-        ≡⟨ {!!} ⟩ -- (a)
+        ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+             (   ⟨ τ' ⟩ᶠ ⟦ eq-ren (var-not-in-ctx-after-ᶜ x (≰⇒> ¬q)) ⟧ʳ
+              ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ cong-ren {Γ'' = proj₁ (proj₂ (var-split x))} wk-ren -ʳ τ' ⟧ʳ)
+          ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (cong ctx-time (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x)))))))))
+          ∘ᵐ split-env⁻¹ {Γ' = proj₁ (var-split x) ∷ B} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+          ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+          ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+        ≡⟨ ∘ᵐ-congˡ (trans (sym (⟨⟩-∘ᵐ _ _)) (cong ⟨ τ' ⟩ᶠ (var-not-in-ctx-after-ᶜ-wk-ren (≰⇒> ¬q) x))) ⟩
              ⟨ τ' ⟩ᶠ ⟦ eq-ren (cong (_-ᶜ τ') (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x))))))) ⟧ʳ
           ∘ᵐ env-⟨⟩-ᶜ τ' (≤-trans p (≤-reflexive (cong ctx-time (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x)))))))))
           ∘ᵐ split-env⁻¹ {Γ' = proj₁ (var-split x) ∷ B} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
@@ -1544,6 +1554,7 @@ mutual
       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
+  -}
   C-subst≡∘ᵐ (delay τ M) x W =
     {!!}
   {-
