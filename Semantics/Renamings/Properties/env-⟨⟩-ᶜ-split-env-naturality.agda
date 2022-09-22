@@ -36,3 +36,17 @@ postulate
                                   (≤-trans
                                     (m≤n+m (ctx-time Γ') (ctx-time Γ))
                                     (≤-reflexive (sym (ctx-time-++ᶜ Γ Γ')))))
+
+postulate
+  env-⟨⟩-ᶜ-split-env⁻¹-nat : ∀ {Γ Γ' A}
+                           → (τ : Time)
+                           → (p : τ ≤ ctx-time Γ')
+                           →    env-⟨⟩-ᶜ {Γ ++ᶜ Γ'} {A = A} τ
+                                  (≤-trans p
+                                    (≤-trans
+                                      (m≤n+m (ctx-time Γ') (ctx-time Γ))
+                                      (≤-reflexive (sym (ctx-time-++ᶜ Γ Γ')))))
+                             ∘ᵐ split-env⁻¹ {Γ' = Γ} {Γ'' = Γ'} (≡-split refl)
+                           ≡    ⟨ τ ⟩ᶠ ⟦ eq-ren (sym (++ᶜ-ᶜ {Γ} {Γ'} {τ} p)) ⟧ʳ
+                             ∘ᵐ ⟨ τ ⟩ᶠ (split-env⁻¹ {Γ' = Γ} {Γ'' = Γ' -ᶜ τ} (≡-split refl))
+                             ∘ᵐ env-⟨⟩-ᶜ {Γ'} {⟦ Γ ⟧ᵉᵒ A} τ p
