@@ -36,7 +36,9 @@ postulate
                      ∘ᵐ ⟦ ρ ⟧ʳ {A}
                    ≡    ⟨ τ ⟩ᶠ ⟦ ρ -ʳ τ ⟧ʳ
                      ∘ᵐ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ))
+
 {-
+
 env-⟨⟩-ᶜ-ren-nat zero p ρ = 
   begin
     η ∘ᵐ ⟦ ρ ⟧ʳ
@@ -788,7 +790,9 @@ env-⟨⟩-ᶜ-ren-nat {Γ ⟨ τ' ⟩} (suc τ) p (⟨⟩-≤-ren {τ' = τ''} 
   ∎
 ... | yes r | no ¬s =
   ⊥-elim (¬s (≤-trans r q))
-... | no ¬r | yes s = 
+... | no ¬r | yes s =
+  {!!}
+  {-
   begin
        (   ⟨⟩-≤ (m≤n+m∸n (suc τ) τ')
         ∘ᵐ μ
@@ -809,7 +813,60 @@ env-⟨⟩-ᶜ-ren-nat {Γ ⟨ τ' ⟩} (suc τ) p (⟨⟩-≤-ren {τ' = τ''} 
     ∘ᵐ ⟨⟩-≤ q
     ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
                   (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym (⟨⟩-μ-≤₁ _))) (∘ᵐ-assoc _ _ _))) ⟩
+       ⟨⟩-≤ (m≤n+m∸n (suc τ) τ')
+    ∘ᵐ ⟨⟩-≤ (+-monoˡ-≤ (suc τ ∸ τ') q)
+    ∘ᵐ μ 
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
+                  (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ
+      (trans (⟨⟩-≤-trans _ _)
+        (sym (trans (∘ᵐ-congʳ (⟨⟩-≤-trans _ _))
+          (trans (⟨⟩-≤-trans _ _) (cong ⟨⟩-≤ (≤-irrelevant _ _))))))) ⟩
+       (   ⟨⟩-≤ s
+        ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
+        ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ τ'' z≤n))
+    ∘ᵐ μ 
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
+                  (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)) ⟩
+       ⟨⟩-≤ s
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
+    ∘ᵐ ⟨⟩-≤ (+-monoʳ-≤ τ'' z≤n)
+    ∘ᵐ μ 
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
+                  (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym (∘ᵐ-assoc _ _ _))) ⟩
+       ⟨⟩-≤ s
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
+    ∘ᵐ (   ⟨⟩-≤ (+-monoʳ-≤ τ'' z≤n)
+        ∘ᵐ μ) 
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
+                  (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congˡ (⟨⟩-μ-≤₂ _))) ⟩
+       ⟨⟩-≤ s
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
+    ∘ᵐ (   μ
+        ∘ᵐ ⟨ τ'' ⟩ᶠ (⟨⟩-≤ z≤n))
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
+                  (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)) ⟩
+       ⟨⟩-≤ s
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
+    ∘ᵐ μ
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (⟨⟩-≤ z≤n)
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
+                  (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ ∘ᵐ-congʳ (sym (∘ᵐ-assoc _ _ _)) ⟩
+       ⟨⟩-≤ s
+    ∘ᵐ (   ⟨⟩-≤ (≤-reflexive (sym (+-identityʳ _)))
+        ∘ᵐ μ)
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (⟨⟩-≤ z≤n)
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ')
+                  (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ
+      (trans (∘ᵐ-congˡ (sym ⟨⟩-Tη⁻¹∘μ⁻¹≡id))
+        (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ ⟨⟩-μ⁻¹∘μ≡id) (∘ᵐ-identityʳ _))))) ⟩
        ⟨⟩-≤ s
     ∘ᵐ ⟨ τ'' ⟩ᶠ η⁻¹
     ∘ᵐ ⟨ τ'' ⟩ᶠ (⟨⟩-≤ z≤n)
@@ -936,7 +993,25 @@ env-⟨⟩-ᶜ-ren-nat {Γ ⟨ τ' ⟩} (suc τ) p (⟨⟩-≤-ren {τ' = τ''} 
     ∘ᵐ μ⁻¹
     ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n s))
   ∎
-... | no ¬r | no ¬s = {!!}
+  -}
+... | no ¬r | no ¬s = 
+  begin
+       (   ⟨⟩-≤ (m≤n+m∸n (suc τ) τ')
+        ∘ᵐ μ
+        ∘ᵐ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ') (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ')))))
+    ∘ᵐ ⟨⟩-≤ q
+  ≡⟨ trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)) ⟩
+       ⟨⟩-≤ (m≤n+m∸n (suc τ) τ')
+    ∘ᵐ μ
+    ∘ᵐ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ') (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+    ∘ᵐ ⟨⟩-≤ q
+  ≡⟨ {!!} ⟩
+       ⟨ suc τ ⟩ᶠ ⟦ -ᶜ-≤-ren (∸-monoʳ-≤ (suc τ) q) ⟧ʳ
+    ∘ᵐ ⟨⟩-≤ (m≤n+m∸n (suc τ) τ'')
+    ∘ᵐ μ
+    ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ'') (≤-trans (∸-monoˡ-≤ τ''
+                  (≤-trans p (+-mono-≤ (≤-reflexive refl) q))) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ''))))
+  ∎
 env-⟨⟩-ᶜ-ren-nat {Γ ⟨ τ' ⟩} (suc τ) p (cong-⟨⟩-ren ρ) = {!!}
 
 -}

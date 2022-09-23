@@ -52,8 +52,7 @@ var-not-in-ctx-after-ᶜ-wk-ren {.(_ ∷ _)} {A} {B} {τ} {suc τ'} p (Tl-∷ {B
        uip ⟩
       ⟦ eq-ren (cong (_-ᶜ suc τ') (sym (cong (_∷ C) (split-≡ (proj₁ (proj₂ (proj₂ (var-split x)))))))) ⟧ʳ
   ∎
-var-not-in-ctx-after-ᶜ-wk-ren {Γ ⟨ τ ⟩} {A} {B} {_} {suc τ'} (s≤s p) (Tl-⟨⟩ {τ' = τ''} x) =
-  {!!}
+var-not-in-ctx-after-ᶜ-wk-ren {Γ ⟨ τ ⟩} {A} {B} {_} {suc τ'} (s≤s p) (Tl-⟨⟩ {τ' = τ''} x) = {!!}
 
   where
 
