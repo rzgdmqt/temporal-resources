@@ -980,8 +980,6 @@ mutual
     ∎
   -}
   C-subst≡∘ᵐ (handle M `with H `in N) x W =
-    {!!}
-  {-
     begin
          uncurryᵐ (   T-alg-of-handlerᵀ
                    ∘ᵐ ⟨ (λ op →
@@ -989,10 +987,8 @@ mutual
                               (   curryᵐ (   idᵐ
                                           ∘ᵐ uncurryᵐ idᵐ
                                           ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
-                                                 ⟨    ⟦⟧ᵍ-⟦⟧ᵛ (param op)
-                                                   ∘ᵐ fstᵐ ,
-                                                      [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ))
-                                                   ∘ᵐ sndᵐ ⟩ᵐ
+                                                 ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                   [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
                                               ∘ᵐ sndᵐ ⟩ᵐ)
                                ∘ᵐ curryᵐ (   ⟦ H op τ'' [ Tl-∷ (Tl-∷ x) ↦ W ]c ⟧ᶜᵗ
                                           ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
@@ -1002,19 +998,225 @@ mutual
       ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , Tᶠ ⟦ N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c ⟧ᶜᵗ ∘ᵐ sndᵐ ⟩ᵐ
       ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , strᵀ ∘ᵐ sndᵐ ⟩ᵐ
       ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congˡ (uncurryᵐ-nat _ _) ⟩
+         (   uncurryᵐ T-alg-of-handlerᵀ
+          ∘ᵐ mapˣᵐ
+               (   ⟨ (λ op →
+                          ⟨ (λ τ'' →
+                              (   curryᵐ (   idᵐ
+                                          ∘ᵐ uncurryᵐ idᵐ
+                                          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                                 ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                   [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                              ∘ᵐ sndᵐ ⟩ᵐ)
+                               ∘ᵐ curryᵐ (   ⟦ H op τ'' [ Tl-∷ (Tl-∷ x) ↦ W ]c ⟧ᶜᵗ
+                                          ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                           ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                       ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+               idᵐ)
+      ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , Tᶠ ⟦ N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c ⟧ᶜᵗ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , strᵀ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))))) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ (   mapˣᵐ
+               (   ⟨ (λ op →
+                          ⟨ (λ τ'' →
+                              (   curryᵐ (   idᵐ
+                                          ∘ᵐ uncurryᵐ idᵐ
+                                          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                                 ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                   [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                              ∘ᵐ sndᵐ ⟩ᵐ)
+                               ∘ᵐ curryᵐ (   ⟦ H op τ'' [ Tl-∷ (Tl-∷ x) ↦ W ]c ⟧ᶜᵗ
+                                          ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                           ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                       ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+               idᵐ
+          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , Tᶠ ⟦ N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c ⟧ᶜᵗ ∘ᵐ sndᵐ ⟩ᵐ
+          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , strᵀ ∘ᵐ sndᵐ ⟩ᵐ)
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (trans (∘ᵐ-congʳ (sym (mapˣᵐ-∘ᵐ _ _ _ _))) (sym (mapˣᵐ-∘ᵐ _ _ _ _)))) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ mapˣᵐ
+           ((   ⟨ (λ op →
+                          ⟨ (λ τ'' →
+                              (   curryᵐ (   idᵐ
+                                          ∘ᵐ uncurryᵐ idᵐ
+                                          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                                 ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                   [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                              ∘ᵐ sndᵐ ⟩ᵐ)
+                               ∘ᵐ curryᵐ (   ⟦ H op τ'' [ Tl-∷ (Tl-∷ x) ↦ W ]c ⟧ᶜᵗ
+                                          ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                           ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                       ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+            ∘ᵐ idᵐ
+            ∘ᵐ idᵐ)
+           (idᵐ ∘ᵐ Tᶠ ⟦ N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c ⟧ᶜᵗ ∘ᵐ strᵀ)
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ (trans (∘ᵐ-congʳ (∘ᵐ-identityʳ _)) (∘ᵐ-identityʳ _)) (∘ᵐ-identityˡ _))) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ mapˣᵐ
+           (   ⟨ (λ op →
+                       ⟨ (λ τ'' →
+                           (   curryᵐ (   idᵐ
+                                       ∘ᵐ uncurryᵐ idᵐ
+                                       ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                            ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                              [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                           ∘ᵐ sndᵐ ⟩ᵐ)
+                            ∘ᵐ curryᵐ (   ⟦ H op τ'' [ Tl-∷ (Tl-∷ x) ↦ W ]c ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                        ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                    ∘ᵐ projᵐ op) ⟩ᵢᵐ
+            ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+           (Tᶠ ⟦ N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c ⟧ᶜᵗ ∘ᵐ strᵀ)
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
     ≡⟨ {!!} ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ mapˣᵐ
+           ( ⟨ (λ op →
+                       ⟨ (λ τ'' →
+                              (  curryᵐ (   idᵐ
+                                         ∘ᵐ uncurryᵐ idᵐ
+                                         ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                              ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                         ∘ᵐ sndᵐ ⟩ᵐ)
+                              ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                           ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                        ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+           (Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵐ strᵀ)
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ
+        (sym (trans (∘ᵐ-congʳ (∘ᵐ-identityʳ _)) (∘ᵐ-identityʳ _)))
+        (sym (∘ᵐ-identityˡ _)))) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ mapˣᵐ
+           (( ⟨ (λ op →
+                       ⟨ (λ τ'' →
+                              (  curryᵐ (   idᵐ
+                                         ∘ᵐ uncurryᵐ idᵐ
+                                         ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                              ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                         ∘ᵐ sndᵐ ⟩ᵐ)
+                              ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                           ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                        ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+            ∘ᵐ idᵐ
+            ∘ᵐ idᵐ)
+           (idᵐ ∘ᵐ Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵐ strᵀ)
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (trans (mapˣᵐ-∘ᵐ _ _ _ _) (∘ᵐ-congʳ (mapˣᵐ-∘ᵐ _ _ _ _)))) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ (   mapˣᵐ
+               ( ⟨ (λ op →
+                       ⟨ (λ τ'' →
+                              (  curryᵐ (   idᵐ
+                                         ∘ᵐ uncurryᵐ idᵐ
+                                         ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                              ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                         ∘ᵐ sndᵐ ⟩ᵐ)
+                              ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                           ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                        ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+               idᵐ
+          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵐ sndᵐ ⟩ᵐ
+          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , strᵀ ∘ᵐ sndᵐ ⟩ᵐ)
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ ∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (sym (trans
+        (∘ᵐ-congˡ (sym (∘ᵐ-assoc _ _ _))) (∘ᵐ-assoc _ _ _)))) (sym (∘ᵐ-assoc _ _ _)))) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ (   mapˣᵐ
+               ( ⟨ (λ op →
+                       ⟨ (λ τ'' →
+                              (  curryᵐ (   idᵐ
+                                         ∘ᵐ uncurryᵐ idᵐ
+                                         ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                              ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                         ∘ᵐ sndᵐ ⟩ᵐ)
+                              ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                           ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                        ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+               idᵐ
+          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵐ sndᵐ ⟩ᵐ
+          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , strᵀ ∘ᵐ sndᵐ ⟩ᵐ
+          ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ)
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+         (   uncurryᵐ T-alg-of-handlerᵀ
+          ∘ᵐ mapˣᵐ
+               ( ⟨ (λ op →
+                       ⟨ (λ τ'' →
+                              (  curryᵐ (   idᵐ
+                                         ∘ᵐ uncurryᵐ idᵐ
+                                         ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                              ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                         ∘ᵐ sndᵐ ⟩ᵐ)
+                              ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                           ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                        ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+               idᵐ
+          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵐ sndᵐ ⟩ᵐ
+          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , strᵀ ∘ᵐ sndᵐ ⟩ᵐ
+          ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ)
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ ∘ᵐ-congˡ (sym (∘ᵐ-assoc _ _ _)) ⟩
+         (   (   uncurryᵐ T-alg-of-handlerᵀ
+              ∘ᵐ mapˣᵐ
+                   ( ⟨ (λ op →
+                           ⟨ (λ τ'' →
+                                  (  curryᵐ (   idᵐ
+                                             ∘ᵐ uncurryᵐ idᵐ
+                                             ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                                  ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                    [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                             ∘ᵐ sndᵐ ⟩ᵐ)
+                                  ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                               ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
+                            ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                    ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+                   idᵐ)
+          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵐ sndᵐ ⟩ᵐ
+          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , strᵀ ∘ᵐ sndᵐ ⟩ᵐ
+          ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ)
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congˡ (sym (uncurryᵐ-nat _ _))) ⟩
          (  uncurryᵐ (   T-alg-of-handlerᵀ
                       ∘ᵐ ⟨ (λ op →
                              ⟨ (λ τ'' →
                                     (  curryᵐ (   idᵐ
                                                ∘ᵐ uncurryᵐ idᵐ
-                                               ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ
-                                               ,
-                                                  ⟨   ⟦⟧ᵍ-⟦⟧ᵛ (param op)
-                                                   ∘ᵐ fstᵐ
-                                                   ,
-                                                      [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ))
-                                                   ∘ᵐ sndᵐ ⟩ᵐ
+                                               ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                                    ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                      [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
                                                ∘ᵐ sndᵐ ⟩ᵐ)
                                     ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
                                  ∘ᵐ projᵐ τ'') ⟩ᵢᵐ
@@ -1027,7 +1229,6 @@ mutual
       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
-  -}
   C-subst≡∘ᵐ {τ = τ} (unbox {τ = τ'} p V M) x W with τ' ≤? τ
   C-subst≡∘ᵐ {Γ = Γ} {τ = τ} (unbox {A = A} {τ = τ'} p V M) x W | yes q with var-in-ctx-after-ᶜ x q
   ... | y , r , s =
