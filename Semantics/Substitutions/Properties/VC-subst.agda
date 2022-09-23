@@ -38,6 +38,34 @@ open import Util.Time
 
 open Model Mod
 
+postulate
+
+-- NOTE: The code below typeckecks, but is very slow. Thus, temporarily
+--       postulating the lemma statements above for development time.
+
+  V-subst≡∘ᵐ : ∀ {Γ A B τ}
+             → (V : Γ ⊢V⦂ B)
+             → (x : A ∈[ τ ] Γ)
+             → (W : proj₁ (var-split x) ⊢V⦂ A)
+             → ⟦ V [ x ↦ W ]v ⟧ᵛᵗ
+             ≡    ⟦ V ⟧ᵛᵗ
+               ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) 
+
+  C-subst≡∘ᵐ : ∀ {Γ A C τ}
+             → (M : Γ ⊢C⦂ C)
+             → (x : A ∈[ τ ] Γ)
+             → (W : proj₁ (var-split x) ⊢V⦂ A)
+             → ⟦ M [ x ↦ W ]c ⟧ᶜᵗ
+             ≡    ⟦ M ⟧ᶜᵗ
+               ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) 
+
+
+{-
+
 -- Auxiliary substitution lemma for the unbox case
 
 C-subst≡∘ᵐ-aux-unbox : ∀ {Γ A τ τ'}
@@ -2428,3 +2456,5 @@ mutual
       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
+
+-}
