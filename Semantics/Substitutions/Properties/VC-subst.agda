@@ -1244,6 +1244,7 @@ mutual
             ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
            (Tᶠ ⟦ N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c ⟧ᶜᵗ ∘ᵐ strᵀ)
       ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    {-
     ≡⟨ {!!} ⟩
          uncurryᵐ T-alg-of-handlerᵀ
       ∘ᵐ mapˣᵐ
@@ -1392,7 +1393,296 @@ mutual
             ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
            (Tᶠ ⟦ N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c ⟧ᶜᵗ ∘ᵐ strᵀ)
       ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ refl
+        (∘ᵐ-congˡ (cong  Tᶠ (C-subst≡∘ᵐ N (Tl-∷ (Tl-⟨⟩ x)) W))))) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ mapˣᵐ
+           (   ⟨ (λ op →
+                       ⟨ (λ τ'' →
+                           (   curryᵐ (   idᵐ
+                                       ∘ᵐ uncurryᵐ idᵐ
+                                       ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                            ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                              [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                           ∘ᵐ sndᵐ ⟩ᵐ)
+                            ∘ᵐ curryᵐ ( ⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ)) ) ⟩ᵢᵐ) ⟩ᵢᵐ
+            ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+            ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+            ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+           (   Tᶠ (   ⟦ N ⟧ᶜᵗ
+                   ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ (split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x)))))) idᵐ
+                   ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ (⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ)) idᵐ
+                   ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ (split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))) idᵐ)
+            ∘ᵐ strᵀ)
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ refl
+        (∘ᵐ-congˡ (cong Tᶠ (∘ᵐ-congʳ (
+          trans (∘ᵐ-congʳ (sym (mapˣᵐ-∘ᵐ _ _ _ _))) (sym (mapˣᵐ-∘ᵐ _ _ _ _)))))))) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ mapˣᵐ
+           (   ⟨ (λ op →
+                       ⟨ (λ τ'' →
+                           (   curryᵐ (   idᵐ
+                                       ∘ᵐ uncurryᵐ idᵐ
+                                       ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                            ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                              [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                           ∘ᵐ sndᵐ ⟩ᵐ)
+                            ∘ᵐ curryᵐ ( ⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ)) ) ⟩ᵢᵐ) ⟩ᵢᵐ
+            ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+            ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+            ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+           (   Tᶠ (   ⟦ N ⟧ᶜᵗ
+                   ∘ᵐ mapˣᵐ
+                        (   ⟨ τ ⟩ᶠ (split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x)))))
+                         ∘ᵐ ⟨ τ ⟩ᶠ (⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ)
+                         ∘ᵐ ⟨ τ ⟩ᶠ (split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)))
+                        (idᵐ ∘ᵐ idᵐ ∘ᵐ idᵐ))
+            ∘ᵐ strᵀ)
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ refl (∘ᵐ-congˡ (cong Tᶠ (∘ᵐ-congʳ
+        (cong₂ mapˣᵐ
+          (sym (trans (⟨⟩-∘ᵐ _ _) (∘ᵐ-congʳ (⟨⟩-∘ᵐ _ _))))
+          (trans (∘ᵐ-identityˡ _) (∘ᵐ-identityˡ _)))))))) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ mapˣᵐ
+           (   ⟨ (λ op →
+                       ⟨ (λ τ'' →
+                           (   curryᵐ (   idᵐ
+                                       ∘ᵐ uncurryᵐ idᵐ
+                                       ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                            ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                              [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                           ∘ᵐ sndᵐ ⟩ᵐ)
+                            ∘ᵐ curryᵐ ( ⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ)) ) ⟩ᵢᵐ) ⟩ᵢᵐ
+            ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+            ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+            ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+           (   Tᶠ (   ⟦ N ⟧ᶜᵗ
+                   ∘ᵐ mapˣᵐ
+                        (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                                 ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                                 ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)))
+                        idᵐ)
+            ∘ᵐ strᵀ)
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ refl (trans (∘ᵐ-congˡ (T-∘ᵐ _ _)) (∘ᵐ-assoc _ _ _)))) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ mapˣᵐ
+           (   ⟨ (λ op →
+                       ⟨ (λ τ'' →
+                           (   curryᵐ (   idᵐ
+                                       ∘ᵐ uncurryᵐ idᵐ
+                                       ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                            ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                              [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                           ∘ᵐ sndᵐ ⟩ᵐ)
+                            ∘ᵐ curryᵐ ( ⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ)) ) ⟩ᵢᵐ) ⟩ᵢᵐ
+            ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+            ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+            ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+           (   Tᶠ ⟦ N ⟧ᶜᵗ
+            ∘ᵐ (   Tᶠ (mapˣᵐ
+                       (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                                ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                                ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)))
+                       idᵐ)
+                ∘ᵐ strᵀ))
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ refl (∘ᵐ-congʳ (sym (strᵀ-nat _ _))))) ⟩
+    -}
     ≡⟨ {!!} ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ mapˣᵐ
+           (   ⟨ (λ op →
+                       ⟨ (λ τ'' →
+                           (   curryᵐ (   idᵐ
+                                       ∘ᵐ uncurryᵐ idᵐ
+                                       ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                            ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                              [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                           ∘ᵐ sndᵐ ⟩ᵐ)
+                            ∘ᵐ curryᵐ ( ⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ)) ) ⟩ᵢᵐ) ⟩ᵢᵐ
+            ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+            ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+            ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+           (   Tᶠ ⟦ N ⟧ᶜᵗ
+            ∘ᵐ strᵀ
+            ∘ᵐ mapˣᵐ
+                  ([ τ ]ᶠ (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                                   ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                                   ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))))
+                  (Tᶠ idᵐ))
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (sym (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _))
+        (cong₂ mapˣᵐ refl (∘ᵐ-assoc _ _ _))))) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ (   mapˣᵐ
+              (   ⟨ (λ op →
+                          ⟨ (λ τ'' →
+                              (   curryᵐ (   idᵐ
+                                          ∘ᵐ uncurryᵐ idᵐ
+                                          ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                               ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                                 [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                              ∘ᵐ sndᵐ ⟩ᵐ)
+                               ∘ᵐ curryᵐ ( ⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ)) ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+              (   Tᶠ ⟦ N ⟧ᶜᵗ
+               ∘ᵐ strᵀ)
+          ∘ᵐ mapˣᵐ
+              (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+              (mapˣᵐ
+                  ([ τ ]ᶠ (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                                   ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                                   ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))))
+                  (Tᶠ idᵐ)))
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-assoc _ _ _) ⟩
+         uncurryᵐ T-alg-of-handlerᵀ
+      ∘ᵐ mapˣᵐ
+          (   ⟨ (λ op →
+                      ⟨ (λ τ'' →
+                          (   curryᵐ (   idᵐ
+                                      ∘ᵐ uncurryᵐ idᵐ
+                                      ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
+                                           ⟨ ⟦⟧ᵍ-⟦⟧ᵛ (param op) ∘ᵐ fstᵐ ,
+                                             [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵛ-⟦⟧ᵍ (arity op) ∘ᵐ sndᵐ ⟩ᵐ)) ∘ᵐ sndᵐ ⟩ᵐ
+                                          ∘ᵐ sndᵐ ⟩ᵐ)
+                           ∘ᵐ curryᵐ ( ⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ)) ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+          (   Tᶠ ⟦ N ⟧ᶜᵗ
+           ∘ᵐ strᵀ)
+      ∘ᵐ mapˣᵐ
+          (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+           ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+           ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+          (mapˣᵐ
+              ([ τ ]ᶠ (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))))
+              (Tᶠ idᵐ))
+      ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (
+        begin
+             mapˣᵐ
+              (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+              (mapˣᵐ
+                  ([ τ ]ᶠ (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                                   ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                                   ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))))
+                  (Tᶠ idᵐ))
+          ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+        ≡⟨ sym (⟨⟩ᵐ-∘ᵐ _ _ _) ⟩
+             ⟨       ((   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+                  ∘ᵐ fstᵐ)
+               ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+             ,       ((mapˣᵐ
+                        ([ τ ]ᶠ (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                                         ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                                         ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))))
+                        (Tᶠ idᵐ))
+                  ∘ᵐ sndᵐ)
+               ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ ⟩ᵐ
+        ≡⟨ cong₂ ⟨_,_⟩ᵐ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))) refl ⟩
+             ⟨    (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                    ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                    ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+               ∘ᵐ idᵐ
+             ,       ((mapˣᵐ
+                        ([ τ ]ᶠ (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                                         ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                                         ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))))
+                        (Tᶠ idᵐ))
+                  ∘ᵐ sndᵐ)
+               ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ ⟩ᵐ
+        ≡⟨ cong₂ ⟨_,_⟩ᵐ refl (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))) ⟩
+             ⟨    (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                    ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                    ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))
+               ∘ᵐ idᵐ
+             ,    (mapˣᵐ
+                     ([ τ ]ᶠ (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                                      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                                      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))))
+                     (Tᶠ idᵐ))
+               ∘ᵐ ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+        ≡⟨ cong₂ ⟨_,_⟩ᵐ (∘ᵐ-identityʳ _) (sym (⟨⟩ᵐ-∘ᵐ _ _ _)) ⟩
+             ⟨   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+             ,    ⟨    (  ([ τ ]ᶠ (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                                           ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                                           ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl))))
+                       ∘ᵐ fstᵐ)
+                    ∘ᵐ ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ
+                  ,    (  (Tᶠ idᵐ)
+                       ∘ᵐ sndᵐ)
+                    ∘ᵐ ⟨ η⊣ , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ ⟩ᵐ
+        ≡⟨ cong₂ ⟨_,_⟩ᵐ refl
+            (cong₂ ⟨_,_⟩ᵐ
+              (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)))
+              (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _)))) ⟩
+             ⟨   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+             ,    ⟨    [ τ ]ᶠ (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                                       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                                       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)))
+                    ∘ᵐ η⊣
+                  ,    (Tᶠ idᵐ)
+                    ∘ᵐ ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+        ≡⟨ cong₂ ⟨_,_⟩ᵐ
+            (sym (∘ᵐ-identityˡ _))
+            (cong₂ ⟨_,_⟩ᵐ refl
+              (trans (∘ᵐ-congˡ T-idᵐ) (∘ᵐ-identityˡ _))) ⟩
+             ⟨    idᵐ
+               ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+               ,
+                  ⟨    [ τ ]ᶠ (⟨ τ ⟩ᶠ (   split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                                       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                                       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)))
+                    ∘ᵐ η⊣
+                    , ⟦ M [ x ↦ W ]c ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+        ≡⟨ cong₂ ⟨_,_⟩ᵐ refl (cong₂ ⟨_,_⟩ᵐ
+            (η⊣-nat _)
+            (C-subst≡∘ᵐ M x W)) ⟩
+             ⟨    idᵐ
+               ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+               ,
+                  ⟨    η⊣
+                    ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                    ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                    ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) 
+                    ,
+                       ⟦ M ⟧ᶜᵗ
+                    ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+                    ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+                    ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) ⟩ᵐ ⟩ᵐ
+        ≡⟨ cong₂ ⟨_,_⟩ᵐ refl (⟨⟩ᵐ-∘ᵐ _ _ _) ⟩
+             ⟨    idᵐ
+               ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+               ,
+                  ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
+               ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+               ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+               ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) ⟩ᵐ
+        ≡⟨ ⟨⟩ᵐ-∘ᵐ _ _ _ ⟩
+             ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+          ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+          ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+          ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+        ∎)) ⟩
          uncurryᵐ T-alg-of-handlerᵀ
       ∘ᵐ mapˣᵐ
            ( ⟨ (λ op →
