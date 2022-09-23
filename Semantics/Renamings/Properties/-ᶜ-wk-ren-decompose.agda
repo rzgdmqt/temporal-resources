@@ -94,7 +94,45 @@ open Model Mod
     ∘ᵐ env-⟨⟩-ᶜ (suc τ ∸ τ') (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ')))
     ∘ᵐ η⁻¹
     ∘ᵐ ⟨⟩-≤ z≤n
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (⟨⟩-η⁻¹-nat _)) (∘ᵐ-assoc _ _ _)))) ⟩
+       η⁻¹
+    ∘ᵐ ⟨⟩-≤ z≤n
+    ∘ᵐ η⁻¹
+    ∘ᵐ ⟨ 0 ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ') (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+    ∘ᵐ ⟨⟩-≤ z≤n
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (⟨⟩-≤-nat _ _))) ⟩
+       η⁻¹
+    ∘ᵐ ⟨⟩-≤ z≤n
+    ∘ᵐ η⁻¹
+    ∘ᵐ ⟨⟩-≤ z≤n
+    ∘ᵐ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ') (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congˡ (
+      begin
+        η⁻¹
+      ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
+        idᵐ ∘ᵐ η⁻¹
+      ≡⟨ ∘ᵐ-congˡ (sym ⟨⟩-μ∘η≡id) ⟩
+        (μ ∘ᵐ η) ∘ᵐ η⁻¹
+      ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
+        μ ∘ᵐ η ∘ᵐ η⁻¹
+      ≡⟨ ∘ᵐ-congʳ ⟨⟩-η∘η⁻¹≡id ⟩
+        μ ∘ᵐ idᵐ
+      ≡⟨ ∘ᵐ-identityʳ _ ⟩
+        μ
+      ∎))) ⟩
+       η⁻¹
+    ∘ᵐ ⟨⟩-≤ z≤n
+    ∘ᵐ μ
+    ∘ᵐ ⟨⟩-≤ z≤n
+    ∘ᵐ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ') (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym (⟨⟩-μ-≤₁ _))) (∘ᵐ-assoc _ _ _)))) ⟩
+       η⁻¹
+    ∘ᵐ ⟨⟩-≤ z≤n
+    ∘ᵐ ⟨⟩-≤ (+-monoˡ-≤ (suc τ ∸ τ') z≤n)
+    ∘ᵐ μ
+    ∘ᵐ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ') (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
+  ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ
+      (trans (⟨⟩-≤-trans _ _) (sym (⟨⟩-≤-trans _ _)))) (∘ᵐ-assoc _ _ _))) ⟩
        η⁻¹
     ∘ᵐ ⟨⟩-≤ z≤n
     ∘ᵐ ⟨⟩-≤ (m≤n+m∸n (suc τ) τ')
