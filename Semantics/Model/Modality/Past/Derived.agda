@@ -109,3 +109,57 @@ open import Semantics.Model.Category.Derived Cat
   ≡⟨ ⟨⟩-μ∘μ⁻¹≡id ⟩
     idᵐ
   ∎
+
+-- Other, mixed laws
+
+⟨⟩-Tμ∘μ⁻¹≡μ⁻¹∘μ : ∀ {A τ₁ τ₂ τ₃}
+                → ⟨ τ₁ ⟩ᶠ μ ∘ᵐ μ⁻¹ {⟨ τ₃ ⟩ᵒ A} {τ₁} {τ₂}
+                ≡ μ⁻¹ ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-assoc τ₁ τ₂ τ₃))) ∘ᵐ μ
+⟨⟩-Tμ∘μ⁻¹≡μ⁻¹∘μ {A} {τ₁} {τ₂} {τ₃} = 
+  begin
+       ⟨ τ₁ ⟩ᶠ μ
+    ∘ᵐ μ⁻¹
+  ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
+       idᵐ
+    ∘ᵐ ⟨ τ₁ ⟩ᶠ μ
+    ∘ᵐ μ⁻¹   
+  ≡⟨ sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ ⟨⟩-μ⁻¹∘μ≡id)) ⟩
+       μ⁻¹
+    ∘ᵐ μ
+    ∘ᵐ ⟨ τ₁ ⟩ᶠ μ
+    ∘ᵐ μ⁻¹   
+  ≡⟨ ∘ᵐ-congʳ (sym (∘ᵐ-identityˡ _)) ⟩
+       μ⁻¹
+    ∘ᵐ idᵐ
+    ∘ᵐ μ
+    ∘ᵐ ⟨ τ₁ ⟩ᶠ μ
+    ∘ᵐ μ⁻¹   
+  ≡⟨ ∘ᵐ-congʳ (sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ
+      (trans (⟨⟩-≤-trans _ _) (trans (cong ⟨⟩-≤ (≤-irrelevant _ _)) ⟨⟩-≤-refl))))) ⟩
+       μ⁻¹
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-assoc τ₁ τ₂ τ₃)))
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (+-assoc τ₁ τ₂ τ₃))
+    ∘ᵐ μ
+    ∘ᵐ ⟨ τ₁ ⟩ᶠ μ
+    ∘ᵐ μ⁻¹   
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ ⟨⟩-μ∘μ≡μ∘Tμ)
+      (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))))))) ⟩
+       μ⁻¹
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-assoc τ₁ τ₂ τ₃)))
+    ∘ᵐ μ
+    ∘ᵐ μ {⟨ τ₃ ⟩ᵒ A} {τ₁} {τ₂}
+    ∘ᵐ μ⁻¹   
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ ⟨⟩-μ∘μ⁻¹≡id)) ⟩
+       μ⁻¹
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-assoc τ₁ τ₂ τ₃)))
+    ∘ᵐ μ
+    ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-identityʳ _)) ⟩
+       μ⁻¹
+    ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-assoc τ₁ τ₂ τ₃)))
+    ∘ᵐ μ
+  ∎
+
+{-
+   {⟨ τ₁ + τ₂ ⟩ᵒ (⟨ τ₃ ⟩ᵒ A) →ᵐ ⟨ τ₁ ⟩ᵒ (⟨ τ₂ + τ₃ ⟩ᵒ A)}
+-}
