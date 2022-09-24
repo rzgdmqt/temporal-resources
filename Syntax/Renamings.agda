@@ -188,7 +188,8 @@ var-ren x     -ʳ suc τ = id-ren
 ⟨⟩-μ-ren {Γ} {τ₁} {τ₂} -ʳ suc τ | yes p | yes q =
   ⟨⟩-μ-ren ∘ʳ ⟨⟩-≤-ren (≤-reflexive (+-∸-assoc τ₁ q))
 ⟨⟩-μ-ren {Γ} {τ₁} {τ₂} -ʳ suc τ | yes p | no ¬q with suc τ ∸ τ₂ | inspect (λ (τ , τ₂) → suc τ ∸ τ₂) (τ , τ₂)
-... | zero  | [| eq |] = ⊥-elim (¬q (m∸n≡0⇒m≤n eq))
+... | zero  | [| eq |] =
+  ⊥-elim (¬q (m∸n≡0⇒m≤n eq))
 ... | suc r | [| eq |] with suc r ≤? τ₁
 ... | yes s rewrite sym eq =
   ⟨⟩-≤-ren (≤-reflexive (¬k≤m⇒k∸m≤n⇒n+m∸k≤n∸k∸m ¬q s))
