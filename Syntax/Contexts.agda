@@ -4,6 +4,7 @@
 
 module Syntax.Contexts where
 
+open import Data.Empty
 open import Data.Product
 open import Data.Sum
 
@@ -189,7 +190,7 @@ var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A}
 ... | inj₂ (y , q , r) =
   inj₂ (Tl-⟨⟩ y , q , cong (_⟨ τ ⟩) r)
 
--- Time-travelling operation on contexts
+-- Temporal minus operation on contexts
 
 _-ᶜ_ : Ctx → Time → Ctx
 Γ        -ᶜ zero  = Γ
@@ -222,3 +223,39 @@ infixl 30 _-ᶜ_
     (≤-trans
       (∸-monoˡ-≤ τ' p)
       (≤-reflexive (m+n∸n≡m (ctx-time Γ') τ')))
+
+++ᶜ-ᶜ-+ : ∀ {Γ τ₁ τ₂}
+       → Γ -ᶜ (τ₁ + τ₂) ≡ (Γ -ᶜ τ₁) -ᶜ τ₂
+++ᶜ-ᶜ-+ {Γ} {zero} {τ₂} =
+  refl
+++ᶜ-ᶜ-+ {[]} {suc τ₁} {τ₂} =
+  sym (-ᶜ-[]-id {τ₂})
+++ᶜ-ᶜ-+ {Γ ∷ A} {suc τ₁} {τ₂} =
+  ++ᶜ-ᶜ-+ {Γ} {suc τ₁} {τ₂}
+++ᶜ-ᶜ-+ {Γ ⟨ τ ⟩} {suc τ₁} {zero} rewrite +-identityʳ τ₁ =
+  refl
+++ᶜ-ᶜ-+ {Γ ⟨ τ ⟩} {suc τ₁} {suc τ₂} with suc τ₁ ≤? τ | suc (τ₁ + suc τ₂) ≤? τ
+++ᶜ-ᶜ-+ {Γ ⟨ τ ⟩} {suc τ₁} {suc τ₂} | yes p | yes q with suc τ₂ ≤? τ ∸ suc τ₁
+... | yes r =
+  cong
+    (λ τ' → Γ ⟨ τ' ⟩) {τ ∸ suc (τ₁ + suc τ₂)} {τ ∸ suc τ₁ ∸ suc τ₂}
+    (sym (∸-+-assoc τ (suc τ₁) (suc τ₂)))
+... | no ¬r =
+  ⊥-elim (¬r (≤-trans (≤-reflexive (sym (m+n∸m≡n τ₁ (suc τ₂)))) (∸-monoˡ-≤ (suc τ₁) q)))
+++ᶜ-ᶜ-+ {Γ ⟨ τ ⟩} {suc τ₁} {suc τ₂} | yes p | no ¬q with suc τ₂ ≤? τ ∸ suc τ₁
+... | yes r =
+  ⊥-elim (¬q (≤-trans (+-monoʳ-≤ (suc τ₁) r) (≤-reflexive
+    (trans (sym (+-∸-assoc (suc τ₁) {τ} {suc τ₁} p)) (m+n∸m≡n τ₁ τ)))))
+... | no ¬r =
+  cong (λ τ' → Γ -ᶜ τ') {suc (τ₁ + suc τ₂) ∸ τ} {suc τ₂ ∸ (τ ∸ suc τ₁)}
+    (trans
+      (cong (_∸ τ) (+-comm (suc τ₁) (suc τ₂)))
+      (m≤k⇒¬n+m≤k⇒n+m∸k≡n∸[k∸m] p (λ s → ¬q
+        (≤-trans (≤-reflexive (+-comm (suc τ₁) (suc τ₂))) s))))
+++ᶜ-ᶜ-+ {Γ ⟨ τ ⟩} {suc τ₁} {suc τ₂} | no ¬p | yes q =
+  ⊥-elim (¬p (m+n≤o⇒m≤o (suc τ₁) q))
+++ᶜ-ᶜ-+ {Γ ⟨ τ ⟩} {suc τ₁} {suc τ₂} | no ¬p | no ¬q = 
+  trans
+    (cong (λ τ → Γ -ᶜ τ) {suc (τ₁ + suc τ₂) ∸ τ} {suc τ₁ ∸ τ + suc τ₂}
+      (+-∸-comm {suc τ₁} (suc τ₂) {τ} (<⇒≤ (≰⇒> ¬p))))
+    (++ᶜ-ᶜ-+ {Γ} {suc τ₁ ∸ τ} {suc τ₂})

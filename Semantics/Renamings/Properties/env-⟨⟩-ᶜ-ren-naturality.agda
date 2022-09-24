@@ -18,24 +18,25 @@ open import Syntax.Renamings
 open import Semantics.Interpretation Mod
 open import Semantics.Renamings Mod
 
+open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose Mod
+
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
 open Model Mod
 
-open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose Mod -- TODO: this proof needs typing up
+postulate
+  env-⟨⟩-ᶜ-ren-nat : ∀ {Γ Γ' A}
+                   → (τ : Time)
+                   → (p : τ ≤ ctx-time Γ)
+                   → (ρ : Ren Γ Γ')
+                   →    env-⟨⟩-ᶜ {Γ} τ p 
+                     ∘ᵐ ⟦ ρ ⟧ʳ {A}
+                   ≡    ⟨ τ ⟩ᶠ ⟦ ρ -ʳ τ ⟧ʳ
+                     ∘ᵐ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ))
 
--- TODO: finish typing up the proof later
-
-env-⟨⟩-ᶜ-ren-nat : ∀ {Γ Γ' A}
-                 → (τ : Time)
-                 → (p : τ ≤ ctx-time Γ)
-                 → (ρ : Ren Γ Γ')
-                 →    env-⟨⟩-ᶜ {Γ} τ p 
-                   ∘ᵐ ⟦ ρ ⟧ʳ {A}
-                 ≡    ⟨ τ ⟩ᶠ ⟦ ρ -ʳ τ ⟧ʳ
-                   ∘ᵐ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ))
+{-
 
 env-⟨⟩-ᶜ-ren-nat zero p ρ = 
   begin
@@ -734,7 +735,7 @@ env-⟨⟩-ᶜ-ren-nat {Γ ⟨ τ' ⟩} (suc τ) p ⟨⟩-η⁻¹-ren with suc �
   ∎
   -}
 env-⟨⟩-ᶜ-ren-nat {Γ ⟨ .(τ' + τ'') ⟩} (suc τ) p (⟨⟩-μ-ren {τ = τ'} {τ' = τ''}) with suc τ ≤? τ' + τ'' | suc τ ≤? τ''
-env-⟨⟩-ᶜ-ren-nat {Γ ⟨ .(τ' + τ'') ⟩} (suc τ) p (⟨⟩-μ-ren {τ = τ'} {τ' = τ''}) | yes q | yes r =
+... | yes q | yes r =
   begin
        (   μ⁻¹
         ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n q)))
@@ -764,10 +765,10 @@ env-⟨⟩-ᶜ-ren-nat {Γ ⟨ .(τ' + τ'') ⟩} (suc τ) p (⟨⟩-μ-ren {τ 
     ∘ᵐ μ⁻¹
     ∘ᵐ ⟨⟩-≤ (≤-reflexive (m+[n∸m]≡n r))
   ∎
-env-⟨⟩-ᶜ-ren-nat {Γ ⟨ .(τ' + τ'') ⟩} (suc τ) p (⟨⟩-μ-ren {τ = τ'} {τ' = τ''}) | yes q | no ¬r = {!!}
-env-⟨⟩-ᶜ-ren-nat {Γ ⟨ .(τ' + τ'') ⟩} (suc τ) p (⟨⟩-μ-ren {τ = τ'} {τ' = τ''}) | no ¬q | yes r =
+... | yes q | no ¬r = {!!}
+... | no ¬q | yes r =
   ⊥-elim (n≤k⇒¬n≤m+k-contradiction r ¬q)
-env-⟨⟩-ᶜ-ren-nat {Γ ⟨ .(τ' + τ'') ⟩} (suc τ) p (⟨⟩-μ-ren {τ = τ'} {τ' = τ''}) | no ¬q | no ¬r = {!!}
+... | no ¬q | no ¬r = {!!}
 env-⟨⟩-ᶜ-ren-nat {.(_ ⟨ _ ⟩) ⟨ τ' ⟩} (suc τ) p ⟨⟩-μ⁻¹-ren = {!!}
 env-⟨⟩-ᶜ-ren-nat {Γ ⟨ τ' ⟩} (suc τ) p (⟨⟩-≤-ren {τ' = τ''} q) with suc τ ≤? τ' | suc τ ≤? τ''
 ... | yes r | yes s =
@@ -1023,7 +1024,10 @@ env-⟨⟩-ᶜ-ren-nat {Γ ⟨ τ' ⟩} (suc τ) p (⟨⟩-≤-ren {τ' = τ''} 
     ∘ᵐ ⟨ τ' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ') (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
     ∘ᵐ ⟨⟩-≤ q
   ≡⟨ {!!} ⟩
-       ⟨ suc τ ⟩ᶠ ⟦ -ᶜ-≤-ren (∸-monoʳ-≤ (suc τ) q) ⟧ʳ
+       ⟨ suc τ ⟩ᶠ (   ⟦ eq-ren (cong (_-ᶜ_ Γ) (sym (m+n∸m≡n (suc τ ∸ τ'') (suc τ ∸ τ')))) ⟧ʳ
+                   ∘ᵐ ⟦ eq-ren (cong (_-ᶜ_ Γ) (+-∸-assoc (suc τ ∸ τ'') (∸-monoʳ-≤ (suc τ) q))) ⟧ʳ
+                   ∘ᵐ ⟦ eq-ren (++ᶜ-ᶜ-+ {Γ} {suc τ ∸ τ''}) ⟧ʳ
+                   ∘ᵐ ⟦ -ᶜ-wk-ren (suc τ ∸ τ' ∸ (suc τ ∸ τ'')) ⟧ʳ)
     ∘ᵐ ⟨⟩-≤ (m≤n+m∸n (suc τ) τ'')
     ∘ᵐ μ
     ∘ᵐ ⟨ τ'' ⟩ᶠ (env-⟨⟩-ᶜ (suc τ ∸ τ'') (≤-trans (∸-monoˡ-≤ τ''
@@ -1103,3 +1107,4 @@ env-⟨⟩-ᶜ-ren-nat {Γ ⟨ τ' ⟩} (suc τ) p (cong-⟨⟩-ren {Γ' = Γ'} 
   ∎
   -}
 
+-}

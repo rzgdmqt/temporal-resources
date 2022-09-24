@@ -93,7 +93,7 @@ open import Semantics.Renamings.Properties.var-not-in-ctx-after-ᶜ-wk-ren
 
 ---- Semantics of substitutions
 
--- open import Semantics.Substitutions.Properties.VC-subst
+open import Semantics.Substitutions.Properties.VC-subst
 
 open import Semantics.Substitutions.Properties.var-subst
 

@@ -147,31 +147,19 @@ ren-≤-ctx-time (cong-⟨⟩-ren {τ = τ} ρ) =
 -ᶜ-wk-ren {Γ ∷ A} (suc τ) =
   wk-ren ∘ʳ -ᶜ-wk-ren {Γ} (suc τ)
 -ᶜ-wk-ren {Γ ⟨ τ' ⟩} (suc τ) with suc τ ≤? τ'
-... | yes p = ⟨⟩-≤-ren (m∸n≤m τ' (suc τ))
+... | yes p =
+  ⟨⟩-≤-ren (m∸n≤m τ' (suc τ))
 ... | no ¬p =
   wk-⟨⟩-ren ∘ʳ -ᶜ-wk-ren (suc τ ∸ τ')
 
 -- Monotonicity renaming for the time-travelling operation on contexts
 
 -ᶜ-≤-ren : ∀ {Γ τ₁ τ₂} → τ₁ ≤ τ₂ → Ren (Γ -ᶜ τ₂) (Γ -ᶜ τ₁)
--ᶜ-≤-ren {Γ} {zero} {zero} p =
-  id-ren
--ᶜ-≤-ren {Γ} {zero} {suc τ₂} p =
-  -ᶜ-wk-ren (suc τ₂)
--ᶜ-≤-ren {[]} {suc τ₁} {suc τ₂} p =
-  id-ren
--ᶜ-≤-ren {Γ ∷ A} {suc τ₁} {suc τ₂} p =
-  -ᶜ-≤-ren {Γ} p
--ᶜ-≤-ren {Γ ⟨ τ ⟩} {suc τ₁} {suc τ₂} p with suc τ₁ ≤? τ | suc τ₂ ≤? τ
-... | yes q | yes r =
-  ⟨⟩-≤-ren (∸-monoʳ-≤ τ p)
-... | yes q | no ¬r =
-     wk-⟨⟩-ren
-  ∘ʳ -ᶜ-wk-ren (suc τ₂ ∸ τ)
-... | no ¬q | yes r =
-  ⊥-elim (¬q (≤-trans p r))
-... | no ¬q | no ¬r =
-  -ᶜ-≤-ren {Γ} {suc τ₁ ∸ τ} {suc τ₂ ∸ τ} (∸-monoˡ-≤ τ p)
+-ᶜ-≤-ren {Γ} {τ₁} {τ₂} p =
+     (  (   -ᶜ-wk-ren {Γ -ᶜ τ₁} (τ₂ ∸ τ₁)
+         ∘ʳ eq-ren (++ᶜ-ᶜ-+ {Γ} {τ₁} {τ₂ ∸ τ₁}))
+     ∘ʳ eq-ren (cong (Γ -ᶜ_) (+-∸-assoc τ₁ {τ₂} {τ₁} p)))
+  ∘ʳ eq-ren (cong (Γ -ᶜ_) (sym (m+n∸m≡n τ₁ τ₂)))
 
 -- Time-travelling operation on renamings
 

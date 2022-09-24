@@ -135,3 +135,23 @@ n∸m≤zero⇒n∸m≡0 {suc n} {suc m} p = n∸m≤zero⇒n∸m≡0 {n} {m} p
     (¬k≤m⇒k∸m≤n⇒n+m∸k≤n∸k∸m {suc n} {m} {k} (λ r → p (+-monoʳ-≤ 1 r)) q)
 
 
+m≤k⇒¬n+m≤k⇒n+m∸k≡n∸[k∸m] : ∀ {n m k}
+                         → m ≤ k
+                         → ¬ (n + m ≤ k)
+                         → n + m ∸ k ≡ n ∸ (k ∸ m)
+m≤k⇒¬n+m≤k⇒n+m∸k≡n∸[k∸m] {zero} {zero} {zero} p q =
+  refl
+m≤k⇒¬n+m≤k⇒n+m∸k≡n∸[k∸m] {zero} {zero} {suc k} p q =
+  refl
+m≤k⇒¬n+m≤k⇒n+m∸k≡n∸[k∸m] {zero} {suc m} {suc k} p q = 
+  ⊥-elim (q p)
+m≤k⇒¬n+m≤k⇒n+m∸k≡n∸[k∸m] {suc n} {zero} {zero} p q =
+  cong suc (+-identityʳ _)
+m≤k⇒¬n+m≤k⇒n+m∸k≡n∸[k∸m] {suc n} {zero} {suc k} p q = 
+  cong (_∸ k) (+-identityʳ _)
+m≤k⇒¬n+m≤k⇒n+m∸k≡n∸[k∸m] {suc n} {suc m} {suc k} (s≤s p) q =
+  trans
+    (cong (_∸ k) (trans (+-comm n (suc m)) (cong suc (+-comm m n))))
+    (m≤k⇒¬n+m≤k⇒n+m∸k≡n∸[k∸m] {suc n} {m} {k} p
+      (λ r → q (≤-trans (≤-reflexive (cong suc (+-comm n (suc m))))
+        (≤-trans (≤-reflexive (cong suc (cong suc (+-comm m n)))) (+-monoʳ-≤ 1 r)))))
