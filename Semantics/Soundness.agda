@@ -22,6 +22,8 @@ open import Semantics.Renamings.Properties.VC-rename Mod
 
 open import Semantics.Substitutions.Properties.VC-subst Mod
 
+open import Semantics.Soundness.;-return Mod
+
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
@@ -255,26 +257,7 @@ mutual
       delayᵀ τ ∘ᵐ [ τ ]ᶠ ⟦ N ⟧ᶜᵗ ∘ᵐ η⊣
     ∎
   C-soundness {Γ} {_} {.(return V ; M)} {.(C-rename (cong-∷-ren ⟨⟩-η-ren) M [ Hd ↦ V ]c)} (;-return V M) =
-    {!!}
-    {-
-    begin
-         μᵀ
-      ∘ᵐ Tᶠ ⟦ M ⟧ᶜᵗ
-      ∘ᵐ strᵀ
-      ∘ᵐ ⟨ η⊣ , ηᵀ ∘ᵐ ⟦ V ⟧ᵛᵗ ⟩ᵐ
-    ≡⟨ {!!} ⟩
-         ⟦ C-rename (cong-∷-ren ⟨⟩-η-ren) M ⟧ᶜᵗ
-      ∘ᵐ idᵐ
-      ∘ᵐ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ
-    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ {!!}) ⟩
-         ⟦ C-rename (cong-∷-ren ⟨⟩-η-ren) M ⟧ᶜᵗ
-      ∘ᵐ idᵐ
-      ∘ᵐ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ
-      ∘ᵐ idᵐ
-    ≡⟨ sym (C-subst≡∘ᵐ (C-rename (cong-∷-ren ⟨⟩-η-ren) M) Hd V) ⟩
-      ⟦ C-rename (cong-∷-ren ⟨⟩-η-ren) M [ Hd ↦ V ]c ⟧ᶜᵗ
-    ∎
-    -}
+    ;-return-sound V M
   C-soundness {Γ} {_}
     {.(perform op V M ; N)}
     {.(τ-subst (sym (+-assoc (op-time op) _ _)) (perform op V (M ; C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N)))}

@@ -75,6 +75,7 @@ open import Semantics.Interpretation.Properties.split-env-naturality
 open import Semantics.Interpretation.Properties.var-in-env-decompose
 open import Semantics.Interpretation.Properties.var-in-env-var-rename
 open import Semantics.Interpretation.Properties.env-⟨⟩-ᶜ-naturality
+open import Semantics.Interpretation.Properties.τ-subst
 
 ---- Semantics of renamings
 
@@ -96,6 +97,10 @@ open import Semantics.Renamings.Properties.var-not-in-ctx-after-ᶜ-wk-ren
 open import Semantics.Substitutions.Properties.VC-subst
 
 open import Semantics.Substitutions.Properties.var-subst
+
+---- Soundness of the interpretation
+
+open import Semantics.Soundness
 
 
 -- TIME-VARYING SETS MODEL

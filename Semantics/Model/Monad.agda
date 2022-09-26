@@ -42,6 +42,11 @@ record Monad : Set₁ where
 
     τ-substᵀ : ∀ {A τ τ'} → τ ≡ τ' → Tᵒ A τ →ᵐ Tᵒ A τ'
 
+    τ-substᵀ-refl : ∀ {A τ} → τ-substᵀ {A} {τ} refl ≡ idᵐ
+    τ-substᵀ-trans : ∀ {A τ τ' τ''}
+                   → (p : τ ≡ τ') → (q : τ' ≡ τ'')
+                   → τ-substᵀ q ∘ᵐ τ-substᵀ p ≡ τ-substᵀ {A} (trans p q)
+
     -- Functoriality
 
     T-idᵐ : ∀ {A τ} → Tᶠ {A} {A} {τ} idᵐ ≡ idᵐ
@@ -88,6 +93,11 @@ record Monad : Set₁ where
     -- Strength
 
     strᵀ : ∀ {A B τ} → [ τ ]ᵒ A ×ᵐ Tᵒ B τ →ᵐ Tᵒ (A ×ᵐ B) τ
+
+    -- Strength laws
+
+    T-str∘η≡η : ∀ {A B}
+              → strᵀ ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ ≡ ηᵀ {A ×ᵐ B}
 
     -- Strength is natural
     
