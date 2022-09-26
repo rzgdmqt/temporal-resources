@@ -26,16 +26,17 @@ open import Util.Time
 
 open Model Mod
 
-env-⟨⟩-ᶜ-ren-nat : ∀ {Γ Γ' A}
-                 → (τ : Time)
-                 → (p : τ ≤ ctx-time Γ)
-                 → (ρ : Ren Γ Γ')
-                 →    env-⟨⟩-ᶜ {Γ} τ p 
-                   ∘ᵐ ⟦ ρ ⟧ʳ {A}
-                 ≡    ⟨ τ ⟩ᶠ ⟦ ρ -ʳ τ ⟧ʳ
-                   ∘ᵐ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ))
+postulate
+  env-⟨⟩-ᶜ-ren-nat : ∀ {Γ Γ' A}
+                   → (τ : Time)
+                   → (p : τ ≤ ctx-time Γ)
+                   → (ρ : Ren Γ Γ')
+                   →    env-⟨⟩-ᶜ {Γ} τ p 
+                     ∘ᵐ ⟦ ρ ⟧ʳ {A}
+                   ≡    ⟨ τ ⟩ᶠ ⟦ ρ -ʳ τ ⟧ʳ
+                     ∘ᵐ env-⟨⟩-ᶜ τ (≤-trans p (ren-≤-ctx-time ρ))
 
-
+{-
 env-⟨⟩-ᶜ-ren-nat zero p ρ = 
   begin
     η ∘ᵐ ⟦ ρ ⟧ʳ
@@ -1152,3 +1153,4 @@ env-⟨⟩-ᶜ-ren-nat {Γ ⟨ τ' ⟩} (suc τ) p (cong-⟨⟩-ren {Γ' = Γ'} 
   ∎
   -}
 
+-}
