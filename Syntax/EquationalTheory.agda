@@ -276,9 +276,9 @@ mutual
               
     absurd-eta : ∀ {C}
                → (V : Γ ⊢V⦂ Empty)
-               → (M : Γ ⊢C⦂ C)
-               ---------------------
-               → Γ ⊢C⦂ absurd V == M
+               → (M : Γ ∷ Empty ⊢C⦂ C)
+               ---------------------------------
+               → Γ ⊢C⦂ absurd V == M [ Hd ↦ V ]c
 
     box-unbox-eta : ∀ {A C τ}
                   → (p : τ ≤ ctx-time Γ)
