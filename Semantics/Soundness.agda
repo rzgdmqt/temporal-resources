@@ -25,6 +25,7 @@ open import Semantics.Substitutions.Properties.VC-subst Mod
 open import Semantics.Soundness.;-return Mod
 
 open import Semantics.Soundness.·-lam Mod
+open import Semantics.Soundness.;-eta Mod
 open import Semantics.Soundness.absurd-eta Mod
 
 open import Semantics.Soundness.delay-; Mod
@@ -282,7 +283,8 @@ mutual
                     (C-rename (cong-ren {Γ'' = [] ∷ A} (cong-ren {Γ'' = [] ⟨ τ ⟩} wk-ren ∘ʳ ⟨⟩-μ-ren)) N))) ]c))}
     (handle-op {A} {B} {τ} {τ'} op V M H N) = {!!}
   C-soundness {Γ} {_} {_} {.(N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren _ p) V ]c)} (unbox-box p V N) = {!!}
-  C-soundness {Γ} {_} {M} {.(τ-subst (+-identityʳ _) (M ; return (var Hd)))} (;-eta .M) = {!!}
+  C-soundness {Γ} {_} {M} {.(τ-subst (+-identityʳ _) (M ; return (var Hd)))} (;-eta .M) =
+    ;-eta-sound M
   C-soundness {Γ} {_} {.(absurd V)} {_} (absurd-eta V N) =
     absurd-eta-sound V N
   C-soundness {Γ} {_}

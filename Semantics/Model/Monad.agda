@@ -110,6 +110,11 @@ record Monad : Set₁ where
     
     strᵀ-nat : ∀ {A A' B B' τ} → (f : A →ᵐ A') → (g : B →ᵐ B')
              → strᵀ {A'} {B'} ∘ᵐ mapˣᵐ ([ τ ]ᶠ f) (Tᶠ g) ≡ Tᶠ (mapˣᵐ f g) ∘ᵐ strᵀ {A} {B}
+
+    -- Discarding the first argument
+
+    strᵀ-snd : ∀ {A B τ}
+             → Tᶠ sndᵐ ∘ᵐ strᵀ {A} {B} {τ} ≡ sndᵐ
     
     -- Operations are algebraic wrt strength
 

@@ -23,7 +23,6 @@ open import Semantics.Substitutions.Properties.VC-subst Mod
 open import Semantics.Interpretation.Properties.τ-subst Mod
 
 open import Util.Equality
-open import Util.Operations
 open import Util.Time
 
 open Model Mod
@@ -354,7 +353,7 @@ delay-;-sound {Γ} {A} {B} {τ} {τ'} {τ''} M N =
   ≡⟨⟩
        τ-substᵀ (sym (+-assoc τ τ' τ''))
     ∘ᵐ ⟦ delay τ (M ; C-rename (cong-∷-ren ⟨⟩-μ-ren) N) ⟧ᶜᵗ
-  ≡⟨ sym (τ-subst≡∘ᵐ _ _) ⟩
+  ≡⟨ sym (τ-subst≡τ-substᵀ∘M _ _) ⟩
     ⟦ τ-subst (sym (+-assoc τ τ' τ''))
         (delay τ (M ; C-rename (cong-∷-ren ⟨⟩-μ-ren) N)) ⟧ᶜᵗ
   ∎

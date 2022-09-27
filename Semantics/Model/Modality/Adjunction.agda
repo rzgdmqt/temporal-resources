@@ -53,11 +53,8 @@ record Adjunction : Set₁ where
     -- Interaction between η⊣/ε⊣ of the adjunction and μ/δ of the modalities
 
     GGμ∘Gη⊣∘η⊣≡δ∘η⊣ : ∀ {A τ τ'}
-                    →    [ τ ]ᶠ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ))
-                      ∘ᵐ [ τ ]ᶠ η⊣
-                      ∘ᵐ η⊣ {A}
-                    ≡    δ
-                      ∘ᵐ η⊣
+                    → [ τ ]ᶠ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) ∘ᵐ [ τ ]ᶠ η⊣ ∘ᵐ η⊣ {A}
+                    ≡ δ ∘ᵐ η⊣
 
     -- ...
 
