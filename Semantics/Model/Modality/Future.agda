@@ -92,8 +92,3 @@ record Future : Set₁ where
                   → δ {[ τ₃ ]ᵒ A} {τ₁} {τ₂} ∘ᵐ δ {A} {τ₁ + τ₂} {τ₃}
                   ≡    [ τ₁ ]ᶠ (δ {A} {τ₂} {τ₃}) ∘ᵐ δ {A} {τ₁} {τ₂ + τ₃}
                     ∘ᵐ []-≤ {A} (≤-reflexive (+-assoc τ₁ τ₂ τ₃))
-
-    -- [_]ᵒ is monoidal (with respect to ×ᵐ) (TODO: derive from adjunction)
-
-    --[]-monoidal : ∀ {A B τ}
-    --            → [ τ ]ᵒ A ×ᵐ [ τ ]ᵒ B →ᵐ [ τ ]ᵒ (A ×ᵐ B)
