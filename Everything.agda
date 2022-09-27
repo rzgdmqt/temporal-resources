@@ -83,6 +83,7 @@ open import Semantics.Renamings
 
 open import Semantics.Renamings.Properties.VC-rename
 
+open import Semantics.Renamings.Properties.-ᶜ-⟨⟩-ren-decompose
 open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose
 open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-ren-naturality
 open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-split-env-naturality
