@@ -69,7 +69,7 @@ record Monad : Set₁ where
 
     T-μ∘η≡id : ∀ {A τ} →  μᵀ {τ = 0} {τ' = τ} ∘ᵐ ηᵀ {Tᵒ A τ} ≡ idᵐ
     T-μ∘Tη≡id : ∀ {A τ} →  μᵀ {τ = τ} {τ' = 0} ∘ᵐ Tᶠ (ηᵀ {A}) ≡ τ-substᵀ (sym (+-identityʳ τ))
-    T-μ∘μ≡μ∘Tμ : ∀ {A τ τ' τ''} →  μᵀ {A} {τ} {τ' + τ''} ∘ᵐ Tᶠ μᵀ ≡ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵐ (μᵀ ∘ᵐ μᵀ)
+    T-μ∘μ≡μ∘Tμ : ∀ {A τ τ' τ''} →  μᵀ {A} {τ} {τ' + τ''} ∘ᵐ Tᶠ μᵀ ≡ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵐ μᵀ ∘ᵐ μᵀ
 
     -- EFFECTS
 
@@ -101,21 +101,28 @@ record Monad : Set₁ where
 
     strᵀ : ∀ {A B τ} → [ τ ]ᵒ A ×ᵐ Tᵒ B τ →ᵐ Tᵒ (A ×ᵐ B) τ
 
-    -- Strength laws
-
-    T-str∘η≡η : ∀ {A B}
-              → strᵀ ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ ≡ ηᵀ {A ×ᵐ B}
-
     -- Strength is natural
     
     strᵀ-nat : ∀ {A A' B B' τ} → (f : A →ᵐ A') → (g : B →ᵐ B')
              → strᵀ {A'} {B'} ∘ᵐ mapˣᵐ ([ τ ]ᶠ f) (Tᶠ g) ≡ Tᶠ (mapˣᵐ f g) ∘ᵐ strᵀ {A} {B}
 
-    -- Discarding the first argument
+    -- Strength laws
 
-    strᵀ-snd : ∀ {A B τ}
+    T-str∘η≡η : ∀ {A B}
+              → strᵀ ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ ≡ ηᵀ {A ×ᵐ B}
+
+    T-μ∘Tstr∘str≡str∘[δ⁻¹×μ] : ∀ {A B τ τ'}
+                             → μᵀ {A ×ᵐ B} {τ} {τ'} ∘ᵐ Tᶠ strᵀ ∘ᵐ strᵀ
+                             ≡ strᵀ ∘ᵐ mapˣᵐ δ⁻¹ μᵀ
+
+    T-Tsnd∘str≡snd : ∀ {A B τ}
              → Tᶠ sndᵐ ∘ᵐ strᵀ {A} {B} {τ} ≡ sndᵐ
-    
+
+    T-Tassoc⁻¹∘str∘[monoidal×id]∘assoc≡str∘[str×id]
+               : ∀ {A B C τ}
+               → Tᶠ ×ᵐ-assoc⁻¹ ∘ᵐ strᵀ ∘ᵐ mapˣᵐ []-monoidal idᵐ ∘ᵐ ×ᵐ-assoc
+               ≡ strᵀ {A} ∘ᵐ mapˣᵐ idᵐ (strᵀ {B} {C} {τ})
+
     -- Operations are algebraic wrt strength
 
     strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ'}

@@ -125,6 +125,16 @@ open import Semantics.Model.Category.Derived Cat
     ∘ᵐ ⟨ [ τ ]ᶠ f ∘ᵐ fstᵐ , [ τ ]ᶠ g ∘ᵐ sndᵐ ⟩ᵐ
   ∎
 
+-- monoidality witness's interaction with projections
+
+postulate
+
+  []-monoidal-fstᵐ : ∀ {A B τ}
+                   → [ τ ]ᶠ fstᵐ ∘ᵐ []-monoidal {A} {B} ≡ fstᵐ
+
+  []-monoidal-sndᵐ : ∀ {A B τ}
+                   → [ τ ]ᶠ sndᵐ ∘ᵐ []-monoidal {A} {B} ≡ sndᵐ
+
 -- monoidality witness's interaction with pairing
 
 []-monoidal-⟨⟩ᵐ : ∀ {A B C τ}

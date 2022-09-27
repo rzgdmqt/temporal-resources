@@ -40,7 +40,7 @@ open Model Mod
   ≡⟨ sym (⟨⟩ᵐ-sndᵐ _ _) ⟩
        sndᵐ
     ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
-  ≡⟨ sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ strᵀ-snd)) ⟩
+  ≡⟨ sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ T-Tsnd∘str≡snd)) ⟩
        Tᶠ sndᵐ
     ∘ᵐ strᵀ
     ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
