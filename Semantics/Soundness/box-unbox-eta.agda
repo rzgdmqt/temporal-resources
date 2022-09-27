@@ -17,6 +17,7 @@ open import Semantics.Interpretation Mod
 
 open import Semantics.Renamings Mod
 open import Semantics.Renamings.Properties.VC-rename Mod
+open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose Mod
 
 open import Semantics.Substitutions.Properties.VC-subst Mod
 
@@ -53,7 +54,177 @@ box-unbox-eta-sound {Γ} {A} {C} {τ} p V M =
   ≡⟨ ∘ᵐ-congʳ (cong ⟨ idᵐ ,_⟩ᵐ (V-rename≡∘ᵐ (-ᶜ-wk-ren τ) V)) ⟩
        ⟦ M ⟧ᶜᵗ
     ∘ᵐ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ∘ᵐ ⟦ -ᶜ-wk-ren τ ⟧ʳ ⟩ᵐ
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congʳ (trans (trans (trans
+      (cong₂ ⟨_,_⟩ᵐ
+        (sym (
+          begin
+               ((fstᵐ ∘ᵐ fstᵐ) ∘ᵐ fstᵐ)
+            ∘ᵐ ⟨ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ,
+                             ([ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣)
+                          ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ⟩ᵐ
+            ,
+               sndᵐ
+            ∘ᵐ ⟨ idᵐ ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ,
+                    ([ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣)
+                 ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ⟩ᵐ ⟩ᵐ
+          ≡⟨ trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)) ⟩
+               (fstᵐ ∘ᵐ fstᵐ)
+            ∘ᵐ idᵐ
+            ∘ᵐ ⟨ idᵐ ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ,
+                    ([ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣)
+                 ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ⟩ᵐ
+          ≡⟨ ∘ᵐ-congʳ (∘ᵐ-identityˡ _) ⟩
+               (fstᵐ ∘ᵐ fstᵐ)
+            ∘ᵐ ⟨ idᵐ ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ,
+                    ([ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣)
+                 ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ⟩ᵐ
+          ≡⟨ trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)) ⟩
+               fstᵐ
+            ∘ᵐ idᵐ
+            ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+          ≡⟨ ∘ᵐ-congʳ (∘ᵐ-identityˡ _) ⟩
+               fstᵐ
+            ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+          ≡⟨ ⟨⟩ᵐ-fstᵐ _ _ ⟩
+            idᵐ
+          ∎))
+        (sym (
+          begin
+               sndᵐ
+            ∘ᵐ ⟨    idᵐ
+                 ∘ᵐ ⟨ idᵐ ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ,
+                         ([ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣)
+                      ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ⟩ᵐ
+            ,
+               sndᵐ
+            ∘ᵐ ⟨ idᵐ ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ,
+                    ([ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣)
+                 ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ⟩ᵐ ⟩ᵐ
+          ≡⟨ ⟨⟩ᵐ-sndᵐ _ _ ⟩
+               sndᵐ
+            ∘ᵐ ⟨ idᵐ ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ,
+                    ([ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣)
+                 ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ ⟩ᵐ 
+          ≡⟨ ⟨⟩ᵐ-sndᵐ _ _ ⟩
+               ([ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣)
+            ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+          ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
+               [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ)
+            ∘ᵐ η⊣
+            ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+          ≡⟨ trans (∘ᵐ-congˡ ([]-∘ᵐ _ _)) (∘ᵐ-assoc _ _ _) ⟩
+               [ τ ]ᶠ ε-⟨⟩
+            ∘ᵐ [ τ ]ᶠ (⟨ τ ⟩ᶠ sndᵐ)
+            ∘ᵐ η⊣
+            ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+          ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (η⊣-nat _)) (∘ᵐ-assoc _ _ _))) ⟩
+               [ τ ]ᶠ ε-⟨⟩
+            ∘ᵐ η⊣
+            ∘ᵐ sndᵐ
+            ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+          ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _)) ⟩
+               [ τ ]ᶠ ε-⟨⟩
+            ∘ᵐ η⊣
+            ∘ᵐ ε⊣
+            ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ
+            ∘ᵐ env-⟨⟩-ᶜ τ p
+          ≡⟨⟩
+               [ τ ]ᶠ (η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n)
+            ∘ᵐ η⊣
+            ∘ᵐ ε⊣
+            ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ
+            ∘ᵐ env-⟨⟩-ᶜ τ p
+          ≡⟨ trans (∘ᵐ-congˡ ([]-∘ᵐ _ _)) (∘ᵐ-assoc _ _ _) ⟩
+               [ τ ]ᶠ η⁻¹
+            ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+            ∘ᵐ η⊣
+            ∘ᵐ ε⊣
+            ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ
+            ∘ᵐ env-⟨⟩-ᶜ τ p
+          ≡⟨ {!!} ⟩
+               ⟦ V ⟧ᵛᵗ
+            ∘ᵐ η⁻¹
+            ∘ᵐ ⟨⟩-≤ z≤n
+            ∘ᵐ env-⟨⟩-ᶜ τ p
+          ≡⟨ ∘ᵐ-congʳ (sym (∘ᵐ-assoc _ _ _)) ⟩
+               ⟦ V ⟧ᵛᵗ
+            ∘ᵐ (η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n)
+            ∘ᵐ env-⟨⟩-ᶜ τ p
+          ≡⟨⟩
+               ⟦ V ⟧ᵛᵗ
+            ∘ᵐ ε-⟨⟩
+            ∘ᵐ env-⟨⟩-ᶜ τ p
+          ≡⟨ ∘ᵐ-congʳ (sym (⟦-ᶜ-wk-ren⟧≡ε∘env-⟨⟩-ᶜ p)) ⟩
+               ⟦ V ⟧ᵛᵗ
+            ∘ᵐ ⟦ -ᶜ-wk-ren τ ⟧ʳ
+          ∎))) (⟨⟩ᵐ-∘ᵐ _ _ _)) (∘ᵐ-congʳ (⟨⟩ᵐ-∘ᵐ _ _ _))) (∘ᵐ-congʳ (∘ᵐ-congʳ (⟨⟩ᵐ-∘ᵐ _ _ _)))) ⟩
+       ⟦ M ⟧ᶜᵗ
+    ∘ᵐ ⟨ (fstᵐ ∘ᵐ fstᵐ) ∘ᵐ fstᵐ , sndᵐ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , sndᵐ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congˡ (cong ⟨ idᵐ ,_⟩ᵐ (sym (∘ᵐ-identityˡ _))))) ⟩
+       ⟦ M ⟧ᶜᵗ
+    ∘ᵐ ⟨ (fstᵐ ∘ᵐ fstᵐ) ∘ᵐ fstᵐ , sndᵐ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ ⟨_,_⟩ᵐ
+      (∘ᵐ-congˡ (∘ᵐ-congˡ (sym (∘ᵐ-identityˡ _))))
+      (sym (∘ᵐ-identityˡ _)))) ⟩
+       ⟦ M ⟧ᶜᵗ
+    ∘ᵐ ⟨ ((idᵐ ∘ᵐ fstᵐ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (sym (∘ᵐ-assoc _ _ _)) ⟩
+       ⟦ M ⟧ᶜᵗ
+    ∘ᵐ (   ⟨ ((idᵐ ∘ᵐ fstᵐ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+        ∘ᵐ ⟨ idᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)
+    ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+  ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+       (   ⟦ M ⟧ᶜᵗ
+        ∘ᵐ (   ⟨ ((idᵐ ∘ᵐ fstᵐ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+            ∘ᵐ ⟨ idᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+    ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+  ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+       (  (   ⟦ M ⟧ᶜᵗ
+           ∘ᵐ (   ⟨ ((idᵐ ∘ᵐ fstᵐ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+               ∘ᵐ ⟨ idᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ)
+    ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+  ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congˡ (∘ᵐ-congʳ (∘ᵐ-congʳ (cong ⟨ idᵐ ,_⟩ᵐ (sym (⟨⟩ᵐ-sndᵐ _ _)))))) ⟩
+       (  (   ⟦ M ⟧ᶜᵗ
+           ∘ᵐ (⟨ ((idᵐ ∘ᵐ fstᵐ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ
+                ⟨ idᵐ ,
+                     sndᵐ
+                  ∘ᵐ ⟨ ⟨ ⟦ Γ ⟧ᵉᶠ terminalᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ))
+       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ)
+    ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+  ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congˡ (∘ᵐ-congʳ (sym (∘ᵐ-identityʳ _)))) ⟩
+       (  (   ⟦ M ⟧ᶜᵗ
+           ∘ᵐ (⟨ ((idᵐ ∘ᵐ fstᵐ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ
+                ⟨ idᵐ ,
+                     sndᵐ
+                  ∘ᵐ ⟨ ⟨ ⟦ Γ ⟧ᵉᶠ terminalᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ)
+           ∘ᵐ idᵐ)
+       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ)
+    ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+  ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congˡ (∘ᵐ-congʳ (∘ᵐ-congʳ (sym (⟨⟩ᵐ-fstᵐ _ _))))) ⟩
+       (  (   ⟦ M ⟧ᶜᵗ
+           ∘ᵐ (⟨ ((idᵐ ∘ᵐ fstᵐ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ
+                ⟨ idᵐ ,
+                     sndᵐ
+                  ∘ᵐ ⟨ ⟨ ⟦ Γ ⟧ᵉᶠ terminalᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ)
+           ∘ᵐ fstᵐ
+           ∘ᵐ ⟨ idᵐ ,
+                   (sndᵐ ∘ᵐ fstᵐ)
+                ∘ᵐ ⟨ ⟨ ⟦ Γ ⟧ᵉᶠ terminalᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ)
+       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ)
+    ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
+  ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congˡ (∘ᵐ-congʳ (sym (∘ᵐ-assoc _ _ _)))) ⟩
        (  (   ⟦ M ⟧ᶜᵗ
            ∘ᵐ ((⟨ ((idᵐ ∘ᵐ fstᵐ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ
                 ⟨ idᵐ ,
@@ -63,7 +234,7 @@ box-unbox-eta-sound {Γ} {A} {C} {τ} p V M =
            ∘ᵐ ⟨ idᵐ ,
                    (sndᵐ ∘ᵐ fstᵐ)
                 ∘ᵐ ⟨ ⟨ ⟦ Γ ⟧ᵉᶠ terminalᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ)
-       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ ((η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n) ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ)
+       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ)
     ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
   ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congˡ (∘ᵐ-congʳ (sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (⟨⟩ᵐ-fstᵐ _ _)))))) ⟩
        (  (   ⟦ M ⟧ᶜᵗ
@@ -78,7 +249,7 @@ box-unbox-eta-sound {Γ} {A} {C} {τ} p V M =
            ∘ᵐ ⟨ idᵐ ,
                    (sndᵐ ∘ᵐ fstᵐ)
                 ∘ᵐ ⟨ ⟨ ⟦ Γ ⟧ᵉᶠ terminalᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ)
-       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ ((η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n) ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ)
+       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ)
     ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
   ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congʳ (sym (trans (∘ᵐ-identityˡ _) (∘ᵐ-identityʳ _)))) ⟩
        (  (   ⟦ M ⟧ᶜᵗ
@@ -94,7 +265,7 @@ box-unbox-eta-sound {Γ} {A} {C} {τ} p V M =
                    (sndᵐ ∘ᵐ fstᵐ)
                 ∘ᵐ ⟨ ⟨ ⟦ Γ ⟧ᵉᶠ terminalᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ)
        ∘ᵐ idᵐ
-       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ ((η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n) ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ
+       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ
        ∘ᵐ idᵐ)
     ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
   ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congˡ (sym (C-rename≡∘ᵐ _ M))) ⟩
@@ -102,7 +273,7 @@ box-unbox-eta-sound {Γ} {A} {C} {τ} p V M =
               cong-∷-ren (var-ren Hd ∘ʳ cong-∷-ren (wk-ren ∘ʳ wk-ren ∘ʳ id-ren)))
              ∘ʳ wk-ren) M ⟧ᶜᵗ
        ∘ᵐ idᵐ
-       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ ((η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n) ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ
+       ∘ᵐ ⟨ idᵐ , [ τ ]ᶠ (ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ) ∘ᵐ η⊣ ⟩ᵐ
        ∘ᵐ idᵐ)
     ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
   ≡⟨ ∘ᵐ-congˡ (sym
