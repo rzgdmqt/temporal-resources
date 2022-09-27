@@ -34,7 +34,7 @@ record Model : Set₂ where
 
     -- Monad
 
-    Mon : Monad Cat Fut Typ
+    Mon : Monad Cat Fut Pas Adj Typ
 
   -- Opening all the structure for public usage
 
@@ -42,11 +42,13 @@ record Model : Set₂ where
   open import Semantics.Model.Category.Derived Cat public
 
   open Future Fut public
+  open import Semantics.Model.Modality.Future.Derived Cat Fut public
   
   open Past Pas public
   open import Semantics.Model.Modality.Past.Derived Cat Pas public
 
   open Adjunction Adj public
+  open import Semantics.Model.Modality.Adjunction.Derived Cat Fut Pas Adj public
 
   open BaseGroundTypes Typ public
 

@@ -159,7 +159,3 @@ open import Semantics.Model.Category.Derived Cat
     ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-assoc τ₁ τ₂ τ₃)))
     ∘ᵐ μ
   ∎
-
-{-
-   {⟨ τ₁ + τ₂ ⟩ᵒ (⟨ τ₃ ⟩ᵒ A) →ᵐ ⟨ τ₁ ⟩ᵒ (⟨ τ₂ + τ₃ ⟩ᵒ A)}
--}

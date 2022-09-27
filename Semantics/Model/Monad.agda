@@ -7,10 +7,14 @@
 
 open import Semantics.Model.Category
 open import Semantics.Model.Modality.Future
+open import Semantics.Model.Modality.Past
+open import Semantics.Model.Modality.Adjunction
 open import Semantics.Model.BaseGroundTypes
 
 module Semantics.Model.Monad (Cat : Category)
                              (Fut : Future Cat)
+                             (Pas : Past Cat)
+                             (Adj : Adjunction Cat Fut Pas)
                              (Typ : BaseGroundTypes Cat Fut) where
 
 open import Util.Equality
@@ -20,6 +24,9 @@ open import Util.Time
 open Category Cat
 open import Semantics.Model.Category.Derived Cat
 open Future Fut
+open Past Pas
+open Adjunction Adj
+open import Semantics.Model.Modality.Adjunction.Derived Cat Fut Pas Adj
 open BaseGroundTypes Typ
 
 record Monad : Set₁ where
@@ -83,10 +90,10 @@ record Monad : Set₁ where
 
     delayᵀ-algebraicity : ∀ {A} (τ : Time) {τ' τ''}
                         → μᵀ {A} {τ + τ'} {τ''} ∘ᵐ delayᵀ τ {τ'}
-                       ≡ τ-substᵀ (sym (+-assoc τ τ' τ'')) ∘ᵐ delayᵀ τ ∘ᵐ [ τ ]ᶠ (μᵀ {A} {τ'} {τ''})
+                        ≡ τ-substᵀ (sym (+-assoc τ τ' τ'')) ∘ᵐ delayᵀ τ ∘ᵐ [ τ ]ᶠ (μᵀ {A} {τ'} {τ''})
     opᵀ-algebraicity : ∀ {A τ τ'} → (op : Op)
                      → μᵀ {A} {op-time op + τ} {τ'} ∘ᵐ opᵀ {τ = τ} op
-                    ≡ τ-substᵀ (sym (+-assoc (op-time op) τ τ')) ∘ᵐ opᵀ op ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ μᵀ))
+                     ≡ τ-substᵀ (sym (+-assoc (op-time op) τ τ')) ∘ᵐ opᵀ op ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ μᵀ))
 
     -- STRENGTH
 
@@ -107,8 +114,8 @@ record Monad : Set₁ where
     -- Operations are algebraic wrt strength
 
     strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ'}
-                             → strᵀ {A} {B} {τ + τ'} ∘ᵐ mapˣᵐ idᵐ ((delayᵀ τ {τ'}))
-                            ≡ delayᵀ τ ∘ᵐ [ τ ]ᶠ (strᵀ {A} {B} {τ'}) ∘ᵐ []-monoidal ∘ᵐ mapˣᵐ (δ {A} {τ} {τ'}) idᵐ
+                             → strᵀ {A} {B} {τ + τ'} ∘ᵐ mapˣᵐ idᵐ (delayᵀ τ {τ'})
+                             ≡ delayᵀ τ ∘ᵐ [ τ ]ᶠ (strᵀ {A} {B} {τ'}) ∘ᵐ []-monoidal ∘ᵐ mapˣᵐ (δ {A} {τ} {τ'}) idᵐ
 
     -- strᵀ-opᵀ-algebraicity : (TODO)
 

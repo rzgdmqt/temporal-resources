@@ -95,10 +95,5 @@ record Future : Set₁ where
 
     -- [_]ᵒ is monoidal (with respect to ×ᵐ) (TODO: derive from adjunction)
 
-    []-monoidal : ∀ {A B τ}
-                → [ τ ]ᵒ A ×ᵐ [ τ ]ᵒ B →ᵐ [ τ ]ᵒ (A ×ᵐ B)
-
-  -- DERIVED STRUCTURE
-
-  η-[] : ∀ {A τ} → A →ᵐ [ τ ]ᵒ A
-  η-[] {A} {τ} = []-≤ {A = A} z≤n ∘ᵐ ε⁻¹
+    --[]-monoidal : ∀ {A B τ}
+    --            → [ τ ]ᵒ A ×ᵐ [ τ ]ᵒ B →ᵐ [ τ ]ᵒ (A ×ᵐ B)
