@@ -69,7 +69,7 @@ unbox-box-sound {Γ} {A} {C} {τ} p V N =
     ∘ᵐ ⟨ idᵐ ,
             ⟦ V ⟧ᵛᵗ
          ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
-  ≡⟨ ∘ᵐ-congʳ (cong ⟨ idᵐ ,_⟩ᵐ (∘ᵐ-congʳ (sym (⟦-ᶜ-⟨⟩-ren⟧ʳ≡env-⟨⟩-ᶜ p)))) ⟩
+  ≡⟨ ∘ᵐ-congʳ (cong ⟨ idᵐ ,_⟩ᵐ (∘ᵐ-congʳ (sym (⟦-ᶜ-⟨⟩-ren⟧≡env-⟨⟩-ᶜ p)))) ⟩
       ⟦ N ⟧ᶜᵗ
     ∘ᵐ ⟨ idᵐ ,
             ⟦ V ⟧ᵛᵗ

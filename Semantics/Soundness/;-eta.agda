@@ -81,6 +81,6 @@ open Model Mod
   ≡⟨⟩
        τ-substᵀ (+-identityʳ τ)
     ∘ᵐ ⟦ M ; return (var Hd) ⟧ᶜᵗ
-  ≡⟨ sym (τ-subst≡τ-substᵀ∘M (+-identityʳ τ) (M ; return (var Hd))) ⟩
+  ≡⟨ sym (⟦τ-subst⟧≡τ-substᵀ (+-identityʳ τ) (M ; return (var Hd))) ⟩
     ⟦ τ-subst (+-identityʳ τ) (M ; return (var Hd)) ⟧ᶜᵗ
   ∎

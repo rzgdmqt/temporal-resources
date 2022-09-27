@@ -23,26 +23,26 @@ open import Util.Time
 
 open Model Mod
 
-⟦-ᶜ-⟨⟩-ren⟧ʳ≡env-⟨⟩-ᶜ : ∀ {Γ τ A}
-                        → (p : τ ≤ ctx-time Γ)
-                        → ⟦ -ᶜ-⟨⟩-ren {Γ} τ p ⟧ʳ {A}
-                        ≡ env-⟨⟩-ᶜ τ p
+⟦-ᶜ-⟨⟩-ren⟧≡env-⟨⟩-ᶜ : ∀ {Γ τ A}
+                     → (p : τ ≤ ctx-time Γ)
+                     → ⟦ -ᶜ-⟨⟩-ren {Γ} τ p ⟧ʳ {A}
+                     ≡ env-⟨⟩-ᶜ τ p
                        
-⟦-ᶜ-⟨⟩-ren⟧ʳ≡env-⟨⟩-ᶜ {Γ} {zero} {A} p = 
+⟦-ᶜ-⟨⟩-ren⟧≡env-⟨⟩-ᶜ {Γ} {zero} {A} p = 
   begin
     η
   ≡⟨⟩
     η
   ∎
-⟦-ᶜ-⟨⟩-ren⟧ʳ≡env-⟨⟩-ᶜ {Γ ∷ B} {suc τ} {A} p = 
+⟦-ᶜ-⟨⟩-ren⟧≡env-⟨⟩-ᶜ {Γ ∷ B} {suc τ} {A} p = 
   begin
        ⟦ -ᶜ-⟨⟩-ren {Γ = Γ} (suc τ) p ⟧ʳ
     ∘ᵐ fstᵐ
-  ≡⟨ ∘ᵐ-congˡ (⟦-ᶜ-⟨⟩-ren⟧ʳ≡env-⟨⟩-ᶜ {Γ} {suc τ} p) ⟩
+  ≡⟨ ∘ᵐ-congˡ (⟦-ᶜ-⟨⟩-ren⟧≡env-⟨⟩-ᶜ {Γ} {suc τ} p) ⟩
        env-⟨⟩-ᶜ {Γ = Γ} (suc τ) p
     ∘ᵐ fstᵐ
   ∎
-⟦-ᶜ-⟨⟩-ren⟧ʳ≡env-⟨⟩-ᶜ {Γ ⟨ τ' ⟩} {suc τ} {A} p with suc τ ≤? τ'
+⟦-ᶜ-⟨⟩-ren⟧≡env-⟨⟩-ᶜ {Γ ⟨ τ' ⟩} {suc τ} {A} p with suc τ ≤? τ'
 ... | yes q = 
   begin
        (   μ⁻¹
@@ -68,7 +68,7 @@ open Model Mod
     ∘ᵐ μ
     ∘ᵐ ⟨ τ' ⟩ᶠ ⟦ -ᶜ-⟨⟩-ren (suc τ ∸ τ') (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))) ⟧ʳ
   ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (cong ⟨ τ' ⟩ᶠ
-      (⟦-ᶜ-⟨⟩-ren⟧ʳ≡env-⟨⟩-ᶜ {Γ} {suc τ ∸ τ'} (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))))) ⟩
+      (⟦-ᶜ-⟨⟩-ren⟧≡env-⟨⟩-ᶜ {Γ} {suc τ ∸ τ'} (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))))) ⟩
        ⟨⟩-≤ (≤-reflexive (sym (m∸n+n≡m (≰⇒≥ ¬q))))
     ∘ᵐ ⟨⟩-≤ (≤-reflexive (+-comm (suc τ ∸ τ') τ'))
     ∘ᵐ μ

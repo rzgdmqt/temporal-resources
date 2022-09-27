@@ -353,7 +353,7 @@ delay-;-sound {Γ} {A} {B} {τ} {τ'} {τ''} M N =
   ≡⟨⟩
        τ-substᵀ (sym (+-assoc τ τ' τ''))
     ∘ᵐ ⟦ delay τ (M ; C-rename (cong-∷-ren ⟨⟩-μ-ren) N) ⟧ᶜᵗ
-  ≡⟨ sym (τ-subst≡τ-substᵀ∘M _ _) ⟩
+  ≡⟨ sym (⟦τ-subst⟧≡τ-substᵀ _ _) ⟩
     ⟦ τ-subst (sym (+-assoc τ τ' τ''))
         (delay τ (M ; C-rename (cong-∷-ren ⟨⟩-μ-ren) N)) ⟧ᶜᵗ
   ∎

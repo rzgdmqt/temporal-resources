@@ -941,7 +941,7 @@ env-⟨⟩-ᶜ-ren-nat {Γ ⟨ τ' ⟩} (suc τ) p (⟨⟩-≤-ren {τ' = τ''} 
     ∘ᵐ ⟨ τ'' ⟩ᶠ (   (η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n)
                  ∘ᵐ env-⟨⟩-ᶜ (suc τ ∸ τ')
                       (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
-  ≡⟨ ∘ᵐ-congʳ (cong ⟨ τ'' ⟩ᶠ (sym (⟦-ᶜ-wk-ren⟧ʳ≡ε∘env-⟨⟩-ᶜ _))) ⟩
+  ≡⟨ ∘ᵐ-congʳ (cong ⟨ τ'' ⟩ᶠ (sym (⟦-ᶜ-wk-ren⟧≡ε∘env-⟨⟩-ᶜ _))) ⟩
        ⟨⟩-≤ s
     ∘ᵐ ⟨ τ'' ⟩ᶠ ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
   ≡⟨ ∘ᵐ-congˡ (cong ⟨⟩-≤ (≤-irrelevant _ _)) ⟩

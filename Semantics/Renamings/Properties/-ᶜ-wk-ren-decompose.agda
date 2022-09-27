@@ -23,12 +23,12 @@ open import Util.Time
 
 open Model Mod
 
-⟦-ᶜ-wk-ren⟧ʳ≡ε∘env-⟨⟩-ᶜ : ∀ {Γ τ A}
-                          → (p : τ ≤ ctx-time Γ)
-                          → ⟦ -ᶜ-wk-ren {Γ} τ ⟧ʳ {A}
-                          ≡ ε-⟨⟩ ∘ᵐ env-⟨⟩-ᶜ τ p
+⟦-ᶜ-wk-ren⟧≡ε∘env-⟨⟩-ᶜ : ∀ {Γ τ A}
+                       → (p : τ ≤ ctx-time Γ)
+                       → ⟦ -ᶜ-wk-ren {Γ} τ ⟧ʳ {A}
+                       ≡ ε-⟨⟩ ∘ᵐ env-⟨⟩-ᶜ τ p
                        
-⟦-ᶜ-wk-ren⟧ʳ≡ε∘env-⟨⟩-ᶜ {Γ} {zero} {A} p = 
+⟦-ᶜ-wk-ren⟧≡ε∘env-⟨⟩-ᶜ {Γ} {zero} {A} p = 
   begin
     idᵐ
   ≡⟨ sym ⟨⟩-η⁻¹∘η≡id ⟩
@@ -40,11 +40,11 @@ open Model Mod
   ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congʳ (cong ⟨⟩-≤ (≤-irrelevant _ _))) ⟩
     (η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n) ∘ᵐ η
   ∎
-⟦-ᶜ-wk-ren⟧ʳ≡ε∘env-⟨⟩-ᶜ {Γ ∷ B} {suc τ} {A} p = 
+⟦-ᶜ-wk-ren⟧≡ε∘env-⟨⟩-ᶜ {Γ ∷ B} {suc τ} {A} p = 
   begin
        ⟦ -ᶜ-wk-ren {Γ} (suc τ) ⟧ʳ
     ∘ᵐ fstᵐ
-  ≡⟨ ∘ᵐ-congˡ (⟦-ᶜ-wk-ren⟧ʳ≡ε∘env-⟨⟩-ᶜ {Γ} {suc τ} p) ⟩
+  ≡⟨ ∘ᵐ-congˡ (⟦-ᶜ-wk-ren⟧≡ε∘env-⟨⟩-ᶜ {Γ} {suc τ} p) ⟩
        (ε-⟨⟩ ∘ᵐ env-⟨⟩-ᶜ {Γ} (suc τ) p)
     ∘ᵐ fstᵐ
   ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
@@ -52,7 +52,7 @@ open Model Mod
     ∘ᵐ env-⟨⟩-ᶜ {Γ} (suc τ) p
     ∘ᵐ fstᵐ
   ∎
-⟦-ᶜ-wk-ren⟧ʳ≡ε∘env-⟨⟩-ᶜ {Γ ⟨ τ' ⟩} {suc τ} {A} p with suc τ ≤? τ'
+⟦-ᶜ-wk-ren⟧≡ε∘env-⟨⟩-ᶜ {Γ ⟨ τ' ⟩} {suc τ} {A} p with suc τ ≤? τ'
 ... | yes q = 
   begin
     ⟨⟩-≤ (m∸n≤m τ' (suc τ))
@@ -83,7 +83,7 @@ open Model Mod
        ⟦ -ᶜ-wk-ren (suc τ ∸ τ') ⟧ʳ
     ∘ᵐ η⁻¹
     ∘ᵐ ⟨⟩-≤ z≤n
-  ≡⟨ ∘ᵐ-congˡ (⟦-ᶜ-wk-ren⟧ʳ≡ε∘env-⟨⟩-ᶜ _) ⟩
+  ≡⟨ ∘ᵐ-congˡ (⟦-ᶜ-wk-ren⟧≡ε∘env-⟨⟩-ᶜ _) ⟩
        (   (η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n)
         ∘ᵐ env-⟨⟩-ᶜ (suc τ ∸ τ') (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m (ctx-time Γ) τ'))))
     ∘ᵐ η⁻¹

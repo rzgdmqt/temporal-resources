@@ -122,7 +122,16 @@ record Monad : Set₁ where
                              → strᵀ {A} {B} {τ + τ'} ∘ᵐ mapˣᵐ idᵐ (delayᵀ τ {τ'})
                              ≡ delayᵀ τ ∘ᵐ [ τ ]ᶠ (strᵀ {A} {B} {τ'}) ∘ᵐ []-monoidal ∘ᵐ mapˣᵐ (δ {A} {τ} {τ'}) idᵐ
 
-    -- strᵀ-opᵀ-algebraicity : (TODO)
+    strᵀ-opᵀ-algebraicity : ∀ {A B τ} → (op : Op)
+                          → strᵀ {A} {B} ∘ᵐ mapˣᵐ idᵐ (opᵀ op)
+                          ≡    opᵀ op
+                            ∘ᵐ mapˣᵐ
+                                 idᵐ
+                                 (   [ op-time op ]ᶠ (   map⇒ᵐ idᵐ (strᵀ {A} {B} {τ})
+                                                      ∘ᵐ curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ)
+                                  ∘ᵐ []-monoidal
+                                  ∘ᵐ mapˣᵐ (δ {A} {op-time op} {τ}) idᵐ)
+                            ∘ᵐ ⟨ fstᵐ ∘ᵐ sndᵐ , ⟨ fstᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
 
     -- EFFECT HANDLING
 

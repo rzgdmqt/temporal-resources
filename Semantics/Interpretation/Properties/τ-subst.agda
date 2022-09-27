@@ -16,13 +16,13 @@ open import Util.Equality
 
 open Model Mod
 
-τ-subst≡τ-substᵀ∘M : ∀ {Γ A τ τ'}
+⟦τ-subst⟧≡τ-substᵀ : ∀ {Γ A τ τ'}
                    → (p : τ ≡ τ')
                    → (M : Γ ⊢C⦂ A ‼ τ)
                    → ⟦ τ-subst p M ⟧ᶜᵗ
                    ≡ τ-substᵀ p ∘ᵐ ⟦ M ⟧ᶜᵗ
 
-τ-subst≡τ-substᵀ∘M refl M = 
+⟦τ-subst⟧≡τ-substᵀ refl M = 
   begin
     ⟦ M ⟧ᶜᵗ
   ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
