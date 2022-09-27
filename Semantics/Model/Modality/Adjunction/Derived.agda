@@ -127,13 +127,65 @@ open import Semantics.Model.Category.Derived Cat
 
 -- monoidality witness's interaction with projections
 
-postulate
+[]-monoidal-fstᵐ : ∀ {A B τ}
+                 → [ τ ]ᶠ fstᵐ ∘ᵐ []-monoidal {A} {B} ≡ fstᵐ
 
-  []-monoidal-fstᵐ : ∀ {A B τ}
-                   → [ τ ]ᶠ fstᵐ ∘ᵐ []-monoidal {A} {B} ≡ fstᵐ
+[]-monoidal-fstᵐ {A} {B} {τ} = 
+  begin
+       [ τ ]ᶠ fstᵐ
+    ∘ᵐ [ τ ]ᶠ ⟨ ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ ⟩ᵐ
+    ∘ᵐ η⊣
+  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym ([]-∘ᵐ _ _))) ⟩
+       [ τ ]ᶠ (   fstᵐ
+               ∘ᵐ ⟨ ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ ⟩ᵐ)
+    ∘ᵐ η⊣
+  ≡⟨ ∘ᵐ-congˡ (cong [ τ ]ᶠ (⟨⟩ᵐ-fstᵐ _ _)) ⟩
+       [ τ ]ᶠ (ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ)
+    ∘ᵐ η⊣
+  ≡⟨ trans (∘ᵐ-congˡ ([]-∘ᵐ _ _)) (∘ᵐ-assoc _ _ _) ⟩
+       [ τ ]ᶠ ε⊣
+    ∘ᵐ [ τ ]ᶠ (⟨ τ ⟩ᶠ fstᵐ)
+    ∘ᵐ η⊣
+  ≡⟨ ∘ᵐ-congʳ (η⊣-nat _) ⟩
+       [ τ ]ᶠ ε⊣
+    ∘ᵐ η⊣
+    ∘ᵐ fstᵐ
+  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ Gε⊣∘η⊣≡id) ⟩
+       idᵐ
+    ∘ᵐ fstᵐ
+  ≡⟨ ∘ᵐ-identityˡ _ ⟩
+    fstᵐ
+  ∎
 
-  []-monoidal-sndᵐ : ∀ {A B τ}
-                   → [ τ ]ᶠ sndᵐ ∘ᵐ []-monoidal {A} {B} ≡ sndᵐ
+[]-monoidal-sndᵐ : ∀ {A B τ}
+                 → [ τ ]ᶠ sndᵐ ∘ᵐ []-monoidal {A} {B} ≡ sndᵐ
+
+[]-monoidal-sndᵐ {A} {B} {τ} = 
+  begin
+       [ τ ]ᶠ sndᵐ
+    ∘ᵐ [ τ ]ᶠ ⟨ ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ ⟩ᵐ
+    ∘ᵐ η⊣
+  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym ([]-∘ᵐ _ _))) ⟩
+       [ τ ]ᶠ (   sndᵐ
+               ∘ᵐ ⟨ ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ ⟩ᵐ)
+    ∘ᵐ η⊣
+  ≡⟨ ∘ᵐ-congˡ (cong [ τ ]ᶠ (⟨⟩ᵐ-sndᵐ _ _)) ⟩
+       [ τ ]ᶠ (ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ sndᵐ)
+    ∘ᵐ η⊣
+  ≡⟨ trans (∘ᵐ-congˡ ([]-∘ᵐ _ _)) (∘ᵐ-assoc _ _ _) ⟩
+       [ τ ]ᶠ ε⊣
+    ∘ᵐ [ τ ]ᶠ (⟨ τ ⟩ᶠ sndᵐ)
+    ∘ᵐ η⊣
+  ≡⟨ ∘ᵐ-congʳ (η⊣-nat _) ⟩
+       [ τ ]ᶠ ε⊣
+    ∘ᵐ η⊣
+    ∘ᵐ sndᵐ
+  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ Gε⊣∘η⊣≡id) ⟩
+       idᵐ
+    ∘ᵐ sndᵐ
+  ≡⟨ ∘ᵐ-identityˡ _ ⟩
+    sndᵐ
+  ∎
 
 -- monoidality witness's interaction with pairing
 

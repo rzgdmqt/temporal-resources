@@ -46,7 +46,11 @@ open Model Mod
          ∘ᵐ Tᶠ ⟦ N ⟧ᶜᵗ
          ∘ᵐ strᵀ
          ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans
+      (cong₂ ⟨_,_⟩ᵐ
+        (sym (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))
+          (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ []-δ⁻¹∘δ≡id) (∘ᵐ-identityˡ _))))))
+        (sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))))) (⟨⟩ᵐ-∘ᵐ _ _ _)))) ⟩
        μᵀ
     ∘ᵐ Tᶠ ⟦ P ⟧ᶜᵗ
     ∘ᵐ strᵀ
@@ -115,7 +119,12 @@ open Model Mod
                 Tᶠ ⟦ N ⟧ᶜᵗ
              ∘ᵐ strᵀ
              ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
-      ≡⟨ {!!} ⟩ 
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (trans (cong₂ ⟨_,_⟩ᵐ
+          (sym (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))
+            (∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)) (∘ᵐ-identityˡ _)))))))
+          (sym (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _)) (∘ᵐ-congʳ
+            (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))))))))
+          (⟨⟩ᵐ-∘ᵐ _ _ _)) (∘ᵐ-congʳ (⟨⟩ᵐ-∘ᵐ _ _ _)))) ⟩ 
            Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ))
         ∘ᵐ strᵀ
         ∘ᵐ mapˣᵐ ([ τ ]ᶠ η⊣) (Tᶠ ⟦ N ⟧ᶜᵗ)
@@ -136,7 +145,24 @@ open Model Mod
         ∘ᵐ mapˣᵐ []-monoidal idᵐ
         ∘ᵐ ×ᵐ-assoc
         ∘ᵐ ⟨ η⊣ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congʳ (sym (∘ᵐ-assoc _ _ _)) ⟩ 
+           Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ))
+        ∘ᵐ (   Tᶠ (mapˣᵐ η⊣ ⟦ N ⟧ᶜᵗ)
+            ∘ᵐ Tᶠ ×ᵐ-assoc⁻¹)
+        ∘ᵐ strᵀ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc
+        ∘ᵐ ⟨ η⊣ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
       ≡⟨ {!!} ⟩ 
+           Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ))
+        ∘ᵐ (   Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨ τ' ⟩ᶠ fstᵐ)) (Tᶠ idᵐ))
+            ∘ᵐ Tᶠ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ
+            ∘ᵐ Tᶠ (mapˣᵐ fstᵐ idᵐ))
+        ∘ᵐ strᵀ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc
+        ∘ᵐ ⟨ η⊣ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+      ≡⟨ ∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))) ⟩ 
            Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ))
         ∘ᵐ Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨ τ' ⟩ᶠ fstᵐ)) (Tᶠ idᵐ))
         ∘ᵐ Tᶠ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ
