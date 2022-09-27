@@ -27,6 +27,8 @@ open import Semantics.Soundness.;-return Mod
 open import Semantics.Soundness.·-lam Mod
 open import Semantics.Soundness.absurd-eta Mod
 
+open import Semantics.Soundness.delay-; Mod
+
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
@@ -290,7 +292,8 @@ mutual
   C-soundness {Γ} {_}
     {.(delay _ M ; N)}
     {.(τ-subst (sym (+-assoc τ τ' τ'')) (delay _ (M ; C-rename (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N)))}
-    (delay-; {A} {B} {τ} {τ'} {τ''} M N) = {!!}
+    (delay-; {A} {B} {τ} {τ'} {τ''} M N) =
+      delay-;-sound M N
   C-soundness {Γ} {_}
     {.(handle delay _ M `with H `in N)}
     {.(τ-subst (sym (+-assoc τ τ' τ'')) (delay _

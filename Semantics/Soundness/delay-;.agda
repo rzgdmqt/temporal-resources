@@ -41,7 +41,10 @@ delay-;-sound {Γ} {A} {B} {τ} {τ'} {τ''} M N =
     ∘ᵐ Tᶠ ⟦ N ⟧ᶜᵗ
     ∘ᵐ strᵀ
     ∘ᵐ ⟨ η⊣ , delayᵀ τ ∘ᵐ [ τ ]ᶠ ⟦ M ⟧ᶜᵗ ∘ᵐ η⊣ ⟩ᵐ
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans
+      (cong₂ ⟨_,_⟩ᵐ
+        (sym (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)) (∘ᵐ-identityˡ _))))
+        (sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))))) (⟨⟩ᵐ-∘ᵐ _ _ _)))) ⟩
        μᵀ
     ∘ᵐ Tᶠ ⟦ N ⟧ᶜᵗ
     ∘ᵐ strᵀ
@@ -89,12 +92,19 @@ delay-;-sound {Γ} {A} {B} {τ} {τ'} {τ''} M N =
                  ∘ᵐ δ⁻¹
                  ∘ᵐ [ τ ]ᶠ η⊣
                  ∘ᵐ η⊣
-               ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ {!!}) (∘ᵐ-assoc _ _ _)) ⟩
+               ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ ([]-δ⁻¹-nat _)) (∘ᵐ-assoc _ _ _)) ⟩
                     δ⁻¹
                  ∘ᵐ [ τ ]ᶠ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ))
                  ∘ᵐ [ τ ]ᶠ η⊣
                  ∘ᵐ η⊣
-               ≡⟨ {!!} ⟩
+               ≡⟨ ∘ᵐ-congʳ GGμ∘Gη⊣∘η⊣≡δ∘η⊣ ⟩
+                    δ⁻¹
+                 ∘ᵐ δ
+                 ∘ᵐ η⊣
+               ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ []-δ⁻¹∘δ≡id) ⟩
+                    idᵐ
+                 ∘ᵐ η⊣
+               ≡⟨ ∘ᵐ-identityˡ _ ⟩
                  η⊣
                ∎)) ⟩
             ⟨    [ τ + τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)
