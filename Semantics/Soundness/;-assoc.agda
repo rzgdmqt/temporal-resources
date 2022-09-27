@@ -46,6 +46,132 @@ open Model Mod
          ∘ᵐ Tᶠ ⟦ N ⟧ᶜᵗ
          ∘ᵐ strᵀ
          ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+  ≡⟨ {!!} ⟩
+       μᵀ
+    ∘ᵐ Tᶠ ⟦ P ⟧ᶜᵗ
+    ∘ᵐ Tᶠ (mapˣᵐ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ) idᵐ)
+    ∘ᵐ Tᶠ (mapˣᵐ (⟨ τ' ⟩ᶠ fstᵐ) idᵐ)
+    ∘ᵐ μᵀ
+    ∘ᵐ Tᶠ strᵀ
+    ∘ᵐ Tᶠ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ
+    ∘ᵐ strᵀ
+    ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
+  ≡⟨ {!!} ⟩ -- naturality of μ 2x
+       μᵀ
+    ∘ᵐ Tᶠ ⟦ P ⟧ᶜᵗ
+    ∘ᵐ μᵀ
+    ∘ᵐ Tᶠ (Tᶠ (mapˣᵐ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ) idᵐ))
+    ∘ᵐ Tᶠ (Tᶠ (mapˣᵐ (⟨ τ' ⟩ᶠ fstᵐ) idᵐ))
+    ∘ᵐ Tᶠ strᵀ
+    ∘ᵐ Tᶠ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ
+    ∘ᵐ strᵀ
+    ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym (μᵀ-nat _))) (∘ᵐ-assoc _ _ _))) ⟩
+       μᵀ
+    ∘ᵐ μᵀ
+    ∘ᵐ Tᶠ (Tᶠ ⟦ P ⟧ᶜᵗ)
+    ∘ᵐ Tᶠ (Tᶠ (mapˣᵐ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ) idᵐ))
+    ∘ᵐ Tᶠ (Tᶠ (mapˣᵐ (⟨ τ' ⟩ᶠ fstᵐ) idᵐ))
+    ∘ᵐ Tᶠ strᵀ
+    ∘ᵐ Tᶠ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ
+    ∘ᵐ strᵀ
+    ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym
+      (trans
+        (∘ᵐ-congˡ
+          (trans
+            (cong Tᶠ (trans (T-∘ᵐ _ _) (∘ᵐ-congʳ (T-∘ᵐ _ _))))
+            (trans (T-∘ᵐ _ _) (∘ᵐ-congʳ (T-∘ᵐ _ _)))))
+        (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))))) ⟩
+       μᵀ
+    ∘ᵐ μᵀ
+    ∘ᵐ Tᶠ (Tᶠ (   ⟦ P ⟧ᶜᵗ
+                  ∘ᵐ mapˣᵐ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ) idᵐ
+                  ∘ᵐ mapˣᵐ (⟨ τ' ⟩ᶠ fstᵐ) idᵐ))
+    ∘ᵐ Tᶠ strᵀ
+    ∘ᵐ Tᶠ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ
+    ∘ᵐ strᵀ
+    ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
+  ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
+       idᵐ
+    ∘ᵐ μᵀ
+    ∘ᵐ μᵀ
+    ∘ᵐ Tᶠ (Tᶠ (   ⟦ P ⟧ᶜᵗ
+                  ∘ᵐ mapˣᵐ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ) idᵐ
+                  ∘ᵐ mapˣᵐ (⟨ τ' ⟩ᶠ fstᵐ) idᵐ))
+    ∘ᵐ Tᶠ strᵀ
+    ∘ᵐ Tᶠ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ
+    ∘ᵐ strᵀ
+    ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
+  ≡⟨ sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (trans (τ-substᵀ-trans _ _)
+      (trans (cong τ-substᵀ uip) τ-substᵀ-refl)))) ⟩
+       τ-substᵀ (sym (+-assoc τ τ' τ''))
+    ∘ᵐ τ-substᵀ (+-assoc τ τ' τ'')
+    ∘ᵐ μᵀ
+    ∘ᵐ μᵀ
+    ∘ᵐ Tᶠ (Tᶠ (   ⟦ P ⟧ᶜᵗ
+                  ∘ᵐ mapˣᵐ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ) idᵐ
+                  ∘ᵐ mapˣᵐ (⟨ τ' ⟩ᶠ fstᵐ) idᵐ))
+    ∘ᵐ Tᶠ strᵀ
+    ∘ᵐ Tᶠ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ
+    ∘ᵐ strᵀ
+    ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (sym (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ T-μ∘μ≡μ∘Tμ)
+      (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))))) ⟩
+       τ-substᵀ (sym (+-assoc τ τ' τ''))
+    ∘ᵐ μᵀ
+    ∘ᵐ Tᶠ μᵀ
+    ∘ᵐ Tᶠ (Tᶠ (   ⟦ P ⟧ᶜᵗ
+                  ∘ᵐ mapˣᵐ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ) idᵐ
+                  ∘ᵐ mapˣᵐ (⟨ τ' ⟩ᶠ fstᵐ) idᵐ))
+    ∘ᵐ Tᶠ strᵀ
+    ∘ᵐ Tᶠ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ
+    ∘ᵐ strᵀ
+    ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym
+      (trans
+        (∘ᵐ-congˡ (trans (T-∘ᵐ _ _) (∘ᵐ-congʳ (trans (T-∘ᵐ _ _) (∘ᵐ-congʳ (T-∘ᵐ _ _))))))
+        (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))))))) ⟩
+       τ-substᵀ (sym (+-assoc τ τ' τ''))
+    ∘ᵐ μᵀ
+    ∘ᵐ Tᶠ (   μᵀ
+           ∘ᵐ Tᶠ (   ⟦ P ⟧ᶜᵗ
+                  ∘ᵐ mapˣᵐ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ) idᵐ
+                  ∘ᵐ mapˣᵐ (⟨ τ' ⟩ᶠ fstᵐ) idᵐ)
+           ∘ᵐ strᵀ
+           ∘ᵐ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ)
+    ∘ᵐ strᵀ
+    ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congˡ (cong Tᶠ (∘ᵐ-congʳ (∘ᵐ-congˡ
+      (cong Tᶠ (sym (C-rename≡∘ᵐ (cong-∷-ren (cong-⟨⟩-ren wk-ren) ∘ʳ cong-∷-ren ⟨⟩-μ-ren) P)))))))) ⟩
+       τ-substᵀ (sym (+-assoc τ τ' τ''))
+    ∘ᵐ μᵀ
+    ∘ᵐ Tᶠ (   μᵀ
+           ∘ᵐ Tᶠ ⟦ C-rename (cong-∷-ren (cong-⟨⟩-ren wk-ren) ∘ʳ cong-∷-ren ⟨⟩-μ-ren) P ⟧ᶜᵗ
+           ∘ᵐ strᵀ
+           ∘ᵐ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ)
+      ∘ᵐ strᵀ
+      ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
+  ≡⟨⟩
+       τ-substᵀ (sym (+-assoc τ τ' τ''))
+    ∘ᵐ ⟦ M ; (N ; C-rename (cong-∷-ren (cong-⟨⟩-ren wk-ren) ∘ʳ cong-∷-ren ⟨⟩-μ-ren) P) ⟧ᶜᵗ
+  ≡⟨ sym (⟦τ-subst⟧≡τ-substᵀ (sym (+-assoc τ τ' τ'')) _) ⟩
+      ⟦ τ-subst (sym (+-assoc τ τ' τ'')) (M ;
+          (N ; C-rename (cong-∷-ren (cong-⟨⟩-ren wk-ren) ∘ʳ cong-∷-ren ⟨⟩-μ-ren) P)) ⟧ᶜᵗ
+  ∎
+
+
+{-
+;-assoc-sound {Γ} {A} {B} {C} {τ} {τ'} {τ''} M N P = 
+  begin
+       μᵀ
+    ∘ᵐ Tᶠ ⟦ P ⟧ᶜᵗ
+    ∘ᵐ strᵀ
+    ∘ᵐ ⟨ η⊣ ,
+            μᵀ
+         ∘ᵐ Tᶠ ⟦ N ⟧ᶜᵗ
+         ∘ᵐ strᵀ
+         ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
   ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans
       (cong₂ ⟨_,_⟩ᵐ
         (sym (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))
@@ -340,3 +466,4 @@ open Model Mod
       ⟦ τ-subst (sym (+-assoc τ τ' τ'')) (M ;
           (N ; C-rename (cong-∷-ren (cong-⟨⟩-ren wk-ren) ∘ʳ cong-∷-ren ⟨⟩-μ-ren) P)) ⟧ᶜᵗ
   ∎
+-}
