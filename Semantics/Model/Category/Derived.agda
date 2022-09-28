@@ -345,22 +345,116 @@ curryᵐ-mapˣᵐ f g h =
     ∘ᵐ g
   ∎
 
-postulate
+curryᵐ-map⇒ᵐ : ∀ {A B C D}
+             → (f : A ×ᵐ B →ᵐ C) → (g : C →ᵐ D)
+             → curryᵐ (g ∘ᵐ f) ≡ map⇒ᵐ idᵐ g ∘ᵐ curryᵐ f
+curryᵐ-map⇒ᵐ {A} {B} {C} {D} f g = 
+  begin
+    curryᵐ (g ∘ᵐ f)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (sym (curryᵐ-uncurryᵐ-iso _))) ⟩
+    curryᵐ (g ∘ᵐ uncurryᵐ (curryᵐ f))
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (cong uncurryᵐ (sym (∘ᵐ-identityˡ _)))) ⟩
+    curryᵐ (g ∘ᵐ uncurryᵐ (idᵐ ∘ᵐ (curryᵐ f)))
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (uncurryᵐ-nat _ _)) ⟩
+    curryᵐ (g ∘ᵐ uncurryᵐ idᵐ ∘ᵐ mapˣᵐ (curryᵐ f) idᵐ)
+  ≡⟨ cong curryᵐ (sym (∘ᵐ-assoc _ _ _)) ⟩
+    curryᵐ ((g ∘ᵐ uncurryᵐ idᵐ) ∘ᵐ mapˣᵐ (curryᵐ f) idᵐ)
+  ≡⟨ curryᵐ-nat _ _ ⟩
+       curryᵐ (g ∘ᵐ uncurryᵐ idᵐ)
+    ∘ᵐ curryᵐ f
+  ≡⟨ ∘ᵐ-congˡ (cong curryᵐ (∘ᵐ-congʳ (cong uncurryᵐ (sym (∘ᵐ-identityˡ _))))) ⟩
+       curryᵐ (g ∘ᵐ uncurryᵐ (idᵐ ∘ᵐ idᵐ))
+    ∘ᵐ curryᵐ f
+  ≡⟨ ∘ᵐ-congˡ (cong curryᵐ (∘ᵐ-congʳ (uncurryᵐ-nat _ _))) ⟩
+       curryᵐ (g ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)
+    ∘ᵐ curryᵐ f
+  ∎
 
-  curryᵐ-map⇒ᵐ : ∀ {A B C D}
-               → (f : A ×ᵐ B →ᵐ C) → (g : C →ᵐ D)
-               → curryᵐ (g ∘ᵐ f) ≡ map⇒ᵐ idᵐ g ∘ᵐ curryᵐ f
+map⇒ᵐ-∘ᵐ : ∀ {A B C D E F}
+         → (f : C →ᵐ B) → (g : B →ᵐ A)
+         → (h : D →ᵐ E) → (i : E →ᵐ F)
+         → map⇒ᵐ (g ∘ᵐ f) (i ∘ᵐ h)
+         ≡ map⇒ᵐ f i ∘ᵐ map⇒ᵐ g h
 
-  map⇒ᵐ-∘ᵐ : ∀ {A B C D E F}
-           → (f : C →ᵐ B)
-           → (g : B →ᵐ A)
-           → (h : D →ᵐ E)
-           → (i : E →ᵐ F)
-           → map⇒ᵐ (g ∘ᵐ f) (i ∘ᵐ h)
-           ≡ map⇒ᵐ f i ∘ᵐ map⇒ᵐ g h
+map⇒ᵐ-∘ᵐ {A} {B} {C} {D} {E} {F} f g h i = 
+  begin
+    curryᵐ (   (i ∘ᵐ h)
+            ∘ᵐ uncurryᵐ idᵐ
+            ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , (g ∘ᵐ f) ∘ᵐ sndᵐ ⟩ᵐ)
+  ≡⟨ cong curryᵐ (∘ᵐ-assoc _ _ _) ⟩
+    curryᵐ (   i
+            ∘ᵐ h
+            ∘ᵐ uncurryᵐ idᵐ
+            ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , (g ∘ᵐ f) ∘ᵐ sndᵐ ⟩ᵐ)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans
+       (cong₂ mapˣᵐ (sym (∘ᵐ-identityˡ _)) refl) (mapˣᵐ-∘ᵐ _ _ _ _))))) ⟩
+    curryᵐ (   i
+            ∘ᵐ h
+            ∘ᵐ uncurryᵐ idᵐ
+            ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ
+            ∘ᵐ mapˣᵐ idᵐ f)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))))) ⟩
+    curryᵐ (   i
+            ∘ᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ)
+            ∘ᵐ mapˣᵐ idᵐ f)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (sym (∘ᵐ-congˡ (curryᵐ-uncurryᵐ-iso _)))) ⟩
+    curryᵐ (   i
+            ∘ᵐ uncurryᵐ (curryᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ))
+            ∘ᵐ mapˣᵐ idᵐ f)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (∘ᵐ-congˡ (cong uncurryᵐ (sym (∘ᵐ-identityˡ _))))) ⟩
+    curryᵐ (   i
+            ∘ᵐ uncurryᵐ (idᵐ ∘ᵐ (curryᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ)))
+            ∘ᵐ mapˣᵐ idᵐ f)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (∘ᵐ-congˡ (uncurryᵐ-nat _ _))) ⟩
+    curryᵐ (   i
+            ∘ᵐ (   uncurryᵐ idᵐ
+                ∘ᵐ mapˣᵐ (curryᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ)) idᵐ)
+            ∘ᵐ mapˣᵐ idᵐ f)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)) ⟩
+    curryᵐ (   i
+            ∘ᵐ uncurryᵐ idᵐ
+            ∘ᵐ mapˣᵐ (curryᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ)) idᵐ
+            ∘ᵐ mapˣᵐ idᵐ f)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (∘ᵐ-congʳ (sym (trans
+       (cong₂ mapˣᵐ (sym (∘ᵐ-identityʳ _)) (sym (∘ᵐ-identityˡ _))) (mapˣᵐ-∘ᵐ _ _ _ _))))) ⟩
+    curryᵐ (   i
+            ∘ᵐ uncurryᵐ idᵐ
+            ∘ᵐ ⟨ curryᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ fstᵐ ,
+                 f ∘ᵐ sndᵐ ⟩ᵐ)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ refl (∘ᵐ-congʳ (sym (∘ᵐ-identityˡ _)))))) ⟩
+    curryᵐ (   i ∘ᵐ uncurryᵐ idᵐ
+            ∘ᵐ ⟨ curryᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ fstᵐ ,
+                 f ∘ᵐ idᵐ ∘ᵐ sndᵐ ⟩ᵐ)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (∘ᵐ-congʳ (sym (cong₂ ⟨_,_⟩ᵐ
+      (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)) (∘ᵐ-identityˡ _)))
+      (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))))))) ⟩
+    curryᵐ (   i ∘ᵐ uncurryᵐ idᵐ
+            ∘ᵐ ⟨    (idᵐ ∘ᵐ fstᵐ)
+                 ∘ᵐ mapˣᵐ (curryᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ)) idᵐ ,
+                    (f ∘ᵐ sndᵐ)
+                 ∘ᵐ mapˣᵐ (curryᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ)) idᵐ ⟩ᵐ)
+  ≡⟨ cong curryᵐ (∘ᵐ-congʳ (∘ᵐ-congʳ (⟨⟩ᵐ-∘ᵐ _ _ _))) ⟩
+    curryᵐ (   i ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , f ∘ᵐ sndᵐ ⟩ᵐ
+            ∘ᵐ mapˣᵐ (curryᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ)) idᵐ)
+  ≡⟨ cong curryᵐ (sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))) ⟩
+    curryᵐ (   (i ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , f ∘ᵐ sndᵐ ⟩ᵐ)
+            ∘ᵐ mapˣᵐ (curryᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ)) idᵐ)
+  ≡⟨ curryᵐ-nat _ _ ⟩
+       curryᵐ (i ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , f ∘ᵐ sndᵐ ⟩ᵐ)
+    ∘ᵐ curryᵐ (h ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ)
+  ∎
 
-  map⇒ᵐ-∘ᵐʳ : ∀ {A B C D}
-            → (f : B →ᵐ C)
-            → (g : C →ᵐ D)
-            → map⇒ᵐ (idᵐ {A}) (g ∘ᵐ f)
-            ≡ map⇒ᵐ idᵐ g ∘ᵐ map⇒ᵐ idᵐ f
+map⇒ᵐ-∘ᵐʳ : ∀ {A B C D}
+          → (f : B →ᵐ C)
+          → (g : C →ᵐ D)
+          → map⇒ᵐ (idᵐ {A}) (g ∘ᵐ f)
+          ≡ map⇒ᵐ idᵐ g ∘ᵐ map⇒ᵐ idᵐ f
+
+map⇒ᵐ-∘ᵐʳ {A} {B} {C} {D} f g = 
+  begin
+    map⇒ᵐ idᵐ (g ∘ᵐ f)
+  ≡⟨ cong₂ map⇒ᵐ (sym (∘ᵐ-identityˡ _)) refl ⟩
+    map⇒ᵐ (idᵐ ∘ᵐ idᵐ) (g ∘ᵐ f)
+  ≡⟨ map⇒ᵐ-∘ᵐ _ _ _ _ ⟩
+    map⇒ᵐ idᵐ g ∘ᵐ map⇒ᵐ idᵐ f
+  ∎
