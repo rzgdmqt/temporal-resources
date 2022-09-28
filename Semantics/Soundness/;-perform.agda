@@ -296,7 +296,27 @@ open Model Mod
             ∘ᵐ mapˣᵐ η⊣ idᵐ
             ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ))
             ∘ᵐ ⟨ idᵐ , η⊣ ⟩ᵐ
+          ≡⟨ ∘ᵐ-congʳ (sym (trans (∘ᵐ-assoc _ _ _) {!!})) ⟩
+               [ op-time op ]ᶠ (map⇒ᵐ idᵐ strᵀ)
+            ∘ᵐ (   [ op-time op ]ᶠ (curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ)
+                ∘ᵐ [ op-time op ]ᶠ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) idᵐ)
+                ∘ᵐ [ op-time op ]ᶠ (mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)))
+            ∘ᵐ [ op-time op ]ᶠ (mapˣᵐ η⊣ idᵐ)
+            ∘ᵐ []-monoidal
+            ∘ᵐ mapˣᵐ η⊣ idᵐ
+            ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ))
+            ∘ᵐ ⟨ idᵐ , η⊣ ⟩ᵐ
           ≡⟨ {!!} ⟩ -- (A)
+               [ op-time op ]ᶠ (map⇒ᵐ idᵐ strᵀ)
+            ∘ᵐ (   [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)
+                ∘ᵐ [ op-time op ]ᶠ (map⇒ᵐ idᵐ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) (Tᶠ idᵐ)))
+                ∘ᵐ [ op-time op ]ᶠ (curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ))
+            ∘ᵐ [ op-time op ]ᶠ (mapˣᵐ η⊣ idᵐ)
+            ∘ᵐ []-monoidal
+            ∘ᵐ mapˣᵐ η⊣ idᵐ
+            ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ))
+            ∘ᵐ ⟨ idᵐ , η⊣ ⟩ᵐ
+          ≡⟨ {!!} ⟩
                [ op-time op ]ᶠ (map⇒ᵐ idᵐ strᵀ)
             ∘ᵐ [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)
             ∘ᵐ [ op-time op ]ᶠ (map⇒ᵐ idᵐ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) (Tᶠ idᵐ)))
