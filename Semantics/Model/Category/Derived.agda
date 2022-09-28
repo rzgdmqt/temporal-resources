@@ -344,3 +344,23 @@ curryᵐ-mapˣᵐ f g h =
     ∘ᵐ curryᵐ f
     ∘ᵐ g
   ∎
+
+postulate
+
+  curryᵐ-map⇒ᵐ : ∀ {A B C D}
+               → (f : A ×ᵐ B →ᵐ C) → (g : C →ᵐ D)
+               → curryᵐ (g ∘ᵐ f) ≡ map⇒ᵐ idᵐ g ∘ᵐ curryᵐ f
+
+  map⇒ᵐ-∘ᵐ : ∀ {A B C D E F}
+           → (f : C →ᵐ B)
+           → (g : B →ᵐ A)
+           → (h : D →ᵐ E)
+           → (i : E →ᵐ F)
+           → map⇒ᵐ (g ∘ᵐ f) (i ∘ᵐ h)
+           ≡ map⇒ᵐ f i ∘ᵐ map⇒ᵐ g h
+
+  map⇒ᵐ-∘ᵐʳ : ∀ {A B C D}
+            → (f : B →ᵐ C)
+            → (g : C →ᵐ D)
+            → map⇒ᵐ (idᵐ {A}) (g ∘ᵐ f)
+            ≡ map⇒ᵐ idᵐ g ∘ᵐ map⇒ᵐ idᵐ f
