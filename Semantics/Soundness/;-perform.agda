@@ -375,9 +375,12 @@ open Model Mod
                     (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ mapˣᵐ sndᵐ idᵐ
                   ≡⟨ ∘ᵐ-congˡ (∘ᵐ-identityˡ _) ⟩
                     (uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ mapˣᵐ sndᵐ idᵐ
-                  ≡⟨ {!∘ᵐ-assoc _ _ _!} ⟩
+                  ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
                     uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ mapˣᵐ sndᵐ idᵐ
-                  ≡⟨ {!!} ⟩
+                  ≡⟨ ∘ᵐ-congʳ (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _)) (trans (cong₂ mapˣᵐ
+                      (trans (∘ᵐ-identityˡ _) (sym (∘ᵐ-identityʳ _))) (trans (∘ᵐ-identityʳ _) (sym (∘ᵐ-identityˡ _)))) (mapˣᵐ-∘ᵐ _ _ _ _))) ⟩
+                    uncurryᵐ idᵐ ∘ᵐ mapˣᵐ sndᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ
+                  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (trans (sym (uncurryᵐ-nat _ _)) (cong uncurryᵐ (∘ᵐ-identityˡ _)))) ⟩
                     uncurryᵐ sndᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ
                   ∎))) ⟩
                 [ op-time op ]ᶠ (curryᵐ ⟨   [ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)
