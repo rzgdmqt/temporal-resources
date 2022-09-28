@@ -407,7 +407,33 @@ open Model Mod
                    [ op-time op ]ᶠ (   curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ
                                     ∘ᵐ ⟨ η⊣ , curryᵐ ⟦ M ⟧ᶜᵗ ⟩ᵐ)
                 ∘ᵐ η⊣
-              ≡⟨ ∘ᵐ-congˡ (cong [ op-time op ]ᶠ {!!}) ⟩
+              ≡⟨ ∘ᵐ-congˡ (cong [ op-time op ]ᶠ (
+                  begin
+                       curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ
+                    ∘ᵐ ⟨ η⊣ , curryᵐ ⟦ M ⟧ᶜᵗ ⟩ᵐ
+                  ≡⟨ sym (curryᵐ-nat _ _) ⟩
+                     curryᵐ (   ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ
+                             ∘ᵐ ⟨ ⟨ η⊣ , curryᵐ ⟦ M ⟧ᶜᵗ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)
+                  ≡⟨ cong curryᵐ (sym (⟨⟩ᵐ-∘ᵐ _ _ _)) ⟩
+                     curryᵐ ⟨   (fstᵐ ∘ᵐ fstᵐ)
+                             ∘ᵐ ⟨ ⟨ η⊣ , curryᵐ ⟦ M ⟧ᶜᵗ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ,
+                                uncurryᵐ sndᵐ
+                             ∘ᵐ ⟨ ⟨ η⊣ , curryᵐ ⟦ M ⟧ᶜᵗ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
+                  ≡⟨ cong curryᵐ (cong₂ ⟨_,_⟩ᵐ (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))
+                      (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (⟨⟩ᵐ-fstᵐ _ _))))) refl) ⟩
+                     curryᵐ ⟨ η⊣ ∘ᵐ fstᵐ
+                             ,
+                                uncurryᵐ sndᵐ
+                             ∘ᵐ ⟨ ⟨ η⊣ , curryᵐ ⟦ M ⟧ᶜᵗ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
+                  ≡⟨ cong curryᵐ (cong ⟨ η⊣ ∘ᵐ fstᵐ ,_⟩ᵐ (sym (uncurryᵐ-nat _ _))) ⟩
+                     curryᵐ ⟨ η⊣ ∘ᵐ fstᵐ ,
+                              uncurryᵐ (sndᵐ ∘ᵐ ⟨ η⊣ , curryᵐ ⟦ M ⟧ᶜᵗ ⟩ᵐ) ⟩ᵐ
+                  ≡⟨ cong curryᵐ (cong ⟨ η⊣ ∘ᵐ fstᵐ ,_⟩ᵐ (cong uncurryᵐ (⟨⟩ᵐ-sndᵐ _ _))) ⟩
+                     curryᵐ ⟨ η⊣ ∘ᵐ fstᵐ ,
+                              uncurryᵐ (curryᵐ ⟦ M ⟧ᶜᵗ) ⟩ᵐ
+                  ≡⟨ cong curryᵐ (cong ⟨ η⊣ ∘ᵐ fstᵐ ,_⟩ᵐ (curryᵐ-uncurryᵐ-iso _)) ⟩
+                    curryᵐ ⟨ η⊣ ∘ᵐ fstᵐ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
+                  ∎)) ⟩
                    [ op-time op ]ᶠ (curryᵐ ⟨ η⊣ ∘ᵐ fstᵐ , ⟦ M ⟧ᶜᵗ ⟩ᵐ)
                 ∘ᵐ η⊣
               ≡⟨ ∘ᵐ-congˡ (cong [ op-time op ]ᶠ (cong curryᵐ (cong ⟨_, ⟦ M ⟧ᶜᵗ ⟩ᵐ (sym (η⊣-nat _))))) ⟩
