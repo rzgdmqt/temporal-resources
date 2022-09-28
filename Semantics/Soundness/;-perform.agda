@@ -296,7 +296,7 @@ open Model Mod
             ∘ᵐ mapˣᵐ η⊣ idᵐ
             ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ))
             ∘ᵐ ⟨ idᵐ , η⊣ ⟩ᵐ
-          ≡⟨ ∘ᵐ-congʳ (sym (trans (∘ᵐ-assoc _ _ _) {!!})) ⟩
+          ≡⟨ ∘ᵐ-congʳ (sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))) ⟩
                [ op-time op ]ᶠ (map⇒ᵐ idᵐ strᵀ)
             ∘ᵐ (   [ op-time op ]ᶠ (curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ)
                 ∘ᵐ [ op-time op ]ᶠ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) idᵐ)
@@ -306,7 +306,132 @@ open Model Mod
             ∘ᵐ mapˣᵐ η⊣ idᵐ
             ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ))
             ∘ᵐ ⟨ idᵐ , η⊣ ⟩ᵐ
-          ≡⟨ {!!} ⟩ -- (A)
+          ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ
+              (begin
+                   [ op-time op ]ᶠ (curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ)
+                ∘ᵐ [ op-time op ]ᶠ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) idᵐ)
+                ∘ᵐ [ op-time op ]ᶠ (mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ))
+              ≡⟨ sym (trans ([]-∘ᵐ _ _) (∘ᵐ-congʳ ([]-∘ᵐ _ _))) ⟩
+                [ op-time op ]ᶠ (   curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ
+                                 ∘ᵐ mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) idᵐ
+                                 ∘ᵐ mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ))
+              ≡⟨ cong [ op-time op ]ᶠ (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym (curryᵐ-nat _ _)))) ⟩
+                [ op-time op ]ᶠ (   curryᵐ (   ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ
+                                            ∘ᵐ mapˣᵐ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) idᵐ) idᵐ)
+                                 ∘ᵐ mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ))
+              ≡⟨ cong [ op-time op ]ᶠ (∘ᵐ-congˡ (cong curryᵐ (sym (⟨⟩ᵐ-∘ᵐ _ _ _)))) ⟩
+                [ op-time op ]ᶠ (   curryᵐ ⟨    (fstᵐ ∘ᵐ fstᵐ)
+                                             ∘ᵐ mapˣᵐ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) idᵐ) idᵐ ,
+                                                uncurryᵐ sndᵐ
+                                             ∘ᵐ mapˣᵐ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) idᵐ) idᵐ ⟩ᵐ
+                                 ∘ᵐ mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ))
+              ≡⟨ cong [ op-time op ]ᶠ (∘ᵐ-congˡ (cong curryᵐ (cong₂ ⟨_,_⟩ᵐ
+                  (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)) (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (⟨⟩ᵐ-fstᵐ _ _)))))
+                  (sym (uncurryᵐ-nat _ _))))) ⟩
+                [ op-time op ]ᶠ (   curryᵐ ⟨ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ ,
+                                             uncurryᵐ (sndᵐ ∘ᵐ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) idᵐ)) ⟩ᵐ
+                                 ∘ᵐ mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ))
+              ≡⟨ cong [ op-time op ]ᶠ (∘ᵐ-congˡ (cong curryᵐ (cong₂ ⟨_,_⟩ᵐ refl (cong uncurryᵐ (⟨⟩ᵐ-sndᵐ _ _))))) ⟩
+                [ op-time op ]ᶠ (   curryᵐ ⟨ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ ,
+                                             uncurryᵐ (idᵐ ∘ᵐ sndᵐ) ⟩ᵐ
+                                 ∘ᵐ mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ))
+              ≡⟨ cong [ op-time op ]ᶠ (∘ᵐ-congˡ (cong curryᵐ (cong₂ ⟨_,_⟩ᵐ refl (cong uncurryᵐ (∘ᵐ-identityˡ _))))) ⟩
+                [ op-time op ]ᶠ (   curryᵐ ⟨ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ ,
+                                             uncurryᵐ sndᵐ ⟩ᵐ
+                                 ∘ᵐ mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ))
+              ≡⟨ cong [ op-time op ]ᶠ (sym (curryᵐ-nat _ _)) ⟩
+                [ op-time op ]ᶠ (curryᵐ (   ⟨ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ ,
+                                              uncurryᵐ sndᵐ ⟩ᵐ
+                                         ∘ᵐ mapˣᵐ (mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)) idᵐ))
+              ≡⟨ cong [ op-time op ]ᶠ (cong curryᵐ (sym (⟨⟩ᵐ-∘ᵐ _ _ _))) ⟩
+                [ op-time op ]ᶠ (curryᵐ ⟨    (([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ fstᵐ) ∘ᵐ fstᵐ)
+                                          ∘ᵐ mapˣᵐ (mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)) idᵐ ,
+                                             uncurryᵐ sndᵐ
+                                          ∘ᵐ mapˣᵐ (mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)) idᵐ ⟩ᵐ)
+              ≡⟨ cong [ op-time op ]ᶠ (cong curryᵐ (cong₂ ⟨_,_⟩ᵐ
+                  (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)) (trans (∘ᵐ-assoc _ _ _)
+                    (trans (sym (∘ᵐ-assoc _ _ _)) (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ
+                      (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)))))))))
+                  (sym (uncurryᵐ-nat _ _)))) ⟩
+                [ op-time op ]ᶠ (curryᵐ ⟨    (   [ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)
+                                              ∘ᵐ idᵐ
+                                              ∘ᵐ fstᵐ)
+                                          ∘ᵐ fstᵐ ,
+                                          uncurryᵐ (sndᵐ ∘ᵐ (mapˣᵐ idᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ))) ⟩ᵐ)
+              ≡⟨ cong [ op-time op ]ᶠ (cong curryᵐ (cong₂ ⟨_,_⟩ᵐ refl (cong uncurryᵐ (⟨⟩ᵐ-sndᵐ _ _)))) ⟩
+                [ op-time op ]ᶠ (curryᵐ ⟨    (   [ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)
+                                              ∘ᵐ idᵐ
+                                              ∘ᵐ fstᵐ)
+                                          ∘ᵐ fstᵐ ,
+                                          uncurryᵐ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ ∘ᵐ sndᵐ) ⟩ᵐ)
+              ≡⟨ cong [ op-time op ]ᶠ (cong curryᵐ (cong₂ ⟨_,_⟩ᵐ
+                  (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ
+                    (trans (∘ᵐ-congˡ (∘ᵐ-identityˡ _)) (∘ᵐ-congʳ (sym (∘ᵐ-identityˡ _))))))
+                  (begin
+                    uncurryᵐ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ sndᵐ)
+                  ≡⟨ cong uncurryᵐ (sym (curryᵐ-nat _ _)) ⟩
+                    uncurryᵐ (curryᵐ ((idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ mapˣᵐ sndᵐ idᵐ))
+                  ≡⟨ curryᵐ-uncurryᵐ-iso _ ⟩
+                    (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ mapˣᵐ sndᵐ idᵐ
+                  ≡⟨ ∘ᵐ-congˡ (∘ᵐ-identityˡ _) ⟩
+                    (uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ) ∘ᵐ mapˣᵐ sndᵐ idᵐ
+                  ≡⟨ {!∘ᵐ-assoc _ _ _!} ⟩
+                    uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ mapˣᵐ sndᵐ idᵐ
+                  ≡⟨ {!!} ⟩
+                    uncurryᵐ sndᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ
+                  ∎))) ⟩
+                [ op-time op ]ᶠ (curryᵐ ⟨   [ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)
+                                         ∘ᵐ fstᵐ ∘ᵐ idᵐ ∘ᵐ fstᵐ ,
+                                            uncurryᵐ sndᵐ
+                                         ∘ᵐ mapˣᵐ idᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) ⟩ᵐ)
+              ≡⟨ cong [ op-time op ]ᶠ (cong curryᵐ (cong₂ ⟨_,_⟩ᵐ (sym
+                  (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)))))) refl)) ⟩
+                [ op-time op ]ᶠ (curryᵐ ⟨   (   [ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)
+                                             ∘ᵐ fstᵐ
+                                             ∘ᵐ fstᵐ)
+                                         ∘ᵐ mapˣᵐ idᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) ,
+                                            uncurryᵐ sndᵐ
+                                         ∘ᵐ mapˣᵐ idᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) ⟩ᵐ)
+              ≡⟨ cong [ op-time op ]ᶠ (cong curryᵐ (cong₂ ⟨_,_⟩ᵐ (∘ᵐ-congˡ (sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))))) refl)) ⟩
+                [ op-time op ]ᶠ (curryᵐ ⟨   (   ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ fstᵐ)
+                                             ∘ᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ)
+                                         ∘ᵐ mapˣᵐ idᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) ,
+                                            uncurryᵐ sndᵐ
+                                         ∘ᵐ mapˣᵐ idᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) ⟩ᵐ)
+              ≡⟨ cong [ op-time op ]ᶠ (cong curryᵐ (⟨⟩ᵐ-∘ᵐ _ _ _)) ⟩
+                [ op-time op ]ᶠ (curryᵐ (   ⟨    ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ fstᵐ)
+                                              ∘ᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ ,
+                                                 uncurryᵐ sndᵐ ⟩ᵐ
+                                         ∘ᵐ mapˣᵐ idᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op))))
+              ≡⟨ cong [ op-time op ]ᶠ (cong curryᵐ (∘ᵐ-congˡ (cong₂ ⟨_,_⟩ᵐ refl
+                  (sym (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _)) (trans (∘ᵐ-congˡ T-idᵐ) (∘ᵐ-identityˡ _)))))))) ⟩
+                [ op-time op ]ᶠ (curryᵐ (   ⟨    ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ fstᵐ)
+                                              ∘ᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ ,
+                                                 (Tᶠ idᵐ ∘ᵐ sndᵐ)
+                                              ∘ᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ ⟩ᵐ
+                                         ∘ᵐ mapˣᵐ idᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op))))
+              ≡⟨ cong [ op-time op ]ᶠ (cong curryᵐ (sym (∘ᵐ-congˡ (sym (⟨⟩ᵐ-∘ᵐ _ _ _) )))) ⟩
+                [ op-time op ]ᶠ (curryᵐ (   (   (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) (Tᶠ idᵐ))
+                                             ∘ᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ)
+                                         ∘ᵐ mapˣᵐ idᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op))))
+              ≡⟨ cong [ op-time op ]ᶠ (curryᵐ-mapˣᵐ _ _ _) ⟩
+                [ op-time op ]ᶠ (   map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ
+                                 ∘ᵐ curryᵐ (   (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) (Tᶠ idᵐ))
+                                            ∘ᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ)
+                                 ∘ᵐ idᵐ)
+              ≡⟨ cong [ op-time op ]ᶠ (∘ᵐ-congʳ (∘ᵐ-identityʳ _)) ⟩
+                [ op-time op ]ᶠ (   map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ
+                                 ∘ᵐ curryᵐ (   (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) (Tᶠ idᵐ))
+                                            ∘ᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ))
+              ≡⟨ cong [ op-time op ]ᶠ (∘ᵐ-congʳ (curryᵐ-map⇒ᵐ _ _)) ⟩
+                [ op-time op ]ᶠ (   map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ
+                                 ∘ᵐ map⇒ᵐ idᵐ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) (Tᶠ idᵐ))
+                                 ∘ᵐ curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ)
+              ≡⟨ trans ([]-∘ᵐ _ _) (∘ᵐ-congʳ ([]-∘ᵐ _ _)) ⟩
+                   [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)
+                ∘ᵐ [ op-time op ]ᶠ (map⇒ᵐ idᵐ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) (Tᶠ idᵐ)))
+                ∘ᵐ [ op-time op ]ᶠ (curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ)
+              ∎)) ⟩
                [ op-time op ]ᶠ (map⇒ᵐ idᵐ strᵀ)
             ∘ᵐ (   [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)
                 ∘ᵐ [ op-time op ]ᶠ (map⇒ᵐ idᵐ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) (Tᶠ idᵐ)))
@@ -316,7 +441,7 @@ open Model Mod
             ∘ᵐ mapˣᵐ η⊣ idᵐ
             ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ))
             ∘ᵐ ⟨ idᵐ , η⊣ ⟩ᵐ
-          ≡⟨ {!!} ⟩
+          ≡⟨ ∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)) ) ⟩
                [ op-time op ]ᶠ (map⇒ᵐ idᵐ strᵀ)
             ∘ᵐ [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)
             ∘ᵐ [ op-time op ]ᶠ (map⇒ᵐ idᵐ (mapˣᵐ ([ τ ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ)) (Tᶠ idᵐ)))
