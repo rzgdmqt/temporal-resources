@@ -23,6 +23,7 @@ open import Semantics.Renamings.Properties.VC-rename Mod
 open import Semantics.Substitutions.Properties.VC-subst Mod
 
 open import Semantics.Soundness.;-return Mod
+open import Semantics.Soundness.;-perform Mod
 
 open import Semantics.Soundness.·-lam Mod
 open import Semantics.Soundness.unbox-box Mod
@@ -268,7 +269,8 @@ mutual
   C-soundness {Γ} {_}
     {.(perform op V M ; N)}
     {.(τ-subst (sym (+-assoc (op-time op) _ _)) (perform op V (M ; C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N)))}
-    (;-perform {A} {B} {τ} {τ'} op V M N) = {!!}
+    (;-perform {A} {B} {τ} {τ'} op V M N) =
+      ;-perform-sound op V M N
   C-soundness {Γ} {_}
     {.((M ; N) ; P)}
     {.(τ-subst (sym (+-assoc τ τ' τ'')) (M ; (N ; C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ cong-ren {Γ'' = [] ∷ B} ⟨⟩-μ-ren) P)))}
