@@ -57,7 +57,7 @@ open Model Mod
     ∘ᵐ strᵀ
     ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ
     ∘ᵐ ⟨ η , ⟦ V ⟧ᵛᵗ ⟩ᵐ
-  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ T-str∘η≡η))) ⟩
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ strᵀ-ηᵀ))) ⟩
        μᵀ
     ∘ᵐ Tᶠ ⟦ M ⟧ᶜᵗ
     ∘ᵐ ηᵀ

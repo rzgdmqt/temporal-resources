@@ -109,19 +109,18 @@ record Monad : Set₁ where
 
     -- Strength laws
 
-    T-str∘η≡η : ∀ {A B}
-              → strᵀ ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ
-              ≡ ηᵀ {A ×ᵐ B}
+    strᵀ-ηᵀ : ∀ {A B}
+            → strᵀ ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ
+            ≡ ηᵀ {A ×ᵐ B}
 
-    T-μ∘Tstr∘str≡str∘[δ⁻¹×μ] : ∀ {A B τ τ'}
-                             → μᵀ {A ×ᵐ B} {τ} {τ'} ∘ᵐ Tᶠ strᵀ ∘ᵐ strᵀ
-                             ≡ strᵀ ∘ᵐ mapˣᵐ δ⁻¹ μᵀ
+    strᵀ-μᵀ : ∀ {A B τ τ'}
+            → μᵀ {A ×ᵐ B} {τ} {τ'} ∘ᵐ Tᶠ strᵀ ∘ᵐ strᵀ
+            ≡ strᵀ ∘ᵐ mapˣᵐ δ⁻¹ μᵀ
 
-    T-Tsnd∘str≡snd : ∀ {A B τ}
-             → Tᶠ sndᵐ ∘ᵐ strᵀ {A} {B} {τ} ≡ sndᵐ
+    strᵀ-sndᵐ : ∀ {A B τ}
+              → Tᶠ sndᵐ ∘ᵐ strᵀ {A} {B} {τ} ≡ sndᵐ
 
-    T-Tassoc⁻¹∘str∘[monoidal×id]∘assoc≡str∘[str×id]
-               : ∀ {A B C τ}
+    strᵀ-assoc : ∀ {A B C τ}
                → Tᶠ ×ᵐ-assoc⁻¹ ∘ᵐ strᵀ ∘ᵐ mapˣᵐ []-monoidal idᵐ ∘ᵐ ×ᵐ-assoc
                ≡ strᵀ {A} ∘ᵐ mapˣᵐ idᵐ (strᵀ {B} {C} {τ})
 
@@ -154,4 +153,8 @@ record Monad : Set₁ where
 
     -- Properties
 
-    -- TODO
+    T-alg-of-handlerᵀ-ηᵀ : ∀ {A τ}
+                         → uncurryᵐ T-alg-of-handlerᵀ ∘ᵐ mapˣᵐ idᵐ (ηᵀ {Tᵒ A τ})
+                         ≡ sndᵐ
+
+    -- ...

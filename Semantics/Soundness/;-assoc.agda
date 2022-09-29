@@ -76,7 +76,7 @@ open Model Mod
         ∘ᵐ mapˣᵐ η⊣ (Tᶠ ⟦ N ⟧ᶜᵗ)
         ∘ᵐ mapˣᵐ idᵐ strᵀ
         ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
-      ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym T-μ∘Tstr∘str≡str∘[δ⁻¹×μ]))
+      ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym strᵀ-μᵀ))
           (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))) ⟩
            μᵀ
         ∘ᵐ Tᶠ strᵀ
@@ -195,7 +195,7 @@ open Model Mod
         ∘ᵐ mapˣᵐ idᵐ strᵀ
         ∘ᵐ ⟨ η⊣ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
       ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _))
-          (trans (∘ᵐ-congˡ (sym T-Tassoc⁻¹∘str∘[monoidal×id]∘assoc≡str∘[str×id]))
+          (trans (∘ᵐ-congˡ (sym strᵀ-assoc))
             (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))))))))))) ⟩
            μᵀ
         ∘ᵐ Tᶠ strᵀ
