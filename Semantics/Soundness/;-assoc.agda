@@ -56,7 +56,8 @@ open Model Mod
     ∘ᵐ Tᶠ ⟨ η⊣ , ⟦ N ⟧ᶜᵗ ⟩ᵐ
     ∘ᵐ strᵀ
     ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
-  ≡⟨ {!!} ⟩ -- naturality of μ 2x
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym (μᵀ-nat _))) (∘ᵐ-assoc _ _ _))))
+      (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym (μᵀ-nat _))) (∘ᵐ-assoc _ _ _))))) ⟩
        μᵀ
     ∘ᵐ Tᶠ ⟦ P ⟧ᶜᵗ
     ∘ᵐ μᵀ

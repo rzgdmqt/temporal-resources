@@ -104,12 +104,14 @@ record Monad : Set₁ where
     -- Strength is natural
     
     strᵀ-nat : ∀ {A A' B B' τ} → (f : A →ᵐ A') → (g : B →ᵐ B')
-             → strᵀ {A'} {B'} ∘ᵐ mapˣᵐ ([ τ ]ᶠ f) (Tᶠ g) ≡ Tᶠ (mapˣᵐ f g) ∘ᵐ strᵀ {A} {B}
+             → strᵀ {A'} {B'} ∘ᵐ mapˣᵐ ([ τ ]ᶠ f) (Tᶠ g)
+             ≡ Tᶠ (mapˣᵐ f g) ∘ᵐ strᵀ {A} {B}
 
     -- Strength laws
 
     T-str∘η≡η : ∀ {A B}
-              → strᵀ ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ ≡ ηᵀ {A ×ᵐ B}
+              → strᵀ ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ
+              ≡ ηᵀ {A ×ᵐ B}
 
     T-μ∘Tstr∘str≡str∘[δ⁻¹×μ] : ∀ {A B τ τ'}
                              → μᵀ {A ×ᵐ B} {τ} {τ'} ∘ᵐ Tᶠ strᵀ ∘ᵐ strᵀ
