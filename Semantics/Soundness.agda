@@ -29,6 +29,7 @@ open import Semantics.Soundness.·-lam Mod
 open import Semantics.Soundness.unbox-box Mod
 open import Semantics.Soundness.;-eta Mod
 open import Semantics.Soundness.absurd-eta Mod
+open import Semantics.Soundness.box-unbox-eta Mod
 
 open import Semantics.Soundness.delay-; Mod
 
@@ -292,9 +293,10 @@ mutual
   C-soundness {Γ} {_} {.(absurd V)} {_} (absurd-eta V N) =
     absurd-eta-sound V N
   C-soundness {Γ} {_}
-    {.(M [ Hd ↦ V-rename (-ᶜ-wk-ren τ) V ]c)}
-    {.(unbox p V (C-rename (exch-ren ∘ʳ wk-ren) M [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c))}
-    (box-unbox-eta {A} {C} {τ} p V M) = {!!}
+    {.(M [ Hd ↦ V ]c)}
+    {.(unbox z≤n V (C-rename (exch-ren ∘ʳ wk-ren) M [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c))}
+    (box-unbox-eta {A} {C} V M) =
+      box-unbox-eta-sound V M
   C-soundness {Γ} {_}
     {.(delay _ M ; N)}
     {.(τ-subst (sym (+-assoc τ τ' τ'')) (delay _ (M ; C-rename (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N)))}

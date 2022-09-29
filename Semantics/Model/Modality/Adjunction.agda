@@ -45,7 +45,7 @@ record Adjunction : Set₁ where
     ε⊣∘Fη⊣≡id : ∀ {A τ} → ε⊣ {⟨ τ ⟩ᵒ A} ∘ᵐ ⟨ τ ⟩ᶠ (η⊣ {A}) ≡ idᵐ
     Gε⊣∘η⊣≡id : ∀ {A τ} → [ τ ]ᶠ (ε⊣ {A}) ∘ᵐ η⊣ {[ τ ]ᵒ A} ≡ idᵐ
 
-    -- Interaction between η⊣/ε⊣ of the adjunction and η/ε of the modalities
+    -- Interaction between η⊣/ε⊣ of the adjunction and η/ε of the modalities (TODO: can be generalised)
 
     η⊣≡ε⁻¹∘η : ∀ {A} → η⊣ {A} ≡ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵐ η {A}
     ε⊣≡ε∘η⁻¹ : ∀ {A} → ε⊣ {A} ≡ ε {A} ∘ᵐ η⁻¹ {[ 0 ]ᵒ A}

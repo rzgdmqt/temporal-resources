@@ -280,15 +280,14 @@ mutual
                ---------------------------------
                → Γ ⊢C⦂ absurd V == M [ Hd ↦ V ]c
 
-    box-unbox-eta : ∀ {A C τ}
-                  → (p : τ ≤ ctx-time Γ)
-                  → (V : Γ -ᶜ τ ⊢V⦂ [ τ ] A)
-                  → (M : Γ ∷ [ τ ] A ⊢C⦂ C)
+    box-unbox-eta : ∀ {A C}
+                  → (V : Γ ⊢V⦂ [ 0 ] A)
+                  → (M : Γ ∷ [ 0 ] A ⊢C⦂ C)
                   --------------------------------------------
-                  → Γ ⊢C⦂ M [ Hd ↦ V-rename (-ᶜ-wk-ren τ) V ]c                   -- M[V/y]
-                      == unbox p V (                                             -- unbox V to x in M[box x/y]
-                           (C-rename (exch-ren ∘ʳ wk-ren) M)
-                              [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c)   
+                  → Γ ⊢C⦂ M [ Hd ↦ V ]c                   
+                      == unbox z≤n V
+                           (C-rename (exch-ren ∘ʳ wk-ren) M
+                             [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c)   
 
     -- delay equations
 
