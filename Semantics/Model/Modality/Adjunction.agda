@@ -45,7 +45,7 @@ record Adjunction : Set₁ where
     ε⊣∘Fη⊣≡id : ∀ {A τ} → ε⊣ {⟨ τ ⟩ᵒ A} ∘ᵐ ⟨ τ ⟩ᶠ (η⊣ {A}) ≡ idᵐ
     Gε⊣∘η⊣≡id : ∀ {A τ} → [ τ ]ᶠ (ε⊣ {A}) ∘ᵐ η⊣ {[ τ ]ᵒ A} ≡ idᵐ
 
-    -- Interaction between η⊣/ε⊣ of the adjunction and η/ε of the modalities (TODO: can be generalised)
+    -- Interaction between η⊣/ε⊣ of the adjunction and η/ε of the modalities
 
     η⊣≡ε⁻¹∘η : ∀ {A} → η⊣ {A} ≡ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵐ η {A}
     ε⊣≡ε∘η⁻¹ : ∀ {A} → ε⊣ {A} ≡ ε {A} ∘ᵐ η⁻¹ {[ 0 ]ᵒ A}
@@ -56,6 +56,7 @@ record Adjunction : Set₁ where
                     → [ τ ]ᶠ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) ∘ᵐ [ τ ]ᶠ η⊣ ∘ᵐ η⊣ {A}
                     ≡ δ ∘ᵐ η⊣
 
-    -- ...
-
+    ε⊣∘Fε⊣∘FFδ≡ε⊣∘μ : ∀ {A τ τ'}
+                    → ε⊣ {A} ∘ᵐ ⟨ τ ⟩ᶠ ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ (⟨ τ' ⟩ᶠ (δ ∘ᵐ []-≤ (≤-reflexive (+-comm τ τ'))))
+                    ≡ ε⊣ ∘ᵐ μ
 

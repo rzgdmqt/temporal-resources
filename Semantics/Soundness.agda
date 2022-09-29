@@ -24,6 +24,7 @@ open import Semantics.Substitutions.Properties.VC-subst Mod
 
 open import Semantics.Soundness.;-return Mod
 open import Semantics.Soundness.;-perform Mod
+open import Semantics.Soundness.;-assoc Mod
 
 open import Semantics.Soundness.·-lam Mod
 open import Semantics.Soundness.unbox-box Mod
@@ -275,17 +276,23 @@ mutual
   C-soundness {Γ} {_}
     {.((M ; N) ; P)}
     {.(τ-subst (sym (+-assoc τ τ' τ'')) (M ; (N ; C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ cong-ren {Γ'' = [] ∷ B} ⟨⟩-μ-ren) P)))}
-    (;-assoc {A} {B} {C} {τ} {τ'} {τ''} M N P) = {!!}
+    (;-assoc {A} {B} {C} {τ} {τ'} {τ''} M N P) =
+      ;-assoc-sound M N P
   C-soundness {Γ} {_} {.(lam M · W)} {.(M [ Hd ↦ W ]c)} (·-lam M W) =
     ·-lam-sound M W
-  C-soundness {Γ} {_} {.(handle return V `with H `in N)} {.(C-rename (cong-∷-ren ⟨⟩-η-ren) N [ Hd ↦ V ]c)} (handle-return V H N) = {!!}
+  C-soundness {Γ} {_}
+    {.(handle return V `with H `in N)}
+    {.(C-rename (cong-∷-ren ⟨⟩-η-ren) N [ Hd ↦ V ]c)}
+    (handle-return V H N) =
+      {!!}
   C-soundness {Γ} {_}
     {.(handle perform op V M `with H `in N)}
     {.(τ-subst (sym (+-assoc (op-time op) _ _))
         ((H op (τ + τ') [ Tl-∷ Hd ↦ V ]c)
            [ Hd ↦ box (lam (handle M `with (λ op' τ'' → C-rename (cong-ren {Γ'' = [] ∷ _ ∷ [ _ ] (_ ⇒ _)} wk-ctx-ren) (H op' τ'')) `in
                     (C-rename (cong-ren {Γ'' = [] ∷ A} (cong-ren {Γ'' = [] ⟨ τ ⟩} wk-ren ∘ʳ ⟨⟩-μ-ren)) N))) ]c))}
-    (handle-op {A} {B} {τ} {τ'} op V M H N) = {!!}
+    (handle-op {A} {B} {τ} {τ'} op V M H N) =
+      {!!}
   C-soundness {Γ} {_} {_} {.(N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren _ p) V ]c)} (unbox-box p V N) =
     unbox-box-sound p V N
   C-soundness {Γ} {_} {M} {.(τ-subst (+-identityʳ _) (M ; return (var Hd)))} (;-eta .M) =
@@ -307,4 +314,5 @@ mutual
     {.(τ-subst (sym (+-assoc τ τ' τ'')) (delay _
       (handle M `with (λ op τ''' → C-rename (cong-ren {Γ'' = [] ∷ _ ∷ _} (⟨⟩-≤-ren z≤n ∘ʳ ⟨⟩-η⁻¹-ren)) (H op τ''')) `in
         (C-rename (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N))))}
-    (delay-handle {A} {B} {τ} {τ'} {τ''} M H N) = {!!}
+    (delay-handle {A} {B} {τ} {τ'} {τ''} M H N) =
+      {!!}
