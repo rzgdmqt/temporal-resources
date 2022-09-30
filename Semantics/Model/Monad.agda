@@ -165,9 +165,9 @@ record Monad : Set₁ where
               → Tᶠ sndᵐ ∘ᵐ strᵀ {A} {B} {τ} ≡ sndᵐ
 
     strᵀ-assoc : ∀ {A B C τ}
-               →    Tᶠ ×ᵐ-assoc⁻¹
+               →    Tᶠ ×ᵐ-assoc
                  ∘ᵐ strᵀ
-                 ∘ᵐ mapˣᵐ []-monoidal idᵐ ∘ᵐ ×ᵐ-assoc
+                 ∘ᵐ mapˣᵐ []-monoidal idᵐ ∘ᵐ ×ᵐ-assoc⁻¹
                ≡    strᵀ {A}
                  ∘ᵐ mapˣᵐ idᵐ (strᵀ {B} {C} {τ})
 
@@ -224,7 +224,7 @@ record Monad : Set₁ where
                           ≡    τ-substᵀ (sym (+-assoc (op-time op) τ τ'))
                             ∘ᵐ appᵐ
                             ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ (uncurryᵐ T-alg-of-handlerᵀ))))
-                            ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (curryᵐ (mapˣᵐ idᵐ appᵐ ∘ᵐ ×ᵐ-assoc⁻¹))))
+                            ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (curryᵐ (mapˣᵐ idᵐ appᵐ ∘ᵐ ×ᵐ-assoc))))
                             ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (mapˣᵐ ε-⟨⟩ idᵐ)))
                             ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ []-monoidal)
                             ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ (mapˣᵐ (η⊣ {τ = op-time op}) idᵐ))

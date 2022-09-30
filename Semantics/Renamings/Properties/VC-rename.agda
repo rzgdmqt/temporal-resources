@@ -316,7 +316,7 @@ mutual
                     ∘ᵐ
                     curryᵐ
                     (   ⟦ C-rename (cong-∷-ren (cong-∷-ren ρ)) (H op τ'') ⟧ᶜᵗ
-                     ∘ᵐ ×ᵐ-assoc)))
+                     ∘ᵐ ×ᵐ-assoc⁻¹)))
          ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ C-rename (cong-∷-ren (cong-⟨⟩-ren ρ)) N ⟧ᶜᵗ)
       ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -337,7 +337,7 @@ mutual
                     ∘ᵐ
                     curryᵐ
                     (   ⟦ C-rename (cong-∷-ren (cong-∷-ren ρ)) (H op τ'') ⟧ᶜᵗ
-                     ∘ᵐ ×ᵐ-assoc)))
+                     ∘ᵐ ×ᵐ-assoc⁻¹)))
          ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
       ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -361,7 +361,7 @@ mutual
                      (   (   ⟦ H op τ'' ⟧ᶜᵗ
                           ∘ᵐ ⟦ (cong-∷-ren {A = [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')}
                                  (cong-∷-ren {A = type-of-gtype (param op)} ρ)) ⟧ʳ)
-                      ∘ᵐ ×ᵐ-assoc)))
+                      ∘ᵐ ×ᵐ-assoc⁻¹)))
          ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
       ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -380,7 +380,7 @@ mutual
                      ∘ᵐ curryᵐ
                           (   (   ⟦ H op τ'' ⟧ᶜᵗ
                                ∘ᵐ mapˣᵐ (mapˣᵐ ⟦ ρ ⟧ʳ idᵐ) idᵐ)
-                           ∘ᵐ ×ᵐ-assoc)))
+                           ∘ᵐ ×ᵐ-assoc⁻¹)))
          ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
       ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -389,24 +389,24 @@ mutual
         (cong mapⁱˣᵐ (fun-ext (λ op → cong mapⁱˣᵐ (fun-ext (λ τ'' →
           (∘ᵐ-congʳ (
             begin
-              curryᵐ ((⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ mapˣᵐ (mapˣᵐ ⟦ ρ ⟧ʳ idᵐ) idᵐ) ∘ᵐ ×ᵐ-assoc)
+              curryᵐ ((⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ mapˣᵐ (mapˣᵐ ⟦ ρ ⟧ʳ idᵐ) idᵐ) ∘ᵐ ×ᵐ-assoc⁻¹)
             ≡⟨ cong curryᵐ (∘ᵐ-assoc _ _ _) ⟩
-              curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ (mapˣᵐ (mapˣᵐ ⟦ ρ ⟧ʳ idᵐ) idᵐ ∘ᵐ ×ᵐ-assoc))
-            ≡⟨ cong curryᵐ (∘ᵐ-congʳ (mapˣᵐ-×ᵐ-assoc _ _ _)) ⟩
-              curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ (×ᵐ-assoc ∘ᵐ mapˣᵐ ⟦ ρ ⟧ʳ (mapˣᵐ idᵐ idᵐ)))
+              curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ (mapˣᵐ (mapˣᵐ ⟦ ρ ⟧ʳ idᵐ) idᵐ ∘ᵐ ×ᵐ-assoc⁻¹))
+            ≡⟨ cong curryᵐ (∘ᵐ-congʳ (mapˣᵐ-×ᵐ-assoc⁻¹ _ _ _)) ⟩
+              curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ (×ᵐ-assoc⁻¹ ∘ᵐ mapˣᵐ ⟦ ρ ⟧ʳ (mapˣᵐ idᵐ idᵐ)))
             ≡⟨ cong curryᵐ (sym (∘ᵐ-assoc _ _ _)) ⟩
-              curryᵐ ((⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc) ∘ᵐ mapˣᵐ ⟦ ρ ⟧ʳ (mapˣᵐ idᵐ idᵐ))
+              curryᵐ ((⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹) ∘ᵐ mapˣᵐ ⟦ ρ ⟧ʳ (mapˣᵐ idᵐ idᵐ))
             ≡⟨ curryᵐ-mapˣᵐ _ _ _ ⟩
-              map⇒ᵐ (mapˣᵐ idᵐ idᵐ) idᵐ ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc) ∘ᵐ ⟦ ρ ⟧ʳ
+              map⇒ᵐ (mapˣᵐ idᵐ idᵐ) idᵐ ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹) ∘ᵐ ⟦ ρ ⟧ʳ
             ≡⟨ ∘ᵐ-congˡ (cong (λ f → map⇒ᵐ f idᵐ) (sym
                  (⟨⟩ᵐ-unique _ _ _
                    (trans (∘ᵐ-identityʳ _) (sym (∘ᵐ-identityˡ _)))
                    (trans (∘ᵐ-identityʳ _) (sym (∘ᵐ-identityˡ _)))))) ⟩
-              map⇒ᵐ idᵐ idᵐ ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc) ∘ᵐ ⟦ ρ ⟧ʳ
+              map⇒ᵐ idᵐ idᵐ ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹) ∘ᵐ ⟦ ρ ⟧ʳ
             ≡⟨ ∘ᵐ-congˡ map⇒ᵐ-identity ⟩
-              idᵐ ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc) ∘ᵐ ⟦ ρ ⟧ʳ
+              idᵐ ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹) ∘ᵐ ⟦ ρ ⟧ʳ
             ≡⟨ ∘ᵐ-identityˡ _ ⟩
-              curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc) ∘ᵐ ⟦ ρ ⟧ʳ
+              curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹) ∘ᵐ ⟦ ρ ⟧ʳ
             ∎)))))))))) ⟩
       uncurryᵐ
         (   T-alg-of-handlerᵀ
@@ -418,7 +418,7 @@ mutual
                           (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                             ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                           idᵐ
-                     ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)
+                     ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)
                      ∘ᵐ ⟦ ρ ⟧ʳ))
          ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
@@ -436,7 +436,7 @@ mutual
                              (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                                ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                              idᵐ
-                         ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc))
+                         ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹))
                      ∘ᵐ ⟦ ρ ⟧ʳ))
          ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
@@ -454,7 +454,7 @@ mutual
                             (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                               ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                             idᵐ
-                       ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc))
+                       ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹))
                        ∘ᵐ mapⁱˣᵐ (λ τ'' → ⟦ ρ ⟧ʳ)))
          ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
@@ -472,7 +472,7 @@ mutual
                             (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                               ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                             idᵐ
-                       ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc))))
+                       ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹))))
             ∘ᵐ mapⁱˣᵐ (λ op → mapⁱˣᵐ (λ τ'' → ⟦ ρ ⟧ʳ)))
          ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
@@ -489,7 +489,7 @@ mutual
                           (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                             ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                           idᵐ
-                     ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc))))
+                     ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹))))
          ∘ᵐ mapⁱˣᵐ (λ op → mapⁱˣᵐ (λ τ'' → ⟦ ρ ⟧ʳ))
          ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
@@ -521,7 +521,7 @@ mutual
                           (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                             ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                           idᵐ
-                     ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc))))
+                     ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹))))
          ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → ⟦ ρ ⟧ʳ) ⟩ᵢᵐ) ⟩ᵢᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
       ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -538,7 +538,7 @@ mutual
                            (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                              ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                            idᵐ
-                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)))))
+                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)))))
          ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → ⟦ ρ ⟧ʳ) ⟩ᵢᵐ) ⟩ᵢᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
       ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -554,7 +554,7 @@ mutual
                            (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                              ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                            idᵐ
-                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)))))
+                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)))))
       ∘ᵐ mapˣᵐ ⟨ (λ op → ⟨ (λ τ'' → ⟦ ρ ⟧ʳ) ⟩ᵢᵐ) ⟩ᵢᵐ idᵐ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
       ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -570,7 +570,7 @@ mutual
                            (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                              ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                            idᵐ
-                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)))))
+                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)))))
       ∘ᵐ mapˣᵐ ⟨ (λ op → ⟨ (λ τ'' → ⟦ ρ ⟧ʳ) ⟩ᵢᵐ) ⟩ᵢᵐ idᵐ
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (⟦ N ⟧ᶜᵗ ∘ᵐ mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
       ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -586,7 +586,7 @@ mutual
                            (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                              ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                            idᵐ
-                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)))))
+                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)))))
       ∘ᵐ mapˣᵐ ⟨ (λ op → ⟨ (λ τ'' → ⟦ ρ ⟧ʳ) ⟩ᵢᵐ) ⟩ᵢᵐ idᵐ
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵐ Tᶠ (mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
       ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -605,7 +605,7 @@ mutual
                            (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                              ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                            idᵐ
-                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)))))
+                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)))))
       ∘ᵐ mapˣᵐ ⟨ (λ op → ⟨ (λ τ'' → ⟦ ρ ⟧ʳ) ⟩ᵢᵐ) ⟩ᵢᵐ idᵐ
       ∘ᵐ (   mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
           ∘ᵐ mapˣᵐ idᵐ (Tᶠ (mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ)))
@@ -622,7 +622,7 @@ mutual
                            (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                              ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                            idᵐ
-                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)))))
+                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)))))
       ∘ᵐ mapˣᵐ ⟨ (λ op → ⟨ (λ τ'' → ⟦ ρ ⟧ʳ) ⟩ᵢᵐ) ⟩ᵢᵐ idᵐ
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
       ∘ᵐ mapˣᵐ idᵐ (Tᶠ (mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
@@ -646,7 +646,7 @@ mutual
                            (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                              ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                            idᵐ
-                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)))))
+                      ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)))))
       ∘ᵐ (   mapˣᵐ ⟨ (λ op → ⟨ (λ τ'' → ⟦ ρ ⟧ʳ) ⟩ᵢᵐ) ⟩ᵢᵐ idᵐ
           ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
           ∘ᵐ mapˣᵐ idᵐ (Tᶠ (mapˣᵐ (⟨ τ ⟩ᶠ ⟦ ρ ⟧ʳ) idᵐ))
@@ -707,7 +707,7 @@ mutual
                          (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                            ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                          idᵐ
-                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc))))
+                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹))))
        ∘ᵐ (   mapˣᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ idᵐ
            ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
            ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -731,7 +731,7 @@ mutual
                          (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                            ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                          idᵐ
-                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc))))
+                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹))))
        ∘ᵐ mapˣᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ idᵐ
        ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
        ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -754,7 +754,7 @@ mutual
                          (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                            ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                          idᵐ
-                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc))))
+                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹))))
        ∘ᵐ mapˣᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ idᵐ
        ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
        ∘ᵐ mapˣᵐ idᵐ strᵀ)
@@ -771,7 +771,7 @@ mutual
                             (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                               ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                             idᵐ
-                       ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc))))
+                       ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹))))
           ∘ᵐ mapˣᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ idᵐ)
        ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
        ∘ᵐ mapˣᵐ idᵐ strᵀ)
@@ -788,7 +788,7 @@ mutual
                          (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                            ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                          idᵐ
-                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc))))
+                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹))))
         ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
        ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
        ∘ᵐ mapˣᵐ idᵐ strᵀ)
@@ -805,7 +805,7 @@ mutual
                          (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                            ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                          idᵐ
-                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)))
+                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)))
         ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
        ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
        ∘ᵐ mapˣᵐ idᵐ strᵀ)
@@ -853,7 +853,7 @@ mutual
                          (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                            ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                          idᵐ
-                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)))
+                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)))
         ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
        ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
        ∘ᵐ mapˣᵐ idᵐ strᵀ)
@@ -879,7 +879,7 @@ mutual
                          (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op))
                            ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
                          idᵐ
-                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)))
+                    ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)))
         ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
        ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
        ∘ᵐ mapˣᵐ idᵐ strᵀ

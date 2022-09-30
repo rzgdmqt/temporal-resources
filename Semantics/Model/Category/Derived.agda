@@ -22,11 +22,11 @@ open Category Cat
 
 -- BINARY PRODUCTS
 
-×ᵐ-assoc : ∀ {A B C} → A ×ᵐ (B ×ᵐ C) →ᵐ (A ×ᵐ B) ×ᵐ C
-×ᵐ-assoc = ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+×ᵐ-assoc : ∀ {A B C} → (A ×ᵐ B) ×ᵐ C →ᵐ A ×ᵐ (B ×ᵐ C)
+×ᵐ-assoc = ⟨ fstᵐ ∘ᵐ fstᵐ , ⟨ sndᵐ ∘ᵐ fstᵐ , sndᵐ ⟩ᵐ ⟩ᵐ
 
-×ᵐ-assoc⁻¹ : ∀ {A B C} → (A ×ᵐ B) ×ᵐ C →ᵐ A ×ᵐ (B ×ᵐ C)
-×ᵐ-assoc⁻¹ = ⟨ fstᵐ ∘ᵐ fstᵐ , ⟨ sndᵐ ∘ᵐ fstᵐ , sndᵐ ⟩ᵐ ⟩ᵐ
+×ᵐ-assoc⁻¹ : ∀ {A B C} → A ×ᵐ (B ×ᵐ C) →ᵐ (A ×ᵐ B) ×ᵐ C
+×ᵐ-assoc⁻¹ = ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
 
 ⟨⟩ᵐ-∘ᵐ : ∀ {A B C D} → (f : A →ᵐ B) → (g : B →ᵐ C) → (h : B →ᵐ D)
        → ⟨ g ∘ᵐ f , h ∘ᵐ f ⟩ᵐ ≡ ⟨ g , h ⟩ᵐ ∘ᵐ f
@@ -54,11 +54,11 @@ open Category Cat
     ⟨ g , h ⟩ᵐ ∘ᵐ f
   ∎
 
-mapˣᵐ-×ᵐ-assoc : ∀ {A B C A' B' C'} → (f : A →ᵐ A') (g : B →ᵐ B') (h : C →ᵐ C')
-               → mapˣᵐ (mapˣᵐ f g) h ∘ᵐ ×ᵐ-assoc ≡ ×ᵐ-assoc ∘ᵐ mapˣᵐ f (mapˣᵐ g h)
-mapˣᵐ-×ᵐ-assoc f g h = 
+mapˣᵐ-×ᵐ-assoc⁻¹ : ∀ {A B C A' B' C'} → (f : A →ᵐ A') (g : B →ᵐ B') (h : C →ᵐ C')
+                 → mapˣᵐ (mapˣᵐ f g) h ∘ᵐ ×ᵐ-assoc⁻¹ ≡ ×ᵐ-assoc⁻¹ ∘ᵐ mapˣᵐ f (mapˣᵐ g h)
+mapˣᵐ-×ᵐ-assoc⁻¹ f g h = 
   begin
-    mapˣᵐ (mapˣᵐ f g) h ∘ᵐ ×ᵐ-assoc
+    mapˣᵐ (mapˣᵐ f g) h ∘ᵐ ×ᵐ-assoc⁻¹
   ≡⟨⟩
        ⟨ ⟨ f ∘ᵐ fstᵐ , g ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ
     ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
@@ -145,7 +145,7 @@ mapˣᵐ-×ᵐ-assoc f g h =
        ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
     ∘ᵐ ⟨ f ∘ᵐ fstᵐ , ⟨ g ∘ᵐ fstᵐ , h ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ sndᵐ ⟩ᵐ
   ≡⟨⟩
-    ×ᵐ-assoc ∘ᵐ mapˣᵐ f (mapˣᵐ g h)
+    ×ᵐ-assoc⁻¹ ∘ᵐ mapˣᵐ f (mapˣᵐ g h)
   ∎
 
 mapˣᵐ-identity : ∀ {A B} → mapˣᵐ {A} {B} {A} {B} idᵐ idᵐ ≡ idᵐ

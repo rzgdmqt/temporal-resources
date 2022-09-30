@@ -234,7 +234,7 @@ mutual
        uncurryᵐ (
             T-alg-of-handlerᵀ
          ∘ᵐ mapⁱˣᵐ (λ op → mapⁱˣᵐ (λ τ'' →
-              g op τ'' ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc)))
+              g op τ'' ∘ᵐ curryᵐ (⟦ H op τ'' ⟧ᶜᵗ ∘ᵐ ×ᵐ-assoc⁻¹)))
          ∘ᵐ f)
     ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
     ∘ᵐ mapˣᵐ idᵐ (strᵀ {⟨ τ ⟩ᵒ ⟦ Γ ⟧ᵉ})

@@ -202,10 +202,10 @@ open Model Mod
         ∘ᵐ Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ))
         ∘ᵐ Tᶠ (mapˣᵐ η⊣ idᵐ)
         ∘ᵐ Tᶠ (mapˣᵐ idᵐ ⟦ N ⟧ᶜᵗ)
-        ∘ᵐ Tᶠ ×ᵐ-assoc⁻¹
+        ∘ᵐ Tᶠ ×ᵐ-assoc
         ∘ᵐ strᵀ
         ∘ᵐ mapˣᵐ []-monoidal idᵐ
-        ∘ᵐ ×ᵐ-assoc
+        ∘ᵐ ×ᵐ-assoc⁻¹
         ∘ᵐ ⟨ η⊣ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
       ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ
           (trans (sym (⟨⟩ᵐ-∘ᵐ _ _ _)) (cong₂ ⟨_,_⟩ᵐ
@@ -218,7 +218,7 @@ open Model Mod
         ∘ᵐ Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ))
         ∘ᵐ Tᶠ (mapˣᵐ η⊣ idᵐ)
         ∘ᵐ Tᶠ (mapˣᵐ idᵐ ⟦ N ⟧ᶜᵗ)
-        ∘ᵐ Tᶠ ×ᵐ-assoc⁻¹
+        ∘ᵐ Tᶠ ×ᵐ-assoc
         ∘ᵐ strᵀ
         ∘ᵐ mapˣᵐ []-monoidal idᵐ
         ∘ᵐ ⟨ ⟨ η⊣ , η⊣ ⟩ᵐ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
@@ -234,7 +234,7 @@ open Model Mod
         ∘ᵐ Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ))
         ∘ᵐ Tᶠ (mapˣᵐ η⊣ idᵐ)
         ∘ᵐ Tᶠ (mapˣᵐ idᵐ ⟦ N ⟧ᶜᵗ)
-        ∘ᵐ Tᶠ ×ᵐ-assoc⁻¹
+        ∘ᵐ Tᶠ ×ᵐ-assoc
         ∘ᵐ strᵀ
         ∘ᵐ mapˣᵐ []-monoidal idᵐ
         ∘ᵐ mapˣᵐ ⟨ [ τ ]ᶠ idᵐ , [ τ ]ᶠ idᵐ ⟩ᵐ idᵐ
@@ -247,7 +247,7 @@ open Model Mod
         ∘ᵐ Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ))
         ∘ᵐ Tᶠ (mapˣᵐ η⊣ idᵐ)
         ∘ᵐ Tᶠ (mapˣᵐ idᵐ ⟦ N ⟧ᶜᵗ)
-        ∘ᵐ Tᶠ ×ᵐ-assoc⁻¹
+        ∘ᵐ Tᶠ ×ᵐ-assoc
         ∘ᵐ strᵀ
         ∘ᵐ mapˣᵐ ([ τ ]ᶠ ⟨ idᵐ , idᵐ ⟩ᵐ) idᵐ
         ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
@@ -258,7 +258,7 @@ open Model Mod
         ∘ᵐ Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ))
         ∘ᵐ Tᶠ (mapˣᵐ η⊣ idᵐ)
         ∘ᵐ Tᶠ (mapˣᵐ idᵐ ⟦ N ⟧ᶜᵗ)
-        ∘ᵐ Tᶠ ×ᵐ-assoc⁻¹
+        ∘ᵐ Tᶠ ×ᵐ-assoc
         ∘ᵐ strᵀ
         ∘ᵐ mapˣᵐ ([ τ ]ᶠ ⟨ idᵐ , idᵐ ⟩ᵐ) (Tᶠ idᵐ)
         ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
@@ -269,7 +269,7 @@ open Model Mod
         ∘ᵐ Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ))
         ∘ᵐ Tᶠ (mapˣᵐ η⊣ idᵐ)
         ∘ᵐ Tᶠ (mapˣᵐ idᵐ ⟦ N ⟧ᶜᵗ)
-        ∘ᵐ Tᶠ ×ᵐ-assoc⁻¹
+        ∘ᵐ Tᶠ ×ᵐ-assoc
         ∘ᵐ Tᶠ (mapˣᵐ ⟨ idᵐ , idᵐ ⟩ᵐ idᵐ)
         ∘ᵐ strᵀ
         ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
@@ -280,7 +280,7 @@ open Model Mod
         ∘ᵐ Tᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ))
         ∘ᵐ Tᶠ (mapˣᵐ η⊣ idᵐ)
         ∘ᵐ (   Tᶠ (mapˣᵐ idᵐ ⟦ N ⟧ᶜᵗ)
-            ∘ᵐ Tᶠ ×ᵐ-assoc⁻¹
+            ∘ᵐ Tᶠ ×ᵐ-assoc
             ∘ᵐ Tᶠ (mapˣᵐ ⟨ idᵐ , idᵐ ⟩ᵐ idᵐ))
         ∘ᵐ strᵀ
         ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
