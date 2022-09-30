@@ -36,6 +36,7 @@ open import Semantics.Soundness.absurd-eta Mod
 open import Semantics.Soundness.box-unbox-eta Mod
 
 open import Semantics.Soundness.delay-; Mod
+open import Semantics.Soundness.delay-handle Mod
 
 open import Util.Equality
 open import Util.Operations
@@ -318,4 +319,4 @@ mutual
       (handle M `with (λ op τ''' → C-rename (cong-ren {Γ'' = [] ∷ _ ∷ _} (⟨⟩-≤-ren z≤n ∘ʳ ⟨⟩-η⁻¹-ren)) (H op τ''')) `in
         (C-rename (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N))))}
     (delay-handle {A} {B} {τ} {τ'} {τ''} M H N) =
-      {!!}
+      delay-handle-sound M H N

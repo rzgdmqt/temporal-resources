@@ -58,7 +58,6 @@ delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
     ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
     ∘ᵐ mapˣᵐ idᵐ strᵀ 
     ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , delayᵀ τ ∘ᵐ [ τ ]ᶠ ⟦ M ⟧ᶜᵗ ∘ᵐ η⊣ ⟩ᵐ ⟩ᵐ
-  {-
   ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans (trans (trans
       (cong₂ ⟨_,_⟩ᵐ
         (sym (trans (∘ᵐ-identityˡ _) (trans (∘ᵐ-identityˡ _) (∘ᵐ-identityˡ _))))
@@ -161,8 +160,6 @@ delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
   ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ T-alg-of-handlerᵀ-delayᵀ)
       (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ
         (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))))))))) ⟩
-  -}
-  ≡⟨ {!!} ⟩
        τ-substᵀ (sym (+-assoc τ τ' τ''))
     ∘ᵐ delayᵀ τ
     ∘ᵐ [ τ ]ᶠ (uncurryᵐ T-alg-of-handlerᵀ)
@@ -535,7 +532,8 @@ delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
                                             ∘ᵐ projᵐ op) ⟩ᵢᵐ
                                    ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ))
                        (idᵐ ∘ᵐ idᵐ))
-            ≡⟨ {!!} ⟩ -- nat of ε-⟨⟩
+            ≡⟨ cong [ τ ]ᶠ (cong₂ mapˣᵐ (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (sym (⟨⟩-≤-nat _ _)))
+                (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym (⟨⟩-η⁻¹-nat _))) (∘ᵐ-assoc _ _ _))))) refl) ⟩
               [ τ ]ᶠ (mapˣᵐ
                        ((   ⟨ (λ op → ⟨ (λ τ''' →
                                                   (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
@@ -548,16 +546,20 @@ delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
                        (idᵐ ∘ᵐ idᵐ))
             ≡⟨ cong [ τ ]ᶠ (cong₂ mapˣᵐ (∘ᵐ-assoc _ _ _) (∘ᵐ-identityˡ _)) ⟩
               [ τ ]ᶠ (mapˣᵐ
-                       (   ⟨ (λ op → ⟨ (λ τ''' →
-                                                 (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
-                                                  ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
-                                                             ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
-                                              ∘ᵐ projᵐ τ''') ⟩ᵢᵐ
-                                           ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                       (   mapⁱˣᵐ (λ op →
+                             mapⁱˣᵐ (λ τ''' →
+                                  (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
+                                   ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
+                                              ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))))
                         ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ
                         ∘ᵐ ε-⟨⟩)
                        idᵐ)
-            ≡⟨ {!!} ⟩ -- commute ε-⟨⟩ through the pairings
+            ≡⟨ cong [ τ ]ᶠ (cong₂ mapˣᵐ (∘ᵐ-congʳ (trans (sym (⟨⟩ᵢᵐ-∘ᵐ _ _)) (trans
+                (cong ⟨_⟩ᵢᵐ (fun-ext (λ op → trans (sym (⟨⟩ᵢᵐ-∘ᵐ _ _)) (sym
+                  (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵢᵐ-projᵐ _ op)) (sym (trans
+                    (cong ⟨_⟩ᵢᵐ (fun-ext (λ τ''' → trans (∘ᵐ-identityˡ _)
+                      (sym (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵢᵐ-projᵐ _ τ''')) (∘ᵐ-identityʳ _)))))))
+                        (⟨⟩ᵢᵐ-∘ᵐ _ _))))) )))) (⟨⟩ᵢᵐ-∘ᵐ _ _)))) refl) ⟩
               [ τ ]ᶠ (mapˣᵐ
                        (   mapⁱˣᵐ (λ op →
                              mapⁱˣᵐ (λ τ''' →
@@ -567,7 +569,17 @@ delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
                         ∘ᵐ mapⁱˣᵐ (λ op → mapⁱˣᵐ (λ τ''' → ε-⟨⟩))
                         ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
                        idᵐ)
-            ≡⟨ {!!} ⟩
+            ≡⟨ cong [ τ ]ᶠ (cong₂ mapˣᵐ (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym (mapⁱˣᵐ-∘ᵐ _ _)))) refl) ⟩
+              [ τ ]ᶠ (mapˣᵐ
+                       (      mapⁱˣᵐ (λ op →
+                                mapⁱˣᵐ (λ τ''' →
+                                     (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
+                                      ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
+                                                 ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ)))
+                           ∘ᵐ mapⁱˣᵐ (λ τ''' → ε-⟨⟩))
+                        ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+                       idᵐ)
+            ≡⟨ cong [ τ ]ᶠ (cong₂ mapˣᵐ (∘ᵐ-congˡ (cong mapⁱˣᵐ (fun-ext (λ op → sym (mapⁱˣᵐ-∘ᵐ _ _))))) refl) ⟩
               [ τ ]ᶠ (mapˣᵐ
                        (   mapⁱˣᵐ (λ op →
                              mapⁱˣᵐ (λ τ''' →
@@ -685,8 +697,6 @@ delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
     ∘ᵐ [ τ ]ᶠ (mapˣᵐ idᵐ strᵀ)
     ∘ᵐ [ τ ]ᶠ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
     ∘ᵐ η⊣
-  ≡⟨ {!!} ⟩
-  {-
   ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym (trans (∘ᵐ-congˡ (cong [ τ ]ᶠ (uncurryᵐ-nat _ _)))
       (trans (∘ᵐ-congˡ ([]-∘ᵐ _ _)) (∘ᵐ-assoc _ _ _))))) ⟩
        τ-substᵀ (sym (+-assoc τ τ' τ''))
@@ -762,7 +772,6 @@ delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
                ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ)
     ∘ᵐ η⊣
   ≡⟨ sym (⟦τ-subst⟧≡τ-substᵀ (sym (+-assoc τ τ' τ'')) _) ⟩
-  -}
       ⟦ τ-subst (sym (+-assoc τ τ' τ''))
           (delay τ
            (handle M `with
