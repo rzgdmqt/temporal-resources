@@ -55,8 +55,8 @@ delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
                        ∘ᵐ projᵐ τ''') ⟩ᵢᵐ
                     ∘ᵐ projᵐ op) ⟩ᵢᵐ
                  ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
-    ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵐ sndᵐ ⟩ᵐ
-    ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , strᵀ ∘ᵐ sndᵐ ⟩ᵐ
+    ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
+    ∘ᵐ mapˣᵐ idᵐ strᵀ 
     ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , delayᵀ τ ∘ᵐ [ τ ]ᶠ ⟦ M ⟧ᶜᵗ ∘ᵐ η⊣ ⟩ᵐ ⟩ᵐ
   ≡⟨ {!!} ⟩
        τ-substᵀ (sym (+-assoc τ τ' τ''))
@@ -64,19 +64,21 @@ delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
     ∘ᵐ [ τ ]ᶠ (   uncurryᵐ (T-alg-of-handlerᵀ
                             ∘ᵐ ⟨ (λ op → ⟨ (λ τ''' →
                                     (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
-                                     ∘ᵐ curryᵐ (   {!!}
+                                     ∘ᵐ curryᵐ (   (   ⟦ H op τ''' ⟧ᶜᵗ
+                                                    ∘ᵐ mapˣᵐ (mapˣᵐ (η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n) idᵐ) idᵐ)
                                                 ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
                                  ∘ᵐ projᵐ τ''') ⟩ᵢᵐ
                               ∘ᵐ projᵐ op) ⟩ᵢᵐ
                            ∘ᵐ ⟨ (λ op → ⟨ (λ τ''' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
-               ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ ,
-                       Tᶠ (   ⟦ N ⟧ᶜᵗ
-                           ∘ᵐ ⟨ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ) ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)
-                    ∘ᵐ sndᵐ ⟩ᵐ
-               ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , strᵀ ∘ᵐ sndᵐ ⟩ᵐ
+               ∘ᵐ mapˣᵐ idᵐ (Tᶠ (   ⟦ N ⟧ᶜᵗ
+                                 ∘ᵐ mapˣᵐ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ) idᵐ))
+               ∘ᵐ mapˣᵐ idᵐ strᵀ 
                ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ)
     ∘ᵐ η⊣
-  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ {!∘ᵐ-congˡ ?!}) ⟩
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congˡ (cong [ τ ]ᶠ (∘ᵐ-congˡ (cong uncurryᵐ (∘ᵐ-congʳ (∘ᵐ-congˡ
+      (cong ⟨_⟩ᵢᵐ (fun-ext (λ op → ∘ᵐ-congˡ (cong ⟨_⟩ᵢᵐ (fun-ext (λ τ''' →
+        ∘ᵐ-congˡ (∘ᵐ-congʳ (cong curryᵐ (∘ᵐ-congˡ (sym
+          (C-rename≡∘ᵐ (cong-∷-ren (cong-∷-ren (⟨⟩-≤-ren z≤n ∘ʳ ⟨⟩-η⁻¹-ren))) (H op τ'''))))))))))))))))))) ⟩
        τ-substᵀ (sym (+-assoc τ τ' τ''))
     ∘ᵐ delayᵀ τ
     ∘ᵐ [ τ ]ᶠ (   uncurryᵐ (T-alg-of-handlerᵀ

@@ -25,6 +25,7 @@ open Category Cat
 open import Semantics.Model.Category.Derived Cat
 open Future Fut
 open Past Pas
+open import Semantics.Model.Modality.Past.Derived Cat Pas
 open Adjunction Adj
 open import Semantics.Model.Modality.Adjunction.Derived Cat Fut Pas Adj
 open BaseGroundTypes Typ
@@ -156,5 +157,14 @@ record Monad : Set₁ where
     T-alg-of-handlerᵀ-ηᵀ : ∀ {A τ}
                          → uncurryᵐ T-alg-of-handlerᵀ ∘ᵐ mapˣᵐ idᵐ (ηᵀ {Tᵒ A τ})
                          ≡ sndᵐ
+
+    T-alg-of-handlerᵀ-delayᵀ : ∀ {A τ τ' τ''}
+                             → uncurryᵐ T-alg-of-handlerᵀ ∘ᵐ mapˣᵐ idᵐ (delayᵀ {Tᵒ A τ''} τ {τ'})
+                             ≡    τ-substᵀ (sym (+-assoc τ τ' τ''))
+                               ∘ᵐ delayᵀ τ
+                               ∘ᵐ [ τ ]ᶠ (uncurryᵐ T-alg-of-handlerᵀ)
+                               ∘ᵐ [ τ ]ᶠ (mapˣᵐ ε-⟨⟩ idᵐ)
+                               ∘ᵐ []-monoidal
+                               ∘ᵐ mapˣᵐ η⊣ idᵐ
 
     -- ...
