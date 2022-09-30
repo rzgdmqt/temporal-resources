@@ -22,13 +22,14 @@ open import Util.Operations
 open import Util.Time
 
 open Category Cat
-open import Semantics.Model.Category.Derived Cat
 open Future Fut
 open Past Pas
-open import Semantics.Model.Modality.Past.Derived Cat Pas
 open Adjunction Adj
-open import Semantics.Model.Modality.Adjunction.Derived Cat Fut Pas Adj
 open BaseGroundTypes Typ
+
+open import Semantics.Model.Category.Derived Cat
+open import Semantics.Model.Modality.Past.Derived Cat Pas
+open import Semantics.Model.Modality.Adjunction.Derived Cat Fut Pas Adj
 
 record Monad : Set₁ where
 
@@ -39,62 +40,104 @@ record Monad : Set₁ where
     -- Functor
     
     Tᵒ : Obj → Time → Obj
+    
     Tᶠ : ∀ {A B τ} → A →ᵐ B → Tᵒ A τ →ᵐ Tᵒ B τ
 
     -- Unit and multiplication
 
     ηᵀ : ∀ {A} → A →ᵐ Tᵒ A 0
+    
     μᵀ : ∀ {A τ τ'} → Tᵒ (Tᵒ A τ') τ →ᵐ Tᵒ A (τ + τ')
 
     -- Equality coercion/substitutions
 
     τ-substᵀ : ∀ {A τ τ'} → τ ≡ τ' → Tᵒ A τ →ᵐ Tᵒ A τ'
 
-    τ-substᵀ-refl : ∀ {A τ} → τ-substᵀ {A} {τ} refl ≡ idᵐ
-    τ-substᵀ-trans : ∀ {A τ τ' τ''}
-                   → (p : τ ≡ τ') → (q : τ' ≡ τ'')
-                   → τ-substᵀ q ∘ᵐ τ-substᵀ p ≡ τ-substᵀ {A} (trans p q)
+    τ-substᵀ-refl : ∀ {A τ}
+                  → τ-substᵀ {A} {τ} refl
+                  ≡ idᵐ
+    
+    τ-substᵀ-trans : ∀ {A τ τ' τ''} → (p : τ ≡ τ') → (q : τ' ≡ τ'')
+                   → τ-substᵀ q ∘ᵐ τ-substᵀ p
+                   ≡ τ-substᵀ {A} (trans p q)
 
     -- Functoriality
 
-    T-idᵐ : ∀ {A τ} → Tᶠ {A} {A} {τ} idᵐ ≡ idᵐ
+    T-idᵐ : ∀ {A τ}
+          → Tᶠ {A} {A} {τ} idᵐ
+          ≡ idᵐ
+    
     T-∘ᵐ : ∀ {A B C τ} → (g : B →ᵐ C) → (f : A →ᵐ B)
-         → Tᶠ {A} {C} {τ} (g ∘ᵐ f) ≡ Tᶠ g ∘ᵐ Tᶠ f
+         → Tᶠ {A} {C} {τ} (g ∘ᵐ f)
+         ≡ Tᶠ g ∘ᵐ Tᶠ f
 
     -- Unit and multiplication are natural
 
     ηᵀ-nat : ∀ {A B} → (f : A →ᵐ B) → ηᵀ ∘ᵐ f ≡ Tᶠ f ∘ᵐ ηᵀ
-    μᵀ-nat : ∀ {A B τ τ'} → (f : A →ᵐ B) → μᵀ {τ = τ} {τ' = τ'} ∘ᵐ Tᶠ (Tᶠ f) ≡ Tᶠ f ∘ᵐ μᵀ
+    
+    μᵀ-nat : ∀ {A B τ τ'} → (f : A →ᵐ B)
+           →    μᵀ {τ = τ} {τ' = τ'}
+             ∘ᵐ Tᶠ (Tᶠ f)
+           ≡    Tᶠ f
+             ∘ᵐ μᵀ
 
     -- Graded monad laws
 
-    T-μ∘η≡id : ∀ {A τ} →  μᵀ {τ = 0} {τ' = τ} ∘ᵐ ηᵀ {Tᵒ A τ} ≡ idᵐ
-    T-μ∘Tη≡id : ∀ {A τ} →  μᵀ {τ = τ} {τ' = 0} ∘ᵐ Tᶠ (ηᵀ {A}) ≡ τ-substᵀ (sym (+-identityʳ τ))
-    T-μ∘μ≡μ∘Tμ : ∀ {A τ τ' τ''} →  μᵀ {A} {τ} {τ' + τ''} ∘ᵐ Tᶠ μᵀ ≡ τ-substᵀ (+-assoc τ τ' τ'') ∘ᵐ μᵀ ∘ᵐ μᵀ
+    T-μ∘η≡id : ∀ {A τ}
+             →    μᵀ {τ = 0} {τ' = τ}
+               ∘ᵐ ηᵀ {Tᵒ A τ}
+             ≡ idᵐ
+    
+    T-μ∘Tη≡id : ∀ {A τ}
+              →    μᵀ {τ = τ} {τ' = 0}
+                ∘ᵐ Tᶠ (ηᵀ {A})
+              ≡ τ-substᵀ (sym (+-identityʳ τ))
+    
+    T-μ∘μ≡μ∘Tμ : ∀ {A τ τ' τ''}
+               →    μᵀ {A} {τ} {τ' + τ''}
+                 ∘ᵐ Tᶠ μᵀ
+               ≡    τ-substᵀ (+-assoc τ τ' τ'')
+                 ∘ᵐ μᵀ
+                 ∘ᵐ μᵀ
 
     -- EFFECTS
 
     -- Operations
 
     delayᵀ : ∀ {A} (τ : Time) {τ'} → [ τ ]ᵒ (Tᵒ A τ') →ᵐ Tᵒ A (τ + τ')
+    
     opᵀ : ∀ {A τ} → (op : Op)
         → ⟦ param op ⟧ᵍ ×ᵐ [ op-time op ]ᵒ (⟦ arity op ⟧ᵍ ⇒ᵐ Tᵒ A τ) →ᵐ Tᵒ A (op-time op + τ)
 
     -- Operations are natural
 
     delayᵀ-nat : ∀ {A B} (τ : Time) {τ'} → (f : A →ᵐ B)
-               →  delayᵀ τ {τ' = τ'} ∘ᵐ [ τ ]ᶠ (Tᶠ f) ≡ Tᶠ f ∘ᵐ delayᵀ τ
+               →    delayᵀ τ {τ' = τ'}
+                 ∘ᵐ [ τ ]ᶠ (Tᶠ f)
+               ≡    Tᶠ f
+                 ∘ᵐ delayᵀ τ
+               
     opᵀ-nat : ∀ {A B τ} → (op : Op) → (f : A →ᵐ B)
-            →  opᵀ {τ = τ} op ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ (Tᶠ f))) ≡ Tᶠ f ∘ᵐ opᵀ op
+            →    opᵀ {τ = τ} op
+              ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ (Tᶠ f)))
+            ≡    Tᶠ f
+              ∘ᵐ opᵀ op
 
     -- Operations are algebraic
 
     delayᵀ-algebraicity : ∀ {A} (τ : Time) {τ' τ''}
-                        → μᵀ {A} {τ + τ'} {τ''} ∘ᵐ delayᵀ τ {τ'}
-                        ≡ τ-substᵀ (sym (+-assoc τ τ' τ'')) ∘ᵐ delayᵀ τ ∘ᵐ [ τ ]ᶠ (μᵀ {A} {τ'} {τ''})
+                        →    μᵀ {A} {τ + τ'} {τ''}
+                          ∘ᵐ delayᵀ τ {τ'}
+                        ≡    τ-substᵀ (sym (+-assoc τ τ' τ''))
+                          ∘ᵐ delayᵀ τ
+                          ∘ᵐ [ τ ]ᶠ (μᵀ {A} {τ'} {τ''})
+                        
     opᵀ-algebraicity : ∀ {A τ τ'} → (op : Op)
-                     → μᵀ {A} {op-time op + τ} {τ'} ∘ᵐ opᵀ {τ = τ} op
-                     ≡ τ-substᵀ (sym (+-assoc (op-time op) τ τ')) ∘ᵐ opᵀ op ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ μᵀ))
+                     →    μᵀ {A} {op-time op + τ} {τ'}
+                       ∘ᵐ opᵀ {τ = τ} op
+                     ≡    τ-substᵀ (sym (+-assoc (op-time op) τ τ'))
+                       ∘ᵐ opᵀ op
+                       ∘ᵐ mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ μᵀ))
 
     -- STRENGTH
 
@@ -122,17 +165,23 @@ record Monad : Set₁ where
               → Tᶠ sndᵐ ∘ᵐ strᵀ {A} {B} {τ} ≡ sndᵐ
 
     strᵀ-assoc : ∀ {A B C τ}
-               → Tᶠ ×ᵐ-assoc⁻¹ ∘ᵐ strᵀ ∘ᵐ mapˣᵐ []-monoidal idᵐ ∘ᵐ ×ᵐ-assoc
-               ≡ strᵀ {A} ∘ᵐ mapˣᵐ idᵐ (strᵀ {B} {C} {τ})
+               →    Tᶠ ×ᵐ-assoc⁻¹
+                 ∘ᵐ strᵀ
+                 ∘ᵐ mapˣᵐ []-monoidal idᵐ ∘ᵐ ×ᵐ-assoc
+               ≡    strᵀ {A}
+                 ∘ᵐ mapˣᵐ idᵐ (strᵀ {B} {C} {τ})
 
     -- Operations are algebraic wrt strength
 
     strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ'}
-                             → strᵀ {A} {B} {τ + τ'} ∘ᵐ mapˣᵐ idᵐ (delayᵀ τ {τ'})
-                             ≡ delayᵀ τ ∘ᵐ [ τ ]ᶠ (strᵀ {A} {B} {τ'}) ∘ᵐ []-monoidal ∘ᵐ mapˣᵐ (δ {A} {τ} {τ'}) idᵐ
+                             →    strᵀ {A} {B} {τ + τ'}
+                               ∘ᵐ mapˣᵐ idᵐ (delayᵀ τ {τ'})
+                             ≡    delayᵀ τ ∘ᵐ [ τ ]ᶠ (strᵀ {A} {B} {τ'})
+                               ∘ᵐ []-monoidal ∘ᵐ mapˣᵐ (δ {A} {τ} {τ'}) idᵐ
 
     strᵀ-opᵀ-algebraicity : ∀ {A B τ} → (op : Op)
-                          → strᵀ {A} {B} ∘ᵐ mapˣᵐ idᵐ (opᵀ op)
+                          →    strᵀ {A} {B}
+                            ∘ᵐ mapˣᵐ idᵐ (opᵀ op)
                           ≡    opᵀ op
                             ∘ᵐ mapˣᵐ
                                  idᵐ
@@ -152,19 +201,35 @@ record Monad : Set₁ where
                            ⇒ᵐ Tᵒ A (op-time op + τ'')))
                       →ᵐ Tᵒ (Tᵒ A τ') τ ⇒ᵐ Tᵒ A (τ + τ')
 
-    -- Properties
+    -- T-alg-of-handlerᵀ is an algebra
 
     T-alg-of-handlerᵀ-ηᵀ : ∀ {A τ}
-                         → uncurryᵐ T-alg-of-handlerᵀ ∘ᵐ mapˣᵐ idᵐ (ηᵀ {Tᵒ A τ})
+                         →    uncurryᵐ T-alg-of-handlerᵀ
+                           ∘ᵐ mapˣᵐ idᵐ (ηᵀ {Tᵒ A τ})
                          ≡ sndᵐ
 
     T-alg-of-handlerᵀ-delayᵀ : ∀ {A τ τ' τ''}
-                             → uncurryᵐ T-alg-of-handlerᵀ ∘ᵐ mapˣᵐ idᵐ (delayᵀ {Tᵒ A τ''} τ {τ'})
+                             →    uncurryᵐ T-alg-of-handlerᵀ
+                               ∘ᵐ mapˣᵐ idᵐ (delayᵀ {Tᵒ A τ''} τ {τ'})
                              ≡    τ-substᵀ (sym (+-assoc τ τ' τ''))
                                ∘ᵐ delayᵀ τ
                                ∘ᵐ [ τ ]ᶠ (uncurryᵐ T-alg-of-handlerᵀ)
                                ∘ᵐ [ τ ]ᶠ (mapˣᵐ ε-⟨⟩ idᵐ)
                                ∘ᵐ []-monoidal
                                ∘ᵐ mapˣᵐ η⊣ idᵐ
+
+    T-alg-of-handlerᵀ-opᵀ : ∀ {A τ τ'} → (op : Op)
+                          →    uncurryᵐ T-alg-of-handlerᵀ
+                            ∘ᵐ mapˣᵐ idᵐ (opᵀ {Tᵒ A τ'} {τ} op)
+                          ≡    τ-substᵀ (sym (+-assoc (op-time op) τ τ'))
+                            ∘ᵐ appᵐ
+                            ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ (uncurryᵐ T-alg-of-handlerᵀ))))
+                            ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (curryᵐ (mapˣᵐ idᵐ appᵐ ∘ᵐ ×ᵐ-assoc⁻¹))))
+                            ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (mapˣᵐ ε-⟨⟩ idᵐ)))
+                            ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ []-monoidal)
+                            ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ (mapˣᵐ (η⊣ {τ = op-time op}) idᵐ))
+                            ∘ᵐ mapˣᵐ idᵐ ⟨ fstᵐ ∘ᵐ sndᵐ , ⟨ fstᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
+                            ∘ᵐ mapˣᵐ (projᵐ (τ + τ') ∘ᵐ projᵐ op) idᵐ
+                            ∘ᵐ ⟨ fstᵐ , idᵐ ⟩ᵐ
 
     -- ...
