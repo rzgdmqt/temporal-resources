@@ -27,6 +27,9 @@ open import Semantics.Soundness.;-perform Mod
 open import Semantics.Soundness.;-assoc Mod
 
 open import Semantics.Soundness.·-lam Mod
+
+open import Semantics.Soundness.handle-return Mod
+
 open import Semantics.Soundness.unbox-box Mod
 open import Semantics.Soundness.;-eta Mod
 open import Semantics.Soundness.absurd-eta Mod
@@ -284,7 +287,7 @@ mutual
     {.(handle return V `with H `in N)}
     {.(C-rename (cong-∷-ren ⟨⟩-η-ren) N [ Hd ↦ V ]c)}
     (handle-return V H N) =
-      {!!}
+      handle-return-sound V H N
   C-soundness {Γ} {_}
     {.(handle perform op V M `with H `in N)}
     {.(τ-subst (sym (+-assoc (op-time op) _ _))
