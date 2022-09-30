@@ -273,7 +273,46 @@ delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
               ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ η⊣ idᵐ)
               ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ))
               ∘ᵐ ⟨ idᵐ , ⟨ idᵐ , η⊣ ⟩ᵐ ⟩ᵐ
+            ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ
+                (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _)) (sym (trans (∘ᵐ-congʳ (sym (mapˣᵐ-∘ᵐ _ _ _ _)))
+                  (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _))
+                    (cong₂ mapˣᵐ
+                      (trans (∘ᵐ-congˡ []-idᵐ) (trans (∘ᵐ-identityˡ _) (trans (∘ᵐ-identityˡ _) (sym (∘ᵐ-identityʳ _)))))
+                      (sym (trans (∘ᵐ-identityˡ _) (sym (trans (∘ᵐ-congʳ (sym (mapˣᵐ-∘ᵐ _ _ _ _)))
+                        (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _))
+                          (cong₂ mapˣᵐ
+                            (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym ([]-∘ᵐ _ _)))
+                              (trans (∘ᵐ-congˡ (cong [ τ ]ᶠ (trans (sym ([]-∘ᵐ _ _)) (cong [ τ' ]ᶠ
+                                (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _))
+                                  (∘ᵐ-congˡ ⟨⟩-μ∘μ⁻¹≡id))) (trans (∘ᵐ-congʳ (∘ᵐ-identityˡ _))
+                                    (trans
+                                      (⟨⟩-≤-trans (≤-reflexive (+-comm τ τ')) (≤-reflexive (sym (+-comm τ τ'))))
+                                      (trans (cong ⟨⟩-≤ (≤-irrelevant _ _)) ⟨⟩-≤-refl)))))))))
+                                        (trans (∘ᵐ-congˡ (trans (cong [ τ ]ᶠ []-idᵐ) []-idᵐ)) (∘ᵐ-identityˡ _)))))
+                            (trans (∘ᵐ-congˡ (trans (cong [ τ ]ᶠ T-idᵐ) []-idᵐ))
+                              (trans (∘ᵐ-identityˡ _) (∘ᵐ-identityˡ _)))))))))))))))))) ⟩
+                 mapˣᵐ ([ τ ]ᶠ idᵐ) ([ τ ]ᶠ (Tᶠ ⟦ N ⟧ᶜᵗ))
+              ∘ᵐ mapˣᵐ ([ τ ]ᶠ idᵐ) ([ τ ]ᶠ strᵀ)
+              ∘ᵐ mapˣᵐ idᵐ []-monoidal
+              ∘ᵐ (   mapˣᵐ ([ τ ]ᶠ idᵐ) (mapˣᵐ ([ τ ]ᶠ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ {τ₁ = τ'} {τ₂ = τ}))) ([ τ ]ᶠ (Tᶠ idᵐ)))
+                  ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ ([ τ ]ᶠ ([ τ' ]ᶠ (μ⁻¹ ∘ᵐ ⟨⟩-≤ (≤-reflexive (sym (+-comm τ τ')))))) idᵐ)
+                  ∘ᵐ mapˣᵐ η⊣ (mapˣᵐ δ idᵐ))
+              ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ η⊣ idᵐ)
+              ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ))
+              ∘ᵐ ⟨ idᵐ , ⟨ idᵐ , η⊣ ⟩ᵐ ⟩ᵐ
             ≡⟨ {!!} ⟩
+                 mapˣᵐ ([ τ ]ᶠ idᵐ) ([ τ ]ᶠ (Tᶠ ⟦ N ⟧ᶜᵗ))
+              ∘ᵐ mapˣᵐ ([ τ ]ᶠ idᵐ) ([ τ ]ᶠ strᵀ)
+              ∘ᵐ mapˣᵐ idᵐ []-monoidal
+              ∘ᵐ mapˣᵐ ([ τ ]ᶠ idᵐ) (mapˣᵐ ([ τ ]ᶠ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ))) ([ τ ]ᶠ (Tᶠ idᵐ)))
+              ∘ᵐ ⟨ [ τ ]ᶠ idᵐ , ⟨ [ τ ]ᶠ η⊣ , [ τ ]ᶠ ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+              ∘ᵐ η⊣
+            ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ
+                (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _)) (trans
+                  (cong₂ mapˣᵐ
+                    (trans (∘ᵐ-identityˡ _) (sym (∘ᵐ-identityʳ _)))
+                    (sym ([]-monoidal-nat _ _)))
+                (mapˣᵐ-∘ᵐ _ _ _ _)))) (∘ᵐ-assoc _ _ _)))) ⟩
                  mapˣᵐ ([ τ ]ᶠ idᵐ) ([ τ ]ᶠ (Tᶠ ⟦ N ⟧ᶜᵗ))
               ∘ᵐ mapˣᵐ ([ τ ]ᶠ idᵐ) ([ τ ]ᶠ strᵀ)
               ∘ᵐ mapˣᵐ ([ τ ]ᶠ idᵐ) ([ τ ]ᶠ (mapˣᵐ ([ τ' ]ᶠ (⟨⟩-≤ (≤-reflexive (+-comm τ τ')) ∘ᵐ μ)) (Tᶠ idᵐ)))
