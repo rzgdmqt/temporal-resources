@@ -54,6 +54,18 @@ mutual
             -------------------
             → Γ ⊢V⦂ V == U
 
+    -- substitutivity
+
+    V-subst : ∀ {Γ' A B τ}
+            → {V W : Γ' ⊢V⦂ B}
+            → (p : Γ' ⊢V⦂ V == W)
+            → (x : A ∈[ τ ] Γ')
+            → (q : proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) ≡ Γ)
+            → (U : proj₁ (var-split x) ⊢V⦂ A)
+            ---------------------------------------------------------------
+            → Γ ⊢V⦂ subst (_⊢V⦂ B) q (V [ x ↦ U ]v)
+                == subst (_⊢V⦂ B) q (W [ x ↦ U ]v)
+
     -- congruence equations
 
     lam-cong : ∀ {A B τ}
@@ -104,6 +116,18 @@ mutual
             → Γ ⊢C⦂ N == P
             -------------------
             → Γ ⊢C⦂ M == P
+
+    -- substitutivity
+
+    C-subst : ∀ {Γ' A C τ}
+            → {M N : Γ' ⊢C⦂ C}
+            → (p : Γ' ⊢C⦂ M == N)
+            → (x : A ∈[ τ ] Γ')
+            → (q : proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) ≡ Γ)
+            → (V : proj₁ (var-split x) ⊢V⦂ A)
+            ---------------------------------------------------------------
+            → Γ ⊢C⦂ subst (_⊢C⦂ C) q (M [ x ↦ V ]c)
+                == subst (_⊢C⦂ C) q (N [ x ↦ V ]c)
 
     -- congruence equations
 

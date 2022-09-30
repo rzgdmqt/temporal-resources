@@ -6,6 +6,8 @@ open import Semantics.Model
 
 module Semantics.Soundness (Mod : Model) where
 
+open import Data.Product
+
 open import Relation.Nullary
 
 open import Syntax.Types
@@ -71,6 +73,22 @@ mutual
     ≡⟨ V-soundness q ⟩
       ⟦ U ⟧ᵛᵗ
     ∎
+  V-soundness {_} {_} {_} {_} (V-subst {Γ'} {A} {B} {τ} {V} {W} p x refl U) =
+    begin
+      ⟦ V [ x ↦ U ]v ⟧ᵛᵗ
+    ≡⟨ V-subst≡∘ᵐ V x U ⟩
+         ⟦ V ⟧ᵛᵗ
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ U ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ ∘ᵐ-congˡ (V-soundness p) ⟩
+         ⟦ W ⟧ᵛᵗ
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ U ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ sym (V-subst≡∘ᵐ W x U) ⟩
+      ⟦ W [ x ↦ U ]v ⟧ᵛᵗ
+    ∎
   V-soundness {Γ} {.(_ ⇒ _ ‼ _)} {lam M} {lam N} (lam-cong p) = 
     begin
       curryᵐ ⟦ M ⟧ᶜᵗ
@@ -133,6 +151,22 @@ mutual
       ⟦ N ⟧ᶜᵗ
     ≡⟨ C-soundness q ⟩
       ⟦ P ⟧ᶜᵗ
+    ∎
+  C-soundness {_} {_} {_} {_} (C-subst {Γ'} {A} {C} {τ} {M} {N} p x refl V) =
+    begin
+      ⟦ M [ x ↦ V ]c ⟧ᶜᵗ
+    ≡⟨ C-subst≡∘ᵐ M x V ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ ∘ᵐ-congˡ (C-soundness p) ⟩
+         ⟦ N ⟧ᶜᵗ
+      ∘ᵐ split-env⁻¹ (proj₁ (proj₂ (proj₂ (var-split x))))
+      ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
+    ≡⟨ sym (C-subst≡∘ᵐ N x V) ⟩
+      ⟦ N [ x ↦ V ]c ⟧ᶜᵗ
     ∎
   C-soundness {Γ} {_} {return V} {return W} (return-cong p) = 
     begin
