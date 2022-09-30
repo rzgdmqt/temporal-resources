@@ -58,6 +58,127 @@ delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
     ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
     ∘ᵐ mapˣᵐ idᵐ strᵀ 
     ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , delayᵀ τ ∘ᵐ [ τ ]ᶠ ⟦ M ⟧ᶜᵗ ∘ᵐ η⊣ ⟩ᵐ ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans (trans (trans
+      (cong₂ ⟨_,_⟩ᵐ
+        (sym (trans (∘ᵐ-identityˡ _) (trans (∘ᵐ-identityˡ _) (∘ᵐ-identityˡ _))))
+        (trans (trans (trans
+          (cong₂ ⟨_,_⟩ᵐ
+            (sym (trans (∘ᵐ-identityˡ _) (trans (∘ᵐ-congʳ (∘ᵐ-identityˡ _)) (∘ᵐ-identityʳ _))))
+            (sym (∘ᵐ-congʳ (∘ᵐ-identityˡ _))))
+          (mapˣᵐ-⟨⟩ᵐ _ _ _ _)) (∘ᵐ-congʳ (mapˣᵐ-⟨⟩ᵐ _ _ _ _))) (∘ᵐ-congʳ (∘ᵐ-congʳ (mapˣᵐ-⟨⟩ᵐ _ _ _ _)))))
+      (mapˣᵐ-⟨⟩ᵐ _ _ _ _)) (∘ᵐ-congʳ (mapˣᵐ-⟨⟩ᵐ _ _ _ _))) (∘ᵐ-congʳ (∘ᵐ-congʳ (mapˣᵐ-⟨⟩ᵐ _ _ _ _)))))) ⟩
+       uncurryᵐ (   T-alg-of-handlerᵀ
+                 ∘ᵐ ⟨ (λ op → ⟨ (λ τ''' →
+                          (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
+                           ∘ᵐ curryᵐ (⟦ H op τ''' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                       ∘ᵐ projᵐ τ''') ⟩ᵢᵐ
+                    ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                 ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
+    ∘ᵐ mapˣᵐ idᵐ strᵀ 
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ (delayᵀ τ))
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ η⊣ idᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ))
+    ∘ᵐ ⟨ idᵐ , ⟨ idᵐ , η⊣ ⟩ᵐ ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ
+      (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _)) (cong (mapˣᵐ (idᵐ ∘ᵐ idᵐ)) strᵀ-delayᵀ-algebraicity)))
+        (trans (∘ᵐ-congˡ (cong₂ mapˣᵐ (sym (∘ᵐ-identityˡ _)) refl))
+          (trans (∘ᵐ-congˡ (trans (mapˣᵐ-∘ᵐ _ _ _ _) (∘ᵐ-congʳ (mapˣᵐ-∘ᵐ _ _ _ _))))
+            (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ
+              (trans (∘ᵐ-congˡ (cong₂ mapˣᵐ (sym (∘ᵐ-identityˡ _)) refl))
+                (trans (∘ᵐ-congˡ (mapˣᵐ-∘ᵐ _ _ _ _)) (∘ᵐ-assoc _ _ _)))))))))))) ⟩
+       uncurryᵐ (   T-alg-of-handlerᵀ
+                 ∘ᵐ ⟨ (λ op → ⟨ (λ τ''' →
+                          (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
+                           ∘ᵐ curryᵐ (⟦ H op τ''' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                       ∘ᵐ projᵐ τ''') ⟩ᵢᵐ
+                    ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                 ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ)
+    ∘ᵐ mapˣᵐ idᵐ (delayᵀ τ) 
+    ∘ᵐ mapˣᵐ idᵐ ([ τ ]ᶠ strᵀ)
+    ∘ᵐ mapˣᵐ idᵐ []-monoidal
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ δ idᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ η⊣ idᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ))
+    ∘ᵐ ⟨ idᵐ , ⟨ idᵐ , η⊣ ⟩ᵐ ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ
+      (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _)) (trans (cong (mapˣᵐ (idᵐ ∘ᵐ idᵐ))
+        (sym (delayᵀ-nat τ _))) (mapˣᵐ-∘ᵐ _ _ _ _)))) (∘ᵐ-assoc _ _ _))) ⟩
+       uncurryᵐ (   T-alg-of-handlerᵀ
+                 ∘ᵐ ⟨ (λ op → ⟨ (λ τ''' →
+                          (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
+                           ∘ᵐ curryᵐ (⟦ H op τ''' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                       ∘ᵐ projᵐ τ''') ⟩ᵢᵐ
+                    ∘ᵐ projᵐ op) ⟩ᵢᵐ
+                 ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (delayᵀ τ)
+    ∘ᵐ mapˣᵐ idᵐ ([ τ ]ᶠ (Tᶠ ⟦ N ⟧ᶜᵗ))
+    ∘ᵐ mapˣᵐ idᵐ ([ τ ]ᶠ strᵀ)
+    ∘ᵐ mapˣᵐ idᵐ []-monoidal
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ δ idᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ η⊣ idᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ))
+    ∘ᵐ ⟨ idᵐ , ⟨ idᵐ , η⊣ ⟩ᵐ ⟩ᵐ
+  ≡⟨ trans (∘ᵐ-congˡ (uncurryᵐ-nat _ _)) (∘ᵐ-assoc _ _ _) ⟩
+       uncurryᵐ T-alg-of-handlerᵀ
+    ∘ᵐ mapˣᵐ (   ⟨ (λ op → ⟨ (λ τ''' →
+                             (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
+                              ∘ᵐ curryᵐ (⟦ H op τ''' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                          ∘ᵐ projᵐ τ''') ⟩ᵢᵐ
+                       ∘ᵐ projᵐ op) ⟩ᵢᵐ
+              ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ) idᵐ
+    ∘ᵐ mapˣᵐ idᵐ (delayᵀ τ)
+    ∘ᵐ mapˣᵐ idᵐ ([ τ ]ᶠ (Tᶠ ⟦ N ⟧ᶜᵗ))
+    ∘ᵐ mapˣᵐ idᵐ ([ τ ]ᶠ strᵀ)
+    ∘ᵐ mapˣᵐ idᵐ []-monoidal
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ δ idᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ η⊣ idᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ))
+    ∘ᵐ ⟨ idᵐ , ⟨ idᵐ , η⊣ ⟩ᵐ ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ
+      (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _)) (trans
+        (cong₂ mapˣᵐ
+          (trans (∘ᵐ-identityʳ _) (sym (∘ᵐ-identityˡ _)))
+          (trans (∘ᵐ-identityˡ _) (sym (∘ᵐ-identityʳ _))))
+      (mapˣᵐ-∘ᵐ _ _ _ _)))) (∘ᵐ-assoc _ _ _))) ⟩
+       uncurryᵐ T-alg-of-handlerᵀ
+    ∘ᵐ mapˣᵐ idᵐ (delayᵀ τ)
+    ∘ᵐ mapˣᵐ (   ⟨ (λ op → ⟨ (λ τ''' →
+                             (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
+                              ∘ᵐ curryᵐ (⟦ H op τ''' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                          ∘ᵐ projᵐ τ''') ⟩ᵢᵐ
+                       ∘ᵐ projᵐ op) ⟩ᵢᵐ
+              ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ) idᵐ
+    ∘ᵐ mapˣᵐ idᵐ ([ τ ]ᶠ (Tᶠ ⟦ N ⟧ᶜᵗ))
+    ∘ᵐ mapˣᵐ idᵐ ([ τ ]ᶠ strᵀ)
+    ∘ᵐ mapˣᵐ idᵐ []-monoidal
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ δ idᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ η⊣ idᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ))
+    ∘ᵐ ⟨ idᵐ , ⟨ idᵐ , η⊣ ⟩ᵐ ⟩ᵐ
+  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ T-alg-of-handlerᵀ-delayᵀ)
+      (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ
+        (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))))))))) ⟩
+       τ-substᵀ (sym (+-assoc τ τ' τ''))
+    ∘ᵐ delayᵀ τ
+    ∘ᵐ [ τ ]ᶠ (uncurryᵐ T-alg-of-handlerᵀ)
+    ∘ᵐ [ τ ]ᶠ (mapˣᵐ ε-⟨⟩ idᵐ)
+    ∘ᵐ []-monoidal
+    ∘ᵐ mapˣᵐ η⊣ idᵐ
+    ∘ᵐ mapˣᵐ (   ⟨ (λ op → ⟨ (λ τ''' →
+                             (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
+                              ∘ᵐ curryᵐ (⟦ H op τ''' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ))
+                          ∘ᵐ projᵐ τ''') ⟩ᵢᵐ
+                       ∘ᵐ projᵐ op) ⟩ᵢᵐ
+              ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ) idᵐ
+    ∘ᵐ mapˣᵐ idᵐ ([ τ ]ᶠ (Tᶠ ⟦ N ⟧ᶜᵗ))
+    ∘ᵐ mapˣᵐ idᵐ ([ τ ]ᶠ strᵀ)
+    ∘ᵐ mapˣᵐ idᵐ []-monoidal
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ δ idᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ η⊣ idᵐ)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ))
+    ∘ᵐ ⟨ idᵐ , ⟨ idᵐ , η⊣ ⟩ᵐ ⟩ᵐ
   ≡⟨ {!!} ⟩
        τ-substᵀ (sym (+-assoc τ τ' τ''))
     ∘ᵐ delayᵀ τ

@@ -186,6 +186,21 @@ mapˣᵐ-∘ᵐ f g h i =
     mapˣᵐ h i ∘ᵐ mapˣᵐ f g
   ∎
 
+mapˣᵐ-⟨⟩ᵐ : ∀ {A B C D E} → (f : A →ᵐ B) (g : A →ᵐ C) (h : B →ᵐ D) (i : C →ᵐ E)
+          → ⟨ h ∘ᵐ f , i ∘ᵐ g ⟩ᵐ ≡ mapˣᵐ h i ∘ᵐ ⟨ f , g ⟩ᵐ
+mapˣᵐ-⟨⟩ᵐ f g h i = 
+  begin
+    ⟨ h ∘ᵐ f , i ∘ᵐ g ⟩ᵐ
+  ≡⟨ cong₂ ⟨_,_⟩ᵐ
+       (sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))))
+       (sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _)))) ⟩
+    ⟨ (h ∘ᵐ fstᵐ) ∘ᵐ ⟨ f , g ⟩ᵐ ,
+      (i ∘ᵐ sndᵐ) ∘ᵐ ⟨ f , g ⟩ᵐ ⟩ᵐ
+  ≡⟨ ⟨⟩ᵐ-∘ᵐ _ _ _ ⟩
+       mapˣᵐ h i
+    ∘ᵐ ⟨ f , g ⟩ᵐ
+  ∎
+
 -- SET-INDEXED PRODUCTS
 
 ⟨⟩ᵢᵐ-∘ᵐ : ∀ {I} {A B} {C : I → Obj}
