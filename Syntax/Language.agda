@@ -68,7 +68,7 @@ mutual
 
     -- sequential composition
     
-    _;_     : {A B : VType}      -- note: use \;0 to get this unicode semicolon
+    _;_     : {A B : VType}      -- NOTE: use \;0 to get this unicode semicolon
             → {τ τ' : Time}
             → Γ ⊢C⦂ A ‼ τ
             → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
@@ -101,6 +101,15 @@ mutual
             -------------------------------------------------------
             → Γ ⊢C⦂ A ‼ (op-time op + τ)
 
+    -- explicit delaying of a computation
+
+    delay   : {A : VType}
+            → {τ' : Time}
+            → (τ : Time)
+            → Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ'
+            --------------------
+            → Γ ⊢C⦂ A ‼ (τ + τ')
+
     -- effect handling
 
     handle_`with_`in
@@ -125,12 +134,3 @@ mutual
             → Γ ∷ A  ⊢C⦂ C
             --------------------
             → Γ ⊢C⦂ C
-
-    -- explicit delaying of a computation
-
-    delay   : {A : VType}
-            → {τ' : Time}
-            → (τ : Time)
-            → Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ'
-            --------------------
-            → Γ ⊢C⦂ A ‼ (τ + τ')

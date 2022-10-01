@@ -217,6 +217,11 @@ mutual
         g = [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) (idᵐ {Tᵒ ⟦ A ⟧ᵛ τ})) in
     opᵀ op ∘ᵐ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵐ ⟦ V ⟧ᵛᵗ , g ∘ᵐ f ⟩ᵐ
 
+  ⟦ delay τ M ⟧ᶜᵗ =
+       delayᵀ τ
+    ∘ᵐ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
+    ∘ᵐ η⊣ 
+
   ⟦_⟧ᶜᵗ {Γ} (handle_`with_`in {A} {B} {τ} {τ'} M H N) =
     let f : ⟦ Γ ⟧ᵉ →ᵐ Πᵐ Op (λ op → Πᵐ Time (λ τ'' → ⟦ Γ ⟧ᵉ))
         f = ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ in
@@ -245,11 +250,6 @@ mutual
                     ε⊣ {τ = τ}
                  ∘ᵐ (⟨ τ ⟩ᶠ ⟦ V ⟧ᵛᵗ)
                  ∘ᵐ env-⟨⟩-ᶜ τ p ⟩ᵐ
-
-  ⟦ delay τ M ⟧ᶜᵗ =
-       delayᵀ τ
-    ∘ᵐ ([ τ ]ᶠ ⟦ M ⟧ᶜᵗ)
-    ∘ᵐ η⊣ 
     
   infix 25 ⟦_⟧ᶜᵗ
 

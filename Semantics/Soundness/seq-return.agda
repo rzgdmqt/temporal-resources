@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Soundness.;-return (Mod : Model) where
+module Semantics.Soundness.seq-return (Mod : Model) where
 
 open import Relation.Nullary
 
@@ -26,13 +26,13 @@ open import Util.Equality
 
 open Model Mod
 
-;-return-sound : ∀ {Γ A B τ}
-               → (V : Γ ⊢V⦂ A)
-               → (M : Γ ⟨ 0 ⟩ ∷ A ⊢C⦂ B ‼ τ)
-               → ⟦ return V ; M ⟧ᶜᵗ
-               ≡ ⟦ C-rename (cong-∷-ren ⟨⟩-η-ren) M [ Hd ↦ V ]c ⟧ᶜᵗ
+seq-return-sound : ∀ {Γ A B τ}
+                 → (V : Γ ⊢V⦂ A)
+                 → (M : Γ ⟨ 0 ⟩ ∷ A ⊢C⦂ B ‼ τ)
+                 → ⟦ return V ; M ⟧ᶜᵗ
+                 ≡ ⟦ C-rename (cong-∷-ren ⟨⟩-η-ren) M [ Hd ↦ V ]c ⟧ᶜᵗ
 
-;-return-sound {Γ} {A} {B} V M =
+seq-return-sound {Γ} {A} {B} V M =
   begin
        μᵀ
     ∘ᵐ Tᶠ ⟦ M ⟧ᶜᵗ

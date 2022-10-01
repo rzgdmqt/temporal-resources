@@ -344,10 +344,10 @@ mutual
   C-rename ρ (V · W)          = V-rename ρ V · V-rename ρ W
   C-rename ρ (absurd V)       = absurd (V-rename ρ V)
   C-rename ρ (perform op V M) = perform op (V-rename ρ V) (C-rename (cong-ren ρ) M)
+  C-rename ρ (delay τ M)      = delay τ (C-rename (cong-ren ρ) M)
   C-rename ρ (handle M `with H `in N) =
     handle C-rename ρ M
     `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'') )
     `in (C-rename (cong-ren ρ) N)
   C-rename ρ (unbox {τ = τ} p V M) =
     unbox (≤-trans p (ren-≤-ctx-time ρ)) (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
-  C-rename ρ (delay τ M)      = delay τ (C-rename (cong-ren ρ) M)

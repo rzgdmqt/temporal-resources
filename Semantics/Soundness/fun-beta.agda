@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Soundness.·-lam (Mod : Model) where
+module Semantics.Soundness.fun-beta (Mod : Model) where
 
 open import Syntax.Types
 open import Syntax.Contexts
@@ -26,12 +26,13 @@ open import Util.Time
 
 open Model Mod
 
-·-lam-sound : ∀ {Γ A C}
-            → (M : Γ ∷ A ⊢C⦂ C)
-            → (W : Γ ⊢V⦂ A)
-            → ⟦ lam M · W ⟧ᶜᵗ ≡ ⟦ M [ Hd ↦ W ]c ⟧ᶜᵗ
+fun-beta-sound : ∀ {Γ A C}
+               → (M : Γ ∷ A ⊢C⦂ C)
+               → (W : Γ ⊢V⦂ A)
+               → ⟦ lam M · W ⟧ᶜᵗ
+               ≡ ⟦ M [ Hd ↦ W ]c ⟧ᶜᵗ
 
-·-lam-sound {Γ} {A} {C} M W = 
+fun-beta-sound {Γ} {A} {C} M W = 
   begin
        uncurryᵐ idᵐ
     ∘ᵐ ⟨ curryᵐ ⟦ M ⟧ᶜᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵐ

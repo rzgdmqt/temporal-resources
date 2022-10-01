@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Soundness.unbox-box (Mod : Model) where
+module Semantics.Soundness.box-unbox-beta (Mod : Model) where
 
 open import Syntax.Types
 open import Syntax.Contexts
@@ -29,14 +29,14 @@ open import Util.Time
 
 open Model Mod
 
-unbox-box-sound : ∀ {Γ A C τ}
-                → (p : τ ≤ ctx-time Γ)
-                → (V : (Γ -ᶜ τ) ⟨ τ ⟩ ⊢V⦂ A)
-                → (N : Γ ∷ A ⊢C⦂ C)
-                → ⟦ unbox p (box V) N ⟧ᶜᵗ
-                ≡ ⟦ N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ p) V ]c ⟧ᶜᵗ
+box-unbox-beta-sound : ∀ {Γ A C τ}
+                     → (p : τ ≤ ctx-time Γ)
+                     → (V : (Γ -ᶜ τ) ⟨ τ ⟩ ⊢V⦂ A)
+                     → (N : Γ ∷ A ⊢C⦂ C)
+                     → ⟦ unbox p (box V) N ⟧ᶜᵗ
+                     ≡ ⟦ N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ p) V ]c ⟧ᶜᵗ
 
-unbox-box-sound {Γ} {A} {C} {τ} p V N = 
+box-unbox-beta-sound {Γ} {A} {C} {τ} p V N = 
   begin
        ⟦ N ⟧ᶜᵗ
     ∘ᵐ ⟨ idᵐ ,

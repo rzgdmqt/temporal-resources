@@ -127,6 +127,8 @@ mutual
     absurd (V [ x ↦ W ]v)
   perform op V M [ x ↦ W ]c =
     perform op (V [ x ↦ W ]v) (M [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c)
+  delay τ M [ x ↦ W ]c =
+    delay τ (M [ Tl-⟨⟩ x ↦ W ]c)
   handle M `with H `in N [ x ↦ W ]c =
     handle M [ x ↦ W ]c
     `with (λ op τ'' → (H op τ'') [ Tl-∷ (Tl-∷ x) ↦ W ]c)
@@ -148,5 +150,3 @@ mutual
       (≤-trans s (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))))))
       (V-rename (eq-ren (var-not-in-ctx-after-ᶜ x (≰⇒> ¬p))) V)
       (M [ Tl-∷ x ↦ W ]c)
-  delay τ M [ x ↦ W ]c =
-    delay τ (M [ Tl-⟨⟩ x ↦ W ]c)

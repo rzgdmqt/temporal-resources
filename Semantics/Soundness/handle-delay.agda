@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Soundness.delay-handle (Mod : Model) where
+module Semantics.Soundness.handle-delay (Mod : Model) where
 
 open import Syntax.Types
 open import Syntax.Contexts
@@ -29,7 +29,7 @@ open import Util.Time
 
 open Model Mod
 
-delay-handle-sound : ∀ {Γ A B τ τ' τ''}
+handle-delay-sound : ∀ {Γ A B τ τ' τ''}
                    → (M : Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ')
                    → (H : (op : Op) (τ''' : Time)
                         → Γ ∷ type-of-gtype (param op) ∷
@@ -46,7 +46,7 @@ delay-handle-sound : ∀ {Γ A B τ τ' τ''}
                            `in
                            (C-rename (cong-∷-ren ⟨⟩-μ-ren) N))) ⟧ᶜᵗ
 
-delay-handle-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
+handle-delay-sound {Γ} {A} {B} {τ} {τ'} {τ''} M H N =
   begin
        uncurryᵐ (   T-alg-of-handlerᵀ
                  ∘ᵐ ⟨ (λ op → ⟨ (λ τ''' →

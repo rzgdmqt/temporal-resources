@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Soundness.;-assoc (Mod : Model) where
+module Semantics.Soundness.seq-assoc (Mod : Model) where
 
 open import Syntax.Types
 open import Syntax.Contexts
@@ -28,15 +28,15 @@ open import Util.Time
 
 open Model Mod
 
-;-assoc-sound : ∀ {Γ A B C τ τ' τ''}
-              → (M : Γ ⊢C⦂ A ‼ τ)
-              → (N : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
-              → (P : Γ ⟨ τ + τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
-              → ⟦ (M ; N) ; P ⟧ᶜᵗ
-              ≡ ⟦ τ-subst (sym (+-assoc τ τ' τ'')) (M ;
-                    (N ; C-rename (cong-∷-ren (cong-⟨⟩-ren wk-ren) ∘ʳ cong-∷-ren ⟨⟩-μ-ren) P)) ⟧ᶜᵗ
+seq-assoc-sound : ∀ {Γ A B C τ τ' τ''}
+                → (M : Γ ⊢C⦂ A ‼ τ)
+                → (N : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
+                → (P : Γ ⟨ τ + τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
+                → ⟦ (M ; N) ; P ⟧ᶜᵗ
+                ≡ ⟦ τ-subst (sym (+-assoc τ τ' τ'')) (M ;
+                      (N ; C-rename (cong-∷-ren (cong-⟨⟩-ren wk-ren) ∘ʳ cong-∷-ren ⟨⟩-μ-ren) P)) ⟧ᶜᵗ
 
-;-assoc-sound {Γ} {A} {B} {C} {τ} {τ'} {τ''} M N P = 
+seq-assoc-sound {Γ} {A} {B} {C} {τ} {τ'} {τ''} M N P = 
   begin
        μᵀ
     ∘ᵐ Tᶠ ⟦ P ⟧ᶜᵗ

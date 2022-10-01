@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Soundness.;-eta (Mod : Model) where
+module Semantics.Soundness.seq-eta (Mod : Model) where
 
 open import Relation.Nullary
 
@@ -29,12 +29,12 @@ open import Util.Time
 
 open Model Mod
 
-;-eta-sound : ∀ {Γ A τ}
-               → (M : Γ ⊢C⦂ A ‼ τ)
-               → ⟦ M ⟧ᶜᵗ
-               ≡ ⟦ τ-subst (+-identityʳ τ) (M ; return (var Hd)) ⟧ᶜᵗ
+seq-eta-sound : ∀ {Γ A τ}
+              → (M : Γ ⊢C⦂ A ‼ τ)
+              → ⟦ M ⟧ᶜᵗ
+              ≡ ⟦ τ-subst (+-identityʳ τ) (M ; return (var Hd)) ⟧ᶜᵗ
 
-;-eta-sound {Γ} {A} {τ} M =
+seq-eta-sound {Γ} {A} {τ} M =
   begin
     ⟦ M ⟧ᶜᵗ
   ≡⟨ sym (⟨⟩ᵐ-sndᵐ _ _) ⟩

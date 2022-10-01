@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Soundness.delay-; (Mod : Model) where
+module Semantics.Soundness.seq-delay (Mod : Model) where
 
 open import Syntax.Types
 open import Syntax.Contexts
@@ -27,14 +27,14 @@ open import Util.Time
 
 open Model Mod
 
-delay-;-sound : ∀ {Γ A B τ τ' τ''}
+seq-delay-sound : ∀ {Γ A B τ τ' τ''}
               → (M : Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ')
               → (N : Γ ⟨ τ + τ' ⟩ ∷ A ⊢C⦂ B ‼ τ'')
               → ⟦ delay τ M ; N ⟧ᶜᵗ
               ≡ ⟦ τ-subst (sym (+-assoc τ τ' τ''))
                     (delay τ (M ; C-rename (cong-∷-ren ⟨⟩-μ-ren) N)) ⟧ᶜᵗ
 
-delay-;-sound {Γ} {A} {B} {τ} {τ'} {τ''} M N = 
+seq-delay-sound {Γ} {A} {B} {τ} {τ'} {τ''} M N = 
   begin
        μᵀ
     ∘ᵐ Tᶠ ⟦ N ⟧ᶜᵗ

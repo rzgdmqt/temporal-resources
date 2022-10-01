@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Soundness.;-perform (Mod : Model) where
+module Semantics.Soundness.seq-perform (Mod : Model) where
 
 open import Syntax.Types
 open import Syntax.Contexts
@@ -28,16 +28,16 @@ open import Util.Time
 
 open Model Mod
 
-;-perform-sound : ∀ {Γ A B τ τ'}
-                → (op : Op)
-                → (V : Γ ⊢V⦂ type-of-gtype (param op))
-                → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
-                → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
-                → ⟦ perform op V M ; N ⟧ᶜᵗ
-                ≡ ⟦ τ-subst (sym (+-assoc (op-time op) τ τ'))
-                      (perform op V (M ; C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N)) ⟧ᶜᵗ
+seq-perform-sound : ∀ {Γ A B τ τ'}
+                  → (op : Op)
+                  → (V : Γ ⊢V⦂ type-of-gtype (param op))
+                  → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
+                  → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
+                  → ⟦ perform op V M ; N ⟧ᶜᵗ
+                  ≡ ⟦ τ-subst (sym (+-assoc (op-time op) τ τ'))
+                        (perform op V (M ; C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N)) ⟧ᶜᵗ
 
-;-perform-sound {Γ} {A} {B} {τ} {τ'} op V M N = 
+seq-perform-sound {Γ} {A} {B} {τ} {τ'} op V M N = 
   begin
        μᵀ
     ∘ᵐ Tᶠ ⟦ N ⟧ᶜᵗ
