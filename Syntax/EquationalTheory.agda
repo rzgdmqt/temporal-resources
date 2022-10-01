@@ -68,6 +68,14 @@ mutual
 
     -- congruence equations
 
+    ⦉⦊-cong : ∀ {A B}
+           → {V V' : Γ ⊢V⦂ A}
+           → {W W' : Γ ⊢V⦂ B}
+           → Γ ⊢V⦂ V == V'
+           → Γ ⊢V⦂ W == W'
+           ------------------------------
+           → Γ ⊢V⦂ ⦉ V , W ⦊ == ⦉ V' , W' ⦊
+
     lam-cong : ∀ {A B τ}
              → {M N : Γ ∷ A ⊢C⦂ B ‼ τ}
              → Γ ∷ A ⊢C⦂ M == N
@@ -152,6 +160,15 @@ mutual
            → Γ ⊢V⦂ W == W'
            ------------------------
            → Γ ⊢C⦂ V · W == V' · W'
+
+    match-cong : ∀ {A B C}
+               → {V W : Γ ⊢V⦂ A |×| B}
+               → {M N : Γ ∷ A ∷ B ⊢C⦂ C}
+               → Γ ⊢V⦂ V == W
+               → Γ ∷ A ∷ B ⊢C⦂ M == N
+               -------------------------
+               → Γ ⊢C⦂ match V `in M
+                   == match W `in N 
 
     absurd-cong : ∀ {C}
                 → {V W : Γ ⊢V⦂ Empty}
@@ -251,13 +268,44 @@ mutual
                        (M ; (N ; C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ
                                    cong-ren {Γ'' = [] ∷ B} ⟨⟩-μ-ren ) P))
 
-    -- computational/beta equation for function application
+    -- computational/beta-equation for function application
 
     fun-beta : ∀ {A C}
              → (M : Γ ∷ A ⊢C⦂ C)
              → (W : Γ ⊢V⦂ A)
-             ------------------------
-             → Γ ⊢C⦂ lam M · W == (M [ Hd ↦ W ]c)
+             ----------------------
+             → Γ ⊢C⦂ lam M · W
+                 == M [ Hd ↦ W ]c
+
+    -- beta-equation for pattern-matching
+
+    match-beta : ∀ {A B C}
+               → (V : Γ ⊢V⦂ A)
+               → (W : Γ ⊢V⦂ B)
+               → (M : Γ ∷ A ∷ B ⊢C⦂ C)
+               ------------------------------------
+               → Γ ⊢C⦂ match ⦉ V , W ⦊ `in M
+                   == M [ Hd ↦ V-rename wk-ren W ]c
+                        [ Hd ↦ V ]c
+
+    -- eta-equation for pattern-matching
+
+    match-eta : ∀ {A B C}
+              → (V : Γ ⊢V⦂ A |×| B)
+              → (M : Γ ∷ A |×| B ⊢C⦂ C)
+              -------------------------------------------------------------
+              → Γ ⊢C⦂ match V `in
+                       (C-rename (exch-ren ∘ʳ wk-ren ∘ʳ exch-ren ∘ʳ wk-ren)
+                         M [ Hd ↦ ⦉ var (Tl-∷ Hd) , var Hd ⦊ ]c)
+                  == M [ Hd ↦ V ]c
+
+    -- eta-equation for empty type elimination
+    
+    absurd-eta : ∀ {C}
+               → (V : Γ ⊢V⦂ Empty)
+               → (M : Γ ∷ Empty ⊢C⦂ C)
+               ---------------------------------
+               → Γ ⊢C⦂ absurd V == M [ Hd ↦ V ]c
 
     -- computational/beta-equations for effect handling
 
@@ -338,14 +386,6 @@ mutual
                       == unbox z≤n V
                            (C-rename (exch-ren ∘ʳ wk-ren) M
                              [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c)   
-
-    -- eta equation for empty type elimination
-    
-    absurd-eta : ∀ {C}
-               → (V : Γ ⊢V⦂ Empty)
-               → (M : Γ ∷ Empty ⊢C⦂ C)
-               ---------------------------------
-               → Γ ⊢C⦂ absurd V == M [ Hd ↦ V ]c
 
     -- NOTE: potential extension of the equational theory 
     -- with equations for collapsing successive delays

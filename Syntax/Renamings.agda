@@ -327,11 +327,12 @@ mutual
            ------------
            → Γ' ⊢V⦂ A
 
-  V-rename ρ (var x)   = var (proj₂ (proj₂ (var-rename ρ x)))
-  V-rename ρ (const c) = const c
-  V-rename ρ ⋆         = ⋆
-  V-rename ρ (lam M)   = lam (C-rename (cong-ren ρ) M)
-  V-rename ρ (box V)   = box (V-rename (cong-ren ρ) V)
+  V-rename ρ (var x)    = var (proj₂ (proj₂ (var-rename ρ x)))
+  V-rename ρ (const c)  = const c
+  V-rename ρ ⋆          = ⋆
+  V-rename ρ (⦉ V , W ⦊) = ⦉ V-rename ρ V , V-rename ρ W ⦊
+  V-rename ρ (lam M)    = lam (C-rename (cong-ren ρ) M)
+  V-rename ρ (box V)    = box (V-rename (cong-ren ρ) V)
 
   C-rename : ∀ {Γ Γ' C}
            → Ren Γ Γ'
@@ -342,6 +343,7 @@ mutual
   C-rename ρ (return V)       = return (V-rename ρ V)
   C-rename ρ (M ; N)          = C-rename ρ M ; C-rename (cong-ren ρ) N
   C-rename ρ (V · W)          = V-rename ρ V · V-rename ρ W
+  C-rename ρ (match V `in M)  = match V-rename ρ V `in C-rename (cong-ren ρ) M
   C-rename ρ (absurd V)       = absurd (V-rename ρ V)
   C-rename ρ (perform op V M) = perform op (V-rename ρ V) (C-rename (cong-ren ρ) M)
   C-rename ρ (delay τ M)      = delay τ (C-rename (cong-ren ρ) M)

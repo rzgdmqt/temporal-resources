@@ -53,6 +53,15 @@ mutual
     ≡⟨ sym terminalᵐ-unique ⟩
       terminalᵐ ∘ᵐ ⟦ ρ ⟧ʳ
     ∎
+  V-rename≡∘ᵐ ρ ⦉ V , W ⦊ =
+    begin
+      ⟨ ⟦ V-rename ρ V ⟧ᵛᵗ , ⟦ V-rename ρ W ⟧ᵛᵗ ⟩ᵐ
+    ≡⟨ cong₂ ⟨_,_⟩ᵐ (V-rename≡∘ᵐ ρ V) (V-rename≡∘ᵐ ρ W) ⟩
+      ⟨ ⟦ V ⟧ᵛᵗ ∘ᵐ ⟦ ρ ⟧ʳ , ⟦ W ⟧ᵛᵗ ∘ᵐ ⟦ ρ ⟧ʳ ⟩ᵐ
+    ≡⟨ ⟨⟩ᵐ-∘ᵐ _ _ _ ⟩
+         ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ ⟦ ρ ⟧ʳ
+    ∎
   V-rename≡∘ᵐ ρ (lam {A} M) =
     begin
       curryᵐ ⟦ C-rename (cong-∷-ren ρ) M ⟧ᶜᵗ
@@ -204,6 +213,51 @@ mutual
       appᵐ ∘ᵐ (⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵐ ∘ᵐ ⟦ ρ ⟧ʳ)
     ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
       (appᵐ ∘ᵐ ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵐ) ∘ᵐ ⟦ ρ ⟧ʳ
+    ∎
+  C-rename≡∘ᵐ ρ (match V `in M) =
+    begin
+         ⟦ C-rename (cong-∷-ren (cong-∷-ren ρ)) M ⟧ᶜᵗ
+      ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ , ⟦ V-rename ρ V ⟧ᵛᵗ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (cong ⟨ idᵐ ,_⟩ᵐ (V-rename≡∘ᵐ ρ V))) ⟩
+         ⟦ C-rename (cong-∷-ren (cong-∷-ren ρ)) M ⟧ᶜᵗ
+      ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ∘ᵐ ⟦ ρ ⟧ʳ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congˡ (C-rename≡∘ᵐ (cong-∷-ren (cong-∷-ren ρ)) M) ⟩
+         (   ⟦ M ⟧ᶜᵗ
+          ∘ᵐ ⟨ ⟨ ⟦ ρ ⟧ʳ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ)
+      ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ∘ᵐ ⟦ ρ ⟧ʳ ⟩ᵐ
+    ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨ ⟨ ⟦ ρ ⟧ʳ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ∘ᵐ ⟦ ρ ⟧ʳ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (trans (∘ᵐ-congʳ (sym (⟨⟩ᵐ-∘ᵐ _ _ _)))
+        (trans (sym (mapˣᵐ-⟨⟩ᵐ _ _ _ _)) (sym (trans (∘ᵐ-congʳ (sym (⟨⟩ᵐ-∘ᵐ _ _ _)))
+          (trans (sym (⟨⟩ᵐ-∘ᵐ _ _ _)) (cong₂ ⟨_,_⟩ᵐ
+            (trans (sym (⟨⟩ᵐ-∘ᵐ _ _ _)) (trans
+              (cong₂ ⟨_,_⟩ᵐ
+                (trans (⟨⟩ᵐ-fstᵐ _ _) (trans (∘ᵐ-identityˡ _) (sym
+                  (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (∘ᵐ-congʳ (sym (⟨⟩ᵐ-∘ᵐ _ _ _))))
+                    (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _)) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))
+                      (∘ᵐ-identityʳ _))))))))
+                (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _)) (sym
+                  (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-identityˡ _)
+                    (trans (∘ᵐ-congʳ (sym (⟨⟩ᵐ-∘ᵐ _ _ _))) (trans (⟨⟩ᵐ-sndᵐ _ _)
+                      (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _)))))))))))
+            (⟨⟩ᵐ-∘ᵐ _ _ _)))
+            (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _)) (sym
+              (trans (∘ᵐ-identityˡ _) (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))))))))))))) ⟩
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ
+      ∘ᵐ ⟦ ρ ⟧ʳ
+    ≡⟨ sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))) ⟩
+         (   ⟦ M ⟧ᶜᵗ
+          ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+          ∘ᵐ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ)
+      ∘ᵐ ⟦ ρ ⟧ʳ
     ∎
   C-rename≡∘ᵐ ρ (absurd V) =
     begin

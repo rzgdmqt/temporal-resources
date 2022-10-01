@@ -104,11 +104,12 @@ mutual
           -----------------------------------------------------------
           → proj₁ (var-split x) ++ᶜ proj₁ (proj₂ (var-split x)) ⊢V⦂ B
 
-  var y   [ x ↦ W ]v = y [ x ↦ W ]var
-  const c [ x ↦ W ]v = const c
-  ⋆       [ x ↦ W ]v = ⋆
-  lam M   [ x ↦ W ]v = lam (M [ Tl-∷ x ↦ W ]c)
-  box V   [ x ↦ W ]v = box (V [ Tl-⟨⟩ x ↦ W ]v)
+  var y      [ x ↦ W ]v = y [ x ↦ W ]var
+  const c    [ x ↦ W ]v = const c
+  ⦉ V₁ , V₂ ⦊ [ x ↦ W ]v = ⦉ V₁ [ x ↦ W ]v , V₂ [ x ↦ W ]v ⦊
+  ⋆          [ x ↦ W ]v = ⋆
+  lam M      [ x ↦ W ]v = lam (M [ Tl-∷ x ↦ W ]c)
+  box V      [ x ↦ W ]v = box (V [ Tl-⟨⟩ x ↦ W ]v)
 
   _[_↦_]c : ∀ {Γ A C τ}
           → Γ ⊢C⦂ C
@@ -123,6 +124,8 @@ mutual
     (M [ x ↦ W ]c) ; (N [ Tl-∷ (Tl-⟨⟩ x) ↦ W ]c)
   (V₁ · V₂) [ x ↦ W ]c =
     (V₁ [ x ↦ W ]v) · (V₂ [ x ↦ W ]v)
+  (match V `in M) [ x ↦ W ]c =
+    match V [ x ↦ W ]v `in (M [ Tl-∷ (Tl-∷ x) ↦ W ]c)
   absurd V [ x ↦ W ]c =
     absurd (V [ x ↦ W ]v)
   perform op V M [ x ↦ W ]c =

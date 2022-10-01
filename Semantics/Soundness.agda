@@ -32,13 +32,16 @@ open import Semantics.Soundness.seq-assoc Mod
 
 open import Semantics.Soundness.fun-beta Mod
 
+open import Semantics.Soundness.match-beta Mod
+open import Semantics.Soundness.match-eta Mod
+
+open import Semantics.Soundness.absurd-eta Mod
+
 open import Semantics.Soundness.handle-return Mod
 open import Semantics.Soundness.handle-delay Mod
 
 open import Semantics.Soundness.box-unbox-beta Mod
 open import Semantics.Soundness.box-unbox-eta Mod
-
-open import Semantics.Soundness.absurd-eta Mod
 
 open import Util.Equality
 open import Util.Operations
@@ -88,6 +91,12 @@ mutual
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ≡⟨ sym (V-subst≡∘ᵐ W x U) ⟩
       ⟦ W [ x ↦ U ]v ⟧ᵛᵗ
+    ∎
+  V-soundness {Γ} {_} {⦉ V , W ⦊} {⦉ V' , W' ⦊} (⦉⦊-cong p q) =
+    begin
+      ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
+    ≡⟨ cong₂ ⟨_,_⟩ᵐ (V-soundness p) (V-soundness q) ⟩
+      ⟨ ⟦ V' ⟧ᵛᵗ , ⟦ W' ⟧ᵛᵗ ⟩ᵐ
     ∎
   V-soundness {Γ} {.(_ ⇒ _ ‼ _)} {lam M} {lam N} (lam-cong p) = 
     begin
@@ -187,6 +196,20 @@ mutual
       uncurryᵐ idᵐ ∘ᵐ ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
     ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ (V-soundness p) (V-soundness q)) ⟩
       uncurryᵐ idᵐ ∘ᵐ ⟨ ⟦ V' ⟧ᵛᵗ , ⟦ W' ⟧ᵛᵗ ⟩ᵐ
+    ∎
+  C-soundness {Γ} {_} {match V `in M} {match W `in N} (match-cong p q) =
+    begin
+         ⟦ M ⟧ᶜᵗ
+      ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congˡ (C-soundness q) ⟩
+         ⟦ N ⟧ᶜᵗ
+      ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ
+    ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (cong ⟨ idᵐ ,_⟩ᵐ (V-soundness p))) ⟩
+         ⟦ N ⟧ᶜᵗ
+      ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+      ∘ᵐ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
     ∎
   C-soundness {Γ} {_} {absurd V} {absurd W} (absurd-cong p) = 
     begin
@@ -312,57 +335,31 @@ mutual
     ≡⟨ ∘ᵐ-congʳ (cong ⟨ idᵐ ,_⟩ᵐ (∘ᵐ-congʳ (∘ᵐ-congʳ (cong (env-⟨⟩-ᶜ τ) (≤-irrelevant _ _))))) ⟩
       ⟦ N ⟧ᶜᵗ ∘ᵐ ⟨ idᵐ , ε⊣ ∘ᵐ ⟨ τ ⟩ᶠ ⟦ W ⟧ᵛᵗ ∘ᵐ env-⟨⟩-ᶜ τ q ⟩ᵐ
     ∎
-  C-soundness {Γ} {_} {.(return V ; M)} {.(C-rename (cong-∷-ren ⟨⟩-η-ren) M [ Hd ↦ V ]c)} (seq-return V M) =
+  C-soundness (seq-return V M) =
     seq-return-sound V M
-  C-soundness {Γ} {_}
-    {.(perform op V M ; N)}
-    {.(τ-subst (sym (+-assoc (op-time op) _ _))
-        (perform op V (M ;
-          C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N)))}
-    (seq-perform {A} {B} {τ} {τ'} op V M N) =
-      seq-perform-sound op V M N
-  C-soundness {Γ} {_}
-    {.(delay _ M ; N)}
-    {.(τ-subst (sym (+-assoc τ τ' τ'')) (delay _ (M ; C-rename (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N)))}
-    (seq-delay {A} {B} {τ} {τ'} {τ''} M N) =
-      seq-delay-sound M N
-  C-soundness {Γ} {_} {M} {.(τ-subst (+-identityʳ _) (M ; return (var Hd)))} (seq-eta .M) =
+  C-soundness (seq-perform op V M N) =
+    seq-perform-sound op V M N
+  C-soundness(seq-delay M N) =
+    seq-delay-sound M N
+  C-soundness (seq-eta M) =
     seq-eta-sound M
-  C-soundness {Γ} {_}
-    {.((M ; N) ; P)}
-    {.(τ-subst (sym (+-assoc τ τ' τ''))
-        (M ; (N ; C-rename (cong-ren {Γ'' = [] ⟨ τ' ⟩ ∷ B} wk-ren ∘ʳ cong-ren {Γ'' = [] ∷ B} ⟨⟩-μ-ren) P)))}
-    (seq-assoc {A} {B} {C} {τ} {τ'} {τ''} M N P) =
-      seq-assoc-sound M N P
-  C-soundness {Γ} {_} {.(lam M · W)} {.(M [ Hd ↦ W ]c)} (fun-beta M W) =
+  C-soundness (seq-assoc M N P) =
+    seq-assoc-sound M N P
+  C-soundness (fun-beta M W) =
     fun-beta-sound M W
-  C-soundness {Γ} {_}
-    {.(handle return V `with H `in N)}
-    {.(C-rename (cong-∷-ren ⟨⟩-η-ren) N [ Hd ↦ V ]c)}
-    (handle-return V H N) =
-      handle-return-sound V H N
-  C-soundness {Γ} {_}
-    {.(handle perform op V M `with H `in N)}
-    {.(τ-subst (sym (+-assoc (op-time op) _ _))
-        ((H op (τ + τ') [ Tl-∷ Hd ↦ V ]c)
-           [ Hd ↦ box (lam (handle M
-                             `with (λ op' τ'' → C-rename (cong-ren {Γ'' = [] ∷ _ ∷ [ _ ] (_ ⇒ _)} wk-ctx-ren) (H op' τ''))
-                             `in (C-rename (cong-ren {Γ'' = [] ∷ A} (cong-ren {Γ'' = [] ⟨ τ ⟩} wk-ren ∘ʳ ⟨⟩-μ-ren)) N))) ]c))}
-    (handle-op {A} {B} {τ} {τ'} op V M H N) =
-      {!!}
-  C-soundness {Γ} {_}
-    {.(handle delay _ M `with H `in N)}
-    {.(τ-subst (sym (+-assoc τ τ' τ'')) (delay _
-      (handle M `with (λ op τ''' → C-rename (cong-ren {Γ'' = [] ∷ _ ∷ _} (⟨⟩-≤-ren z≤n ∘ʳ ⟨⟩-η⁻¹-ren)) (H op τ''')) `in
-        (C-rename (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N))))}
-    (handle-delay {A} {B} {τ} {τ'} {τ''} M H N) =
-      handle-delay-sound M H N
-  C-soundness {Γ} {_} {_} {.(N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren _ p) V ]c)} (box-unbox-beta p V N) =
-    box-unbox-beta-sound p V N
-  C-soundness {Γ} {_}
-    {.(M [ Hd ↦ V ]c)}
-    {.(unbox z≤n V (C-rename (exch-ren ∘ʳ wk-ren) M [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c))}
-    (box-unbox-eta {A} {C} V M) =
-      box-unbox-eta-sound V M
-  C-soundness {Γ} {_} {.(absurd V)} {_} (absurd-eta V N) =
+  C-soundness (match-beta V W M) =
+    match-beta-sound V W M
+  C-soundness (match-eta V M) =
+    match-eta-sound V M
+  C-soundness (absurd-eta V N) =
     absurd-eta-sound V N
+  C-soundness (handle-return V H N) =
+    handle-return-sound V H N
+  C-soundness (handle-op op V M H N) =
+    {!!}
+  C-soundness (handle-delay M H N) =
+    handle-delay-sound M H N
+  C-soundness (box-unbox-beta p V N) =
+    box-unbox-beta-sound p V N
+  C-soundness (box-unbox-eta V M) =
+    box-unbox-eta-sound V M

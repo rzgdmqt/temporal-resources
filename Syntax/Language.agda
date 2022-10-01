@@ -41,6 +41,14 @@ mutual
             ------------
               Γ ⊢V⦂ Unit
 
+    -- pairing
+
+    ⦉_,_⦊    : {A B : VType}
+            → Γ ⊢V⦂ A
+            → Γ ⊢V⦂ B
+            ---------------
+            → Γ ⊢V⦂ A |×| B
+
     -- lambda abstraction
           
     lam     : {A : VType}
@@ -83,6 +91,15 @@ mutual
             → Γ ⊢V⦂ A
             -------------
             → Γ ⊢C⦂ C
+
+    -- pattern-matching
+
+    match_`in_ : {A B : VType}
+               → {C : CType}
+               → Γ ⊢V⦂ A |×| B
+               → Γ ∷ A ∷ B ⊢C⦂ C
+               -----------------
+               → Γ ⊢C⦂ C
 
     -- empty type elimination
 
