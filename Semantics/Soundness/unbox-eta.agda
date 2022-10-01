@@ -4,7 +4,7 @@
 
 open import Semantics.Model
 
-module Semantics.Soundness.box-unbox-eta (Mod : Model) where
+module Semantics.Soundness.unbox-eta (Mod : Model) where
 
 open import Syntax.Types
 open import Syntax.Contexts
@@ -29,15 +29,15 @@ open import Util.Time
 
 open Model Mod
 
-box-unbox-eta-sound : ∀ {Γ A C}
-                    → (V : Γ ⊢V⦂ [ 0 ] A)
-                    → (M : Γ ∷ [ 0 ] A ⊢C⦂ C)
-                    → ⟦ M [ Hd ↦ V ]c ⟧ᶜᵗ
-                    ≡ ⟦ unbox z≤n V
-                         (C-rename (exch-ren ∘ʳ wk-ren) M
-                           [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c) ⟧ᶜᵗ
+unbox-eta-sound : ∀ {Γ A C}
+                → (V : Γ ⊢V⦂ [ 0 ] A)
+                → (M : Γ ∷ [ 0 ] A ⊢C⦂ C)
+                → ⟦ M [ Hd ↦ V ]c ⟧ᶜᵗ
+                ≡ ⟦ unbox z≤n V
+                     (C-rename (exch-ren ∘ʳ wk-ren) M
+                       [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c) ⟧ᶜᵗ
 
-box-unbox-eta-sound {Γ} {A} {C} V M = 
+unbox-eta-sound {Γ} {A} {C} V M = 
   begin
     ⟦ M [ Hd ↦ V ]c ⟧ᶜᵗ
   ≡⟨ C-subst≡∘ᵐ M Hd V ⟩

@@ -40,8 +40,8 @@ open import Semantics.Soundness.absurd-eta Mod
 open import Semantics.Soundness.handle-return Mod
 open import Semantics.Soundness.handle-delay Mod
 
-open import Semantics.Soundness.box-unbox-beta Mod
-open import Semantics.Soundness.box-unbox-eta Mod
+open import Semantics.Soundness.unbox-beta Mod
+open import Semantics.Soundness.unbox-eta Mod
 
 open import Util.Equality
 open import Util.Operations
@@ -76,7 +76,7 @@ mutual
     ≡⟨ V-soundness q ⟩
       ⟦ U ⟧ᵛᵗ
     ∎
-  V-soundness {_} {_} {_} {_} (V-subst {Γ'} {A} {B} {τ} {V} {W} p x refl U) =
+  V-soundness (V-subst {Γ'} {A} {B} {τ} {V} {W} p x refl U) =
     begin
       ⟦ V [ x ↦ U ]v ⟧ᵛᵗ
     ≡⟨ V-subst≡∘ᵐ V x U ⟩
@@ -110,7 +110,7 @@ mutual
     ≡⟨ ∘ᵐ-congˡ (cong [ τ ]ᶠ (V-soundness p)) ⟩
       [ τ ]ᶠ ⟦ W ⟧ᵛᵗ ∘ᵐ η⊣
     ∎
-  V-soundness {Γ} {.Unit} {.V} {.⋆} (⋆-eta V) = 
+  V-soundness (unit-eta V) = 
     begin
       ⟦ V ⟧ᵛᵗ
     ≡⟨ terminalᵐ-unique ⟩
@@ -161,7 +161,7 @@ mutual
     ≡⟨ C-soundness q ⟩
       ⟦ P ⟧ᶜᵗ
     ∎
-  C-soundness {_} {_} {_} {_} (C-subst {Γ'} {A} {C} {τ} {M} {N} p x refl V) =
+  C-soundness (C-subst {Γ'} {A} {C} {τ} {M} {N} p x refl V) =
     begin
       ⟦ M [ x ↦ V ]c ⟧ᶜᵗ
     ≡⟨ C-subst≡∘ᵐ M x V ⟩
@@ -183,7 +183,7 @@ mutual
     ≡⟨ ∘ᵐ-congʳ (V-soundness p) ⟩
       ηᵀ ∘ᵐ ⟦ W ⟧ᵛᵗ
     ∎
-  C-soundness {Γ} {_} {M ; N} {M' ; N'} (;-cong p q) = 
+  C-soundness {Γ} {_} {M ; N} {M' ; N'} (seq-cong p q) = 
     begin
       μᵀ ∘ᵐ Tᶠ ⟦ N ⟧ᶜᵗ ∘ᵐ strᵀ ∘ᵐ ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ
     ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong Tᶠ (C-soundness q))) ⟩
@@ -191,7 +191,7 @@ mutual
     ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (cong ⟨ η⊣ ,_⟩ᵐ (C-soundness p)))) ⟩
       μᵀ ∘ᵐ Tᶠ ⟦ N' ⟧ᶜᵗ ∘ᵐ strᵀ ∘ᵐ ⟨ η⊣ , ⟦ M' ⟧ᶜᵗ ⟩ᵐ
     ∎
-  C-soundness {Γ} {_} {V · W} {V' · W'} (·-cong p q) = 
+  C-soundness {Γ} {_} {V · W} {V' · W'} (app-cong p q) = 
     begin
       uncurryᵐ idᵐ ∘ᵐ ⟨ ⟦ V ⟧ᵛᵗ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
     ≡⟨ ∘ᵐ-congʳ (cong₂ ⟨_,_⟩ᵐ (V-soundness p) (V-soundness q)) ⟩
@@ -359,7 +359,7 @@ mutual
     {!!}
   C-soundness (handle-delay M H N) =
     handle-delay-sound M H N
-  C-soundness (box-unbox-beta p V N) =
-    box-unbox-beta-sound p V N
-  C-soundness (box-unbox-eta V M) =
-    box-unbox-eta-sound V M
+  C-soundness (unbox-beta p V N) =
+    unbox-beta-sound p V N
+  C-soundness (unbox-eta V M) =
+    unbox-eta-sound V M

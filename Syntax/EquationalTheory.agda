@@ -90,9 +90,9 @@ mutual
 
     -- eta equations
 
-    ⋆-eta : (V : Γ ⊢V⦂ Unit)
-          ------------------
-          → Γ ⊢V⦂ V == ⋆
+    unit-eta : (V : Γ ⊢V⦂ Unit)
+             ------------------
+             → Γ ⊢V⦂ V == ⋆
 
     fun-eta : ∀ {A C}
             → (V : Γ ⊢V⦂ A ⇒ C)
@@ -145,21 +145,21 @@ mutual
                 ----------------------------
                 → Γ ⊢C⦂ return V == return W
 
-    ;-cong : ∀ {A B τ τ'}
-           → {M M' : Γ ⊢C⦂ A ‼ τ}
-           → {N N' : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'}
-           → Γ ⊢C⦂ M == M'
-           → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ N == N'
-           ---------------------------------
-           → Γ ⊢C⦂ M ; N == (M' ; N')
+    seq-cong : ∀ {A B τ τ'}
+             → {M M' : Γ ⊢C⦂ A ‼ τ}
+             → {N N' : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'}
+             → Γ ⊢C⦂ M == M'
+             → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ N == N'
+             ---------------------------------
+             → Γ ⊢C⦂ M ; N == (M' ; N')
 
-    ·-cong : ∀ {A C}
-           → {V V' : Γ ⊢V⦂ A ⇒ C}
-           → {W W' : Γ ⊢V⦂ A}
-           → Γ ⊢V⦂ V == V'
-           → Γ ⊢V⦂ W == W'
-           ------------------------
-           → Γ ⊢C⦂ V · W == V' · W'
+    app-cong : ∀ {A C}
+             → {V V' : Γ ⊢V⦂ A ⇒ C}
+             → {W W' : Γ ⊢V⦂ A}
+             → Γ ⊢V⦂ V == V'
+             → Γ ⊢V⦂ W == W'
+             ------------------------
+             → Γ ⊢C⦂ V · W == V' · W'
 
     match-cong : ∀ {A B C}
                → {V W : Γ ⊢V⦂ A |×| B}
@@ -368,24 +368,24 @@ mutual
 
     -- computational/beta equation for boxing-unboxing
 
-    box-unbox-beta : ∀ {A C τ}
-                   → (p : τ ≤ ctx-time Γ)
-                   → (V : (Γ -ᶜ τ) ⟨ τ ⟩ ⊢V⦂ A)
-                   → (N : Γ ∷ A ⊢C⦂ C)
-                   -----------------------------------------------
-                   → Γ ⊢C⦂ unbox p (box V) N
-                       == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ p) V ]c)
+    unbox-beta : ∀ {A C τ}
+               → (p : τ ≤ ctx-time Γ)
+               → (V : (Γ -ᶜ τ) ⟨ τ ⟩ ⊢V⦂ A)
+               → (N : Γ ∷ A ⊢C⦂ C)
+               -----------------------------------------------
+               → Γ ⊢C⦂ unbox p (box V) N
+                   == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ p) V ]c)
 
     -- eta equation for boxing-unboxing
 
-    box-unbox-eta : ∀ {A C}
-                  → (V : Γ ⊢V⦂ [ 0 ] A)
-                  → (M : Γ ∷ [ 0 ] A ⊢C⦂ C)
-                  --------------------------------------------
-                  → Γ ⊢C⦂ M [ Hd ↦ V ]c                   
-                      == unbox z≤n V
-                           (C-rename (exch-ren ∘ʳ wk-ren) M
-                             [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c)   
+    unbox-eta : ∀ {A C}
+              → (V : Γ ⊢V⦂ [ 0 ] A)
+              → (M : Γ ∷ [ 0 ] A ⊢C⦂ C)
+              --------------------------------------------
+              → Γ ⊢C⦂ M [ Hd ↦ V ]c                   
+                  == unbox z≤n V
+                       (C-rename (exch-ren ∘ʳ wk-ren) M
+                         [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c)   
 
     -- NOTE: potential extension of the equational theory 
     -- with equations for collapsing successive delays
