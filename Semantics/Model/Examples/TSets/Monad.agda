@@ -16,11 +16,13 @@ open import Semantics.Model.Examples.TSets.BaseGroundTypes
 
 open import Semantics.Model.Examples.TSets.Monad.Core
 open import Semantics.Model.Examples.TSets.Monad.Effects
-open import Semantics.Model.Examples.TSets.Monad.Effects.Algebraicity
-open import Semantics.Model.Examples.TSets.Monad.Effects.Naturality
+open import Semantics.Model.Examples.TSets.Monad.Effects.Properties.Algebraicity
+open import Semantics.Model.Examples.TSets.Monad.Effects.Properties.Naturality
 open import Semantics.Model.Examples.TSets.Monad.Strength
-open import Semantics.Model.Examples.TSets.Monad.Strength.Algebraicity
-open import Semantics.Model.Examples.TSets.Monad.Strength.Naturality
+open import Semantics.Model.Examples.TSets.Monad.Strength.Properties.Algebraicity
+open import Semantics.Model.Examples.TSets.Monad.Strength.Properties.Naturality
+open import Semantics.Model.Examples.TSets.Monad.Strength.Properties.UnitMultiplication
+open import Semantics.Model.Examples.TSets.Monad.Strength.Properties.CartesianStructure
 open import Semantics.Model.Examples.TSets.Monad.Handling
 
 open import Util.Equality
@@ -53,10 +55,10 @@ TSetMon = record
         ; opᵀ-algebraicity         = λ op → ≡ᵗ-≡ (opᵀ-algebraicity op)
         ; strᵀ                     = strᵀ
         ; strᵀ-nat                 = λ f g → ≡ᵗ-≡ (strᵀ-nat f g)
-        ; strᵀ-ηᵀ                  = {!!}
-        ; strᵀ-μᵀ                  = {!!}
-        ; strᵀ-sndᵐ                = {!!}
-        ; strᵀ-assoc               = {!!}
+        ; strᵀ-ηᵀ                  = λ {A} {B} → ≡ᵗ-≡ (strᵀ-ηᵀ {A} {B})
+        ; strᵀ-μᵀ                  = λ {A} {B} → ≡ᵗ-≡ (strᵀ-μᵀ {A} {B})
+        ; strᵀ-sndᵐ                = λ {A} {B} → ≡ᵗ-≡ (strᵀ-sndᵗ {A} {B})
+        ; strᵀ-assoc               = λ {A} {B} {C} → ≡ᵗ-≡ (strᵀ-assoc {A} {B} {C})
         ; strᵀ-delayᵀ-algebraicity = ≡ᵗ-≡ strᵀ-delayᵀ-algebraicity
         ; strᵀ-opᵀ-algebraicity    = {!!}
         ; T-alg-of-handlerᵀ        = T-alg-of-handlerᵀ
