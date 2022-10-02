@@ -201,7 +201,7 @@ record Monad : Set₁ where
                            ⇒ᵐ Tᵒ A (op-time op + τ'')))
                       →ᵐ Tᵒ (Tᵒ A τ') τ ⇒ᵐ Tᵒ A (τ + τ')
 
-    -- T-alg-of-handlerᵀ is an algebra
+    -- T-alg-of-handlerᵀ is an algebra for the operations
 
     T-alg-of-handlerᵀ-ηᵀ : ∀ {A τ}
                          →    uncurryᵐ T-alg-of-handlerᵀ
@@ -231,5 +231,3 @@ record Monad : Set₁ where
                             ∘ᵐ mapˣᵐ idᵐ ⟨ fstᵐ ∘ᵐ sndᵐ , ⟨ fstᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
                             ∘ᵐ mapˣᵐ (projᵐ (τ + τ') ∘ᵐ projᵐ op) idᵐ
                             ∘ᵐ ⟨ fstᵐ , idᵐ ⟩ᵐ
-
-    -- ...
