@@ -18,12 +18,13 @@ open import Semantics.Model.Examples.TSets.Monad.Core
 open import Semantics.Model.Examples.TSets.Monad.Strength
 open import Semantics.Model.Examples.TSets.Monad.Effects
 
+open import Semantics.Model.Category.Derived TSetCat
 open import Semantics.Model.Modality.Adjunction.Derived TSetCat TSetFut TSetPas TSetAdj
 
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
-
+{-
 -- Strength's interaction with ηᵀ
 
 strᵀ-ηᵀ : ∀ {A B}
@@ -196,7 +197,7 @@ strᵀ-μᵀ : ∀ {A B τ τ'}
 strᵀ-μᵀ {A} {B} {τ} {τ'} =
   eqᵗ (λ { {t} (x , c) → strˢ-μˢ x c })
 
--- Strength's interaction with sndᵗ
+-- Strength's interaction with the Cartesian-monoidal structure
 
 strˢ-sndᵗ : ∀ {A B τ t}
           → (v : carrier A (t + τ))
@@ -221,5 +222,104 @@ strᵀ-sndᵗ : ∀ {A B τ}
          ≡ᵗ sndᵗ
 
 strᵀ-sndᵗ {A} {B} {τ} =
-  eqᵗ λ { {t} (x , c) → strˢ-sndᵗ x c }
+  eqᵗ (λ { {t} (x , c) → strˢ-sndᵗ x c })
+-}
+-- Strength's interaction with the Cartesian-monoidal structure
 
+strˢ-assoc : ∀ {A B C τ t}
+           → (x : carrier A (t + τ))
+           → (y : carrier B (t + τ))
+           → (c : Tˢ C τ t)
+           → map-carrier
+               (Tᶠ ×ᵐ-assoc ∘ᵗ strᵀ {A ×ᵗ B} ∘ᵗ mapˣᵗ ([]-monoidal {A} {B}) idᵗ ∘ᵗ ×ᵐ-assoc⁻¹)
+               {t}
+               (x , y , c)
+           ≡ map-carrier (strᵀ ∘ᵗ mapˣᵗ idᵗ strᵀ) {t} (x , y , c)
+
+strˢ-assoc {A} {B} {C} x y (leaf v) =
+  cong leaf
+    (cong₂ _,_
+      (trans
+        (monotone-trans A _ _ _)
+        (trans
+          (monotone-trans A _ _ _)
+          (cong (λ p → monotone A p x) (≤-irrelevant _ _))))
+      (cong₂ _,_
+        (trans
+          (monotone-trans B _ _ _)
+          (trans
+            (monotone-trans B _ _ _)
+            (cong (λ p → monotone B p y) (≤-irrelevant _ _))))
+        refl))
+strˢ-assoc {A} {B} {C} {_} {t} x y (op-node {τ = τ} op v k k-nat) =
+  dcong₂ (op-node op v)
+    (ifun-ext (fun-ext (λ p → fun-ext (λ z →
+      trans
+        (cong (Tˢᶠ (tset-map (λ x₂ → proj₁ (proj₁ x₂) , proj₂ (proj₁ x₂) , proj₂ x₂) (λ p₁ x₂ → refl)))
+          (cong (λ xy → strˢ xy (k p z))
+            (cong₂ _,_
+              (trans
+                (monotone-trans A _ _ _)
+                (trans
+                  (monotone-trans A _ _ _)
+                  (sym
+                    (trans
+                      (monotone-trans A _ _ _)
+                      (trans
+                        (monotone-trans A _ _ _)
+                        (cong (λ p → monotone A p x) (≤-irrelevant _ _)))))))
+              (trans
+                (monotone-trans B _ _ _)
+                (trans
+                  (monotone-trans B _ _ _)
+                  (sym
+                    (trans
+                      (monotone-trans B _ _ _)
+                      (trans
+                        (monotone-trans B _ _ _)
+                        (cong (λ p → monotone B p y) (≤-irrelevant _ _))))))))))
+        (strˢ-assoc
+          (monotone A (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ))) (+-monoˡ-≤ τ p)) x)
+          (monotone B (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ))) (+-monoˡ-≤ τ p)) y)
+          (k p z))))))
+    {!ifun-ext (ifun-ext (fun-ext (λ p → (fun-ext (λ q → fun-ext (λ z →
+      ?))))))!}
+strˢ-assoc {A} {B} {C} {_} {t} x y (delay-node {τ' = τ'} τ k) =
+  cong (delay-node τ)
+    (trans
+      (cong (Tˢᶠ (tset-map (λ x₁ → proj₁ (proj₁ x₁) , proj₂ (proj₁ x₁) , proj₂ x₁) (λ p x₁ → refl)))
+        (cong (λ x → strˢ x k)
+          (cong₂ _,_
+            (trans
+              (monotone-trans A _ _ _)
+              (trans
+                (monotone-trans A _ _ _)
+                (sym
+                  (trans
+                    (monotone-trans A _ _ _)
+                    (trans
+                      (monotone-trans A _ _ _)
+                      (cong (λ p → monotone A p x) (≤-irrelevant _ _)))))))
+            (trans
+              (monotone-trans B _ _ _)
+              (trans
+                (monotone-trans B _ _ _)
+                (sym
+                  (trans
+                    (monotone-trans B _ _ _)
+                    (trans
+                      (monotone-trans B _ _ _)
+                      (cong (λ p → monotone B p y) (≤-irrelevant _ _))))))))))
+      (strˢ-assoc
+        (monotone A (≤-reflexive (sym (+-assoc t τ τ'))) x)
+        (monotone B (≤-reflexive (sym (+-assoc t τ τ'))) y) k) )
+
+strᵀ-assoc : ∀ {A B C τ}
+           →    Tᶠ ×ᵐ-assoc
+             ∘ᵗ strᵀ {A ×ᵗ B} {C}
+             ∘ᵗ mapˣᵗ ([]-monoidal {A} {B}) idᵗ ∘ᵗ ×ᵐ-assoc⁻¹
+          ≡ᵗ    strᵀ {A}
+             ∘ᵗ mapˣᵗ idᵗ (strᵀ {B} {C} {τ})
+
+strᵀ-assoc {A} {B} {C} {τ} =
+  eqᵗ (λ { {t} (x , y , c) → strˢ-assoc x y c })
