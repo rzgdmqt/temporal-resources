@@ -48,15 +48,15 @@ strˢ-μˢ : ∀ {A B τ τ' t}
         → μˢ (Tˢᶠ strᵀ (strˢ x c))
         ≡ strˢ {A} {B} (monotone A (≤-reflexive (+-assoc t τ τ')) x) (μˢ c)
 
-strˢ-μˢ {A} {B} {_} {τ'} {t} x (leaf v) =
-  cong (λ p → strˢ p v) (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-strˢ-μˢ {A} {B} {_} {τ'} {t} x (op-node op w k k-nat) =
+strˢ-μˢ {A} {B} {_} {τ'} {t} v (leaf w) =
+  cong (λ p → strˢ p w) (cong (λ p → monotone A p v) (≤-irrelevant _ _))
+strˢ-μˢ {A} {B} {_} {τ'} {t} v (op-node op w k k-nat) =
   {!!}
-strˢ-μˢ {A} {B} {_} {τ''} {t} x (delay-node {τ' = τ'} τ k) =
+strˢ-μˢ {A} {B} {_} {τ''} {t} v (delay-node {τ' = τ'} τ k) =
   trans
     (cong (τ-substˢ (sym (+-assoc τ τ' τ''))) (cong (delay-node τ)
-      (strˢ-μˢ (monotone ([ τ'' ]ᵒ A) (≤-reflexive (sym (+-assoc t τ τ'))) x) k)))
-    {!(delay-node τ (μˢ k))!}
+      (strˢ-μˢ (monotone ([ τ'' ]ᵒ A) (≤-reflexive (sym (+-assoc t τ τ'))) v) k)))
+    {!!}
 
 strᵀ-μᵀ : ∀ {A B τ τ'}
         → μᵀ {A ×ᵗ B} {τ} {τ'} ∘ᵗ Tᶠ strᵀ ∘ᵗ strᵀ
@@ -64,3 +64,31 @@ strᵀ-μᵀ : ∀ {A B τ τ'}
 
 strᵀ-μᵀ {A} {B} {τ} {τ'} =
   eqᵗ (λ { {t} (x , c) → strˢ-μˢ x c })
+
+-- Strength's interaction with sndᵗ
+
+strˢ-sndᵗ : ∀ {A B τ t}
+          → (v : carrier A (t + τ))
+          → (c : Tˢ B τ t)
+          → Tˢᶠ sndᵗ (strˢ {A} v c)
+          ≡ c
+          
+strˢ-sndᵗ v (leaf w) =
+  refl
+strˢ-sndᵗ {A} {_} {_} {t} v (op-node {τ = τ} op w k k-nat) =
+  dcong₂ (op-node op w)
+    (ifun-ext (fun-ext (λ p → fun-ext (λ y →
+      strˢ-sndᵗ
+        (monotone A (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ))) (+-monoˡ-≤ τ p)) v)
+        (k p y)))))
+    (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext λ q → fun-ext λ y → uip))))
+strˢ-sndᵗ {A} {_} {τ''} {t} v (delay-node {τ' = τ'} τ k) =
+  cong (delay-node τ) (strˢ-sndᵗ (monotone A (≤-reflexive (sym (+-assoc t τ τ'))) v) k)
+
+strᵀ-sndᵗ : ∀ {A B τ}
+          → Tᶠ sndᵗ ∘ᵗ strᵀ {A} {B} {τ}
+         ≡ᵗ sndᵗ
+
+strᵀ-sndᵗ {A} {B} {τ} =
+  eqᵗ λ { {t} (x , c) → strˢ-sndᵗ x c }
+
