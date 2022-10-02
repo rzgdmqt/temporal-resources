@@ -50,13 +50,144 @@ strˢ-μˢ : ∀ {A B τ τ' t}
 
 strˢ-μˢ {A} {B} {_} {τ'} {t} v (leaf w) =
   cong (λ p → strˢ p w) (cong (λ p → monotone A p v) (≤-irrelevant _ _))
-strˢ-μˢ {A} {B} {_} {τ'} {t} v (op-node op w k k-nat) =
-  {!!}
+strˢ-μˢ {A} {B} {_} {τ'} {t} v (op-node {τ = τ} op w k k-nat) =
+  strˢ-μˢ-aux (sym (+-assoc (op-time op) τ τ')) _
+
+  where
+
+    strˢ-μˢ-aux : ∀ {τ'''}
+                → (p : op-time op + (τ + τ') ≡ τ''')
+                → (q : t + (op-time op + τ) + τ' ≡ t + τ''')
+                → τ-substˢ p
+                    (op-node op w
+                     (λ p y →
+                        μˢ
+                        (Tˢᶠ strᵀ
+                         (strˢ
+                          (monotone ([ τ' ]ᵒ A)
+                           (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ)))
+                            (+-monoˡ-≤ τ p))
+                           v)
+                          (k p y))))
+                     (λ p q y →
+                        trans
+                        (cong μˢ
+                         (trans
+                          (cong (Tˢᶠ strᵀ)
+                           (trans
+                            (cong₂ strˢ
+                             (trans
+                              (cong (λ p₁ → monotone ([ τ' ]ᵒ A) p₁ v)
+                               (≤-irrelevant
+                                (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ)))
+                                 (+-monoˡ-≤ τ (≤-trans q p)))
+                                (≤-trans
+                                 (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ)))
+                                  (+-monoˡ-≤ τ q))
+                                 (+-mono-≤ p ≤-refl))))
+                              (sym
+                               (trans
+                                (monotone-trans A
+                                 (+-mono-≤
+                                  (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ)))
+                                   (+-monoˡ-≤ τ q))
+                                  ≤-refl)
+                                 (+-mono-≤ (+-mono-≤ p ≤-refl) ≤-refl) v)
+                                (cong (λ r → monotone A r v)
+                                 (≤-irrelevant
+                                  (≤-trans
+                                   (+-mono-≤
+                                    (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ)))
+                                     (+-monoˡ-≤ τ q))
+                                    ≤-refl)
+                                   (+-mono-≤ (+-mono-≤ p ≤-refl) ≤-refl))
+                                  (+-mono-≤
+                                   (≤-trans
+                                    (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ)))
+                                     (+-monoˡ-≤ τ q))
+                                    (+-mono-≤ p ≤-refl))
+                                   ≤-refl))))))
+                             (k-nat p q y))
+                            (strˢ-≤t-nat p
+                             (monotone ([ τ' ]ᵒ A)
+                              (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ)))
+                               (+-monoˡ-≤ τ q))
+                              v)
+                             (k q y))))
+                          (Tˢᶠ-≤t-nat strᵀ p
+                           (strˢ
+                            (monotone ([ τ' ]ᵒ A)
+                             (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ)))
+                              (+-monoˡ-≤ τ q))
+                             v)
+                            (k q y)))))
+                        (μˢ-≤t-nat p
+                         (Tˢᶠ strᵀ
+                          (strˢ
+                           (monotone ([ τ' ]ᵒ A)
+                            (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ)))
+                             (+-monoˡ-≤ τ q))
+                            v)
+                           (k q y))))))
+                ≡
+                  strˢ {A} (monotone A (≤-reflexive q) v)
+                    (τ-substˢ p
+                     (op-node op w (λ p y → μˢ (k p y))
+                      (λ p q y → trans (cong μˢ (k-nat p q y)) (μˢ-≤t-nat p (k q y)))))
+    strˢ-μˢ-aux refl q =
+      dcong₂ (op-node op w)
+        (ifun-ext (fun-ext (λ r → fun-ext (λ y → 
+          (trans
+            (strˢ-μˢ
+              (monotone ([ τ' ]ᵒ A)
+                 (≤-trans (≤-reflexive (sym (+-assoc t (op-time op) τ)))
+                  (+-monoˡ-≤ τ r))
+                 v)
+              (k r y))
+            (cong (λ x → strˢ x (μˢ (k r y)))
+              (trans
+                (monotone-trans A _ _ _)
+                (sym
+                  (trans
+                    (monotone-trans A _ _ _)
+                    (cong (λ p → monotone A p v) (≤-irrelevant _ _)))))))))))
+        (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ q → fun-ext (λ y → uip))))))
+
+
 strˢ-μˢ {A} {B} {_} {τ''} {t} v (delay-node {τ' = τ'} τ k) =
   trans
     (cong (τ-substˢ (sym (+-assoc τ τ' τ''))) (cong (delay-node τ)
       (strˢ-μˢ (monotone ([ τ'' ]ᵒ A) (≤-reflexive (sym (+-assoc t τ τ'))) v) k)))
-    {!!}
+    (trans
+      (strˢ-μˢ-aux (sym (+-assoc τ τ' τ'')) _ _)
+      (cong (λ x → strˢ x (τ-substˢ (sym (+-assoc τ τ' τ'')) (delay-node τ (μˢ k))))
+        (cong (λ p → monotone A p v) (≤-irrelevant _ _))))
+
+    where
+
+      strˢ-μˢ-aux : ∀ {τ''' τ''''}
+                  → (p : τ + (τ' + τ'') ≡ τ''')
+                  → (q : τ'''' + τ'' ≡ t + τ + (τ' + τ''))
+                  → (r : t + (τ + τ') ≡ τ'''')
+                  → τ-substˢ p
+                      (delay-node τ
+                       (strˢ {A}
+                        (monotone A (≤-reflexive q)
+                         (monotone ([ τ'' ]ᵒ A) (≤-reflexive r) v))
+                        (μˢ k)))
+                  ≡ strˢ
+                      (monotone A (≤-reflexive (trans (trans (+-assoc t (τ + τ') τ'')
+                                     (cong (t +_) (+-assoc τ τ' τ''))) (cong (t +_) p))) v)
+                      (τ-substˢ p (delay-node τ (μˢ k)))
+                      
+      strˢ-μˢ-aux refl q r =
+        cong (delay-node τ)
+          (cong (λ x → strˢ x (μˢ k))
+            (trans
+              (monotone-trans A _ _ _) (sym
+                (trans
+                  (monotone-trans A _ _ _)
+                  (cong (λ p → monotone A p v) (≤-irrelevant _ _))))))
 
 strᵀ-μᵀ : ∀ {A B τ τ'}
         → μᵀ {A ×ᵗ B} {τ} {τ'} ∘ᵗ Tᶠ strᵀ ∘ᵗ strᵀ

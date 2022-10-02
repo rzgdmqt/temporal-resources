@@ -91,6 +91,18 @@ mutual
               (sym (monotone-trans A _ _ v)))))
         (strˢ-≤t-nat _ _ k))
 
+τ-substˢ-strˢ : ∀ {A B τ τ' t}
+              → (p : τ ≡ τ')
+              → (x : carrier A (t + τ))
+              → (c : Tˢ B τ t)
+              → τ-substˢ p (strˢ x c)
+              ≡ strˢ {A} (monotone A (+-monoʳ-≤ t (≤-reflexive p)) x) (τ-substˢ p c)
+τ-substˢ-strˢ {A} refl x c =
+  cong (λ x → strˢ x c) (sym
+    (trans
+      (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+      (monotone-refl A x)))
+
 strᵀ : ∀ {A B τ}
      → [ τ ]ᵒ A ×ᵗ Tᵒ B τ →ᵗ Tᵒ (A ×ᵗ B) τ
 strᵀ {A} {B} {τ} =
