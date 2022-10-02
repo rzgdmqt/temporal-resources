@@ -13,9 +13,12 @@ open import Data.Unit hiding (_≤_)
 open import Semantics.Model.Examples.TSets.TSets
 open import Semantics.Model.Examples.TSets.Modality.Future
 open import Semantics.Model.Examples.TSets.Modality.Past
+open import Semantics.Model.Examples.TSets.Modality.Adjunction
 open import Semantics.Model.Examples.TSets.Monad.Core
 open import Semantics.Model.Examples.TSets.Monad.Strength
 open import Semantics.Model.Examples.TSets.Monad.Effects
+
+open import Semantics.Model.Modality.Adjunction.Derived TSetCat TSetFut TSetPas TSetAdj
 
 open import Util.Equality
 open import Util.Operations
@@ -31,7 +34,17 @@ strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ'}
                             ∘ᵗ []-monoidal {[ τ' ]ᵒ A} {Tᵒ B τ'}
                             ∘ᵗ mapˣᵗ (δ {A} {τ} {τ'}) idᵗ
 strᵀ-delayᵀ-algebraicity {A} {B} {τ} {τ'} =
-  eqᵗ (λ c → refl)
+  eqᵗ (λ c →
+    cong (delay-node τ)
+      (sym
+        (trans
+          (cong₂ strˢ (monotone-trans A _ _ _) (Tˢ-≤t-trans _ _ _))
+          (trans
+            (cong₂ strˢ
+              (monotone-trans A _ _ _)
+              (trans (cong (λ p → Tˢ-≤t p (proj₂ c)) (≤-irrelevant _ _)) (Tˢ-≤t-refl _)))
+            (cong (λ x → strˢ x (proj₂ c))
+              (cong (λ p → monotone A p (proj₁ c)) (≤-irrelevant _ _)))))))
 
 
 -- Algebraicity of algebraic operations wrt strength

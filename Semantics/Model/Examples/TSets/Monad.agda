@@ -29,15 +29,17 @@ open import Util.Time
 
 -- Packaging the monad up in the model
 
-TSetMon : Monad TSetCat TSetFut TSetTyp
+TSetMon : Monad TSetCat TSetFut TSetPas TSetAdj TSetTyp
 TSetMon = record
         { Tᵒ                       = Tᵒ
         ; Tᶠ                       = Tᶠ
         ; ηᵀ                       = ηᵀ
         ; μᵀ                       = μᵀ
         ; τ-substᵀ                 = τ-substᵀ
-        ; Tᶠ-idᵐ                   = ≡ᵗ-≡ (Tᶠ-idᵗ)
-        ; Tᶠ-∘ᵐ                    = λ g f → ≡ᵗ-≡ (Tᶠ-∘ᵗ g f)
+        ; τ-substᵀ-refl            = ≡ᵗ-≡ (τ-substᵀ-refl)
+        ; τ-substᵀ-trans           = λ p q → ≡ᵗ-≡ (τ-substᵀ-trans p q)
+        ; T-idᵐ                    = ≡ᵗ-≡ (Tᶠ-idᵗ)
+        ; T-∘ᵐ                     = λ g f → ≡ᵗ-≡ (Tᶠ-∘ᵗ g f)
         ; ηᵀ-nat                   = λ f → ≡ᵗ-≡ (ηᵀ-nat f)
         ; μᵀ-nat                   = λ f → ≡ᵗ-≡ (μᵀ-nat f)
         ; T-μ∘η≡id                 = ≡ᵗ-≡ μᵀ-identity₁
@@ -51,6 +53,14 @@ TSetMon = record
         ; opᵀ-algebraicity         = λ op → ≡ᵗ-≡ (opᵀ-algebraicity op)
         ; strᵀ                     = strᵀ
         ; strᵀ-nat                 = λ f g → ≡ᵗ-≡ (strᵀ-nat f g)
+        ; strᵀ-ηᵀ                  = {!!}
+        ; strᵀ-μᵀ                  = {!!}
+        ; strᵀ-sndᵐ                = {!!}
+        ; strᵀ-assoc               = {!!}
         ; strᵀ-delayᵀ-algebraicity = ≡ᵗ-≡ strᵀ-delayᵀ-algebraicity
+        ; strᵀ-opᵀ-algebraicity    = {!!}
         ; T-alg-of-handlerᵀ        = T-alg-of-handlerᵀ
+        ; T-alg-of-handlerᵀ-ηᵀ     = {!!}
+        ; T-alg-of-handlerᵀ-delayᵀ = {!!}
+        ; T-alg-of-handlerᵀ-opᵀ    = {!!}
         }

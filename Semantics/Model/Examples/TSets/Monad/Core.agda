@@ -238,14 +238,16 @@ Tᶠ-∘ᵗ g f =
             → (q : t ≤ t')
             → (c : Tˢ A τ t)
             → τ-substˢ p (Tˢ-≤t q c) ≡ Tˢ-≤t q (τ-substˢ p c)
-τ-substˢ-≤t refl q c = refl
+τ-substˢ-≤t refl q c =
+  refl
 
 τ-substˢ-trans : ∀ {A τ τ' τ'' t}
                → (p : τ ≡ τ')
                → (q : τ' ≡ τ'')
                → (c : Tˢ A τ t)
                → τ-substˢ q (τ-substˢ p c) ≡ τ-substˢ (trans p q) c
-τ-substˢ-trans refl refl c = refl
+τ-substˢ-trans refl refl c =
+  refl
 
 τ-substᵀ : ∀ {A τ τ'}
          → τ ≡ τ'
@@ -255,12 +257,27 @@ Tᶠ-∘ᵗ g f =
     (τ-substˢ p)
     (τ-substˢ-≤t p)
 
+τ-substᵀ-refl : ∀ {A τ}
+              → τ-substᵀ {A} {τ} refl
+             ≡ᵗ idᵗ
+τ-substᵀ-refl =
+  eqᵗ (λ x → refl)
+ 
+τ-substᵀ-trans : ∀ {A τ τ' τ''}
+               → (p : τ ≡ τ')
+               → (q : τ' ≡ τ'')
+               → τ-substᵀ q ∘ᵗ τ-substᵀ p
+              ≡ᵗ τ-substᵀ {A} (trans p q)
+τ-substᵀ-trans p q = 
+  eqᵗ (τ-substˢ-trans p q)
+
 τ-substˢ-Tˢᶠ : ∀ {A B τ τ' t}
              → (p : τ ≡ τ')
              → (f : A →ᵗ B)
              → (c : Tˢ A τ t)
              → τ-substˢ p (Tˢᶠ f c) ≡ Tˢᶠ f (τ-substˢ p c)
-τ-substˢ-Tˢᶠ refl f c = refl
+τ-substˢ-Tˢᶠ refl f c =
+  refl
 
 τ-substˢ-delay : ∀ {A τ' τ'' t}
                → (τ : Time)
@@ -268,7 +285,8 @@ Tᶠ-∘ᵗ g f =
                → (c : Tˢ A τ' (t + τ))
                → τ-substˢ (cong (τ +_) p) (delay-node τ c)
                ≡ delay-node τ (τ-substˢ p c)
-τ-substˢ-delay τ refl c = refl
+τ-substˢ-delay τ refl c =
+  refl
 
 τ-substˢ-op : ∀ {A τ τ' t}
               → (p : τ ≡ τ')
