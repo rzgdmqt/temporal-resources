@@ -47,8 +47,13 @@ record Adjunction : Set₁ where
 
     -- Interaction between η⊣/ε⊣ of the adjunction and η/ε of the modalities
 
-    η⊣≡ε⁻¹∘η : ∀ {A} → η⊣ {A} ≡ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵐ η {A}
-    ε⊣≡ε∘η⁻¹ : ∀ {A} → ε⊣ {A} ≡ ε {A} ∘ᵐ η⁻¹ {[ 0 ]ᵒ A}
+    η⊣-≤ : ∀ {A τ}
+         → [ τ ]ᶠ (⟨⟩-≤ z≤n) ∘ᵐ η⊣ {A} {τ}
+         ≡ []-≤ z≤n ∘ᵐ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵐ η {A}
+
+    ε⊣-≤ : ∀ {A τ}
+         → ⟨ 0 ⟩ᶠ ([]-≤ z≤n) ∘ᵐ η ∘ᵐ ε⁻¹ ∘ᵐ ε⊣ {A} {τ}
+         ≡ ⟨⟩-≤ z≤n
 
     -- Interaction between η⊣/ε⊣ of the adjunction and μ/δ of the modalities
 

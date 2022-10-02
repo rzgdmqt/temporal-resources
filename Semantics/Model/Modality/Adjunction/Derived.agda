@@ -22,6 +22,82 @@ open Adjunction Adj
 
 open import Semantics.Model.Category.Derived Cat
 
+-- Interaction between η⊣/ε⊣ of the adjunction and η/ε of the modalities at τ = 0
+
+η⊣≡ε⁻¹∘η : ∀ {A} → η⊣ {A} ≡ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵐ η {A}
+η⊣≡ε⁻¹∘η = 
+  begin
+    η⊣
+  ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
+       idᵐ
+    ∘ᵐ η⊣
+  ≡⟨ ∘ᵐ-congˡ (trans (sym []-idᵐ) (cong [ 0 ]ᶠ
+      (trans (sym ⟨⟩-≤-refl) (cong ⟨⟩-≤ (≤-irrelevant _ _))))) ⟩
+       [ 0 ]ᶠ (⟨⟩-≤ z≤n)
+    ∘ᵐ η⊣
+  ≡⟨ η⊣-≤ ⟩
+       []-≤ z≤n
+    ∘ᵐ ε⁻¹
+    ∘ᵐ η
+  ≡⟨ ∘ᵐ-congˡ (trans (cong []-≤ (≤-irrelevant _ _)) []-≤-refl) ⟩
+       idᵐ
+    ∘ᵐ ε⁻¹
+    ∘ᵐ η
+  ≡⟨ ∘ᵐ-identityˡ _ ⟩
+       ε⁻¹
+    ∘ᵐ η
+  ∎
+
+ε⊣≡ε∘η⁻¹ : ∀ {A} → ε⊣ {A} ≡ ε {A} ∘ᵐ η⁻¹ {[ 0 ]ᵒ A}
+ε⊣≡ε∘η⁻¹ = 
+  begin
+    ε⊣
+  ≡⟨ sym (∘ᵐ-identityˡ _) ⟩
+       idᵐ
+    ∘ᵐ ε⊣ 
+  ≡⟨ trans (∘ᵐ-congˡ (sym []-ε∘ε⁻¹≡id)) (∘ᵐ-assoc _ _ _) ⟩
+       ε
+    ∘ᵐ ε⁻¹
+    ∘ᵐ ε⊣ 
+  ≡⟨ ∘ᵐ-congʳ (sym (∘ᵐ-identityˡ _)) ⟩
+       ε
+    ∘ᵐ idᵐ
+    ∘ᵐ ε⁻¹
+    ∘ᵐ ε⊣ 
+  ≡⟨ ∘ᵐ-congʳ (trans (∘ᵐ-congˡ (sym ⟨⟩-η⁻¹∘η≡id)) (∘ᵐ-assoc _ _ _)) ⟩
+       ε
+    ∘ᵐ η⁻¹
+    ∘ᵐ η
+    ∘ᵐ ε⁻¹
+    ∘ᵐ ε⊣ 
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym (∘ᵐ-identityˡ _))) ⟩
+       ε
+    ∘ᵐ η⁻¹
+    ∘ᵐ idᵐ
+    ∘ᵐ η
+    ∘ᵐ ε⁻¹
+    ∘ᵐ ε⊣ 
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congˡ (trans (sym ⟨⟩-idᵐ) (cong ⟨ 0 ⟩ᶠ
+      (trans (sym []-≤-refl) (cong []-≤ (≤-irrelevant _ _))))))) ⟩
+       ε
+    ∘ᵐ η⁻¹
+    ∘ᵐ ⟨ 0 ⟩ᶠ ([]-≤ z≤n)
+    ∘ᵐ η
+    ∘ᵐ ε⁻¹
+    ∘ᵐ ε⊣ 
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ ε⊣-≤) ⟩
+       ε
+    ∘ᵐ η⁻¹
+    ∘ᵐ ⟨⟩-≤ z≤n
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (cong ⟨⟩-≤ (≤-irrelevant _ _)) ⟨⟩-≤-refl)) ⟩
+       ε
+    ∘ᵐ η⁻¹
+    ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-identityʳ _) ⟩
+       ε
+    ∘ᵐ η⁻¹
+  ∎
+
 -- [_]ᵒ is monoidal (with respect to ×ᵐ)
  
 []-monoidal : ∀ {A B τ}

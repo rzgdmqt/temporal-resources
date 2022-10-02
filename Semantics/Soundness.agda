@@ -361,5 +361,5 @@ mutual
     handle-delay-sound M H N
   C-soundness (unbox-beta p V N) =
     unbox-beta-sound p V N
-  C-soundness (unbox-eta V M) =
-    unbox-eta-sound V M
+  C-soundness (unbox-eta p V M) =
+    unbox-eta-sound p V M
