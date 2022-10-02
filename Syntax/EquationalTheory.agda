@@ -320,31 +320,31 @@ mutual
                   → Γ ⊢C⦂ handle return V `with H `in N
                       == (C-rename (cong-∷-ren ⟨⟩-η-ren) N [ Hd ↦ V ]c)
 
-    handle-op : ∀ {A B τ τ'}
-              → (op : Op)
-              → (V : Γ ⊢V⦂ type-of-gtype (param op))
-              → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
-              → (H : (op : Op) → (τ'' : Time) →
-                       Γ ∷ type-of-gtype (param op)
-                         ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
-                       ⊢C⦂ B ‼ (op-time op + τ''))
-              → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
-              ------------------------------------------------------------------------------------------
-              → Γ ⊢C⦂ handle perform op V M `with H `in N
-                  == τ-subst
-                       (sym (+-assoc (op-time op) τ τ'))
-                       (H op (τ + τ')
-                         [ Tl-∷ Hd ↦ V ]c
-                         [ Hd ↦ box (lam (handle M
-                                          `with (λ op' τ'' →
-                                                  C-rename
-                                                    (cong-ren {Γ'' = [] ∷ _ ∷ [ _ ] (_ ⇒ _)} wk-ctx-ren)
-                                                    (H op' τ''))
-                                          `in (C-rename
-                                                (cong-ren {Γ'' = [] ∷ A}
-                                                  (   cong-ren {Γ'' = [] ⟨ τ ⟩} wk-ren
-                                                   ∘ʳ ⟨⟩-μ-ren))
-                                                N))) ]c)
+    handle-perform : ∀ {A B τ τ'}
+                   → (op : Op)
+                   → (V : Γ ⊢V⦂ type-of-gtype (param op))
+                   → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
+                   → (H : (op : Op) → (τ'' : Time) →
+                            Γ ∷ type-of-gtype (param op)
+                              ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
+                            ⊢C⦂ B ‼ (op-time op + τ''))
+                   → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
+                   ------------------------------------------------------------------------------------------
+                   → Γ ⊢C⦂ handle perform op V M `with H `in N
+                       == τ-subst
+                            (sym (+-assoc (op-time op) τ τ'))
+                            (H op (τ + τ')
+                              [ Tl-∷ Hd ↦ V ]c
+                              [ Hd ↦ box (lam (handle M
+                                               `with (λ op' τ'' →
+                                                       C-rename
+                                                         (cong-ren {Γ'' = [] ∷ _ ∷ [ _ ] (_ ⇒ _)} wk-ctx-ren)
+                                                         (H op' τ''))
+                                               `in (C-rename
+                                                     (cong-ren {Γ'' = [] ∷ A}
+                                                       (   cong-ren {Γ'' = [] ⟨ τ ⟩} wk-ren
+                                                        ∘ʳ ⟨⟩-μ-ren))
+                                                     N))) ]c)
 
     handle-delay : ∀ {A B τ τ' τ''}
                  → (M : Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ')

@@ -355,7 +355,7 @@ mutual
     absurd-eta-sound V N
   C-soundness (handle-return V H N) =
     handle-return-sound V H N
-  C-soundness (handle-op op V M H N) =
+  C-soundness (handle-perform op V M H N) =
     {!!}
   C-soundness (handle-delay M H N) =
     handle-delay-sound M H N
