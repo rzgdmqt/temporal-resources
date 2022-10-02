@@ -262,15 +262,6 @@ open import Util.Time
           (sym (monotone-trans A _ _ _)))
         (sym (monotone-trans A _ _ _)))))
 
--- [_]ᵒ is monoidal (with respect to ×ᵗ)
-
-[]-monoidal : ∀ {A B τ}
-            → [ τ ]ᵒ A ×ᵗ [ τ ]ᵒ B →ᵗ [ τ ]ᵒ (A ×ᵗ B)
-[]-monoidal {A} {B} {τ} =
-  tset-map
-    (λ xy → xy)
-    (λ p xy → refl)
-
 
 -- Packaging the future modality up in the model
 
@@ -302,6 +293,5 @@ TSetFut = record
   ; []-ε∘δ≡id   = λ {A} → ≡ᵗ-≡ ([]-ε∘δ≡id {A})
   ; []-Dε∘δ≡id  = λ {A} → ≡ᵗ-≡ ([]-Dε∘δ≡id {A})
   ; []-δ∘δ≡Dδ∘δ = λ {A} → ≡ᵗ-≡ ([]-δ∘δ≡Dδ∘δ {A})
-  ; []-monoidal = λ {A} {B} → []-monoidal {A} {B}
   }
 

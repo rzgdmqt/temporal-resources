@@ -192,56 +192,32 @@ open import Util.Time
        ≡ᵗ μ {A} ∘ᵗ ⟨ τ₁ ⟩ᶠ (⟨⟩-≤ {A} q) ∘ᵗ ⟨⟩-≤ {⟨ τ₂' ⟩ᵒ A} p
 ⟨⟩-μ-≤ {A} p q =
   eqᵗ (λ { {t} (r , s , x) →
-    (cong₂ _,_
-      (≤-irrelevant _ _)
-      (trans
-        (monotone-trans A _ _ _)
-        (trans
-          (trans
-            (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-            (sym (monotone-trans A _ _ _)))
-          (sym (monotone-trans A _ _ _)))))})
+    cong₂ _,_
+     (≤-irrelevant _ _)
+     (trans
+       (monotone-trans A _ _ _)
+       (trans
+         (trans
+           (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+           (sym (monotone-trans A _ _ _)))
+         (sym (monotone-trans A _ _ _))))})
 
-⟨⟩-μ-≤₁ : ∀ {A τ₁ τ₂ τ₁'} → (p : τ₁ ≤ τ₁')
-        → ⟨⟩-≤ {A} (+-monoˡ-≤ τ₂ p) ∘ᵗ μ {A}
-        ≡ᵗ μ {A} ∘ᵗ ⟨⟩-≤ {⟨ τ₂ ⟩ᵒ A} p
-⟨⟩-μ-≤₁ {A} p =
-  eqᵗ (λ { {t} (r , s , x) →
-    (cong₂ _,_
-      (≤-irrelevant _ _)
-      (trans
-        (monotone-trans A _ _ _)
-        (trans
-          (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-          (sym (monotone-trans A _ _ _))))) })
-
-⟨⟩-μ-≤₂ : ∀ {A τ₁ τ₂ τ₂'} → (q : τ₂ ≤ τ₂')
-        → ⟨⟩-≤ {A} (+-monoʳ-≤ τ₁ q) ∘ᵗ μ {A}
-        ≡ᵗ μ {A} ∘ᵗ ⟨ τ₁ ⟩ᶠ (⟨⟩-≤ {A} q)
-⟨⟩-μ-≤₂ {A} q =
-  eqᵗ (λ { {t} (r , s , x) →
-    (cong₂ _,_
-      (≤-irrelevant _ _)
-      (trans
-        (monotone-trans A _ _ _)
-        (trans
-          (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-          (sym (monotone-trans A _ _ _))))) })
-
-⟨⟩-μ⁻¹-≤₂ : ∀ {A τ₁ τ₂ τ₂'} → (q : τ₂ ≤ τ₂')
-          → μ⁻¹ {A} ∘ᵗ ⟨⟩-≤ {A} (+-monoʳ-≤ τ₁ q)
-         ≡ᵗ ⟨ τ₁ ⟩ᶠ (⟨⟩-≤ {A} q) ∘ᵗ μ⁻¹ {A}
-⟨⟩-μ⁻¹-≤₂ {A} q =
-  eqᵗ (λ { {t} (r , x) → 
-    (cong₂ _,_
+⟨⟩-μ⁻¹-≤ : ∀ {A τ₁ τ₂ τ₁' τ₂'} → (p : τ₁ ≤ τ₁') → (q : τ₂ ≤ τ₂')
+         → μ⁻¹ {A} ∘ᵗ ⟨⟩-≤ {A} (+-mono-≤ p q)
+         ≡ᵗ ⟨⟩-≤ {⟨ τ₂ ⟩ᵒ A} p ∘ᵗ ⟨ τ₁' ⟩ᶠ (⟨⟩-≤ {A} q) ∘ᵗ μ⁻¹ {A}
+⟨⟩-μ⁻¹-≤ {A} p q =
+  eqᵗ λ { {t} (r , x) →
+    cong₂ _,_
       (≤-irrelevant _ _)
       (cong₂ _,_
         (≤-irrelevant _ _)
         (trans
           (monotone-trans A _ _ _)
           (trans
-            (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-            (sym (monotone-trans A _ _ _)))))) })
+            (trans
+              (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+              (sym (monotone-trans A _ _ _)))
+            (sym (monotone-trans A _ _ _)))))}
 
 -- η is invertible
 
@@ -340,9 +316,7 @@ TSetPas = record
   ; ⟨⟩-μ-nat     = λ f → ≡ᵗ-≡ (⟨⟩-μ-nat f)
   ; ⟨⟩-μ⁻¹-nat   = λ f → ≡ᵗ-≡ (⟨⟩-μ⁻¹-nat f)
   ; ⟨⟩-μ-≤       = λ {A} p q → ≡ᵗ-≡ (⟨⟩-μ-≤ {A} p q)
-  ; ⟨⟩-μ-≤₁      = λ {A} p → ≡ᵗ-≡ (⟨⟩-μ-≤₁ {A} p)
-  ; ⟨⟩-μ-≤₂      = λ {A} p → ≡ᵗ-≡ (⟨⟩-μ-≤₂ {A} p)
-  ; ⟨⟩-μ⁻¹-≤₂    = λ {A} p → ≡ᵗ-≡ (⟨⟩-μ⁻¹-≤₂ {A} p)
+  ; ⟨⟩-μ⁻¹-≤     = λ {A} p q → ≡ᵗ-≡ (⟨⟩-μ⁻¹-≤ {A} p q)
   ; ⟨⟩-η∘η⁻¹≡id  = λ {A} → ≡ᵗ-≡ (⟨⟩-η∘η⁻¹≡id {A})
   ; ⟨⟩-η⁻¹∘η≡id  = λ {A} → ≡ᵗ-≡ (⟨⟩-η⁻¹∘η≡id {A})
   ; ⟨⟩-μ∘μ⁻¹≡id  = λ {A} → ≡ᵗ-≡ (⟨⟩-μ∘μ⁻¹≡id {A})

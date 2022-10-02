@@ -94,19 +94,68 @@ Gε⊣∘η⊣≡id {A} {τ} =
 
 -- Interaction between η-⊣/ε-⊣ of the adjunction and η/ε of the modalities
 
-η⊣≡ε⁻¹∘η : ∀ {A} → η⊣ {A} ≡ᵗ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵗ η {A}
-η⊣≡ε⁻¹∘η {A} =
+η⊣-≤ : ∀ {A τ}
+     → [ τ ]ᶠ (⟨⟩-≤ {A} z≤n) ∘ᵗ η⊣ {A} {τ}
+    ≡ᵗ []-≤ {⟨ 0 ⟩ᵒ A} z≤n ∘ᵗ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵗ η {A}
+η⊣-≤ {A} {τ} =
   eqᵗ (λ {t} x →
-    (cong₂ _,_
-          (≤-irrelevant _ _)
-          (cong (λ p → monotone A p x) (≤-irrelevant _ _))))
+    cong₂ _,_
+      (≤-irrelevant _ _)
+      (trans
+        (monotone-trans A _ _ _)
+        (trans
+          (cong (λ p → monotone A p x) (≤-irrelevant _ _))
+          (sym (monotone-trans A _ _ _)))))
 
-ε⊣≡ε∘η⁻¹ : ∀ {A} → ε⊣ {A} ≡ᵗ ε {A} ∘ᵗ η⁻¹ {[ 0 ]ᵒ A}
-ε⊣≡ε∘η⁻¹ {A} =
+ε⊣-≤ : ∀ {A τ}
+     → ⟨ 0 ⟩ᶠ ([]-≤ {A} z≤n) ∘ᵗ η ∘ᵗ ε⁻¹ ∘ᵗ ε⊣ {A} {τ}
+    ≡ᵗ ⟨⟩-≤ {[ τ ]ᵒ A} z≤n
+ε⊣-≤ {A} {τ} =
   eqᵗ (λ { {t} (p , x) →
-    cong (λ p → monotone A p x) (≤-irrelevant _ _) })
+    cong₂ _,_
+      (≤-irrelevant _ _)
+      (trans
+        (monotone-trans A _ _ _)
+        (trans
+          (monotone-trans A _ _ _)
+          (cong (λ p → monotone A p x) (≤-irrelevant _ _)))) })
 
--- ...
+-- Interaction between η⊣/ε⊣ of the adjunction and μ/δ of the modalities
+ 
+GGμ∘Gη⊣∘η⊣≡δ∘η⊣ : ∀ {A τ τ'}
+                →    [ τ ]ᶠ ([ τ' ]ᶠ (⟨⟩-≤ {A} (≤-reflexive (+-comm τ τ')) ∘ᵗ (μ {A})))
+                  ∘ᵗ [ τ ]ᶠ (η⊣ {⟨ τ ⟩ᵒ A}) ∘ᵗ η⊣ {A}
+               ≡ᵗ δ {⟨ τ + τ' ⟩ᵒ A} ∘ᵗ η⊣ {A}
+GGμ∘Gη⊣∘η⊣≡δ∘η⊣ {A} {τ} {τ'} =
+  eqᵗ (λ {x} x →
+    cong₂ _,_
+      (≤-irrelevant _ _)
+      (trans
+        (monotone-trans A _ _ _)
+        (trans
+          (monotone-trans A _ _ _)
+          (trans (monotone-trans A _ _ _)
+            (sym
+              (trans
+                (monotone-trans A _ _ _)
+                (cong (λ p → monotone A p x) (≤-irrelevant _ _))))))))
+
+ε⊣∘Fε⊣∘FFδ≡ε⊣∘μ : ∀ {A τ τ'}
+                →    ε⊣ {A} ∘ᵗ ⟨ τ ⟩ᶠ (ε⊣ {[ τ ]ᵒ A})
+                  ∘ᵗ ⟨ τ ⟩ᶠ (⟨ τ' ⟩ᶠ (δ {A} ∘ᵗ []-≤ {A} (≤-reflexive (+-comm τ τ'))))
+               ≡ᵗ ε⊣ ∘ᵗ μ {[ τ + τ' ]ᵒ A}
+ε⊣∘Fε⊣∘FFδ≡ε⊣∘μ {A} {τ} {τ'} =
+  eqᵗ λ { {t} (p , q , x) →
+    trans
+      (monotone-trans A _ _ _)
+      (trans
+        (monotone-trans A _ _ _)
+        (trans
+          (monotone-trans A _ _ _)
+          (sym
+            (trans
+              (monotone-trans A _ _ _)
+              (cong (λ p → monotone A p x) (≤-irrelevant _ _)))))) }
 
 
 -- Packaging the modality adjunction in the model
@@ -115,12 +164,14 @@ open import Semantics.Model.Modality.Adjunction
 
 TSetAdj : Adjunction TSetCat TSetFut TSetPas
 TSetAdj = record
-  { η⊣        = η⊣
-  ; ε⊣        = ε⊣
-  ; η⊣-nat    = λ f → ≡ᵗ-≡ (η⊣-nat f)
-  ; ε⊣-nat    = λ f → ≡ᵗ-≡ (ε⊣-nat f)
-  ; ε⊣∘Fη⊣≡id = λ {A} → ≡ᵗ-≡ (ε⊣∘Fη⊣≡id {A})
-  ; Gε⊣∘η⊣≡id = λ {A} → ≡ᵗ-≡ (Gε⊣∘η⊣≡id {A})
-  ; η⊣≡ε⁻¹∘η  = λ {A} → ≡ᵗ-≡ (η⊣≡ε⁻¹∘η {A})
-  ; ε⊣≡ε∘η⁻¹  = λ {A} → ≡ᵗ-≡ (ε⊣≡ε∘η⁻¹ {A})
+  { η⊣              = η⊣
+  ; ε⊣              = ε⊣
+  ; η⊣-nat          = λ f → ≡ᵗ-≡ (η⊣-nat f)
+  ; ε⊣-nat          = λ f → ≡ᵗ-≡ (ε⊣-nat f)
+  ; ε⊣∘Fη⊣≡id       = λ {A} → ≡ᵗ-≡ (ε⊣∘Fη⊣≡id {A})
+  ; Gε⊣∘η⊣≡id       = λ {A} → ≡ᵗ-≡ (Gε⊣∘η⊣≡id {A})
+  ; η⊣-≤            = λ {A} → ≡ᵗ-≡ (η⊣-≤ {A})
+  ; ε⊣-≤            = λ {A} → ≡ᵗ-≡ (ε⊣-≤ {A})
+  ; GGμ∘Gη⊣∘η⊣≡δ∘η⊣ = λ {A} → ≡ᵗ-≡ (GGμ∘Gη⊣∘η⊣≡δ∘η⊣ {A})
+  ; ε⊣∘Fε⊣∘FFδ≡ε⊣∘μ = λ {A} → ≡ᵗ-≡ (ε⊣∘Fε⊣∘FFδ≡ε⊣∘μ {A})
   }
