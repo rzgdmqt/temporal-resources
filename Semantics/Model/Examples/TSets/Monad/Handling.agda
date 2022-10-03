@@ -39,20 +39,24 @@ mutual
 
   T-alg-of-handlerˢ h p (leaf c) =
     c
-  T-alg-of-handlerˢ h p (op-node op v k k-nat) =
+  T-alg-of-handlerˢ {A} {_} {τ'} h p (op-node {τ = τ} op v k k-nat) =
     τ-substˢ
       (sym (+-assoc (op-time op) _ _))
-      (op-node op v
-        (λ q y → T-alg-of-handlerˢ h (≤-trans p (m+n≤o⇒m≤o _ q)) (k q y))
-        (λ q r y →
-          trans
-            (cong₂ (T-alg-of-handlerˢ h) (≤-irrelevant _ _) (k-nat q r y))
-            (T-alg-of-handlerˢ-≤t-cod-nat _ h q (k r y))))
+      (map-carrier (h op (τ + τ'))
+        (p ,
+         v ,
+         tset-map
+           (λ { (q , y) → T-alg-of-handlerˢ h (≤-trans p (m+n≤o⇒m≤o _ q)) (k q y)})
+           (λ { q (r , y) →
+             trans
+               (cong₂ (T-alg-of-handlerˢ h) (≤-irrelevant _ _) (k-nat q r y))
+               (T-alg-of-handlerˢ-≤t-cod-nat _ h q (k r y)) })))
   T-alg-of-handlerˢ h p (delay-node τ k) =
     τ-substˢ
       (sym (+-assoc τ _ _))
       (delay-node τ
         (T-alg-of-handlerˢ h (≤-stepsʳ τ p) k))
+
 
   T-alg-of-handlerˢ-≤t-cod-nat : ∀ {A τ τ'} → {t t' : ℕ} → (p : t ≤ t')
                                → (h : carrier (Πᵗ Op (λ op → Πᵗ Time (λ τ'' →
@@ -66,13 +70,22 @@ mutual
                            
   T-alg-of-handlerˢ-≤t-cod-nat p h q (leaf v) =
     refl
-  T-alg-of-handlerˢ-≤t-cod-nat p h q (op-node op v k k-nat) =
+  T-alg-of-handlerˢ-≤t-cod-nat {A} {τ' = τ'} p h q (op-node {τ = τ} op v k k-nat) =
     trans
       (cong (τ-substˢ (sym (+-assoc (op-time op) _ _)))
-        (dcong₂ (op-node op (monotone ⟦ param op ⟧ᵍ q v))
-          (ifun-ext (fun-ext (λ r → fun-ext (λ y →
-            cong (λ p → T-alg-of-handlerˢ h p (k (≤-trans (+-monoˡ-≤ (op-time op) q) r) y)) (≤-irrelevant _ _)))))
-          (ifun-ext (ifun-ext (fun-ext (λ r → fun-ext (λ s → fun-ext (λ y → uip))))))))
+        (trans
+          (cong (map-carrier (h op (τ + τ')))
+            (cong₂ _,_
+              (≤-irrelevant _ _)
+              (cong₂ _,_
+                refl
+                (dcong₂ tset-map
+                  (ifun-ext (fun-ext (λ { (r , y) →
+                    cong
+                      (λ p → T-alg-of-handlerˢ h p (k (≤-trans (+-mono-≤ q (≤-reflexive refl)) r) y))
+                      (≤-irrelevant _ _) })))
+                  (ifun-ext (ifun-ext (fun-ext (λ _ → fun-ext (λ _ → uip)))))))))
+          (map-nat (h op (τ + τ')) q (p , v , _))))
       (τ-substˢ-≤t (sym (+-assoc (op-time op) _ _)) _ _)
   T-alg-of-handlerˢ-≤t-cod-nat p h q (delay-node τ k) =
     trans
@@ -82,6 +95,7 @@ mutual
             (cong (λ p → T-alg-of-handlerˢ h p (Tˢ-≤t (+-monoˡ-≤ τ q) k)) (≤-irrelevant _ _))
             (T-alg-of-handlerˢ-≤t-cod-nat (≤-stepsʳ τ p) h (+-monoˡ-≤ τ q) k))))
       (τ-substˢ-≤t (sym (+-assoc τ _ _)) q _)
+
 
   T-alg-of-handlerˢ-≤t-nat : ∀ {A τ τ'} → {t t' : ℕ} → (p : t ≤ t')
                            → (h : carrier (Πᵗ Op (λ op → Πᵗ Time (λ τ'' →
@@ -98,20 +112,27 @@ mutual
                            ≡ T-alg-of-handlerˢ h (≤-trans p q) c
   T-alg-of-handlerˢ-≤t-nat p h q (leaf v) =
     refl
-  T-alg-of-handlerˢ-≤t-nat p h q (op-node op v k k-nat) =
-    cong (τ-substˢ (sym (+-assoc (op-time op) _ _)))
-      (dcong₂ (op-node op v)
-        (ifun-ext (fun-ext (λ r → fun-ext (λ y →
-          trans
-            (T-alg-of-handlerˢ-≤t-nat p h _ (k r y))
-            (cong (λ p → T-alg-of-handlerˢ h p (k r y)) (≤-irrelevant _ _))))))
-        (ifun-ext (ifun-ext (fun-ext (λ r → fun-ext (λ s → fun-ext (λ y → uip)))))))
+  T-alg-of-handlerˢ-≤t-nat {A} {τ' = τ'} p h q (op-node {τ = τ} op v k k-nat) =
+    cong
+      (τ-substˢ (sym (+-assoc (op-time op) τ τ')))
+      (cong (map-carrier (h op (τ + τ')))
+        (cong₂ _,_
+          refl
+          (cong₂ _,_
+            refl
+            (dcong₂ tset-map
+              (ifun-ext (fun-ext (λ { (r , y) →
+                trans
+                  (T-alg-of-handlerˢ-≤t-nat p h _ (k r y))
+                  (cong (λ p → T-alg-of-handlerˢ h p (k r y)) (≤-irrelevant _ _)) })))
+              (ifun-ext (ifun-ext (fun-ext (λ _ → fun-ext (λ _ → uip)))))))))
   T-alg-of-handlerˢ-≤t-nat p h q (delay-node τ k) =
     cong (τ-substˢ (sym (+-assoc τ _ _)))
       (cong (delay-node τ)
         (trans
           (T-alg-of-handlerˢ-≤t-nat p h _ k)
           (cong (λ p → T-alg-of-handlerˢ h p k) (≤-irrelevant _ _))))
+
 
 T-alg-of-handlerᵀ : ∀ {A τ τ'}
                   → Πᵗ Op (λ op → Πᵗ Time (λ τ'' →

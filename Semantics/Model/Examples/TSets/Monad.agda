@@ -1,3 +1,5 @@
+{-# OPTIONS --experimental-lossy-unification #-}
+
 ---------------------------------
 -- Monad on time-varying sets  --
 ---------------------------------
@@ -24,6 +26,7 @@ open import Semantics.Model.Examples.TSets.Monad.Strength.Properties.Naturality
 open import Semantics.Model.Examples.TSets.Monad.Strength.Properties.UnitMultiplication
 open import Semantics.Model.Examples.TSets.Monad.Strength.Properties.CartesianStructure
 open import Semantics.Model.Examples.TSets.Monad.Handling
+open import Semantics.Model.Examples.TSets.Monad.Handling.Properties.Delay
 
 open import Util.Equality
 open import Util.Operations
@@ -63,6 +66,6 @@ TSetMon = record
         ; strᵀ-opᵀ-algebraicity    = {!!}
         ; T-alg-of-handlerᵀ        = T-alg-of-handlerᵀ
         ; T-alg-of-handlerᵀ-ηᵀ     = {!!}
-        ; T-alg-of-handlerᵀ-delayᵀ = {!!}
+        ; T-alg-of-handlerᵀ-delayᵀ = λ {A} → ≡ᵗ-≡ (T-alg-of-handlerᵀ-delayᵀ {A})
         ; T-alg-of-handlerᵀ-opᵀ    = {!!}
         }
