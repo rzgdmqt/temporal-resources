@@ -213,7 +213,7 @@ record Monad : Set₁ where
                                ∘ᵐ mapˣᵐ idᵐ (delayᵀ {Tᵒ A τ''} τ {τ'})
                              ≡    τ-substᵀ (sym (+-assoc τ τ' τ''))
                                ∘ᵐ delayᵀ τ
-                               ∘ᵐ [ τ ]ᶠ (uncurryᵐ T-alg-of-handlerᵀ)
+                               ∘ᵐ [ τ ]ᶠ (uncurryᵐ (T-alg-of-handlerᵀ {τ = τ'} {τ' = τ''}))
                                ∘ᵐ [ τ ]ᶠ (mapˣᵐ ε-⟨⟩ idᵐ)
                                ∘ᵐ []-monoidal
                                ∘ᵐ mapˣᵐ η⊣ idᵐ
