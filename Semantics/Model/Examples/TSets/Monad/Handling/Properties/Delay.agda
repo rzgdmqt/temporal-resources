@@ -170,7 +170,7 @@ T-alg-of-handlerᵀ-delayᵀ {A} {τ} {τ'} {τ''} =
                    {Tᵒ (Tᵒ A τ'') τ'}
               ∘ᵗ mapˣᵗ η⊣ idᵗ)
              (h , c)))
-        ≡⟨ refl ⟩
+        ≡⟨⟩
           map-carrier
             ([ τ ]ᶠ (uncurryᵗ T-alg-of-handlerᵀ))
             (map-carrier
@@ -188,7 +188,7 @@ T-alg-of-handlerᵀ-delayᵀ {A} {τ} {τ'} {τ''} =
                    {Tᵒ (Tᵒ A τ'') τ'}
               ∘ᵗ mapˣᵗ η⊣ idᵗ)
              (h , c))
-        ≡⟨ refl ⟩
+        ≡⟨⟩
           map-carrier
           (   [ τ ]ᶠ (uncurryᵗ T-alg-of-handlerᵀ)
            ∘ᵗ [ τ ]ᶠ (mapˣᵗ ε-⟨⟩ idᵗ)
