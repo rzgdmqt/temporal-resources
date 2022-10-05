@@ -45,7 +45,7 @@ open import Util.Time
 ε⊣ : ∀ {A τ} → ⟨ τ ⟩ᵒ ([ τ ]ᵒ A) →ᵗ A
 ε⊣ {A} {τ} =
   tset-map
-    (λ { {t'} (p , a) → monotone A (n≤m⇒m∸n+n≤m τ t' p) a })
+    (λ { {t'} (p , a) → monotone A (≤-reflexive (m∸n+n≡m p)) a })
     (λ { p (q , x) →
       trans
         (monotone-trans A _ _ x)
