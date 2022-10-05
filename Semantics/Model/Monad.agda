@@ -167,7 +167,8 @@ record Monad : Set₁ where
     strᵀ-assoc : ∀ {A B C τ}
                →    Tᶠ ×ᵐ-assoc
                  ∘ᵐ strᵀ
-                 ∘ᵐ mapˣᵐ []-monoidal idᵐ ∘ᵐ ×ᵐ-assoc⁻¹
+                 ∘ᵐ mapˣᵐ []-monoidal idᵐ
+                 ∘ᵐ ×ᵐ-assoc⁻¹
                ≡    strᵀ {A}
                  ∘ᵐ mapˣᵐ idᵐ (strᵀ {B} {C} {τ})
 
