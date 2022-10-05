@@ -97,7 +97,7 @@ seq-assoc-sound {Γ} {A} {B} {C} {τ} {τ'} {τ''} M N P =
         ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
       ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _))
           (trans (∘ᵐ-congˡ (sym (mapˣᵐ-∘ᵐ _ _ _ _))) (trans (∘ᵐ-congˡ (cong₂ mapˣᵐ refl (∘ᵐ-identityˡ _)))
-            (trans (∘ᵐ-congˡ (cong₂ mapˣᵐ (sym GGμ∘Gη⊣∘η⊣≡δ∘η⊣) refl)) (trans (∘ᵐ-congˡ
+            (trans (∘ᵐ-congˡ (cong₂ mapˣᵐ (sym η⊣-μ-δ) refl)) (trans (∘ᵐ-congˡ
               (cong₂ mapˣᵐ refl (sym (trans (∘ᵐ-identityˡ _) (∘ᵐ-identityˡ _)))))
                 (trans (∘ᵐ-congˡ (trans (mapˣᵐ-∘ᵐ _ _ _ _) (∘ᵐ-congʳ (mapˣᵐ-∘ᵐ _ _ _ _))))
                   (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))))))))))) ⟩

@@ -22,7 +22,7 @@ open Adjunction Adj
 
 open import Semantics.Model.Category.Derived Cat
 
--- Interaction between η⊣/ε⊣ of the adjunction and η/ε of the modalities at τ = 0
+-- Interaction between η⊣/ε⊣ of the adjunction and η/ε of the modalities at 0
 
 η⊣≡ε⁻¹∘η : ∀ {A} → η⊣ {A} ≡ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵐ η {A}
 η⊣≡ε⁻¹∘η = 
@@ -35,7 +35,31 @@ open import Semantics.Model.Category.Derived Cat
       (trans (sym ⟨⟩-≤-refl) (cong ⟨⟩-≤ (≤-irrelevant _ _))))) ⟩
        [ 0 ]ᶠ (⟨⟩-≤ z≤n)
     ∘ᵐ η⊣
-  ≡⟨ η⊣-≤ ⟩
+  ≡⟨ ∘ᵐ-congʳ (sym (∘ᵐ-identityʳ _)) ⟩
+       [ 0 ]ᶠ (⟨⟩-≤ z≤n)
+    ∘ᵐ η⊣
+    ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym ⟨⟩-η⁻¹∘η≡id)) ⟩
+       [ 0 ]ᶠ (⟨⟩-≤ z≤n)
+    ∘ᵐ η⊣
+    ∘ᵐ η⁻¹
+    ∘ᵐ η
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (sym (∘ᵐ-identityˡ _)))) ⟩
+       [ 0 ]ᶠ (⟨⟩-≤ z≤n)
+    ∘ᵐ η⊣
+    ∘ᵐ η⁻¹
+    ∘ᵐ idᵐ
+    ∘ᵐ η
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ []-ε∘ε⁻¹≡id))))) ⟩
+       [ 0 ]ᶠ (⟨⟩-≤ z≤n)
+    ∘ᵐ η⊣
+    ∘ᵐ η⁻¹
+    ∘ᵐ ε
+    ∘ᵐ ε⁻¹
+    ∘ᵐ η
+  ≡⟨ sym (trans (∘ᵐ-congˡ (sym η⊣-η-ε))
+      (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ
+        (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))))) ⟩
        []-≤ z≤n
     ∘ᵐ ε⁻¹
     ∘ᵐ η
@@ -85,7 +109,7 @@ open import Semantics.Model.Category.Derived Cat
     ∘ᵐ η
     ∘ᵐ ε⁻¹
     ∘ᵐ ε⊣ 
-  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ ε⊣-≤) ⟩
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ ε⊣-η-ε) ⟩
        ε
     ∘ᵐ η⁻¹
     ∘ᵐ ⟨⟩-≤ z≤n
@@ -97,6 +121,7 @@ open import Semantics.Model.Category.Derived Cat
        ε
     ∘ᵐ η⁻¹
   ∎
+
 
 -- [_]ᵒ is monoidal (with respect to ×ᵐ)
  

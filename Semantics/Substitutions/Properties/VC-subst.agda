@@ -38,7 +38,6 @@ open import Util.Time
 
 open Model Mod
 
-
 postulate
 
 -- NOTE: The code below typeckecks, but is very slow. Thus, temporarily
@@ -65,8 +64,8 @@ postulate
                ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl) 
 
 
-{-
 
+{-
 -- Auxiliary substitution lemma for the unbox case
 
 C-subst≡∘ᵐ-aux-unbox : ∀ {Γ A τ τ'}
@@ -2562,6 +2561,5 @@ mutual
       ∘ᵐ ⟦ proj₁ (proj₂ (var-split x)) ⟧ᵉᶠ ⟨ idᵐ , ⟦ W ⟧ᵛᵗ ⟩ᵐ
       ∘ᵐ split-env {Γ' = proj₁ (var-split x)} {Γ'' = proj₁ (proj₂ (var-split x))} (≡-split refl)
     ∎
-
 
 -}

@@ -252,7 +252,7 @@ seq-perform-sound {Γ} {A} {B} {τ} {τ'} op V M N =
             ∘ᵐ ⟨ idᵐ , η⊣ ⟩ᵐ
           ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _))
               (trans (∘ᵐ-congˡ (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _))
-                (trans (cong₂ mapˣᵐ (sym GGμ∘Gη⊣∘η⊣≡δ∘η⊣) (∘ᵐ-congʳ (sym (∘ᵐ-identityʳ _))))
+                (trans (cong₂ mapˣᵐ (sym η⊣-μ-δ) (∘ᵐ-congʳ (sym (∘ᵐ-identityʳ _))))
                   (trans (mapˣᵐ-∘ᵐ _ _ _ _) (∘ᵐ-congʳ (mapˣᵐ-∘ᵐ _ _ _ _))))))
                     (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))))))) ⟩
                [ op-time op ]ᶠ (map⇒ᵐ idᵐ strᵀ)

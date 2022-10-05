@@ -94,23 +94,24 @@ Gε⊣∘η⊣≡id {A} {τ} =
 
 -- Interaction between η-⊣/ε-⊣ of the adjunction and η/ε of the modalities
 
-η⊣-≤ : ∀ {A τ}
-     → [ τ ]ᶠ (⟨⟩-≤ {A} z≤n) ∘ᵗ η⊣ {A} {τ}
-    ≡ᵗ []-≤ {⟨ 0 ⟩ᵒ A} z≤n ∘ᵗ ε⁻¹ {⟨ 0 ⟩ᵒ A} ∘ᵗ η {A}
-η⊣-≤ {A} {τ} =
+η⊣-η-ε : ∀ {A τ}
+       → [ τ ]ᶠ (⟨⟩-≤ {A} z≤n) ∘ᵗ η⊣ {A} {τ} ∘ᵗ η⁻¹ ∘ᵗ ε
+      ≡ᵗ []-≤ {⟨ 0 ⟩ᵒ A} z≤n
+η⊣-η-ε {A} {τ} =
   eqᵗ (λ {t} x →
     cong₂ _,_
       (≤-irrelevant _ _)
       (trans
         (monotone-trans A _ _ _)
         (trans
-          (cong (λ p → monotone A p x) (≤-irrelevant _ _))
-          (sym (monotone-trans A _ _ _)))))
+          (monotone-trans A _ _ _)
+          (cong (λ p → monotone A p (proj₂ x))
+            (≤-irrelevant _ _)))))
 
-ε⊣-≤ : ∀ {A τ}
-     → ⟨ 0 ⟩ᶠ ([]-≤ {A} z≤n) ∘ᵗ η ∘ᵗ ε⁻¹ ∘ᵗ ε⊣ {A} {τ}
-    ≡ᵗ ⟨⟩-≤ {[ τ ]ᵒ A} z≤n
-ε⊣-≤ {A} {τ} =
+ε⊣-η-ε : ∀ {A τ}
+       → ⟨ 0 ⟩ᶠ ([]-≤ {A} z≤n) ∘ᵗ η ∘ᵗ ε⁻¹ ∘ᵗ ε⊣ {A} {τ}
+      ≡ᵗ ⟨⟩-≤ {[ τ ]ᵒ A} z≤n
+ε⊣-η-ε {A} {τ} =
   eqᵗ (λ { {t} (p , x) →
     cong₂ _,_
       (≤-irrelevant _ _)
@@ -122,11 +123,11 @@ Gε⊣∘η⊣≡id {A} {τ} =
 
 -- Interaction between η⊣/ε⊣ of the adjunction and μ/δ of the modalities
  
-GGμ∘Gη⊣∘η⊣≡δ∘η⊣ : ∀ {A τ τ'}
-                →    [ τ ]ᶠ ([ τ' ]ᶠ (⟨⟩-≤ {A} (≤-reflexive (+-comm τ τ')) ∘ᵗ (μ {A})))
-                  ∘ᵗ [ τ ]ᶠ (η⊣ {⟨ τ ⟩ᵒ A}) ∘ᵗ η⊣ {A}
-               ≡ᵗ δ {⟨ τ + τ' ⟩ᵒ A} ∘ᵗ η⊣ {A}
-GGμ∘Gη⊣∘η⊣≡δ∘η⊣ {A} {τ} {τ'} =
+η⊣-μ-δ : ∀ {A τ τ'}
+       →    [ τ ]ᶠ ([ τ' ]ᶠ (⟨⟩-≤ {A} (≤-reflexive (+-comm τ τ')) ∘ᵗ (μ {A})))
+         ∘ᵗ [ τ ]ᶠ (η⊣ {⟨ τ ⟩ᵒ A}) ∘ᵗ η⊣ {A}
+      ≡ᵗ δ {⟨ τ + τ' ⟩ᵒ A} ∘ᵗ η⊣ {A}
+η⊣-μ-δ {A} {τ} {τ'} =
   eqᵗ (λ {x} x →
     cong₂ _,_
       (≤-irrelevant _ _)
@@ -140,11 +141,11 @@ GGμ∘Gη⊣∘η⊣≡δ∘η⊣ {A} {τ} {τ'} =
                 (monotone-trans A _ _ _)
                 (cong (λ p → monotone A p x) (≤-irrelevant _ _))))))))
 
-ε⊣∘Fε⊣∘FFδ≡ε⊣∘μ : ∀ {A τ τ'}
-                →    ε⊣ {A} ∘ᵗ ⟨ τ ⟩ᶠ (ε⊣ {[ τ ]ᵒ A})
-                  ∘ᵗ ⟨ τ ⟩ᶠ (⟨ τ' ⟩ᶠ (δ {A} ∘ᵗ []-≤ {A} (≤-reflexive (+-comm τ τ'))))
-               ≡ᵗ ε⊣ ∘ᵗ μ {[ τ + τ' ]ᵒ A}
-ε⊣∘Fε⊣∘FFδ≡ε⊣∘μ {A} {τ} {τ'} =
+ε⊣-μ-δ : ∀ {A τ τ'}
+       →    ε⊣ {A} ∘ᵗ ⟨ τ ⟩ᶠ (ε⊣ {[ τ ]ᵒ A})
+         ∘ᵗ ⟨ τ ⟩ᶠ (⟨ τ' ⟩ᶠ (δ {A} ∘ᵗ []-≤ {A} (≤-reflexive (+-comm τ τ'))))
+      ≡ᵗ ε⊣ ∘ᵗ μ {[ τ + τ' ]ᵒ A}
+ε⊣-μ-δ {A} {τ} {τ'} =
   eqᵗ λ { {t} (p , q , x) →
     trans
       (monotone-trans A _ _ _)
@@ -164,14 +165,14 @@ open import Semantics.Model.Modality.Adjunction
 
 TSetAdj : Adjunction TSetCat TSetFut TSetPas
 TSetAdj = record
-  { η⊣              = η⊣
-  ; ε⊣              = ε⊣
-  ; η⊣-nat          = λ f → ≡ᵗ-≡ (η⊣-nat f)
-  ; ε⊣-nat          = λ f → ≡ᵗ-≡ (ε⊣-nat f)
-  ; ε⊣∘Fη⊣≡id       = λ {A} → ≡ᵗ-≡ (ε⊣∘Fη⊣≡id {A})
-  ; Gε⊣∘η⊣≡id       = λ {A} → ≡ᵗ-≡ (Gε⊣∘η⊣≡id {A})
-  ; η⊣-≤            = λ {A} → ≡ᵗ-≡ (η⊣-≤ {A})
-  ; ε⊣-≤            = λ {A} → ≡ᵗ-≡ (ε⊣-≤ {A})
-  ; GGμ∘Gη⊣∘η⊣≡δ∘η⊣ = λ {A} → ≡ᵗ-≡ (GGμ∘Gη⊣∘η⊣≡δ∘η⊣ {A})
-  ; ε⊣∘Fε⊣∘FFδ≡ε⊣∘μ = λ {A} → ≡ᵗ-≡ (ε⊣∘Fε⊣∘FFδ≡ε⊣∘μ {A})
+  { η⊣        = η⊣
+  ; ε⊣        = ε⊣
+  ; η⊣-nat    = λ f → ≡ᵗ-≡ (η⊣-nat f)
+  ; ε⊣-nat    = λ f → ≡ᵗ-≡ (ε⊣-nat f)
+  ; ε⊣∘Fη⊣≡id = λ {A} → ≡ᵗ-≡ (ε⊣∘Fη⊣≡id {A})
+  ; Gε⊣∘η⊣≡id = λ {A} → ≡ᵗ-≡ (Gε⊣∘η⊣≡id {A})
+  ; η⊣-η-ε    = λ {A} → ≡ᵗ-≡ (η⊣-η-ε {A})
+  ; ε⊣-η-ε    = λ {A} → ≡ᵗ-≡ (ε⊣-η-ε {A})
+  ; η⊣-μ-δ    = λ {A} → ≡ᵗ-≡ (η⊣-μ-δ {A})
+  ; ε⊣-μ-δ    = λ {A} → ≡ᵗ-≡ (ε⊣-μ-δ {A})
   }

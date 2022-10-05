@@ -154,8 +154,41 @@ unbox-eta-sound {Γ} {A} {C} {τ} p V M =
                 ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
                 ∘ᵐ η⊣
                 ∘ᵐ ε⊣
-              ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ η⊣-≤)
-                  (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)) ))) ⟩
+              ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (sym (∘ᵐ-identityˡ _)))) ⟩
+                   [ τ ]ᶠ η⁻¹
+                ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                ∘ᵐ η⊣
+                ∘ᵐ idᵐ
+                ∘ᵐ ε⊣
+              ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (sym
+                  (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ ⟨⟩-η⁻¹∘η≡id))))) ⟩
+                   [ τ ]ᶠ η⁻¹
+                ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                ∘ᵐ η⊣
+                ∘ᵐ η⁻¹
+                ∘ᵐ η
+                ∘ᵐ ε⊣
+              ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (sym (∘ᵐ-identityˡ _))))) ⟩
+                   [ τ ]ᶠ η⁻¹
+                ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                ∘ᵐ η⊣
+                ∘ᵐ η⁻¹
+                ∘ᵐ idᵐ
+                ∘ᵐ η
+                ∘ᵐ ε⊣
+              ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (sym
+                  (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ []-ε∘ε⁻¹≡id)))))) ⟩
+                   [ τ ]ᶠ η⁻¹
+                ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                ∘ᵐ η⊣
+                ∘ᵐ η⁻¹
+                ∘ᵐ ε
+                ∘ᵐ ε⁻¹
+                ∘ᵐ η
+                ∘ᵐ ε⊣
+              ≡⟨ sym (∘ᵐ-congʳ (trans (∘ᵐ-congˡ (sym η⊣-η-ε))
+                  (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ
+                    (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))))))) ⟩
                    [ τ ]ᶠ η⁻¹
                 ∘ᵐ []-≤ z≤n
                 ∘ᵐ ε⁻¹
@@ -199,7 +232,7 @@ unbox-eta-sound {Γ} {A} {C} {τ} p V M =
                 ∘ᵐ η
                 ∘ᵐ ε⁻¹
                 ∘ᵐ ε⊣
-              ≡⟨ ∘ᵐ-congʳ ε⊣-≤ ⟩
+              ≡⟨ ∘ᵐ-congʳ ε⊣-η-ε ⟩
                    η⁻¹
                 ∘ᵐ ⟨⟩-≤ z≤n
               ∎) ⟩
