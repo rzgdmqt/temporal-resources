@@ -97,7 +97,8 @@ mutual
     fun-eta : ∀ {A C}
             → (V : Γ ⊢V⦂ A ⇒ C)
             ---------------------------------------------
-            → Γ ⊢V⦂ V == lam (V-rename wk-ren V · var Hd)
+            → Γ ⊢V⦂ V
+                == lam (V-rename wk-ren V · var Hd)
 
   infix 18 _⊢V⦂_==_
 
@@ -166,9 +167,8 @@ mutual
                → {M N : Γ ∷ A ∷ B ⊢C⦂ C}
                → Γ ⊢V⦂ V == W
                → Γ ∷ A ∷ B ⊢C⦂ M == N
-               -------------------------
-               → Γ ⊢C⦂ match V `in M
-                   == match W `in N 
+               --------------------------------------
+               → Γ ⊢C⦂ match V `in M == match W `in N 
 
     absurd-cong : ∀ {C}
                 → {V W : Γ ⊢V⦂ Empty}
@@ -304,8 +304,9 @@ mutual
     absurd-eta : ∀ {C}
                → (V : Γ ⊢V⦂ Empty)
                → (M : Γ ∷ Empty ⊢C⦂ C)
-               ---------------------------------
-               → Γ ⊢C⦂ absurd V == M [ Hd ↦ V ]c
+               -----------------------
+               → Γ ⊢C⦂ absurd V
+                   == M [ Hd ↦ V ]c
 
     -- computational/beta-equations for effect handling
 
@@ -388,26 +389,26 @@ mutual
                        (C-rename (exch-ren ∘ʳ wk-ren) M)
                           [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c)   
 
+    {-
     -- NOTE: potential extension of the equational theory 
     -- with equations for collapsing successive delays
 
-    {-
     delay-zero : ∀ {A τ}
                → (M : Γ ⟨ 0 ⟩ ⊢C⦂ A ‼ τ)
-               ------------------------------------------
-               → Γ ⊢C⦂ delay 0 refl M == C-rename ⟨⟩-η-ren M
-
-    delay-delay : ∀ {A τ τ₁ τ₂ τ' τ''}
-                → (q : τ' ≡ τ₂ + τ)
-                → (p : τ'' ≡ τ₁ + τ')
+               --------------------------
+               → Γ ⊢C⦂ delay 0 M
+                   == C-rename ⟨⟩-η-ren M
+               
+    delay-delay : ∀ {A τ τ₁ τ₂}
                 → (M : Γ ⟨ τ₁ ⟩ ⟨ τ₂ ⟩ ⊢C⦂ A ‼ τ)
-                -------------------------------------------------------------------
-                → Γ ⊢C⦂ delay τ₁ p (delay τ₂ q M)
-                    == delay
-                         (τ₁ + τ₂)
-                         (trans p (trans (cong (τ₁ +_) q) (sym (+-assoc τ₁ τ₂ τ))))
-                         (C-rename ⟨⟩-μ⁻¹-ren M)
-    -}
-                         
+                ------------------------------------
+                → Γ ⊢C⦂ delay τ₁ (delay τ₂ M)
+                    == τ-subst
+                         (+-assoc τ₁ τ₂ τ)
+                         (delay
+                           (τ₁ + τ₂)
+                           (C-rename ⟨⟩-μ⁻¹-ren M))
+  -}
+
   infix 18 _⊢C⦂_==_
 
