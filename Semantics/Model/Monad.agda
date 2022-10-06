@@ -177,8 +177,10 @@ record Monad : Set₁ where
     strᵀ-delayᵀ-algebraicity : ∀ {A B τ τ'}
                              →    strᵀ {A} {B} {τ + τ'}
                                ∘ᵐ mapˣᵐ idᵐ (delayᵀ τ {τ'})
-                             ≡    delayᵀ τ ∘ᵐ [ τ ]ᶠ (strᵀ {A} {B} {τ'})
-                               ∘ᵐ []-monoidal ∘ᵐ mapˣᵐ (δ {A} {τ} {τ'}) idᵐ
+                             ≡    delayᵀ τ
+                               ∘ᵐ [ τ ]ᶠ (strᵀ {A} {B} {τ'})
+                               ∘ᵐ []-monoidal
+                               ∘ᵐ mapˣᵐ (δ {A} {τ} {τ'}) idᵐ
 
     strᵀ-opᵀ-algebraicity : ∀ {A B τ} → (op : Op)
                           →    strᵀ {A} {B}
