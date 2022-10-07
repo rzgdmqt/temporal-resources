@@ -25,7 +25,7 @@ open import Semantics.Substitutions.Properties.VC-subst Mod
 
 open import Semantics.Interpretation.Properties.τ-subst Mod
 
--- open import Semantics.Soundness.handle-perform-aux Mod
+open import Semantics.Soundness.handle-perform-aux Mod
 
 open import Util.Equality
 open import Util.Operations
@@ -65,7 +65,6 @@ handle-perform-sound {Γ} {A} {B} {τ} {τ'} op V M H N =
                  ∘ᵐ ⟨ ⟦⟧ᵛ-⟦⟧ᵍ (param op) ∘ᵐ ⟦ V ⟧ᵛᵗ ,
                          [ op-time op ]ᶠ (curryᵐ (idᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , ⟦⟧ᵍ-⟦⟧ᵛ (arity op) ∘ᵐ sndᵐ ⟩ᵐ))
                       ∘ᵐ [ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ) ∘ᵐ η⊣ ⟩ᵐ ⟩ᵐ ⟩ᵐ
-  {-
   ≡⟨⟩
        uncurryᵐ (   T-alg-of-handlerᵀ
                  ∘ᵐ mapⁱˣᵐ (λ op →
@@ -514,8 +513,6 @@ handle-perform-sound {Γ} {A} {B} {τ} {τ'} op V M H N =
                                           (trans (∘ᵐ-congʳ (∘ᵐ-identityˡ _)) (trans (∘ᵐ-congʳ (∘ᵐ-identityˡ _))
                                             (∘ᵐ-identityʳ _)))))))))))))))
                                   (∘ᵐ-identityˡ _)))))))))))))))))) ⟩
-    -}
-  ≡⟨ {!!} ⟩
        τ-substᵀ (sym (+-assoc (op-time op) τ τ'))
     ∘ᵐ uncurryᵐ idᵐ
     ∘ᵐ (  mapˣᵐ (curryᵐ (   (⟦ H op (τ + τ') ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ)
@@ -624,7 +621,7 @@ handle-perform-sound {Γ} {A} {B} {τ} {τ'} op V M H N =
                       [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)
                    ∘ᵐ [ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ)
                    ∘ᵐ η⊣ ⟩ᵐ ⟩ᵐ ⟩ᵐ
-  ≡⟨ {!!} ⟩
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (handle-perform-sound-aux op V M H N)) ⟩
        τ-substᵀ (sym (+-assoc (op-time op) τ τ'))
     ∘ᵐ ⟦ H op (τ + τ') ⟧ᶜᵗ
     ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
@@ -665,8 +662,6 @@ handle-perform-sound {Γ} {A} {B} {τ} {τ'} op V M H N =
                                   ∘ᵐ mapˣᵐ idᵐ strᵀ
                                   ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ))
          ∘ᵐ η⊣ ⟩ᵐ
-  ≡⟨ {!!} ⟩
-  {-
   ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (cong ⟨ idᵐ ,_⟩ᵐ (∘ᵐ-congˡ (cong [ op-time op ]ᶠ
       (cong curryᵐ (∘ᵐ-congˡ (cong uncurryᵐ (∘ᵐ-congʳ (∘ᵐ-congˡ (cong mapⁱˣᵐ (fun-ext (λ op → cong mapⁱˣᵐ (fun-ext λ τ''' →
         ∘ᵐ-congʳ (cong curryᵐ (∘ᵐ-congˡ (sym (C-rename≡∘ᵐ
@@ -762,7 +757,6 @@ handle-perform-sound {Γ} {A} {B} {τ} {τ'} op V M H N =
          ∘ᵐ η⊣ ⟩ᵐ
       ∘ᵐ idᵐ
   ≡⟨ ∘ᵐ-congʳ (sym (C-subst≡∘ᵐ (H op (τ + τ') [ Tl-∷ Hd ↦ V ]c) _ _)) ⟩
-  -}
        τ-substᵀ (sym (+-assoc (op-time op) τ τ'))
     ∘ᵐ ⟦ (H op (τ + τ') [ Tl-∷ Hd ↦ V ]c)
            [ Hd ↦ box (lam (handle M
