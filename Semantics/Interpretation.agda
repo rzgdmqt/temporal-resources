@@ -52,6 +52,97 @@ mutual
 ⟦⟧ᵍ-⟦⟧ᵛ (A |×|ᵍ B) = mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ A) (⟦⟧ᵍ-⟦⟧ᵛ B)
 ⟦⟧ᵍ-⟦⟧ᵛ ([ τ ]ᵍ A) = [ τ ]ᶠ (⟦⟧ᵍ-⟦⟧ᵛ A)
 
+⟦⟧ᵛ-⟦⟧ᵍ-iso : (B : GType)
+            → ⟦⟧ᵍ-⟦⟧ᵛ B ∘ᵐ ⟦⟧ᵛ-⟦⟧ᵍ B ≡ idᵐ
+⟦⟧ᵛ-⟦⟧ᵍ-iso (Base B) =
+  begin
+    idᵐ ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-identityˡ _ ⟩
+    idᵐ
+  ∎
+⟦⟧ᵛ-⟦⟧ᵍ-iso Unit =
+  begin
+    idᵐ ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-identityˡ _ ⟩
+    idᵐ
+  ∎
+⟦⟧ᵛ-⟦⟧ᵍ-iso Empty =
+  begin
+    idᵐ ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-identityˡ _ ⟩
+    idᵐ
+  ∎
+⟦⟧ᵛ-⟦⟧ᵍ-iso (A |×|ᵍ B) = 
+  begin
+       mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ A) (⟦⟧ᵍ-⟦⟧ᵛ B)
+    ∘ᵐ mapˣᵐ (⟦⟧ᵛ-⟦⟧ᵍ A) (⟦⟧ᵛ-⟦⟧ᵍ B)
+  ≡⟨ sym (mapˣᵐ-∘ᵐ _ _ _ _) ⟩
+       mapˣᵐ
+         (⟦⟧ᵍ-⟦⟧ᵛ A ∘ᵐ ⟦⟧ᵛ-⟦⟧ᵍ A)
+         (⟦⟧ᵍ-⟦⟧ᵛ B ∘ᵐ ⟦⟧ᵛ-⟦⟧ᵍ B)
+  ≡⟨ cong₂ mapˣᵐ (⟦⟧ᵛ-⟦⟧ᵍ-iso A) (⟦⟧ᵛ-⟦⟧ᵍ-iso B) ⟩
+     mapˣᵐ idᵐ idᵐ
+  ≡⟨ mapˣᵐ-identity ⟩
+    idᵐ
+  ∎
+⟦⟧ᵛ-⟦⟧ᵍ-iso ([ τ ]ᵍ A) = 
+  begin
+       [ τ ]ᶠ (⟦⟧ᵍ-⟦⟧ᵛ A)
+    ∘ᵐ [ τ ]ᶠ (⟦⟧ᵛ-⟦⟧ᵍ A)
+  ≡⟨ sym ([]-∘ᵐ _ _) ⟩
+    [ τ ]ᶠ (⟦⟧ᵍ-⟦⟧ᵛ A ∘ᵐ ⟦⟧ᵛ-⟦⟧ᵍ A)
+  ≡⟨ cong [ τ ]ᶠ (⟦⟧ᵛ-⟦⟧ᵍ-iso A) ⟩
+    [ τ ]ᶠ idᵐ
+  ≡⟨ []-idᵐ ⟩
+    idᵐ
+  ∎
+
+⟦⟧ᵍ-⟦⟧ᵛ-iso : (B : GType)
+            → ⟦⟧ᵛ-⟦⟧ᵍ B ∘ᵐ ⟦⟧ᵍ-⟦⟧ᵛ B ≡ idᵐ
+⟦⟧ᵍ-⟦⟧ᵛ-iso (Base B) =
+  begin
+    idᵐ ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-identityˡ _ ⟩
+    idᵐ
+  ∎
+⟦⟧ᵍ-⟦⟧ᵛ-iso Unit =
+  begin
+    idᵐ ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-identityˡ _ ⟩
+    idᵐ
+  ∎
+⟦⟧ᵍ-⟦⟧ᵛ-iso Empty =
+  begin
+    idᵐ ∘ᵐ idᵐ
+  ≡⟨ ∘ᵐ-identityˡ _ ⟩
+    idᵐ
+  ∎
+⟦⟧ᵍ-⟦⟧ᵛ-iso (A |×|ᵍ B) = 
+  begin
+       mapˣᵐ (⟦⟧ᵛ-⟦⟧ᵍ A) (⟦⟧ᵛ-⟦⟧ᵍ B)
+    ∘ᵐ mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ A) (⟦⟧ᵍ-⟦⟧ᵛ B)
+  ≡⟨ sym (mapˣᵐ-∘ᵐ _ _ _ _) ⟩
+       mapˣᵐ
+         (⟦⟧ᵛ-⟦⟧ᵍ A ∘ᵐ ⟦⟧ᵍ-⟦⟧ᵛ A)
+         (⟦⟧ᵛ-⟦⟧ᵍ B ∘ᵐ ⟦⟧ᵍ-⟦⟧ᵛ B)
+  ≡⟨ cong₂ mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ-iso A) (⟦⟧ᵍ-⟦⟧ᵛ-iso B) ⟩
+     mapˣᵐ idᵐ idᵐ
+  ≡⟨ mapˣᵐ-identity ⟩
+    idᵐ
+  ∎
+⟦⟧ᵍ-⟦⟧ᵛ-iso ([ τ ]ᵍ A) =
+  begin
+       [ τ ]ᶠ (⟦⟧ᵛ-⟦⟧ᵍ A)
+    ∘ᵐ [ τ ]ᶠ (⟦⟧ᵍ-⟦⟧ᵛ A)
+  ≡⟨ sym ([]-∘ᵐ _ _) ⟩
+    [ τ ]ᶠ (⟦⟧ᵛ-⟦⟧ᵍ A ∘ᵐ ⟦⟧ᵍ-⟦⟧ᵛ A)
+  ≡⟨ cong [ τ ]ᶠ (⟦⟧ᵍ-⟦⟧ᵛ-iso A) ⟩
+    [ τ ]ᶠ idᵐ
+  ≡⟨ []-idᵐ ⟩
+    idᵐ
+  ∎
+
+
 -- Interpretation of contexts as functors
 
 ⟦_⟧ᵉᵒ : Ctx → Obj → Obj
