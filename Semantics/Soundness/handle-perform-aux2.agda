@@ -25,6 +25,8 @@ open import Semantics.Substitutions.Properties.VC-subst Mod
 
 open import Semantics.Interpretation.Properties.τ-subst Mod
 
+open import Semantics.Soundness.handle-perform-aux3 Mod
+
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
@@ -165,7 +167,11 @@ handle-perform-sound-aux2 {Γ} {A} {B} {τ} {τ'} op V M H N =
                      ∘ᵐ mapˣᵐ idᵐ (   [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)
                                    ∘ᵐ [ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ))))
     ∘ᵐ ⟨ idᵐ , ⟨ ⟦ V ⟧ᵛᵗ , ⟨ η⊣ , η⊣ ⟩ᵐ ⟩ᵐ ⟩ᵐ
-  ≡⟨ {!!} ⟩ -- merge map and ⟨ ⟩
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ
+      (trans (sym (mapˣᵐ-⟨⟩ᵐ _ _ _ _))
+        (cong₂ ⟨_,_⟩ᵐ
+          (∘ᵐ-identityˡ _)
+          refl))))))) ⟩
        ×ᵐ-assoc⁻¹
     ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (curryᵐ (   uncurryᵐ T-alg-of-handlerᵀ
                                                                        ∘ᵐ mapˣᵐ idᵐ (uncurryᵐ idᵐ)
@@ -335,7 +341,7 @@ handle-perform-sound-aux2 {Γ} {A} {B} {τ} {τ'} op V M H N =
                      ∘ᵐ mapˣᵐ idᵐ (   [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)
                                    ∘ᵐ [ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ))))
     ∘ᵐ ⟨ idᵐ , ⟨ ⟦ V ⟧ᵛᵗ , ⟨ η⊣ , η⊣ ⟩ᵐ ⟩ᵐ ⟩ᵐ
-  ≡⟨ {!!} ⟩
+  ≡⟨ handle-perform-sound-aux3 {Γ} {A} {B} {τ} {τ'} op V M H N ⟩
        mapˣᵐ (⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ) idᵐ
     ∘ᵐ mapˣᵐ
          idᵐ

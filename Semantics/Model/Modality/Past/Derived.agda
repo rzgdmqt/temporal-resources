@@ -25,6 +25,21 @@ open import Semantics.Model.Category.Derived Cat
  
 ε-⟨⟩ : ∀ {A τ} → ⟨ τ ⟩ᵒ A →ᵐ A
 ε-⟨⟩ {A} {τ} = η⁻¹ ∘ᵐ ⟨⟩-≤ {A = A} z≤n
+
+ε-⟨⟩-nat : ∀ {A B τ}
+         → (f : A →ᵐ B)
+         → f ∘ᵐ ε-⟨⟩
+         ≡ ε-⟨⟩ ∘ᵐ ⟨ τ ⟩ᶠ f
+ε-⟨⟩-nat {A} {B} {τ} f =
+  begin
+    f ∘ᵐ η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n
+  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (⟨⟩-η⁻¹-nat _)) (∘ᵐ-assoc _ _ _)) ⟩
+    η⁻¹ ∘ᵐ ⟨ 0 ⟩ᶠ f ∘ᵐ ⟨⟩-≤ z≤n
+  ≡⟨ ∘ᵐ-congʳ (⟨⟩-≤-nat _ _) ⟩
+    η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n ∘ᵐ ⟨ τ ⟩ᶠ f
+  ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+    (η⁻¹ ∘ᵐ ⟨⟩-≤ z≤n) ∘ᵐ ⟨ τ ⟩ᶠ f
+  ∎
  
 -- Graded monad laws (for inverses)
  
