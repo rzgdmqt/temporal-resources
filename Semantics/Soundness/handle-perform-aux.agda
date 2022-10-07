@@ -25,6 +25,8 @@ open import Semantics.Substitutions.Properties.VC-subst Mod
 
 open import Semantics.Interpretation.Properties.τ-subst Mod
 
+open import Semantics.Soundness.handle-perform-aux2 Mod
+
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
@@ -465,7 +467,7 @@ handle-perform-sound-aux {Γ} {A} {B} {τ} {τ'} op V M H N =
                       [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)
                    ∘ᵐ [ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ)
                    ∘ᵐ η⊣ ⟩ᵐ ⟩ᵐ ⟩ᵐ
-  ≡⟨ {!!} ⟩
+  ≡⟨ handle-perform-sound-aux2 op V M H N ⟩
        ⟨ idᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
     ∘ᵐ ⟨ ⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
     ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
