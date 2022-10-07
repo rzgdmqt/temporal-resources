@@ -25,6 +25,8 @@ open import Semantics.Substitutions.Properties.VC-subst Mod
 
 open import Semantics.Interpretation.Properties.τ-subst Mod
 
+-- open import Semantics.Soundness.handle-perform-aux Mod
+
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
@@ -555,6 +557,43 @@ handle-perform-sound {Γ} {A} {B} {τ} {τ'} op V M H N =
     ∘ᵐ uncurryᵐ idᵐ
     ∘ᵐ mapˣᵐ (curryᵐ (   (⟦ H op (τ + τ') ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ)
                       ∘ᵐ mapˣᵐ fstᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))))) idᵐ
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ (uncurryᵐ T-alg-of-handlerᵀ))))
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (curryᵐ (   mapˣᵐ idᵐ appᵐ
+                                                      ∘ᵐ ×ᵐ-assoc))))
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (mapˣᵐ ε-⟨⟩ idᵐ)))
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ []-monoidal)
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ (mapˣᵐ η⊣ idᵐ))
+    ∘ᵐ mapˣᵐ idᵐ ⟨ fstᵐ ∘ᵐ sndᵐ , ⟨ fstᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ
+         ,
+            mapˣᵐ
+              (mapⁱˣᵐ (λ op →
+                 mapⁱˣᵐ (λ τ''' →
+                   (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
+                    ∘ᵐ curryᵐ (⟦ H op τ''' ⟧ᶜᵗ ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ)))))
+              idᵐ
+         ∘ᵐ mapˣᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ idᵐ ⟩ᵐ
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ (Tᶠ ⟦ N ⟧ᶜᵗ))))
+    ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ
+                    idᵐ
+                    (   [ op-time op ]ᶠ (   map⇒ᵐ idᵐ strᵀ
+                                         ∘ᵐ curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ)
+                     ∘ᵐ []-monoidal
+                     ∘ᵐ mapˣᵐ δ idᵐ))
+    ∘ᵐ mapˣᵐ idᵐ ⟨ fstᵐ ∘ᵐ sndᵐ , ⟨ fstᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
+    ∘ᵐ ⟨ idᵐ , ⟨ η⊣ ,
+                 ⟨    ⟦⟧ᵛ-⟦⟧ᵍ (param op)
+                   ∘ᵐ ⟦ V ⟧ᵛᵗ ,
+                      [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)
+                   ∘ᵐ [ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ)
+                   ∘ᵐ η⊣ ⟩ᵐ ⟩ᵐ ⟩ᵐ
+  ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym (uncurryᵐ-nat _ _)))
+      (trans (∘ᵐ-congˡ (trans (cong uncurryᵐ (∘ᵐ-identityˡ _)) (curryᵐ-uncurryᵐ-iso _)))
+        (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-assoc _ _ _))))) ⟩
+       τ-substᵀ (sym (+-assoc (op-time op) τ τ'))
+    ∘ᵐ ⟦ H op (τ + τ') ⟧ᶜᵗ
+    ∘ᵐ ⟨ ⟨ fstᵐ , fstᵐ ∘ᵐ sndᵐ ⟩ᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ
+    ∘ᵐ mapˣᵐ fstᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ)))
     ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (map⇒ᵐ idᵐ (uncurryᵐ T-alg-of-handlerᵀ))))
     ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ idᵐ ([ op-time op ]ᶠ (curryᵐ (   mapˣᵐ idᵐ appᵐ
                                                       ∘ᵐ ×ᵐ-assoc))))
