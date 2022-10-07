@@ -621,7 +621,7 @@ handle-perform-sound {Γ} {A} {B} {τ} {τ'} op V M H N =
                       [ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵍ-⟦⟧ᵛ (arity op)) idᵐ)
                    ∘ᵐ [ op-time op ]ᶠ (curryᵐ ⟦ M ⟧ᶜᵗ)
                    ∘ᵐ η⊣ ⟩ᵐ ⟩ᵐ ⟩ᵐ
-  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (handle-perform-sound-aux op V M H N)) ⟩
+  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (handle-perform-sound-aux {Γ} {A} {B} {τ} {τ'} op V M H N)) ⟩
        τ-substᵀ (sym (+-assoc (op-time op) τ τ'))
     ∘ᵐ ⟦ H op (τ + τ') ⟧ᶜᵗ
     ∘ᵐ ⟨ idᵐ ∘ᵐ fstᵐ , idᵐ ∘ᵐ sndᵐ ⟩ᵐ
