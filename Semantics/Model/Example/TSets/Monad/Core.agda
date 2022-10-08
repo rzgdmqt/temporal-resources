@@ -5,7 +5,7 @@
 -- Note: A version of the monad that is not quotioned by
 --       the delay equations (identity and composition)
 
-module Semantics.Model.Examples.TSets.Monad.Core where
+module Semantics.Model.Example.TSets.Monad.Core where
 
 open import Function
 
@@ -15,10 +15,10 @@ open import Data.Unit hiding (_≤_)
 
 open import Semantics.Model.BaseGroundTypes
 
-open import Semantics.Model.Examples.TSets.TSets
-open import Semantics.Model.Examples.TSets.Modality.Future
-open import Semantics.Model.Examples.TSets.Modality.Past
-open import Semantics.Model.Examples.TSets.BaseGroundTypes
+open import Semantics.Model.Example.TSets.TSets
+open import Semantics.Model.Example.TSets.Modality.Future
+open import Semantics.Model.Example.TSets.Modality.Past
+open import Semantics.Model.Example.TSets.BaseGroundTypes
 
 open import Util.Equality
 open import Util.Operations

@@ -2,12 +2,12 @@
 -- Interpretation of base and ground types --
 ---------------------------------------------
 
-module Semantics.Model.Examples.TSets.BaseGroundTypes where
+module Semantics.Model.Example.TSets.BaseGroundTypes where
 
 open import Function
 
-open import Semantics.Model.Examples.TSets.TSets
-open import Semantics.Model.Examples.TSets.Modality.Future
+open import Semantics.Model.Example.TSets.TSets
+open import Semantics.Model.Example.TSets.Modality.Future
 
 open import Util.Operations
 open import Util.Equality

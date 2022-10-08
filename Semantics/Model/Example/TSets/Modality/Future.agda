@@ -7,7 +7,7 @@
 -- use the terminology (counit, comultiplication) of graded comonads. --
 ------------------------------------------------------------------------
 
-module Semantics.Model.Examples.TSets.Modality.Future where
+module Semantics.Model.Example.TSets.Modality.Future where
 
 open import Function
 
@@ -18,7 +18,7 @@ open import Data.Unit hiding (_≤_)
 
 open import Syntax.Language
 
-open import Semantics.Model.Examples.TSets.TSets
+open import Semantics.Model.Example.TSets.TSets
 
 open import Util.Equality
 open import Util.Time
