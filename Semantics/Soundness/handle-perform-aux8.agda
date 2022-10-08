@@ -204,6 +204,41 @@ handle-perform-sound-aux8 {Γ} {A} {B} {τ} {τ'} op V M H N =
                        ∘ᵐ mapⁱˣᵐ (λ op →
                            mapⁱˣᵐ (λ τ''' →
                               (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
+                               ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
+                                          ∘ᵐ mapˣᵐ (mapˣᵐ ε-⟨⟩ idᵐ) idᵐ
+                                          ∘ᵐ ×ᵐ-assoc⁻¹
+                                          ∘ᵐ mapˣᵐ fstᵐ idᵐ))))
+                       ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+          ∘ᵐ mapˣᵐ idᵐ (   Tᶠ (   ⟦ N ⟧ᶜᵗ
+                               ∘ᵐ mapˣᵐ ((⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ) idᵐ))
+          ∘ᵐ mapˣᵐ idᵐ strᵀ
+          ∘ᵐ ⟨    fstᵐ
+               ∘ᵐ mapˣᵐ ⟨ idᵐ , ⟨ idᵐ , idᵐ ⟩ᵐ ⟩ᵐ idᵐ ,
+                  ⟨    η⊣
+                    ∘ᵐ sndᵐ
+                    ∘ᵐ fstᵐ ,
+                       ⟦ M ⟧ᶜᵗ
+                    ∘ᵐ mapˣᵐ (sndᵐ ∘ᵐ sndᵐ) idᵐ ⟩ᵐ
+               ∘ᵐ mapˣᵐ ⟨ idᵐ , ⟨ idᵐ , idᵐ ⟩ᵐ ⟩ᵐ idᵐ ⟩ᵐ
+        ≡⟨ {!!} ⟩
+             uncurryᵐ (   T-alg-of-handlerᵀ
+                       ∘ᵐ mapⁱˣᵐ (λ op →
+                           mapⁱˣᵐ (λ τ''' →
+                              (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
+                               ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
+                                          ∘ᵐ mapˣᵐ (mapˣᵐ ε-⟨⟩ idᵐ) idᵐ
+                                          ∘ᵐ ×ᵐ-assoc⁻¹
+                                          ∘ᵐ mapˣᵐ fstᵐ idᵐ))))
+                       ∘ᵐ ⟨ (λ op → ⟨ (λ τ''' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+          ∘ᵐ mapˣᵐ idᵐ (Tᶠ (   ⟦ N ⟧ᶜᵗ
+                            ∘ᵐ mapˣᵐ ((⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ) idᵐ))
+          ∘ᵐ mapˣᵐ idᵐ strᵀ
+          ∘ᵐ ⟨ idᵐ , ⟨ η⊣ , ⟦ M ⟧ᶜᵗ ⟩ᵐ ⟩ᵐ
+        ≡⟨ {!!} ⟩
+             uncurryᵐ (   T-alg-of-handlerᵀ
+                       ∘ᵐ mapⁱˣᵐ (λ op →
+                           mapⁱˣᵐ (λ τ''' →
+                              (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
                                ∘ᵐ curryᵐ (   (   ⟦ H op τ''' ⟧ᶜᵗ
                                               ∘ᵐ mapˣᵐ (mapˣᵐ (ε-⟨⟩ ∘ᵐ fstᵐ) idᵐ) idᵐ)
                                           ∘ᵐ ×ᵐ-assoc⁻¹))))
