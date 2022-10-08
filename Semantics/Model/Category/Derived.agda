@@ -1,6 +1,6 @@
-------------------------------------------------------------------------
--- Derived properties for the category for the models of the language --
-------------------------------------------------------------------------
+-------------------------------------------------------
+-- Category structure for the models of the language --
+-------------------------------------------------------
 
 open import Semantics.Model.Category
 

@@ -1,6 +1,6 @@
--------------------------------------------------------
--- Model of the language based on time-varying sets  --
--------------------------------------------------------
+-------------------------------------------------------------
+-- Model of the language based on time-indexed presheaves  --
+-------------------------------------------------------------
 
 module Semantics.Model.Example.TSets.Model where
 

@@ -3,7 +3,7 @@
 ------------------------------------------------------------
 
 -- Note: A version of the monad that is not quotioned by
---       the delay equations (identity and composition)
+--       the delay equations (see them in EquationalTheory)
 
 open import Semantics.Model.Category
 open import Semantics.Model.Modality.Future

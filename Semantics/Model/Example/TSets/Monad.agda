@@ -1,6 +1,6 @@
----------------------------------
--- Monad on time-varying sets  --
----------------------------------
+--------------------------------------------
+-- Monad on time-indexed presheaves sets  --
+--------------------------------------------
 
 module Semantics.Model.Example.TSets.Monad where
 

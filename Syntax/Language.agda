@@ -57,7 +57,7 @@ mutual
             -------------
             → Γ ⊢V⦂ A ⇒ C
 
-    -- boxing up a value/resource that is ready for use in at least `t` time steps
+    -- boxing up a value/resource that is ready for use in at least `τ` time steps
 
     box     : {A : VType}
             → {τ : Time}
@@ -133,9 +133,9 @@ mutual
             : {A B : VType}
             → {τ τ' : Time}
             → Γ ⊢C⦂ A ‼ τ
-            → ((op : Op) → (τ'' : Time) →                                  -- more formally there should be a
-                 Γ ∷ type-of-gtype (param op)                              -- parametricity condition here as
-                   ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')   -- well on the quantified time τ''
+            → ((op : Op) → (τ'' : Time) →
+                 Γ ∷ type-of-gtype (param op)
+                   ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
                  ⊢C⦂ B ‼ (op-time op + τ''))
             → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
             --------------------------------------------------

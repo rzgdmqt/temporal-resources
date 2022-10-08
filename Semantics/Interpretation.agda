@@ -1,6 +1,6 @@
--------------------------------------------------------------
--- Interpretation of well-typed terms in time-varying sets --
--------------------------------------------------------------
+----------------------------------------
+-- Interpretation of well-typed terms --
+----------------------------------------
 
 open import Semantics.Model
 

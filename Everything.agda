@@ -17,7 +17,10 @@
 --     prescribed execution times and whose execution makes time pass --
 --     (both in the semantics and also in the static typing rules)    --
 --                                                                    --
---   - semantics in time-varying sets (covariant presheaves on (ℕ,≤)) --
+--   - denotational semantics based on adjunctions between strong     --
+--     monoidal functors, and on strong graded monads                 --
+--                                                                    --
+--   - concrete semantics example using covariant presheaves on (ℕ,≤) --
 --                                                                    --
 ------------------------------------------------------------------------
 
@@ -66,16 +69,11 @@ open import Syntax.EquationalTheory
 
 open import Semantics.Model
 
----- Interpretation of types/terms
+---- Interpretation of types and terms
 
 open import Semantics.Interpretation
 
-open import Semantics.Interpretation.Properties.split-env-isomorphism
-open import Semantics.Interpretation.Properties.split-env-naturality
 open import Semantics.Interpretation.Properties.var-in-env-decompose
-open import Semantics.Interpretation.Properties.var-in-env-var-rename
-open import Semantics.Interpretation.Properties.env-⟨⟩-ᶜ-naturality
-open import Semantics.Interpretation.Properties.τ-subst
 
 ---- Semantics of renamings
 
@@ -83,28 +81,32 @@ open import Semantics.Renamings
 
 open import Semantics.Renamings.Properties.VC-rename
 
-open import Semantics.Renamings.Properties.-ᶜ-⟨⟩-ren-decompose
-open import Semantics.Renamings.Properties.-ᶜ-wk-ren-decompose
-open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-ren-naturality
-open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-split-env-naturality
-open import Semantics.Renamings.Properties.env-⟨⟩-ᶜ-eq-ren-naturality
-open import Semantics.Renamings.Properties.split-env-eq-ren
-open import Semantics.Renamings.Properties.eq-ren
-open import Semantics.Renamings.Properties.split-env-wk-ren
-open import Semantics.Renamings.Properties.var-not-in-ctx-after-ᶜ-wk-ren
-
 ---- Semantics of substitutions
 
 open import Semantics.Substitutions.Properties.VC-subst
-
-open import Semantics.Substitutions.Properties.var-subst
 
 ---- Soundness of the interpretation
 
 open import Semantics.Soundness
 
 
--- TIME-VARYING SETS MODEL
---------------------------
+-- PRESHEAF MODEL
+-----------------
 
--- open import Semantics.Model.Examples.TSets.Model
+open import Semantics.Model.Example.TSets.Monad.Core
+open import Semantics.Model.Example.TSets.Monad.Effects
+open import Semantics.Model.Example.TSets.Monad.Effects.Properties.Algebraicity
+open import Semantics.Model.Example.TSets.Monad.Effects.Properties.Naturality
+open import Semantics.Model.Example.TSets.Monad.Strength
+open import Semantics.Model.Example.TSets.Monad.Strength.Properties.Algebraicity
+open import Semantics.Model.Example.TSets.Monad.Strength.Properties.Naturality
+open import Semantics.Model.Example.TSets.Monad.Strength.Properties.UnitMultiplication
+open import Semantics.Model.Example.TSets.Monad.Strength.Properties.CartesianStructure
+open import Semantics.Model.Example.TSets.Monad.Handling
+open import Semantics.Model.Example.TSets.Monad.Handling.Properties.Unit
+open import Semantics.Model.Example.TSets.Monad.Handling.Properties.Delay
+
+-- TODO: commented out because extremely slow typechecking (see README)
+
+-- open import Semantics.Model.Example.TSets.Monad
+-- open import Semantics.Model.Examples.TSets.Model 

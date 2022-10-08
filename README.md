@@ -1,13 +1,13 @@
-# A core calculus for temporal resources
+# A core language for temporal resources
 
 A (work in progress) Agda formalisation of a (Fitch-type)
-modally-typed, effectful **core calculus for safe and correct
+modally-typed, effectful **core language for safe and correct
 programming with temporal resources**, i.e., resources that become
 available only after some amount of time after being brought into
 scope, e.g., when on a production line the assembly operation needs
 to wait for (car) parts to dry after the paint operation.
 
-The main aspects of this calculus are:
+The main aspects of this language are:
 
 * Fitch-style, *temporally-graded modal types* `[ tau ] X` are used to
   capture temporal resources, expressing that an `X`-value will be
@@ -23,12 +23,15 @@ The main aspects of this calculus are:
 * A *graded monads-based effect system* (with some added temporal
   awareness) that modularly tracks the execution times of
   computations.
+  
+The formalisation is developed and tested with Agda version 2.6.2.2
+and Agda Standard Library version 1.7.1.
 
 The formalisation consists of three main parts:
 
-## Core calculus, type system, equations, basic meta-theory
+## Core language, type system, equations, basic meta-theory
 
-The main modules presenting the core calculus are:
+The main modules presenting the core language are:
 
 * `Syntax/Types.agda` defines types
 * `Syntax/Contexts.agda` defines contexts and operations on them
@@ -61,7 +64,7 @@ modules presenting this model are:
 * `Semantics/Model/Monad.agda` axiomatises strong graded monad structure
   used to model computation types and terms
   
-This abstract model is then used to give the core calculus a denotational
+This abstract model is then used to give the core language a denotational
 semantics and prove it sound, in the following modules:
 
 * `Semantics/Interpretation.agda` defines the interpretation of types, 
