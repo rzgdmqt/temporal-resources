@@ -25,6 +25,8 @@ open import Semantics.Substitutions.Properties.VC-subst Mod
 
 open import Semantics.Interpretation.Properties.τ-subst Mod
 
+open import Semantics.Soundness.handle-perform-aux6 Mod
+
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
@@ -790,7 +792,7 @@ handle-perform-sound-aux5 {Γ} {A} {B} {τ} {τ'} op V M H N =
                     (   []-monoidal
                      ∘ᵐ mapˣᵐ η⊣ idᵐ))
     ∘ᵐ ⟨ idᵐ , ⟨ ⟦ V ⟧ᵛᵗ , ⟨ idᵐ , η⊣ ⟩ᵐ ⟩ᵐ ⟩ᵐ
-  ≡⟨ {!!} ⟩
+  ≡⟨ handle-perform-sound-aux6 {Γ} {A} {B} {τ} {τ'} op V M H N ⟩
        mapˣᵐ (⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ) idᵐ
     ∘ᵐ mapˣᵐ
          idᵐ

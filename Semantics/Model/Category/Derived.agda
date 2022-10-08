@@ -275,6 +275,26 @@ mapⁱˣᵐ-∘ᵐ f g =
     mapⁱˣᵐ g ∘ᵐ mapⁱˣᵐ f
   ∎
 
+mapⁱˣᵐ-⟨⟩ᵐ : ∀ {I} {A : Obj} {B C : I → Obj}
+           → (f : (i : I) → A →ᵐ B i)
+           → (g : (i : I) → B i →ᵐ C i)
+           → ⟨ (λ i → g i ∘ᵐ f i) ⟩ᵢᵐ
+           ≡ mapⁱˣᵐ g ∘ᵐ ⟨ f ⟩ᵢᵐ
+mapⁱˣᵐ-⟨⟩ᵐ {I} {A} {B} {C} f g =
+  begin
+    ⟨ (λ i → g i ∘ᵐ f i) ⟩ᵢᵐ
+  ≡⟨ sym
+      (⟨⟩ᵢᵐ-unique _ _
+        (λ i → trans (sym (∘ᵐ-assoc _ _ _))
+          (trans
+            (∘ᵐ-congˡ
+              (⟨⟩ᵢᵐ-projᵐ _ i))
+              (trans
+                (∘ᵐ-assoc _ _ _)
+                (∘ᵐ-congʳ (⟨⟩ᵢᵐ-projᵐ _ i)))))) ⟩
+    mapⁱˣᵐ g ∘ᵐ ⟨ f ⟩ᵢᵐ
+  ∎
+
 -- EXPONENTIALS
 
 appᵐ : ∀ {A B} → (A ⇒ᵐ B) ×ᵐ A →ᵐ B
