@@ -29,17 +29,13 @@ open import Semantics.Soundness.seq-perform Mod
 open import Semantics.Soundness.seq-delay Mod
 open import Semantics.Soundness.seq-eta Mod
 open import Semantics.Soundness.seq-assoc Mod
-
 open import Semantics.Soundness.fun-beta Mod
-
 open import Semantics.Soundness.match-beta Mod
 open import Semantics.Soundness.match-eta Mod
-
 open import Semantics.Soundness.absurd-eta Mod
-
 open import Semantics.Soundness.handle-return Mod
 open import Semantics.Soundness.handle-delay Mod
-
+open import Semantics.Soundness.handle-perform Mod
 open import Semantics.Soundness.unbox-beta Mod
 open import Semantics.Soundness.unbox-eta Mod
 
@@ -356,7 +352,7 @@ mutual
   C-soundness (handle-return V H N) =
     handle-return-sound V H N
   C-soundness (handle-perform op V M H N) =
-    {!!}
+    handle-perform-sound op V M H N
   C-soundness (handle-delay M H N) =
     handle-delay-sound M H N
   C-soundness (unbox-beta p V N) =
