@@ -1,5 +1,3 @@
-{-# OPTIONS --experimental-lossy-unification #-}
-
 ---------------------------------
 -- Monad on time-varying sets  --
 ---------------------------------
@@ -58,15 +56,17 @@ TSetMon = record
         ; delayᵀ-algebraicity      = λ {A} τ {τ'} {τ''} → ≡ᵗ-≡ (delayᵀ-algebraicity {A} τ {τ'} {τ''})
         ; opᵀ-algebraicity         = λ {A} {τ} {τ'} op → ≡ᵗ-≡ (opᵀ-algebraicity {A} {τ} {τ'} op)
         ; strᵀ                     = λ {A} {B} {τ} → strᵀ {A} {B} {τ}
-        ; strᵀ-nat                 = λ f g → ≡ᵗ-≡ (strᵀ-nat f g)
+        ; strᵀ-nat                 = λ {A} {A'} {B} {B'} {τ} f g → ≡ᵗ-≡ (strᵀ-nat {A} {A'} {B} {B'} {τ} f g)
         ; strᵀ-ηᵀ                  = λ {A} {B} → ≡ᵗ-≡ (strᵀ-ηᵀ {A} {B})
         ; strᵀ-μᵀ                  = λ {A} {B} → ≡ᵗ-≡ (strᵀ-μᵀ {A} {B})
         ; strᵀ-sndᵐ                = λ {A} {B} → ≡ᵗ-≡ (strᵀ-sndᵗ {A} {B})
         ; strᵀ-assoc               = λ {A} {B} {C} → ≡ᵗ-≡ (strᵀ-assoc {A} {B} {C})
         ; strᵀ-delayᵀ-algebraicity = λ {A} {B} {τ} {τ'} → ≡ᵗ-≡ (strᵀ-delayᵀ-algebraicity {A} {B} {τ} {τ'})
-        ; strᵀ-opᵀ-algebraicity    = {!!}
+        ; strᵀ-opᵀ-algebraicity    = λ {A} {B} {τ} op → ≡ᵗ-≡ (strᵀ-opᵀ-algebraicity {A} {B} {τ} op)
+                                     -- TODO: strᵀ-opᵀ-algebraicity currently postulated due to typechecking slowness
         ; T-alg-of-handlerᵀ        = λ {A} {τ} {τ'} → T-alg-of-handlerᵀ {A} {τ} {τ'}
         ; T-alg-of-handlerᵀ-ηᵀ     = λ {A} {τ} → ≡ᵗ-≡ (T-alg-of-handlerᵀ-ηᵀ {A} {τ})
         ; T-alg-of-handlerᵀ-delayᵀ = λ {A} {τ} {τ'} {τ''} → ≡ᵗ-≡ (T-alg-of-handlerᵀ-delayᵀ {A} {τ} {τ'} {τ''})
-        ; T-alg-of-handlerᵀ-opᵀ    = {!!}
+        ; T-alg-of-handlerᵀ-opᵀ    = {!!} -- TODO: experiment with workarounds for the slow typechecking problems
+                                          --       with the example category, monad, etc to write down this law
         }

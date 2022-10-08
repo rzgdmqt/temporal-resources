@@ -52,7 +52,10 @@ strᵀ-delayᵀ-algebraicity {A} {B} {τ} {τ'} =
 -- Algebraicity of algebraic operations wrt strength
 
 -- TODO: One of the very slow proofs because unfolding of definition produces
---       humongous internal terms, complicating implicit argument resolution.
+--       humongous internal inequality proof terms (morphisms in the presheaf
+--       site), complicating implicit argument resolution. TODO: Needs further
+--       experimentation with manually simplifying such inequalities and/or 
+--       making some definitions abstract to unfold them only on demand.
 
 postulate
   strᵀ-opᵀ-algebraicity : ∀ {A B τ} → (op : Op)
