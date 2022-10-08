@@ -33,6 +33,7 @@ open import Util.Time
 
 open Model Mod
 
+
 handle-perform-sound-aux7 : ∀ {Γ A B τ τ'} → (op : Op)
                           → (V : Γ ⊢V⦂ type-of-gtype (param op))
                           → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
@@ -49,9 +50,10 @@ handle-perform-sound-aux7 : ∀ {Γ A B τ τ'} → (op : Op)
                                                                            ∘ᵐ mapⁱˣᵐ (λ op → mapⁱˣᵐ (λ τ''' →
                                                                                             (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
                                                                                              ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
-                                                                                                        ∘ᵐ mapˣᵐ (mapˣᵐ (ε-⟨⟩ ∘ᵐ fstᵐ) idᵐ) idᵐ
+                                                                                                        ∘ᵐ mapˣᵐ (mapˣᵐ ε-⟨⟩ idᵐ) idᵐ
                                                                                                         ∘ᵐ ×ᵐ-assoc⁻¹))))
                                                                            ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+                                                              ∘ᵐ mapˣᵐ fstᵐ idᵐ
                                                               ∘ᵐ mapˣᵐ idᵐ (   Tᶠ (   ⟦ N ⟧ᶜᵗ
                                                                                    ∘ᵐ mapˣᵐ ((⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ) idᵐ))
                                                               ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -101,9 +103,10 @@ handle-perform-sound-aux7 {Γ} {A} {B} {τ} {τ'} op V M H N =
                                                     ∘ᵐ mapⁱˣᵐ (λ op → mapⁱˣᵐ (λ τ''' →
                                                                      (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
                                                                       ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
-                                                                                 ∘ᵐ mapˣᵐ (mapˣᵐ (ε-⟨⟩ ∘ᵐ fstᵐ) idᵐ) idᵐ
+                                                                                 ∘ᵐ mapˣᵐ (mapˣᵐ ε-⟨⟩ idᵐ) idᵐ
                                                                                  ∘ᵐ ×ᵐ-assoc⁻¹))))
                                                     ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+                                       ∘ᵐ mapˣᵐ fstᵐ idᵐ
                                        ∘ᵐ mapˣᵐ idᵐ (   Tᶠ (   ⟦ N ⟧ᶜᵗ
                                                             ∘ᵐ mapˣᵐ ((⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ) idᵐ))
                                        ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -145,9 +148,10 @@ handle-perform-sound-aux7 {Γ} {A} {B} {τ} {τ'} op V M H N =
                                                     ∘ᵐ mapⁱˣᵐ (λ op → mapⁱˣᵐ (λ τ''' →
                                                                      (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
                                                                       ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
-                                                                                 ∘ᵐ mapˣᵐ (mapˣᵐ (ε-⟨⟩ ∘ᵐ fstᵐ) idᵐ) idᵐ
+                                                                                 ∘ᵐ mapˣᵐ (mapˣᵐ ε-⟨⟩ idᵐ) idᵐ
                                                                                  ∘ᵐ ×ᵐ-assoc⁻¹))))
                                                     ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+                                       ∘ᵐ mapˣᵐ fstᵐ idᵐ
                                        ∘ᵐ mapˣᵐ idᵐ (   Tᶠ (   ⟦ N ⟧ᶜᵗ
                                                             ∘ᵐ mapˣᵐ ((⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ) idᵐ))
                                        ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -190,9 +194,10 @@ handle-perform-sound-aux7 {Γ} {A} {B} {τ} {τ'} op V M H N =
                                                     ∘ᵐ mapⁱˣᵐ (λ op → mapⁱˣᵐ (λ τ''' →
                                                                      (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
                                                                       ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
-                                                                                 ∘ᵐ mapˣᵐ (mapˣᵐ (ε-⟨⟩ ∘ᵐ fstᵐ) idᵐ) idᵐ
+                                                                                 ∘ᵐ mapˣᵐ (mapˣᵐ ε-⟨⟩ idᵐ) idᵐ
                                                                                  ∘ᵐ ×ᵐ-assoc⁻¹))))
                                                     ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+                                       ∘ᵐ mapˣᵐ fstᵐ idᵐ
                                        ∘ᵐ mapˣᵐ idᵐ (   Tᶠ (   ⟦ N ⟧ᶜᵗ
                                                             ∘ᵐ mapˣᵐ ((⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ) idᵐ))
                                        ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -223,9 +228,10 @@ handle-perform-sound-aux7 {Γ} {A} {B} {τ} {τ'} op V M H N =
                                                         mapⁱˣᵐ (λ τ''' →
                                                            (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
                                                             ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
-                                                                       ∘ᵐ mapˣᵐ (mapˣᵐ (ε-⟨⟩ ∘ᵐ fstᵐ) idᵐ) idᵐ
+                                                                       ∘ᵐ mapˣᵐ (mapˣᵐ ε-⟨⟩ idᵐ) idᵐ
                                                                        ∘ᵐ ×ᵐ-assoc⁻¹))))
                                                     ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+                                       ∘ᵐ mapˣᵐ fstᵐ idᵐ
                                        ∘ᵐ mapˣᵐ idᵐ (   Tᶠ (   ⟦ N ⟧ᶜᵗ
                                                             ∘ᵐ mapˣᵐ ((⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ) idᵐ))
                                        ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -261,9 +267,10 @@ handle-perform-sound-aux7 {Γ} {A} {B} {τ} {τ'} op V M H N =
                                                         mapⁱˣᵐ (λ τ''' →
                                                            (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
                                                             ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
-                                                                       ∘ᵐ mapˣᵐ (mapˣᵐ (ε-⟨⟩ ∘ᵐ fstᵐ) idᵐ) idᵐ
+                                                                       ∘ᵐ mapˣᵐ (mapˣᵐ ε-⟨⟩ idᵐ) idᵐ
                                                                        ∘ᵐ ×ᵐ-assoc⁻¹))))
                                                     ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+                                       ∘ᵐ mapˣᵐ fstᵐ idᵐ
                                        ∘ᵐ mapˣᵐ idᵐ (   Tᶠ (   ⟦ N ⟧ᶜᵗ
                                                             ∘ᵐ mapˣᵐ ((⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ) idᵐ))
                                        ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -294,9 +301,10 @@ handle-perform-sound-aux7 {Γ} {A} {B} {τ} {τ'} op V M H N =
                                                       mapⁱˣᵐ (λ τ''' →
                                                          (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
                                                           ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
-                                                                     ∘ᵐ mapˣᵐ (mapˣᵐ (ε-⟨⟩ ∘ᵐ fstᵐ) idᵐ) idᵐ
+                                                                     ∘ᵐ mapˣᵐ (mapˣᵐ ε-⟨⟩ idᵐ) idᵐ
                                                                      ∘ᵐ ×ᵐ-assoc⁻¹))))
                                                   ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+                                     ∘ᵐ mapˣᵐ fstᵐ idᵐ
                                      ∘ᵐ mapˣᵐ idᵐ (   Tᶠ (   ⟦ N ⟧ᶜᵗ
                                                           ∘ᵐ mapˣᵐ ((⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ) idᵐ))
                                      ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -330,9 +338,10 @@ handle-perform-sound-aux7 {Γ} {A} {B} {τ} {τ'} op V M H N =
                                                   mapⁱˣᵐ (λ τ''' →
                                                      (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
                                                       ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
-                                                                 ∘ᵐ mapˣᵐ (mapˣᵐ (ε-⟨⟩ ∘ᵐ fstᵐ) idᵐ) idᵐ
+                                                                 ∘ᵐ mapˣᵐ (mapˣᵐ ε-⟨⟩ idᵐ) idᵐ
                                                                  ∘ᵐ ×ᵐ-assoc⁻¹))))
                                               ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+                                 ∘ᵐ mapˣᵐ fstᵐ idᵐ
                                  ∘ᵐ mapˣᵐ idᵐ (   Tᶠ (   ⟦ N ⟧ᶜᵗ
                                                       ∘ᵐ mapˣᵐ ((⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ) idᵐ))
                                  ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -463,9 +472,10 @@ handle-perform-sound-aux7 {Γ} {A} {B} {τ} {τ'} op V M H N =
                                                   mapⁱˣᵐ (λ τ''' →
                                                      (   map⇒ᵐ (mapˣᵐ (⟦⟧ᵍ-⟦⟧ᵛ (param op)) ([ op-time op ]ᶠ (map⇒ᵐ (⟦⟧ᵛ-⟦⟧ᵍ (arity op)) idᵐ))) idᵐ
                                                       ∘ᵐ curryᵐ (   ⟦ H op τ''' ⟧ᶜᵗ
-                                                                 ∘ᵐ mapˣᵐ (mapˣᵐ (ε-⟨⟩ ∘ᵐ fstᵐ) idᵐ) idᵐ
+                                                                 ∘ᵐ mapˣᵐ (mapˣᵐ ε-⟨⟩ idᵐ) idᵐ
                                                                  ∘ᵐ ×ᵐ-assoc⁻¹))))
                                               ∘ᵐ ⟨ (λ op → ⟨ (λ τ'' → idᵐ) ⟩ᵢᵐ) ⟩ᵢᵐ)
+                                 ∘ᵐ mapˣᵐ fstᵐ idᵐ
                                  ∘ᵐ mapˣᵐ idᵐ (   Tᶠ (   ⟦ N ⟧ᶜᵗ
                                                       ∘ᵐ mapˣᵐ ((⟨⟩-≤ (≤-reflexive (+-comm (op-time op) τ)) ∘ᵐ μ) ∘ᵐ ⟨ τ ⟩ᶠ fstᵐ) idᵐ))
                                  ∘ᵐ mapˣᵐ idᵐ strᵀ
@@ -479,7 +489,7 @@ handle-perform-sound-aux7 {Γ} {A} {B} {τ} {τ'} op V M H N =
                                              idᵐ ⟩ᵐ ⟩ᵐ))
      ∘ᵐ [ op-time op ]ᶠ ⟨ idᵐ , ⟨ idᵐ , idᵐ ⟩ᵐ ⟩ᵐ
      ∘ᵐ η⊣ ⟩ᵐ
-  ≡⟨ handle-perform-sound-aux8 {Γ} {A} {B} {τ} {τ'} op V M H N ⟩
+  ≡⟨  handle-perform-sound-aux8 {Γ} {A} {B} {τ} {τ'} op V M H N  ⟩
        mapˣᵐ (⟨ idᵐ , ⟦ V ⟧ᵛᵗ ⟩ᵐ) idᵐ
     ∘ᵐ mapˣᵐ
          idᵐ
