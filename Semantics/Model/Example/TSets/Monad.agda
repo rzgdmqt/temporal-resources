@@ -1,6 +1,6 @@
---------------------------------------------
--- Monad on time-indexed presheaves sets  --
---------------------------------------------
+---------------------------------------------------------
+-- [-]-strong graded monad on time-indexed presheaves  --
+---------------------------------------------------------
 
 module Semantics.Model.Example.TSets.Monad where
 

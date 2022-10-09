@@ -1,6 +1,6 @@
 --------------------------------------------------------
--- Time-varying sets (covariant presheaves on (ℕ,≤)), --
--- their morphisms, and basic categorical structures  --
+-- Time-indexed presheaves (indexed by (ℕ,≤)), their, --
+-- morphisms, and basic other categorical structures  --
 --------------------------------------------------------
 
 module Semantics.Model.Example.TSets.TSets where
@@ -16,7 +16,7 @@ open import Util.Equality hiding (begin_; _≡⟨⟩_; step-≡; _∎)
 open import Util.Operations
 open import Util.Time
 
--- Time-varying sets (covariant presheaves on (ℕ,≤))
+-- Time-indexed presheaves
 
 record TSet : Set₁ where
   constructor
@@ -34,7 +34,7 @@ record TSet : Set₁ where
 
 open TSet public
 
--- Maps of time-varying sets
+-- Maps of time-indexed presheaves (natural transformations)
 
 record _→ᵗ_ (A B : TSet) : Set where
   constructor
@@ -373,7 +373,7 @@ uncurryᵗ-curryᵗ-iso {A} {B} {C} f =
       (ifun-ext (ifun-ext (fun-ext (λ p → fun-ext (λ qx → uip))))))
 
 
--- Packaging TSets up in the model
+-- Packaging time-indexed presheaves up in the model
 
 open import Semantics.Model.Category
 

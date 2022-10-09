@@ -12,19 +12,18 @@ open import Semantics.Model.Example.TSets.Modality.Future
 open import Util.Operations
 open import Util.Equality
 
--- Constant time-varying sets
+-- Constant time-indexed presheaves
 
 ConstTSet : Set → TSet
 ConstTSet A = tset (λ _ → A) (λ _ → id) (λ _ → refl) (λ _ _ _ → refl)
 
--- Base-typed constants as elements
+-- Interpretation of ase-typed constants as elements
 
 constᵗ : ∀ {B} → BaseSet B → 𝟙ᵗ →ᵗ ConstTSet (BaseSet B)
 constᵗ c =
   tset-map
     (λ _ → c)
     (λ p _ → refl)
-
 
 -- Packaging the base and ground types interpretation up in the model
 
