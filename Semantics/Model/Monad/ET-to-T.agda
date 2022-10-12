@@ -330,7 +330,6 @@ ET-to-T M = record
            strᴱᵀ
         ∘ᵐ mapˣᵐ δ⁻¹ μᴱᵀ
       ∎
-    -}
 
     strᵀ-sndᵐ : ∀ {A B τ}
               → ETᶠ sndᵐ ∘ᵐ strᴱᵀ {A} {B} {τ} ≡ sndᵐ
@@ -434,7 +433,154 @@ ET-to-T M = record
                     ∘ᵐ terminalᵐ
                     ∘ᵐ [ τ ]ᶠ terminalᵐ
                     ∘ᵐ fstᵐ
-                  ≡⟨ {!!} ⟩ -- TODO: from [ τ ] being right adjoint and thus preserving limits
+                  ≡⟨ ∘ᵐ-congʳ (sym (∘ᵐ-identityˡ _)) ⟩
+                       []-≤ z≤n
+                    ∘ᵐ idᵐ
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congʳ (sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ Gε⊣∘η⊣≡id))) ⟩
+                       []-≤ z≤n
+                    ∘ᵐ [ 0 ]ᶠ ε⊣
+                    ∘ᵐ η⊣
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ
+                      (sym ([]-≤-nat _ _))) (∘ᵐ-assoc _ _ _)) ⟩
+                       [ τ ]ᶠ ε⊣
+                    ∘ᵐ []-≤ z≤n
+                    ∘ᵐ η⊣
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congʳ (trans (∘ᵐ-congˡ (sym η⊣-η-ε))
+                      (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ
+                        (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))))) ⟩ 
+                       [ τ ]ᶠ ε⊣
+                    ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                    ∘ᵐ η⊣
+                    ∘ᵐ η⁻¹
+                    ∘ᵐ ε
+                    ∘ᵐ η⊣
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ
+                      (trans (∘ᵐ-congˡ η⊣≡ε⁻¹∘η) (∘ᵐ-assoc _ _ _)))))) ⟩ 
+                       [ τ ]ᶠ ε⊣
+                    ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                    ∘ᵐ η⊣
+                    ∘ᵐ η⁻¹
+                    ∘ᵐ ε
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ η
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ
+                      (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ []-ε∘ε⁻¹≡id))))) ⟩ 
+                       [ τ ]ᶠ ε⊣
+                    ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                    ∘ᵐ η⊣
+                    ∘ᵐ η⁻¹
+                    ∘ᵐ idᵐ
+                    ∘ᵐ η
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-identityˡ _)))) ⟩ 
+                       [ τ ]ᶠ ε⊣
+                    ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                    ∘ᵐ η⊣
+                    ∘ᵐ η⁻¹
+                    ∘ᵐ η
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ ⟨⟩-η⁻¹∘η≡id)))) ⟩ 
+                       [ τ ]ᶠ ε⊣
+                    ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                    ∘ᵐ η⊣
+                    ∘ᵐ idᵐ
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-identityˡ _))) ⟩ 
+                       [ τ ]ᶠ ε⊣
+                    ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                    ∘ᵐ η⊣
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _))
+                      (trans (∘ᵐ-congˡ (sym (η⊣-nat _))) (∘ᵐ-assoc _ _ _)))) ⟩
+                       [ τ ]ᶠ ε⊣
+                    ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                    ∘ᵐ [ τ ]ᶠ (⟨ τ ⟩ᶠ ε⁻¹)
+                    ∘ᵐ η⊣
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ
+                      (trans (sym ([]-∘ᵐ _ _)) (trans (cong [ τ ]ᶠ
+                        (sym (⟨⟩-≤-nat _ _))) ([]-∘ᵐ _ _)))) (∘ᵐ-assoc _ _ _))) ⟩
+                       [ τ ]ᶠ ε⊣
+                    ∘ᵐ [ τ ]ᶠ (⟨ 0 ⟩ᶠ ε⁻¹)
+                    ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                    ∘ᵐ η⊣
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym ([]-∘ᵐ _ _))) ⟩
+                       [ τ ]ᶠ (ε⊣ ∘ᵐ ⟨ 0 ⟩ᶠ ε⁻¹)
+                    ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                    ∘ᵐ η⊣
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congˡ (cong [ τ ]ᶠ
+                      (trans (∘ᵐ-congˡ ε⊣≡ε∘η⁻¹) (trans (∘ᵐ-assoc _ _ _)
+                        (trans (∘ᵐ-congʳ (sym (⟨⟩-η⁻¹-nat _)))
+                          (trans (sym (∘ᵐ-assoc _ _ _))
+                            (trans (∘ᵐ-congˡ []-ε∘ε⁻¹≡id) (∘ᵐ-identityˡ _))))))) ⟩
+                       [ τ ]ᶠ η⁻¹
+                    ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                    ∘ᵐ η⊣
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _))
+                      (trans (∘ᵐ-congˡ (sym (η⊣-nat _))) (∘ᵐ-assoc _ _ _)))) ⟩
+                       [ τ ]ᶠ η⁻¹
+                    ∘ᵐ [ τ ]ᶠ (⟨⟩-≤ z≤n)
+                    ∘ᵐ [ τ ]ᶠ (⟨ τ ⟩ᶠ terminalᵐ)
+                    ∘ᵐ η⊣
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ sym (trans (∘ᵐ-congˡ ([]-∘ᵐ _ _)) (trans (∘ᵐ-assoc _ _ _)
+                      (∘ᵐ-congʳ (trans (∘ᵐ-congˡ ([]-∘ᵐ _ _)) (∘ᵐ-assoc _ _ _))))) ⟩
+                       [ τ ]ᶠ (   η⁻¹
+                               ∘ᵐ ⟨⟩-≤ z≤n
+                               ∘ᵐ ⟨ τ ⟩ᶠ terminalᵐ)
+                    ∘ᵐ η⊣
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-congˡ (cong [ τ ]ᶠ (trans terminalᵐ-unique (sym terminalᵐ-unique))) ⟩
+                       [ τ ]ᶠ ε⊣
+                    ∘ᵐ η⊣
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ Gε⊣∘η⊣≡id) ⟩
                        idᵐ
                     ∘ᵐ [ τ ]ᶠ terminalᵐ
                     ∘ᵐ fstᵐ
@@ -521,8 +667,6 @@ ET-to-T M = record
         sndᵐ
       ∎
 
-  
-    {-
     strᵀ-assoc : ∀ {A B C τ}
                →    ETᶠ ×ᵐ-assoc
                  ∘ᵐ strᴱᵀ
