@@ -25,6 +25,7 @@ open Adjunction Adj
 open BaseGroundTypes Typ
 
 open import Semantics.Model.Category.Derived Cat
+open import Semantics.Model.Modality.Future.Derived Cat Fut
 open import Semantics.Model.Modality.Past.Derived Cat Pas
 open import Semantics.Model.Modality.Adjunction.Derived Cat Fut Pas Adj
 
@@ -168,10 +169,25 @@ record EMonad : Set₁ where
               ≡    uncurryᵐ enrᴱᵀ
                 ∘ᵐ mapˣᵐ δ⁻¹ (μᴱᵀ {A} {τ} {τ'})
 
-    enrᴱᵀ-sndᵐ : ∀ {A B τ}
-               →    ETᶠ sndᵐ
-                 ∘ᵐ uncurryᵐ (enrᴱᵀ {B} {A ×ᵐ B} {τ})
-               ≡ sndᵐ
+    enrᴱᵀ-idᵐ : ∀ {A τ}
+              →    uncurryᵐ (enrᴱᵀ {A} {A} {τ})
+                ∘ᵐ mapˣᵐ η-[] idᵐ
+                ∘ᵐ mapˣᵐ {𝟙ᵐ} (curryᵐ sndᵐ) idᵐ
+              ≡ sndᵐ
+
+    enrᴱᵀ-idᵐ-∘ᵐ : ∀ {A B C τ}
+                 →    uncurryᵐ (enrᴱᵀ {B} {C} {τ})
+                   ∘ᵐ mapˣᵐ idᵐ (uncurryᵐ (enrᴱᵀ {A} {B} {τ}))
+                 ≡    uncurryᵐ (enrᴱᵀ {A} {C} {τ})
+                   ∘ᵐ mapˣᵐ
+                       ([ τ ]ᶠ (curryᵐ (   appᵐ
+                                        ∘ᵐ mapˣᵐ idᵐ appᵐ
+                                        ∘ᵐ ×ᵐ-assoc)))
+                       idᵐ
+                   ∘ᵐ mapˣᵐ []-monoidal idᵐ
+                   ∘ᵐ ×ᵐ-assoc⁻¹
+
+    -- Operations are algebraic wrt enrichment
 
     -- ...
     

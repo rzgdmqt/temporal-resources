@@ -25,6 +25,7 @@ open Adjunction Adj
 open BaseGroundTypes Typ
 
 open import Semantics.Model.Category.Derived Cat
+open import Semantics.Model.Modality.Future.Derived Cat Fut
 open import Semantics.Model.Modality.Past.Derived Cat Pas
 open import Semantics.Model.Modality.Adjunction.Derived Cat Fut Pas Adj
 
@@ -60,8 +61,8 @@ ET-to-T M = record
               ; strᵀ-nat = {!!} -- strᴱᵀ-nat
               ; strᵀ-ηᵀ = {!!} --strᵀ-ηᵀ
               ; strᵀ-μᵀ = {!!} --strᵀ-μᵀ
-              ; strᵀ-sndᵐ = ? --strᵀ-sndᵐ
-              ; strᵀ-assoc = {!!}
+              ; strᵀ-sndᵐ = {!!} --strᵀ-sndᵐ
+              ; strᵀ-assoc = {!!} --strᵀ-assoc
               ; strᵀ-delayᵀ-algebraicity = {!!}
               ; strᵀ-opᵀ-algebraicity = {!!}
               ; T-alg-of-handlerᵀ = ET-alg-of-handlerᴱᵀ
@@ -77,9 +78,7 @@ ET-to-T M = record
     strᴱᵀ : ∀ {A B τ} → [ τ ]ᵒ A ×ᵐ ETᵒ B τ →ᵐ ETᵒ (A ×ᵐ B) τ
     strᴱᵀ {A} {B} {τ} =
          uncurryᵐ (enrᴱᵀ {B} {A ×ᵐ B} {τ})
-      ∘ᵐ mapˣᵐ
-          ([ τ ]ᶠ (curryᵐ idᵐ))
-          idᵐ
+      ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
     {-
     strᴱᵀ-nat : ∀ {A B C D τ}
               → (f : A →ᵐ B)
@@ -331,6 +330,7 @@ ET-to-T M = record
            strᴱᵀ
         ∘ᵐ mapˣᵐ δ⁻¹ μᴱᵀ
       ∎
+    -}
 
     strᵀ-sndᵐ : ∀ {A B τ}
               → ETᶠ sndᵐ ∘ᵐ strᴱᵀ {A} {B} {τ} ≡ sndᵐ
@@ -342,13 +342,441 @@ ET-to-T M = record
            ETᶠ sndᵐ
         ∘ᵐ uncurryᵐ enrᴱᵀ
         ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
-      ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ enrᴱᵀ-sndᵐ) ⟩
-           sndᵐ
+      ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (trans (trans (sym (uncurryᵐ-map⇒ᵐ _ _))
+          (cong uncurryᵐ
+            (trans
+              (∘ᵐ-congˡ (cong₂ map⇒ᵐ (sym ET-idᵐ) refl))
+              (enrᴱᵀ-nat _ _))))
+          (uncurryᵐ-nat _ _))) (∘ᵐ-assoc _ _ _)) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (map⇒ᵐ idᵐ sndᵐ)) idᵐ
         ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
-      ≡⟨ ⟨⟩ᵐ-sndᵐ _ _ ⟩
-        idᵐ ∘ᵐ sndᵐ
-      ≡⟨ ∘ᵐ-identityˡ _ ⟩
+      ≡⟨ ∘ᵐ-congʳ (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _)) (sym (trans (∘ᵐ-congʳ (∘ᵐ-congʳ (sym (⟨⟩ᵐ-∘ᵐ _ _ _))))
+          (trans (∘ᵐ-congʳ (sym (mapˣᵐ-⟨⟩ᵐ _ _ _ _))) (trans (sym (mapˣᵐ-⟨⟩ᵐ _ _ _ _))
+            (cong₂ ⟨_,_⟩ᵐ
+              (begin
+                   ([]-≤ z≤n ∘ᵐ ε⁻¹)
+                ∘ᵐ curryᵐ sndᵐ
+                ∘ᵐ terminalᵐ
+                ∘ᵐ sndᵐ
+              ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
+                   []-≤ z≤n
+                ∘ᵐ ε⁻¹
+                ∘ᵐ curryᵐ sndᵐ
+                ∘ᵐ terminalᵐ
+                ∘ᵐ sndᵐ
+              ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ terminalᵐ-unique)) ⟩
+                   []-≤ z≤n
+                ∘ᵐ ε⁻¹
+                ∘ᵐ curryᵐ sndᵐ
+                ∘ᵐ terminalᵐ
+              ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym ([]-ε⁻¹-nat _))) (∘ᵐ-assoc _ _ _))) ⟩
+                   []-≤ z≤n
+                ∘ᵐ [ 0 ]ᶠ (curryᵐ sndᵐ)
+                ∘ᵐ ε⁻¹
+                ∘ᵐ terminalᵐ
+              ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong [ 0 ]ᶠ (cong curryᵐ
+                  (trans (sym (∘ᵐ-identityʳ _)) (∘ᵐ-congʳ (sym (curryᵐ-uncurryᵐ-iso _))))))) ⟩
+                   []-≤ z≤n
+                ∘ᵐ [ 0 ]ᶠ (curryᵐ (   sndᵐ
+                                   ∘ᵐ uncurryᵐ (curryᵐ idᵐ)))
+                ∘ᵐ ε⁻¹
+                ∘ᵐ terminalᵐ
+              ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong [ 0 ]ᶠ (cong curryᵐ
+                  (∘ᵐ-congʳ (cong uncurryᵐ (sym (∘ᵐ-identityˡ _))))))) ⟩
+                   []-≤ z≤n
+                ∘ᵐ [ 0 ]ᶠ (curryᵐ (   sndᵐ
+                                   ∘ᵐ uncurryᵐ (idᵐ ∘ᵐ curryᵐ idᵐ)))
+                ∘ᵐ ε⁻¹
+                ∘ᵐ terminalᵐ
+              ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong [ 0 ]ᶠ (cong curryᵐ (∘ᵐ-congʳ (uncurryᵐ-nat _ _))))) ⟩
+                   []-≤ z≤n
+                ∘ᵐ [ 0 ]ᶠ (curryᵐ (   sndᵐ
+                                   ∘ᵐ uncurryᵐ idᵐ
+                                   ∘ᵐ mapˣᵐ (curryᵐ idᵐ) idᵐ))
+                ∘ᵐ ε⁻¹
+                ∘ᵐ terminalᵐ
+              ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong [ 0 ]ᶠ
+                  (trans (cong curryᵐ (sym (∘ᵐ-assoc _ _ _))) (curryᵐ-nat _ _)))) ⟩
+                   []-≤ z≤n
+                ∘ᵐ [ 0 ]ᶠ (   curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ)
+                           ∘ᵐ curryᵐ idᵐ)
+                ∘ᵐ ε⁻¹
+                ∘ᵐ terminalᵐ
+              ≡⟨ ∘ᵐ-congʳ (sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym ([]-∘ᵐ _ _))))) ⟩
+                   []-≤ z≤n
+                ∘ᵐ [ 0 ]ᶠ (curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ))
+                ∘ᵐ [ 0 ]ᶠ (curryᵐ idᵐ)
+                ∘ᵐ ε⁻¹
+                ∘ᵐ terminalᵐ
+              ≡⟨ trans (sym (∘ᵐ-assoc _ _ _))
+                  (trans (∘ᵐ-congˡ (sym ([]-≤-nat _ _))) (∘ᵐ-assoc _ _ _)) ⟩
+                   [ τ ]ᶠ (curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ))
+                ∘ᵐ []-≤ z≤n
+                ∘ᵐ [ 0 ]ᶠ (curryᵐ idᵐ)
+                ∘ᵐ ε⁻¹
+                ∘ᵐ terminalᵐ
+              ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _))
+                  (trans (∘ᵐ-congˡ (sym ([]-≤-nat _ _))) (∘ᵐ-assoc _ _ _))) ⟩
+                   [ τ ]ᶠ (curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ))
+                ∘ᵐ [ τ ]ᶠ (curryᵐ idᵐ)
+                ∘ᵐ []-≤ z≤n
+                ∘ᵐ ε⁻¹
+                ∘ᵐ terminalᵐ
+              ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ
+                  (begin
+                       []-≤ z≤n
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ terminalᵐ
+                  ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym terminalᵐ-unique)) ⟩
+                       []-≤ z≤n
+                    ∘ᵐ ε⁻¹
+                    ∘ᵐ terminalᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ {!!} ⟩ -- TODO: from [ τ ] being right adjoint and thus preserving limits
+                       idᵐ
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ≡⟨ ∘ᵐ-identityˡ _ ⟩
+                       [ τ ]ᶠ terminalᵐ
+                    ∘ᵐ fstᵐ
+                  ∎)) ⟩
+                   [ τ ]ᶠ (curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ))
+                ∘ᵐ [ τ ]ᶠ (curryᵐ idᵐ)
+                ∘ᵐ [ τ ]ᶠ terminalᵐ
+                ∘ᵐ fstᵐ
+              ≡⟨ sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))) ⟩
+                   (   [ τ ]ᶠ (curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ))
+                    ∘ᵐ [ τ ]ᶠ (curryᵐ idᵐ)
+                    ∘ᵐ [ τ ]ᶠ terminalᵐ)
+                ∘ᵐ fstᵐ
+              ≡⟨ sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (trans (sym ([]-∘ᵐ _ _))
+                  (sym (trans (∘ᵐ-congʳ (sym ([]-∘ᵐ _ _))) (trans (sym ([]-∘ᵐ _ _))
+                    (cong [ τ ]ᶠ (
+                      begin
+                           curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ)
+                        ∘ᵐ curryᵐ idᵐ
+                        ∘ᵐ terminalᵐ
+                      ≡⟨ ∘ᵐ-congʳ (sym (curryᵐ-nat _ _)) ⟩
+                           curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ)
+                        ∘ᵐ curryᵐ (idᵐ ∘ᵐ mapˣᵐ terminalᵐ idᵐ)
+                      ≡⟨ ∘ᵐ-congʳ (cong curryᵐ (∘ᵐ-identityˡ _)) ⟩
+                           curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ)
+                        ∘ᵐ curryᵐ (mapˣᵐ terminalᵐ idᵐ)
+                      ≡⟨ trans (sym (curryᵐ-nat _ _)) (cong curryᵐ (∘ᵐ-assoc _ _ _)) ⟩
+                        curryᵐ (   sndᵐ
+                                ∘ᵐ uncurryᵐ idᵐ
+                                ∘ᵐ mapˣᵐ (curryᵐ (mapˣᵐ terminalᵐ idᵐ)) idᵐ)
+                      ≡⟨ cong curryᵐ (∘ᵐ-congʳ (sym (uncurryᵐ-nat _ _)))  ⟩
+                        curryᵐ (   sndᵐ
+                                ∘ᵐ uncurryᵐ (idᵐ ∘ᵐ curryᵐ (mapˣᵐ terminalᵐ idᵐ)))
+                      ≡⟨ cong curryᵐ (∘ᵐ-congʳ (cong uncurryᵐ (∘ᵐ-identityˡ _))) ⟩
+                        curryᵐ (   sndᵐ
+                                ∘ᵐ uncurryᵐ (curryᵐ (mapˣᵐ terminalᵐ idᵐ)))
+                      ≡⟨ cong curryᵐ (∘ᵐ-congʳ (curryᵐ-uncurryᵐ-iso _)) ⟩
+                        curryᵐ (   sndᵐ
+                                ∘ᵐ mapˣᵐ terminalᵐ idᵐ)
+                      ≡⟨ cong curryᵐ (trans (⟨⟩ᵐ-sndᵐ _ _) (trans (∘ᵐ-identityˡ _) (sym (∘ᵐ-identityʳ _)))) ⟩
+                        curryᵐ (   sndᵐ
+                                ∘ᵐ idᵐ)
+                      ≡⟨ cong curryᵐ (∘ᵐ-congʳ (sym (curryᵐ-uncurryᵐ-iso _))) ⟩
+                        curryᵐ (   sndᵐ
+                                ∘ᵐ uncurryᵐ (curryᵐ idᵐ))
+                      ≡⟨ cong curryᵐ (∘ᵐ-congʳ (cong uncurryᵐ (sym (∘ᵐ-identityˡ _)))) ⟩
+                        curryᵐ (   sndᵐ
+                                ∘ᵐ uncurryᵐ (idᵐ ∘ᵐ curryᵐ idᵐ))
+                      ≡⟨ cong curryᵐ (∘ᵐ-congʳ (uncurryᵐ-nat _ _)) ⟩
+                        curryᵐ (   sndᵐ
+                                ∘ᵐ uncurryᵐ idᵐ
+                                ∘ᵐ mapˣᵐ (curryᵐ idᵐ) idᵐ)
+                      ≡⟨ trans (cong curryᵐ (sym (∘ᵐ-assoc _ _ _))) (curryᵐ-nat _ _) ⟩
+                           curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ)
+                        ∘ᵐ curryᵐ idᵐ
+                      ∎)))))))) ⟩
+                   [ τ ]ᶠ (curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ))
+                ∘ᵐ [ τ ]ᶠ (curryᵐ idᵐ)
+                ∘ᵐ fstᵐ
+              ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+                   (   [ τ ]ᶠ (curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ))
+                    ∘ᵐ [ τ ]ᶠ (curryᵐ idᵐ))
+                ∘ᵐ fstᵐ
+              ≡⟨ ∘ᵐ-congˡ (∘ᵐ-congˡ (cong [ τ ]ᶠ (cong curryᵐ (∘ᵐ-congʳ
+                  (trans (sym (∘ᵐ-identityʳ _)) (∘ᵐ-congʳ (sym mapˣᵐ-identity))))))) ⟩
+                   (   [ τ ]ᶠ (curryᵐ (sndᵐ ∘ᵐ uncurryᵐ idᵐ ∘ᵐ mapˣᵐ idᵐ idᵐ))
+                    ∘ᵐ [ τ ]ᶠ (curryᵐ idᵐ))
+                ∘ᵐ fstᵐ
+              ∎)
+              (trans (∘ᵐ-identityˡ _) (trans (∘ᵐ-identityˡ _) (∘ᵐ-congˡ (sym (∘ᵐ-identityˡ _))))))))))) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ([]-≤ z≤n ∘ᵐ ε⁻¹) idᵐ
+        ∘ᵐ mapˣᵐ {𝟙ᵐ} (curryᵐ sndᵐ) idᵐ
+        ∘ᵐ ⟨ terminalᵐ , idᵐ ⟩ᵐ
+        ∘ᵐ sndᵐ
+      ≡⟨ sym (trans (∘ᵐ-congˡ (sym (enrᴱᵀ-idᵐ))) (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _)))) ⟩
+           sndᵐ
+        ∘ᵐ ⟨ terminalᵐ , idᵐ ⟩ᵐ
+        ∘ᵐ sndᵐ
+      ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (⟨⟩ᵐ-sndᵐ _ _)) (∘ᵐ-identityˡ _)) ⟩
         sndᵐ
       ∎
-    -}
 
+  
+    {-
+    strᵀ-assoc : ∀ {A B C τ}
+               →    ETᶠ ×ᵐ-assoc
+                 ∘ᵐ strᴱᵀ
+                 ∘ᵐ mapˣᵐ []-monoidal idᵐ
+                 ∘ᵐ ×ᵐ-assoc⁻¹
+               ≡    strᴱᵀ {A} {B ×ᵐ C} {τ}
+                 ∘ᵐ mapˣᵐ idᵐ strᴱᵀ
+    strᵀ-assoc {A} {B} {C} {τ} = 
+      begin
+           ETᶠ ×ᵐ-assoc
+        ∘ᵐ strᴱᵀ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-assoc _ _ _) ⟩
+           ETᶠ ×ᵐ-assoc
+        ∘ᵐ uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym (uncurryᵐ-map⇒ᵐ _ _))) ⟩
+           uncurryᵐ (   map⇒ᵐ idᵐ (ETᶠ ×ᵐ-assoc)
+                     ∘ᵐ enrᴱᵀ)
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congˡ (cong uncurryᵐ (∘ᵐ-congˡ (cong₂ map⇒ᵐ (sym ET-idᵐ) refl))) ⟩
+           uncurryᵐ (   map⇒ᵐ (ETᶠ idᵐ) (ETᶠ ×ᵐ-assoc)
+                     ∘ᵐ enrᴱᵀ)
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congˡ (cong uncurryᵐ (enrᴱᵀ-nat _ _)) ⟩
+           uncurryᵐ (   enrᴱᵀ
+                     ∘ᵐ [ τ ]ᶠ (map⇒ᵐ idᵐ ×ᵐ-assoc))
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨⟩
+           uncurryᵐ (   enrᴱᵀ
+                     ∘ᵐ [ τ ]ᶠ (curryᵐ (×ᵐ-assoc ∘ᵐ uncurryᵐ idᵐ ∘ᵐ mapˣᵐ idᵐ idᵐ)))
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (trans (sym (uncurryᵐ-nat _ _))
+          (cong uncurryᵐ (∘ᵐ-assoc _ _ _)))) ⟩
+           uncurryᵐ (   enrᴱᵀ
+                     ∘ᵐ [ τ ]ᶠ (curryᵐ (×ᵐ-assoc ∘ᵐ uncurryᵐ idᵐ ∘ᵐ mapˣᵐ idᵐ idᵐ))
+                     ∘ᵐ [ τ ]ᶠ (curryᵐ idᵐ))
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congˡ (cong uncurryᵐ (∘ᵐ-congʳ (sym ([]-∘ᵐ _ _)))) ⟩
+           uncurryᵐ (   enrᴱᵀ
+                     ∘ᵐ [ τ ]ᶠ (curryᵐ (×ᵐ-assoc ∘ᵐ uncurryᵐ idᵐ ∘ᵐ mapˣᵐ idᵐ idᵐ) ∘ᵐ curryᵐ idᵐ))
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congˡ (cong uncurryᵐ (∘ᵐ-congʳ (cong [ τ ]ᶠ (∘ᵐ-congˡ (cong curryᵐ
+         (trans (∘ᵐ-congʳ (∘ᵐ-congʳ mapˣᵐ-identity)) (∘ᵐ-congʳ (∘ᵐ-identityʳ _)))))))) ⟩
+           uncurryᵐ (   enrᴱᵀ
+                     ∘ᵐ [ τ ]ᶠ (curryᵐ (×ᵐ-assoc ∘ᵐ uncurryᵐ idᵐ) ∘ᵐ curryᵐ idᵐ))
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congˡ (cong uncurryᵐ (∘ᵐ-congʳ (cong [ τ ]ᶠ
+          (trans (sym (curryᵐ-nat _ _)) (cong curryᵐ (∘ᵐ-assoc _ _ _)))))) ⟩
+           uncurryᵐ (   enrᴱᵀ
+                     ∘ᵐ [ τ ]ᶠ (curryᵐ (×ᵐ-assoc ∘ᵐ uncurryᵐ idᵐ ∘ᵐ mapˣᵐ (curryᵐ idᵐ) idᵐ)))
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congˡ (cong uncurryᵐ (∘ᵐ-congʳ (cong [ τ ]ᶠ (cong curryᵐ (∘ᵐ-congʳ (sym (uncurryᵐ-nat _ _))))))) ⟩
+           uncurryᵐ (   enrᴱᵀ
+                     ∘ᵐ [ τ ]ᶠ (curryᵐ (×ᵐ-assoc ∘ᵐ uncurryᵐ (idᵐ ∘ᵐ curryᵐ idᵐ))))
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congˡ (cong uncurryᵐ (∘ᵐ-congʳ (cong [ τ ]ᶠ (cong curryᵐ
+          (trans (∘ᵐ-congʳ (cong uncurryᵐ (∘ᵐ-identityˡ _)))
+            (trans (∘ᵐ-congʳ (curryᵐ-uncurryᵐ-iso _)) (∘ᵐ-identityʳ _))))))) ⟩
+           uncurryᵐ (   enrᴱᵀ
+                     ∘ᵐ [ τ ]ᶠ (curryᵐ ×ᵐ-assoc))
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym (uncurryᵐ-nat _ _)))) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (curryᵐ ×ᵐ-assoc))
+            idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ (cong [ τ ]ᶠ (cong curryᵐ
+          (sym (∘ᵐ-identityˡ _)))) refl)) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (curryᵐ (   idᵐ
+                             ∘ᵐ ×ᵐ-assoc)))
+            idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ (cong [ τ ]ᶠ (cong curryᵐ
+          (sym (trans (∘ᵐ-congˡ (cong uncurryᵐ (∘ᵐ-identityˡ _)))
+            (∘ᵐ-congˡ (curryᵐ-uncurryᵐ-iso _)))))) refl)) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (curryᵐ (   uncurryᵐ (idᵐ ∘ᵐ curryᵐ idᵐ)
+                             ∘ᵐ ×ᵐ-assoc)))
+            idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ (cong [ τ ]ᶠ (cong curryᵐ
+          (sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym (uncurryᵐ-nat _ _))))))) refl)) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (curryᵐ (   appᵐ
+                             ∘ᵐ mapˣᵐ (curryᵐ idᵐ) idᵐ
+                             ∘ᵐ ×ᵐ-assoc)))
+            idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ (cong [ τ ]ᶠ (cong curryᵐ
+          (∘ᵐ-congʳ (∘ᵐ-congˡ
+            (cong₂ mapˣᵐ refl
+              (sym (trans (cong uncurryᵐ (∘ᵐ-identityˡ _)) (curryᵐ-uncurryᵐ-iso _)))))))) refl)) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (curryᵐ (   appᵐ
+                             ∘ᵐ mapˣᵐ (curryᵐ idᵐ) (uncurryᵐ (idᵐ ∘ᵐ curryᵐ idᵐ))
+                             ∘ᵐ ×ᵐ-assoc)))
+            idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ (cong [ τ ]ᶠ (cong curryᵐ
+          (∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ refl (uncurryᵐ-nat _ _)))))) refl)) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (curryᵐ (   appᵐ
+                             ∘ᵐ mapˣᵐ (curryᵐ idᵐ) (uncurryᵐ idᵐ ∘ᵐ mapˣᵐ (curryᵐ idᵐ) idᵐ)
+                             ∘ᵐ ×ᵐ-assoc)))
+            idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ (cong [ τ ]ᶠ (cong curryᵐ (∘ᵐ-congʳ
+          (trans (sym (mapˣᵐ-⟨⟩ᵐ _ _ _ _)) (sym (trans (∘ᵐ-congʳ (sym (mapˣᵐ-⟨⟩ᵐ _ _ _ _)))
+            (trans (sym (mapˣᵐ-⟨⟩ᵐ _ _ _ _))
+              (cong₂ ⟨_,_⟩ᵐ (∘ᵐ-identityˡ _) (sym (∘ᵐ-assoc _ _ _)))))))))) refl)) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (curryᵐ (   appᵐ
+                             ∘ᵐ mapˣᵐ idᵐ appᵐ
+                             ∘ᵐ mapˣᵐ (curryᵐ idᵐ) (mapˣᵐ (curryᵐ idᵐ) idᵐ)
+                             ∘ᵐ ×ᵐ-assoc)))
+            idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ (cong [ τ ]ᶠ (cong curryᵐ
+          (∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (mapˣᵐ-⟨⟩ᵐ _ _ _ _)) (sym (trans (sym (⟨⟩ᵐ-∘ᵐ _ _ _))
+             (cong₂ ⟨_,_⟩ᵐ
+               (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))
+                 (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (⟨⟩ᵐ-fstᵐ _ _)) (∘ᵐ-assoc _ _ _)))))
+               (trans (sym (⟨⟩ᵐ-∘ᵐ _ _ _)) (sym (trans (sym (mapˣᵐ-⟨⟩ᵐ _ _ _ _))
+                 (cong₂ ⟨_,_⟩ᵐ
+                   (sym (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-fstᵐ _ _))
+                     (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (⟨⟩ᵐ-sndᵐ _ _)) (∘ᵐ-assoc _ _ _))))))
+                   (trans (∘ᵐ-identityˡ _) (sym (trans (⟨⟩ᵐ-sndᵐ _ _) (∘ᵐ-identityˡ _)))))))))))))))) refl)) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (curryᵐ (   appᵐ
+                             ∘ᵐ mapˣᵐ idᵐ appᵐ
+                             ∘ᵐ ×ᵐ-assoc
+                             ∘ᵐ mapˣᵐ (mapˣᵐ (curryᵐ idᵐ) (curryᵐ idᵐ)) idᵐ)))
+            idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congˡ (cong₂ mapˣᵐ (cong [ τ ]ᶠ (trans (cong curryᵐ
+          (sym (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))))) (curryᵐ-nat _ _))) refl)) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (   curryᵐ (   appᵐ
+                                ∘ᵐ mapˣᵐ idᵐ appᵐ
+                                ∘ᵐ ×ᵐ-assoc)
+                     ∘ᵐ mapˣᵐ (curryᵐ idᵐ) (curryᵐ idᵐ)))
+            idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _))
+          (cong₂ mapˣᵐ (sym ([]-∘ᵐ _ _)) (∘ᵐ-identityˡ _)))))) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (curryᵐ (   appᵐ
+                             ∘ᵐ mapˣᵐ idᵐ appᵐ
+                             ∘ᵐ ×ᵐ-assoc)))
+            idᵐ
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (mapˣᵐ (curryᵐ idᵐ) (curryᵐ idᵐ))) idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans
+          (∘ᵐ-congˡ (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _)) (sym (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _))
+            (cong₂ mapˣᵐ (sym ([]-monoidal-nat _ _)) refl))))) (∘ᵐ-assoc _ _ _)))) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (curryᵐ (   appᵐ
+                             ∘ᵐ mapˣᵐ idᵐ appᵐ
+                             ∘ᵐ ×ᵐ-assoc)))
+            idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ mapˣᵐ (mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) ([ τ ]ᶠ (curryᵐ idᵐ))) idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (mapˣᵐ-⟨⟩ᵐ _ _ _ _))
+          (sym (trans (∘ᵐ-congʳ (sym (mapˣᵐ-∘ᵐ _ _ _ _))) (trans (sym (⟨⟩ᵐ-∘ᵐ _ _ _))
+            (cong₂ ⟨_,_⟩ᵐ
+              (trans (sym (⟨⟩ᵐ-∘ᵐ _ _ _)) (sym (trans (sym (mapˣᵐ-⟨⟩ᵐ _ _ _ _))
+                (cong₂ ⟨_,_⟩ᵐ
+                  (sym (trans (⟨⟩ᵐ-fstᵐ _ _) (∘ᵐ-congˡ (∘ᵐ-identityʳ _))))
+                  (sym (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _))
+                    (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (trans (∘ᵐ-congʳ (∘ᵐ-identityˡ _))
+                      (⟨⟩ᵐ-fstᵐ _ _))) (∘ᵐ-assoc _ _ _))))))))))
+              (trans (∘ᵐ-assoc _ _ _) (trans (∘ᵐ-congʳ (⟨⟩ᵐ-sndᵐ _ _)) (trans (sym (∘ᵐ-assoc _ _ _))
+                (trans (∘ᵐ-congˡ (trans (∘ᵐ-congʳ (∘ᵐ-identityˡ _)) (⟨⟩ᵐ-sndᵐ _ _))) (∘ᵐ-assoc _ _ _)))))))))))) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ
+            ([ τ ]ᶠ (curryᵐ (   appᵐ
+                             ∘ᵐ mapˣᵐ idᵐ appᵐ
+                             ∘ᵐ ×ᵐ-assoc)))
+            idᵐ
+        ∘ᵐ mapˣᵐ []-monoidal idᵐ
+        ∘ᵐ ×ᵐ-assoc⁻¹
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ)
+      ≡⟨ sym (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ enrᴱᵀ-idᵐ-∘ᵐ)
+          (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))))))) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ idᵐ (uncurryᵐ enrᴱᵀ)
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ)
+      ≡⟨ ∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ
+          (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _)) (sym (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _))
+            (cong₂ mapˣᵐ
+              (trans (∘ᵐ-identityʳ _) (sym (∘ᵐ-identityˡ _)))
+              (trans (∘ᵐ-identityˡ _) (sym (∘ᵐ-identityʳ _))))))))
+            (∘ᵐ-assoc _ _ _))) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ idᵐ (uncurryᵐ enrᴱᵀ)
+        ∘ᵐ mapˣᵐ idᵐ (mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ)
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (sym (trans
+          (cong₂ mapˣᵐ
+            (sym (∘ᵐ-identityˡ _)) refl)
+            (mapˣᵐ-∘ᵐ _ _ _ _)))) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ idᵐ (   uncurryᵐ enrᴱᵀ
+                      ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ)
+      ≡⟨⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ idᵐ strᴱᵀ
+      ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+           strᴱᵀ
+        ∘ᵐ mapˣᵐ idᵐ strᴱᵀ
+      ∎
+    -}
