@@ -56,10 +56,10 @@ ET-to-T M = record
               ; opᵀ-nat = opᴱᵀ-nat
               ; delayᵀ-algebraicity = delayᴱᵀ-algebraicity
               ; opᵀ-algebraicity = opᴱᵀ-algebraicity
-              ; strᵀ = ? --strᴱᵀ
-              ; strᵀ-nat = {!!}
-              ; strᵀ-ηᵀ = {!!}
-              ; strᵀ-μᵀ = {!!}
+              ; strᵀ = strᴱᵀ
+              ; strᵀ-nat = {!!} -- strᴱᵀ-nat
+              ; strᵀ-ηᵀ = {!!} --strᵀ-ηᵀ
+              ; strᵀ-μᵀ = strᵀ-μᵀ
               ; strᵀ-sndᵐ = {!!}
               ; strᵀ-assoc = {!!}
               ; strᵀ-delayᵀ-algebraicity = {!!}
@@ -73,14 +73,14 @@ ET-to-T M = record
 
     open EMonad M
 
-    {-
+    
     strᴱᵀ : ∀ {A B τ} → [ τ ]ᵒ A ×ᵐ ETᵒ B τ →ᵐ ETᵒ (A ×ᵐ B) τ
     strᴱᵀ {A} {B} {τ} =
          uncurryᵐ (enrᴱᵀ {B} {A ×ᵐ B} {τ})
       ∘ᵐ mapˣᵐ
           ([ τ ]ᶠ (curryᵐ idᵐ))
           idᵐ
-
+    {-
     strᴱᵀ-nat : ∀ {A B C D τ}
               → (f : A →ᵐ B)
               → (g : C →ᵐ D)
@@ -176,4 +176,107 @@ ET-to-T M = record
            ETᶠ (mapˣᵐ f g)
         ∘ᵐ strᴱᵀ
       ∎
+    
+    strᵀ-ηᵀ : ∀ {A B}
+            → strᴱᵀ {A} {B} {0} ∘ᵐ mapˣᵐ ε⁻¹ ηᴱᵀ ≡ ηᴱᵀ
+    strᵀ-ηᵀ {A} {B} = 
+      begin
+          strᴱᵀ
+       ∘ᵐ mapˣᵐ ε⁻¹ ηᴱᵀ
+      ≡⟨ ∘ᵐ-assoc _ _ _ ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ([ 0 ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ ε⁻¹ ηᴱᵀ
+      ≡⟨ ∘ᵐ-congʳ (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _)) (sym (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _))
+          (cong₂ mapˣᵐ
+            (sym ([]-ε⁻¹-nat _))
+            (trans (∘ᵐ-identityʳ _) (sym (∘ᵐ-identityˡ _))))))) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ε⁻¹ ηᴱᵀ
+        ∘ᵐ mapˣᵐ (curryᵐ idᵐ) idᵐ
+      ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ enrᴱᵀ-ηᴱᵀ) (∘ᵐ-assoc _ _ _)) ⟩
+           ηᴱᵀ
+        ∘ᵐ uncurryᵐ idᵐ
+        ∘ᵐ mapˣᵐ (curryᵐ idᵐ) idᵐ
+      ≡⟨ ∘ᵐ-congʳ (sym (uncurryᵐ-nat _ _)) ⟩
+           ηᴱᵀ
+        ∘ᵐ uncurryᵐ (idᵐ ∘ᵐ curryᵐ idᵐ)
+      ≡⟨ ∘ᵐ-congʳ (cong uncurryᵐ (∘ᵐ-identityˡ _)) ⟩
+           ηᴱᵀ
+        ∘ᵐ uncurryᵐ (curryᵐ idᵐ)
+      ≡⟨ ∘ᵐ-congʳ (curryᵐ-uncurryᵐ-iso _) ⟩
+           ηᴱᵀ
+        ∘ᵐ idᵐ
+      ≡⟨ ∘ᵐ-identityʳ _ ⟩
+        ηᴱᵀ
+      ∎
       -}
+    strᵀ-μᵀ : ∀ {A B τ τ'}
+            → μᴱᵀ {A ×ᵐ B} {τ} {τ'} ∘ᵐ ETᶠ strᴱᵀ ∘ᵐ strᴱᵀ
+            ≡ strᴱᵀ ∘ᵐ mapˣᵐ δ⁻¹ μᴱᵀ
+    strᵀ-μᵀ {A} {B} {τ} {τ'} =
+      begin
+           μᴱᵀ
+        ∘ᵐ ETᶠ strᴱᵀ
+        ∘ᵐ strᴱᵀ
+      ≡⟨⟩
+           μᴱᵀ
+        ∘ᵐ ETᶠ (   uncurryᵐ enrᴱᵀ
+                ∘ᵐ mapˣᵐ ([ τ' ]ᶠ (curryᵐ idᵐ)) idᵐ)
+        ∘ᵐ uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+      ≡⟨ ∘ᵐ-congʳ (sym (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym (ET-∘ᵐ _ _))))) ⟩
+           μᴱᵀ
+        ∘ᵐ ETᶠ (uncurryᵐ enrᴱᵀ)
+        ∘ᵐ ETᶠ (mapˣᵐ ([ τ' ]ᶠ (curryᵐ idᵐ)) idᵐ)
+        ∘ᵐ uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym (uncurryᵐ-map⇒ᵐ _ _))))) ⟩
+           μᴱᵀ
+        ∘ᵐ ETᶠ (uncurryᵐ enrᴱᵀ)
+        ∘ᵐ uncurryᵐ (   map⇒ᵐ idᵐ (ETᶠ (mapˣᵐ ([ τ' ]ᶠ (curryᵐ idᵐ)) idᵐ))
+                     ∘ᵐ enrᴱᵀ)
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+      ≡⟨ ∘ᵐ-congʳ (∘ᵐ-congʳ (trans (sym (uncurryᵐ-nat _ _)) (cong uncurryᵐ (∘ᵐ-assoc _ _ _)))) ⟩
+           μᴱᵀ
+        ∘ᵐ ETᶠ (uncurryᵐ enrᴱᵀ)
+        ∘ᵐ uncurryᵐ (   map⇒ᵐ idᵐ (ETᶠ (mapˣᵐ ([ τ' ]ᶠ (curryᵐ idᵐ)) idᵐ))
+                     ∘ᵐ enrᴱᵀ
+                     ∘ᵐ [ τ ]ᶠ (curryᵐ idᵐ))
+      ≡⟨ {!!} ⟩
+           μᴱᵀ
+        ∘ᵐ ETᶠ (uncurryᵐ (enrᴱᵀ ))
+        ∘ᵐ uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ ([ τ' ]ᶠ (curryᵐ idᵐ))) idᵐ
+      ≡⟨ sym (trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ (sym enrᴱᵀ-μᴱᵀ))
+          (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ
+            (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))))))) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ δ⁻¹ μᴱᵀ
+        ∘ᵐ mapˣᵐ ([ τ ]ᶠ ([ τ' ]ᶠ (curryᵐ idᵐ))) idᵐ
+      ≡⟨ ∘ᵐ-congʳ (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _)) (sym (trans (sym (mapˣᵐ-∘ᵐ _ _ _ _))
+          (cong₂ mapˣᵐ
+            ([]-δ⁻¹-nat _)
+            (trans (∘ᵐ-identityˡ _) (sym (∘ᵐ-identityʳ _))))))) ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ ([ τ + τ' ]ᶠ (curryᵐ idᵐ)) idᵐ
+        ∘ᵐ mapˣᵐ δ⁻¹ μᴱᵀ
+      ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+           strᴱᵀ
+        ∘ᵐ mapˣᵐ δ⁻¹ μᴱᵀ
+      ∎
+
+
+
+{-
+
+    enrᴱᵀ-μᴱᵀ : ∀ {A B τ τ'}
+              →    μᴱᵀ {B} {τ} {τ'}
+                ∘ᵐ ETᶠ (uncurryᵐ (enrᴱᵀ {A} {B} {τ'} ))
+                ∘ᵐ uncurryᵐ enrᴱᵀ
+                ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+              ≡    uncurryᵐ enrᴱᵀ
+                ∘ᵐ mapˣᵐ δ⁻¹ (μᴱᵀ {A} {τ} {τ'})
+
+-}

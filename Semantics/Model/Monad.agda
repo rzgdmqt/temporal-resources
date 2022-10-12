@@ -154,15 +154,21 @@ record Monad : Set₁ where
     -- Strength laws
 
     strᵀ-ηᵀ : ∀ {A B}
-            → strᵀ ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ
+            →    strᵀ
+              ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ
             ≡ ηᵀ {A ×ᵐ B}
 
     strᵀ-μᵀ : ∀ {A B τ τ'}
-            → μᵀ {A ×ᵐ B} {τ} {τ'} ∘ᵐ Tᶠ strᵀ ∘ᵐ strᵀ
-            ≡ strᵀ ∘ᵐ mapˣᵐ δ⁻¹ μᵀ
+            →    μᵀ {A ×ᵐ B} {τ} {τ'}
+              ∘ᵐ Tᶠ strᵀ
+              ∘ᵐ strᵀ
+            ≡    strᵀ
+              ∘ᵐ mapˣᵐ δ⁻¹ μᵀ
 
     strᵀ-sndᵐ : ∀ {A B τ}
-              → Tᶠ sndᵐ ∘ᵐ strᵀ {A} {B} {τ} ≡ sndᵐ
+              →    Tᶠ sndᵐ
+                ∘ᵐ strᵀ {A} {B} {τ}
+              ≡ sndᵐ
 
     strᵀ-assoc : ∀ {A B C τ}
                →    Tᶠ ×ᵐ-assoc

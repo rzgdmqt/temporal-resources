@@ -150,6 +150,20 @@ record EMonad : Set₁ where
               → map⇒ᵐ (ETᶠ f) (ETᶠ g) ∘ᵐ enrᴱᵀ {B} {C} {τ}
               ≡ enrᴱᵀ ∘ᵐ [ τ ]ᶠ (map⇒ᵐ f g)
 
+    -- Enrichment laws
+
+    enrᴱᵀ-ηᴱᵀ : ∀ {A B}
+              → uncurryᵐ enrᴱᵀ ∘ᵐ mapˣᵐ ε⁻¹ ηᴱᵀ
+              ≡ ηᴱᵀ ∘ᵐ appᵐ {A} {B}
+
+    enrᴱᵀ-μᴱᵀ : ∀ {A B τ τ'}
+              →    μᴱᵀ {B} {τ} {τ'}
+                ∘ᵐ ETᶠ (uncurryᵐ (enrᴱᵀ {A} {B} {τ'} ))
+                ∘ᵐ uncurryᵐ enrᴱᵀ
+                ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+              ≡    uncurryᵐ enrᴱᵀ
+                ∘ᵐ mapˣᵐ δ⁻¹ (μᴱᵀ {A} {τ} {τ'})
+
     -- ...
     
 
