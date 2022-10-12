@@ -147,14 +147,18 @@ record EMonad : Set₁ where
     enrᴱᵀ-nat : ∀ {A B C D τ}
               → (f : A →ᵐ B)
               → (g : C →ᵐ D)
-              → map⇒ᵐ (ETᶠ f) (ETᶠ g) ∘ᵐ enrᴱᵀ {B} {C} {τ}
-              ≡ enrᴱᵀ ∘ᵐ [ τ ]ᶠ (map⇒ᵐ f g)
+              →    map⇒ᵐ (ETᶠ f) (ETᶠ g)
+                ∘ᵐ enrᴱᵀ {B} {C} {τ}
+              ≡    enrᴱᵀ
+                ∘ᵐ [ τ ]ᶠ (map⇒ᵐ f g)
 
     -- Enrichment laws
 
     enrᴱᵀ-ηᴱᵀ : ∀ {A B}
-              → uncurryᵐ enrᴱᵀ ∘ᵐ mapˣᵐ ε⁻¹ ηᴱᵀ
-              ≡ ηᴱᵀ ∘ᵐ appᵐ {A} {B}
+              →    uncurryᵐ enrᴱᵀ
+                ∘ᵐ mapˣᵐ ε⁻¹ ηᴱᵀ
+              ≡    ηᴱᵀ
+                ∘ᵐ appᵐ {A} {B}
 
     enrᴱᵀ-μᴱᵀ : ∀ {A B τ τ'}
               →    μᴱᵀ {B} {τ} {τ'}
@@ -163,6 +167,11 @@ record EMonad : Set₁ where
                 ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
               ≡    uncurryᵐ enrᴱᵀ
                 ∘ᵐ mapˣᵐ δ⁻¹ (μᴱᵀ {A} {τ} {τ'})
+
+    enrᴱᵀ-sndᵐ : ∀ {A B τ}
+               →    ETᶠ sndᵐ
+                 ∘ᵐ uncurryᵐ (enrᴱᵀ {B} {A ×ᵐ B} {τ})
+               ≡ sndᵐ
 
     -- ...
     
