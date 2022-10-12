@@ -493,3 +493,92 @@ map⇒ᵐ-∘ᵐʳ {A} {B} {C} {D} f g =
   ≡⟨ map⇒ᵐ-∘ᵐ _ _ _ _ ⟩
     map⇒ᵐ idᵐ g ∘ᵐ map⇒ᵐ idᵐ f
   ∎
+
+uncurryᵐ-mapˣᵐ : ∀ {A B C D E}
+               → (f : B →ᵐ D ⇒ᵐ E)
+               → (g : A →ᵐ B)
+               → (h : C →ᵐ D)
+               → uncurryᵐ (map⇒ᵐ h idᵐ ∘ᵐ f ∘ᵐ g)
+               ≡ uncurryᵐ f ∘ᵐ mapˣᵐ g h
+               
+uncurryᵐ-mapˣᵐ {A} {B} {C} {D} {E} f g h =
+  begin
+    uncurryᵐ (   map⇒ᵐ h idᵐ
+              ∘ᵐ f
+              ∘ᵐ g)
+  ≡⟨⟩
+    uncurryᵐ
+      (   curryᵐ (   idᵐ
+                  ∘ᵐ uncurryᵐ idᵐ
+                  ∘ᵐ mapˣᵐ idᵐ h)
+       ∘ᵐ f
+       ∘ᵐ g)
+  ≡⟨ uncurryᵐ-nat _ _ ⟩
+       uncurryᵐ
+         (curryᵐ (   idᵐ
+                  ∘ᵐ uncurryᵐ idᵐ
+                  ∘ᵐ mapˣᵐ idᵐ h))
+    ∘ᵐ mapˣᵐ (f ∘ᵐ g) idᵐ
+  ≡⟨ trans
+      (∘ᵐ-congˡ (curryᵐ-uncurryᵐ-iso _))
+      (trans (∘ᵐ-assoc _ _ _) (∘ᵐ-congʳ (∘ᵐ-assoc _ _ _))) ⟩
+       idᵐ
+    ∘ᵐ uncurryᵐ idᵐ
+    ∘ᵐ mapˣᵐ idᵐ h
+    ∘ᵐ mapˣᵐ (f ∘ᵐ g) idᵐ
+  ≡⟨ ∘ᵐ-identityˡ _ ⟩
+       uncurryᵐ idᵐ
+    ∘ᵐ mapˣᵐ idᵐ h
+    ∘ᵐ mapˣᵐ (f ∘ᵐ g) idᵐ
+  ≡⟨ ∘ᵐ-congʳ
+      (trans
+        (sym (mapˣᵐ-∘ᵐ _ _ _ _))
+        (sym
+          (trans
+            (sym (mapˣᵐ-∘ᵐ _ _ _ _))
+            (cong₂ mapˣᵐ
+              (sym (∘ᵐ-identityˡ _))
+              (trans (∘ᵐ-identityˡ _) (sym (∘ᵐ-identityʳ _))))))) ⟩
+       uncurryᵐ idᵐ
+    ∘ᵐ mapˣᵐ f idᵐ
+    ∘ᵐ mapˣᵐ g h
+  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (∘ᵐ-congˡ (sym (uncurryᵐ-nat _ _))) ⟩
+       uncurryᵐ (idᵐ ∘ᵐ f)
+    ∘ᵐ mapˣᵐ g h
+  ≡⟨ ∘ᵐ-congˡ (cong uncurryᵐ (∘ᵐ-identityˡ _)) ⟩
+       uncurryᵐ f
+    ∘ᵐ mapˣᵐ g h
+  ≡⟨⟩
+       uncurryᵐ f
+    ∘ᵐ mapˣᵐ g h
+  ∎
+
+uncurryᵐ-map⇒ᵐ : ∀ {A B C D}
+               → (f : A →ᵐ B ⇒ᵐ C)
+               → (g : C →ᵐ D)
+               → uncurryᵐ (map⇒ᵐ idᵐ g ∘ᵐ f)
+               ≡ g ∘ᵐ uncurryᵐ f
+
+uncurryᵐ-map⇒ᵐ {A} {B} {C} {D} f g =
+  begin
+    uncurryᵐ (map⇒ᵐ idᵐ g ∘ᵐ f)
+  ≡⟨⟩
+    uncurryᵐ (   curryᵐ (g ∘ᵐ uncurryᵐ idᵐ ∘ᵐ mapˣᵐ idᵐ idᵐ)
+              ∘ᵐ f)
+  ≡⟨ cong uncurryᵐ (∘ᵐ-congˡ (cong curryᵐ (∘ᵐ-congʳ (trans (∘ᵐ-congʳ mapˣᵐ-identity) (∘ᵐ-identityʳ _))))) ⟩
+    uncurryᵐ (   curryᵐ (g ∘ᵐ uncurryᵐ idᵐ)
+              ∘ᵐ f)
+  ≡⟨ uncurryᵐ-nat _ _ ⟩
+       uncurryᵐ (curryᵐ (g ∘ᵐ uncurryᵐ idᵐ))
+    ∘ᵐ mapˣᵐ f idᵐ
+  ≡⟨ trans (∘ᵐ-congˡ (curryᵐ-uncurryᵐ-iso _)) (∘ᵐ-assoc _ _ _) ⟩
+       g
+    ∘ᵐ uncurryᵐ idᵐ
+    ∘ᵐ mapˣᵐ f idᵐ
+  ≡⟨ ∘ᵐ-congʳ (sym (uncurryᵐ-nat _ _)) ⟩
+      g
+    ∘ᵐ uncurryᵐ (idᵐ ∘ᵐ f)
+  ≡⟨ ∘ᵐ-congʳ (cong uncurryᵐ (∘ᵐ-identityˡ _)) ⟩
+      g
+    ∘ᵐ uncurryᵐ f
+  ∎
