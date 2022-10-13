@@ -30,7 +30,6 @@ open import Semantics.Model.Modality.Past.Derived Cat Pas
 open import Semantics.Model.Modality.Adjunction.Derived Cat Fut Pas Adj
 
 open import Semantics.Model.Monad Cat Fut Pas Adj Typ
-
 open import Semantics.Model.Monad.Enriched Cat Fut Pas Adj Typ
 
 -- Showing that [-]-strength follows from [-]-enrichment
