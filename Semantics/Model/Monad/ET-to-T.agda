@@ -33,7 +33,7 @@ open import Semantics.Model.Monad Cat Fut Pas Adj Typ
 
 open import Semantics.Model.Monad.Enriched Cat Fut Pas Adj Typ
 
--- Showing that the [-]-strength follows from [-]-enrichment
+-- Showing that [-]-strength follows from [-]-enrichment
 
 ET-to-T : EMonad → Monad
 ET-to-T M = record
