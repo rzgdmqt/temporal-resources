@@ -76,6 +76,9 @@ modules presenting this model are:
 * `Semantics/Model/Monad.agda` axiomatises `[-]`-strong graded monad
   structure used to model computation types and terms.
   
+* `Semantics/Model/Monad/ET-equiv-T.agda` proves that `[-]`-strength
+  is equivalent to asking the graded monad to be `[-]`-enriched.
+  
 This abstract model is then used to give the core language a denotational
 semantics and prove it sound, in the following modules:
 
