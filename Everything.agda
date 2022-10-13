@@ -89,6 +89,10 @@ open import Semantics.Substitutions.Properties.VC-subst
 
 open import Semantics.Soundness
 
+---- Equivalence of [-]-strong and [-]-enriched graded monads
+
+open import Semantics.Model.Monad.ET-equiv-T
+
 
 -- PRESHEAF MODEL
 -----------------
