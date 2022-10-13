@@ -189,7 +189,25 @@ record EMonad : Set₁ where
 
     -- Operations are algebraic wrt enrichment
 
-    -- ...
+    enrᴱᵀ-delayᴱᵀ-algebraicity : ∀ {A B τ τ'}
+                               →    uncurryᵐ (enrᴱᵀ {A} {B} {τ + τ'})
+                                 ∘ᵐ mapˣᵐ idᵐ (delayᴱᵀ τ {τ'})
+                               ≡    delayᴱᵀ τ
+                                 ∘ᵐ [ τ ]ᶠ (uncurryᵐ (enrᴱᵀ {A} {B} {τ'}))
+                                 ∘ᵐ []-monoidal
+                                 ∘ᵐ mapˣᵐ (δ {A ⇒ᵐ B} {τ} {τ'}) idᵐ
+
+    enrᴱᵀ-opᴱᵀ-algebraicity : ∀ {A B τ} → (op : Op)
+                            →    uncurryᵐ (enrᴱᵀ {A} {B})
+                              ∘ᵐ mapˣᵐ idᵐ (opᴱᵀ op)
+                            ≡    opᴱᵀ op
+                              ∘ᵐ mapˣᵐ
+                                   idᵐ
+                                   (   [ op-time op ]ᶠ (   map⇒ᵐ idᵐ (uncurryᵐ (enrᴱᵀ {A} {B} {τ}))
+                                                        ∘ᵐ curryᵐ ⟨ fstᵐ ∘ᵐ fstᵐ , uncurryᵐ sndᵐ ⟩ᵐ)
+                                    ∘ᵐ []-monoidal
+                                    ∘ᵐ mapˣᵐ δ idᵐ)
+                              ∘ᵐ ⟨ fstᵐ ∘ᵐ sndᵐ , ⟨ fstᵐ , sndᵐ ∘ᵐ sndᵐ ⟩ᵐ ⟩ᵐ
     
 
     -- EFFECT HANDLING
