@@ -25,3 +25,30 @@ open import Semantics.Model.Category.Derived Cat
 
 η-[] : ∀ {A τ} → A →ᵐ [ τ ]ᵒ A
 η-[] {A} {τ} = []-≤ {A = A} z≤n ∘ᵐ ε⁻¹
+
+
+η-[]-nat : ∀ {A B τ}
+         → (f : A →ᵐ B)
+         → [ τ ]ᶠ f ∘ᵐ η-[]
+         ≡ η-[] ∘ᵐ f
+         
+η-[]-nat {A} {B} {τ} f =
+  begin
+       [ τ ]ᶠ f
+    ∘ᵐ η-[]
+  ≡⟨⟩
+       [ τ ]ᶠ f
+    ∘ᵐ []-≤ z≤n
+    ∘ᵐ ε⁻¹
+  ≡⟨ trans (sym (∘ᵐ-assoc _ _ _)) (trans (∘ᵐ-congˡ ([]-≤-nat _ _)) (∘ᵐ-assoc _ _ _)) ⟩
+       []-≤ z≤n
+    ∘ᵐ [ 0 ]ᶠ f
+    ∘ᵐ ε⁻¹
+  ≡⟨ ∘ᵐ-congʳ ([]-ε⁻¹-nat _) ⟩
+       []-≤ z≤n
+    ∘ᵐ ε⁻¹
+    ∘ᵐ f
+  ≡⟨ sym (∘ᵐ-assoc _ _ _) ⟩
+       η-[]
+    ∘ᵐ f
+  ∎
