@@ -163,7 +163,7 @@ record EMonad : Set₁ where
 
     enrᴱᵀ-μᴱᵀ : ∀ {A B τ τ'}
               →    μᴱᵀ {B} {τ} {τ'}
-                ∘ᵐ ETᶠ (uncurryᵐ (enrᴱᵀ {A} {B} {τ'} ))
+                ∘ᵐ ETᶠ (uncurryᵐ (enrᴱᵀ {A} {B} {τ'}))
                 ∘ᵐ uncurryᵐ enrᴱᵀ
                 ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
               ≡    uncurryᵐ enrᴱᵀ

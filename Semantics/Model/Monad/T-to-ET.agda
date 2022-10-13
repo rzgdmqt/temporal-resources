@@ -59,7 +59,7 @@ T-to-ET M = record
               ; opᴱᵀ-algebraicity = opᵀ-algebraicity
               ; enrᴱᵀ = enrᴱᵀ
               ; enrᴱᵀ-nat = {!!} --enrᴱᵀ-nat
-              ; enrᴱᵀ-ηᴱᵀ = enrᴱᵀ-ηᴱᵀ
+              ; enrᴱᵀ-ηᴱᵀ = {!!} --enrᴱᵀ-ηᴱᵀ
               ; enrᴱᵀ-μᴱᵀ = {!!}
               ; enrᴱᵀ-idᵐ = {!!}
               ; enrᴱᵀ-idᵐ-∘ᵐ = {!!}
@@ -176,8 +176,6 @@ T-to-ET M = record
         ∘ᵐ [ τ ]ᶠ (map⇒ᵐ f g)
       ∎
 
-    -}
-
     enrᴱᵀ-ηᴱᵀ : ∀ {A B}
               → uncurryᵐ (enrᴱᵀ {A} {B}) ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ
               ≡ ηᵀ ∘ᵐ appᵐ
@@ -186,7 +184,46 @@ T-to-ET M = record
       begin
            uncurryᵐ enrᴱᵀ
         ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ
-      ≡⟨ {!!} ⟩
+      ≡⟨⟩
+           uncurryᵐ (curryᵐ (   Tᶠ (uncurryᵐ idᵐ)
+                             ∘ᵐ strᵀ))
+        ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ
+      ≡⟨ trans (∘ᵐ-congˡ (curryᵐ-uncurryᵐ-iso _)) (∘ᵐ-assoc _ _ _) ⟩
+           Tᶠ (uncurryᵐ idᵐ)
+        ∘ᵐ strᵀ
+        ∘ᵐ mapˣᵐ ε⁻¹ ηᵀ
+      ≡⟨ ∘ᵐ-congʳ strᵀ-ηᵀ ⟩
+           Tᶠ (uncurryᵐ idᵐ)
+        ∘ᵐ ηᵀ
+      ≡⟨ sym (ηᵀ-nat _) ⟩
            ηᵀ
-        ∘ᵐ appᵐ
+        ∘ᵐ uncurryᵐ idᵐ
       ∎
+    -}
+
+    enrᴱᵀ-μᴱᵀ : ∀ {A B τ τ'}
+              →    μᵀ {B} {τ} {τ'}
+                ∘ᵐ Tᶠ (uncurryᵐ (enrᴱᵀ {A} {B} {τ'}))
+                ∘ᵐ uncurryᵐ enrᴱᵀ ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+              ≡    uncurryᵐ enrᴱᵀ
+                ∘ᵐ mapˣᵐ δ⁻¹ μᵀ
+
+    enrᴱᵀ-μᴱᵀ {A} {B} {τ} {τ'} =
+      begin
+           μᵀ {B} {τ} {τ'}
+        ∘ᵐ Tᶠ (uncurryᵐ (enrᴱᵀ {A} {B} {τ'}))
+        ∘ᵐ uncurryᵐ enrᴱᵀ ∘ᵐ mapˣᵐ ([ τ ]ᶠ (curryᵐ idᵐ)) idᵐ
+      ≡⟨ {!!} ⟩
+           uncurryᵐ enrᴱᵀ
+        ∘ᵐ mapˣᵐ δ⁻¹ μᵀ
+      ∎
+
+
+{-
+
+    enrᴱᵀ : ∀ {A B τ} → [ τ ]ᵒ (A ⇒ᵐ B) →ᵐ Tᵒ A τ ⇒ᵐ Tᵒ B τ
+    enrᴱᵀ {A} {B} {τ} =
+      curryᵐ (   Tᶠ (uncurryᵐ idᵐ)
+              ∘ᵐ strᵀ)
+
+-}
