@@ -82,11 +82,6 @@ mutual
              -------------------------
              → Γ ⊢V⦂ lam M == lam N
 
-    box-cong : ∀ {A τ}
-             → {V W : Γ ⟨ τ ⟩ ⊢V⦂ A}
-             → Γ ⟨ τ ⟩ ⊢V⦂ V == W
-             -----------------------
-             → Γ ⊢V⦂ box V == box W
 
     -- eta equations
 
@@ -214,6 +209,14 @@ mutual
                → Γ ∷ A ⊢C⦂ M == N
                ----------------------------------
                → Γ ⊢C⦂ unbox p V M == unbox q W N
+
+    box-cong : ∀ {A B τ τ'}
+             → {V W : Γ ⟨ τ ⟩ ⊢V⦂ A}
+             → {M N : Γ ∷ [ τ ] A ⊢C⦂ B ‼ τ' }
+             → Γ ⟨ τ ⟩ ⊢V⦂ V == W
+             → Γ ∷ [ τ ] A ⊢C⦂ M == N
+             --------------------------
+             → Γ ⊢C⦂ box V M == box W N
                     
     -- computational/beta-equations for sequential composition
 
@@ -320,33 +323,43 @@ mutual
                   ----------------------------------------------------------------
                   → Γ ⊢C⦂ handle return V `with H `in N
                       == (C-rename (cong-∷-ren ⟨⟩-η-ren) N [ Hd ↦ V ]c)
-
+                      
     handle-perform : ∀ {A B τ τ'}
-                   → (op : Op)
-                   → (V : Γ ⊢V⦂ type-of-gtype (param op))
+                    → (op : Op)
+                    → (V : Γ ⊢V⦂ type-of-gtype (param op))
                    → (M : Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ)
                    → (H : (op : Op) → (τ'' : Time) →
                             Γ ∷ type-of-gtype (param op)
                               ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
                             ⊢C⦂ B ‼ (op-time op + τ''))
                    → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
-                   ------------------------------------------------------------------------------------------
-                   → Γ ⊢C⦂ handle perform op V M `with H `in N
-                       == τ-subst
-                            (sym (+-assoc (op-time op) τ τ'))
-                            (H op (τ + τ')
-                              [ Tl-∷ Hd ↦ V ]c
-                              [ Hd ↦ box (lam (handle M
-                                               `with (λ op' τ'' →
-                                                       C-rename
-                                                         (cong-ren {Γ'' = [] ∷ _ ∷ [ _ ] (_ ⇒ _)} wk-ctx-ren)
-                                                         (H op' τ''))
-                                               `in (C-rename
-                                                     (cong-ren {Γ'' = [] ∷ A}
-                                                       (   cong-ren {Γ'' = [] ⟨ τ ⟩} wk-ren
-                                                        ∘ʳ ⟨⟩-μ-ren))
-                                                     N))) ]c)
+                   ----------------------------------------------------------------
+                   → Γ ⊢C⦂ handle perform op V M `with H `in N 
+                      == τ-subst ((sym (+-assoc (op-time op) τ τ'))) 
+                          ((H op (τ + τ') 
+                          [ Tl-∷ Hd ↦ V ]c) 
+                          [ Hd ↦  {!  !} ]c) 
 
+
+    --                ------------------------------------------------------------------------------------------
+    --                → Γ ⊢C⦂ handle perform op V M `with H `in N
+    --                    == τ-subst
+    --                         (sym (+-assoc (op-time op) τ τ'))
+    --                         (H op (τ + τ')
+    --                           [ Tl-∷ Hd ↦ V ]c
+    --                           [ Hd ↦ box (lam (handle M
+    --                                            `with (λ op' τ'' →
+    --                                                    C-rename
+    --                                                      (cong-ren {Γ'' = [] ∷ _ ∷ [ _ ] (_ ⇒ _)} wk-ctx-ren)
+    --                                                      (H op' τ''))
+    --                                            `in (C-rename
+    --                                                  (cong-ren {Γ'' = [] ∷ A}
+    --                                                    (   cong-ren {Γ'' = [] ⟨ τ ⟩} wk-ren
+    --                                                     ∘ʳ ⟨⟩-μ-ren))
+    --                                                  N))) ]c)
+
+
+    
     handle-delay : ∀ {A B τ τ' τ''}
                  → (M : Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ')
                  → (H : (op : Op) → (τ''' : Time) →
@@ -367,27 +380,28 @@ mutual
                                     (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren)
                                     N)))
 
-    -- computational/beta equation for boxing-unboxing
 
-    unbox-beta : ∀ {A C τ}
-               → (p : τ ≤ ctx-time Γ)
-               → (V : (Γ -ᶜ τ) ⟨ τ ⟩ ⊢V⦂ A)
-               → (N : Γ ∷ A ⊢C⦂ C)
-               -----------------------------------------------
-               → Γ ⊢C⦂ unbox p (box V) N
-                   == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ p) V ]c)
+    -- -- computational/beta equation for boxing-unboxing
 
-    -- eta equation for boxing-unboxing
+    -- unbox-beta : ∀ {A C τ}
+    --            → (p : τ ≤ ctx-time Γ)
+    --            → (V : (Γ -ᶜ τ) ⟨ τ ⟩ ⊢V⦂ A)
+    --            → (N : Γ ∷ A ⊢C⦂ C)
+    --            -----------------------------------------------
+    --            → Γ ⊢C⦂ unbox p (box V) N
+    --                == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ p) V ]c)
 
-    unbox-eta : ∀ {A C τ}
-              → (p : τ ≤ ctx-time Γ)
-              → (V : Γ -ᶜ τ ⊢V⦂ [ τ ] A)
-              → (M : Γ ∷ [ τ ] A ⊢C⦂ C)
-              --------------------------------------------
-              → Γ ⊢C⦂ M [ Hd ↦ V-rename (-ᶜ-wk-ren τ) V ]c
-                  == unbox p V (
-                       (C-rename (exch-ren ∘ʳ wk-ren) M)
-                          [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c)   
+    -- -- eta equation for boxing-unboxing
+
+    -- unbox-eta : ∀ {A C τ}
+    --           → (p : τ ≤ ctx-time Γ)
+    --           → (V : Γ -ᶜ τ ⊢V⦂ [ τ ] A)
+    --           → (M : Γ ∷ [ τ ] A ⊢C⦂ C)
+    --           --------------------------------------------
+    --           → Γ ⊢C⦂ M [ Hd ↦ V-rename (-ᶜ-wk-ren τ) V ]c
+    --               == unbox p V (
+    --                    (C-rename (exch-ren ∘ʳ wk-ren) M)
+    --                       [ Hd ↦ box (var (Tl-⟨⟩ Hd)) ]c)   
 
     {-
     -- NOTE: potential extension of the equational theory 

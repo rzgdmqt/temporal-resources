@@ -109,7 +109,6 @@ mutual
   ⦉ V₁ , V₂ ⦊ [ x ↦ W ]v = ⦉ V₁ [ x ↦ W ]v , V₂ [ x ↦ W ]v ⦊
   ⋆          [ x ↦ W ]v = ⋆
   lam M      [ x ↦ W ]v = lam (M [ Tl-∷ x ↦ W ]c)
-  box V      [ x ↦ W ]v = box (V [ Tl-⟨⟩ x ↦ W ]v)
 
   _[_↦_]c : ∀ {Γ A C τ}
           → Γ ⊢C⦂ C
@@ -153,3 +152,6 @@ mutual
       (≤-trans s (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))))))
       (V-rename (eq-ren (var-not-in-ctx-after-ᶜ x (≰⇒> ¬p))) V)
       (M [ Tl-∷ x ↦ W ]c)
+  
+  box V M [ x ↦ W ]c  = 
+    box (V [ Tl-⟨⟩ x ↦ W ]v) (M [ Tl-∷ x ↦ W ]c)

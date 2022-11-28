@@ -332,7 +332,6 @@ mutual
   V-rename ρ ⋆          = ⋆
   V-rename ρ (⦉ V , W ⦊) = ⦉ V-rename ρ V , V-rename ρ W ⦊
   V-rename ρ (lam M)    = lam (C-rename (cong-ren ρ) M)
-  V-rename ρ (box V)    = box (V-rename (cong-ren ρ) V)
 
   C-rename : ∀ {Γ Γ' C}
            → Ren Γ Γ'
@@ -353,3 +352,4 @@ mutual
     `in (C-rename (cong-ren ρ) N)
   C-rename ρ (unbox {τ = τ} p V M) =
     unbox (≤-trans p (ren-≤-ctx-time ρ)) (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
+  C-rename ρ (box V M)         = box (V-rename (cong-ren ρ) V) (C-rename (cong-ren ρ) M)

@@ -57,13 +57,6 @@ mutual
             -------------
             → Γ ⊢V⦂ A ⇒ C
 
-    -- boxing up a value/resource that is ready for use in at least `τ` time steps
-
-    box     : {A : VType}
-            → {τ : Time}
-            → Γ ⟨ τ ⟩ ⊢V⦂ A
-            ---------------
-            → Γ ⊢V⦂ [ τ ] A
 
   data _⊢C⦂_ (Γ : Ctx) : CType → Set where
 
@@ -151,3 +144,12 @@ mutual
             → Γ ∷ A  ⊢C⦂ C
             --------------------
             → Γ ⊢C⦂ C
+
+    -- boxing up a value/resource that is ready for use in at least `τ` time steps
+
+    box     : {A B : VType}
+            → {τ τ' : Time}
+            → Γ ⟨ τ ⟩ ⊢V⦂ A
+            → Γ ∷ [ τ ] A ⊢C⦂ B ‼ τ'
+            --------------------
+            → Γ ⊢C⦂ B ‼ τ'
