@@ -13,6 +13,15 @@ open import Syntax.Renamings
 open import Relation.Binary.PropositionalEquality as Eq
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)
 
+τ-subst⟨⟩ : ∀ {Γ A B τ τ' τ''}
+        → τ ≡ τ'
+        → Γ ⟨ τ ⟩ ∷ B ⊢C⦂ A ‼ τ''
+        --------------------------
+        → Γ ⟨ τ' ⟩ ∷ B ⊢C⦂ A ‼ τ''
+
+τ-subst⟨⟩ refl M = M
+
+
 a+b∸a≡b : ∀ {a b} → {p : a ≤ b} → a + (b ∸ a) ≡ b 
 a+b∸a≡b {a} {b} {p} = 
     begin 
@@ -57,8 +66,7 @@ data _↝_ : {C D : CType} → Triple C → Triple D → Set where
             ⟨ τ , S , M ; N ⟩ ↝ 
             ⟨ τ + τ' , 
             _⟨_⟩ₘ {τ = τ + τ'} S  τ' {refl} , 
-            -- M' ; C-rename (cong-∷-ren (⟨⟩-μ-ren {Γ = toCtx S} {τ = τ'} {τ' = τ'' ∸ τ'})) {!   !} ⟩
-            M' ; ( C-rename (cong-∷-ren ( {!   !} )) N)  ⟩ 
+            M' ; ( C-rename (cong-∷-ren ( ⟨⟩-μ-ren )) (τ-subst⟨⟩ (sym (a+b∸a≡b {τ'} {τ''} {p})) N))  ⟩ 
 
     SEQ_RET : {τ τ' : Time} → 
             {A B : VType} → {S : 𝕊 τ} → 
