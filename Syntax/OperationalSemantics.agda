@@ -21,6 +21,10 @@ open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)
 
 τ-subst⟨⟩ refl M = M
 
+-- this needs to be reconsidered
+resource-use : ∀ {Γ τ A} → (M : Γ ⊢V⦂ [_]_ τ A) → Γ ⟨ τ ⟩ ⊢V⦂ A
+resource-use {A = A} M =  {!   !}
+
 
 a+b∸a≡b : ∀ {a b} → {p : a ≤ b} → a + (b ∸ a) ≡ b 
 a+b∸a≡b {a} {b} {p} = 
@@ -35,7 +39,7 @@ mutual
     data 𝕊 (τ : Time) : Set where
         ∅ : 𝕊 τ
         _⟨_⟩ₘ : {τ' : Time} → 𝕊 τ' → (τ'' : Time) → {τ' + τ'' ≡ τ} → 𝕊 τ 
-        _∷ₘ_ : {A : VType} → (S : 𝕊 τ) → (toCtx S) ∷ A ⊢V⦂ A → 𝕊 τ -- is this ok? 
+        _∷ₘ_ : {A : VType} → (S : 𝕊 τ) → (toCtx S) ∷ A ⊢V⦂ A → 𝕊 τ
 
     toCtx : {τ : Time} → 𝕊 τ → Ctx
     toCtx {τ = τ} ∅  = [] ⟨ τ ⟩
@@ -52,10 +56,18 @@ record Triple (A : CType) : Set where
 
 data _↝_ :  {C D : CType} → Triple C → Triple D → Set where
     
-    APP :   {A : VType} {B : CType} {τ : Time} 
-            {S : 𝕊 τ} {M : ((toCtx S) ∷ A) ⊢C⦂ B} {V : (toCtx S) ⊢V⦂ A} →
+    APP :   {A : VType} {B : VType} {τ τ' : Time} 
+            {S : 𝕊 τ} → {M : ((toCtx S) ∷ A) ⊢C⦂ B ‼ τ'} → {V : (toCtx S) ⊢V⦂ A} →
             -------------------------------------------------------------
             ⟨ τ , S , lam M · V ⟩ ↝ ⟨ τ , S , M [ Hd ↦ V ]c ⟩
+
+    MATCH : {τ : Time} {S : 𝕊 τ} {A B : VType} {C : CType} → 
+            {V : toCtx S ⊢V⦂ A } →
+            {W : toCtx S ⊢V⦂ B } → 
+            {M : toCtx S ∷ A ∷ B ⊢C⦂ C} → 
+            -------------------------------------------------------
+            ⟨ τ , S , match ⦉ V , W ⦊ `in M ⟩ ↝ 
+            ⟨ τ , S , (M [ Hd ↦ V-rename wk-ren W ]c) [ Hd ↦ V ]c ⟩
     
     SEQ_FST : {τ τ' τ'' τ''' : Time} → {p : τ' ≤ τ''} → 
             {A B : VType} → {S : 𝕊 τ} → 
@@ -66,7 +78,11 @@ data _↝_ :  {C D : CType} → Triple C → Triple D → Set where
             --------------------------------------------------------------------
             ⟨ τ , S , M ; N ⟩ ↝ 
             ⟨ τ + τ' , _⟨_⟩ₘ {τ = τ + τ'} S  τ' {refl} , 
-            M' ; ( C-rename (cong-∷-ren ( ⟨⟩-μ-ren )) (τ-subst⟨⟩ (sym (a+b∸a≡b {τ'} {τ''} {p})) N)) ⟩ 
+            M' ; ( 
+                C-rename 
+                    (cong-∷-ren ( ⟨⟩-μ-ren )) 
+                    (τ-subst⟨⟩ (sym (a+b∸a≡b {τ'} {τ''} {p})) N)
+                ) ⟩ 
 
     SEQ_RET : {τ τ' : Time} → 
             {A B : VType} → {S : 𝕊 τ} → 
@@ -92,40 +108,59 @@ data _↝_ :  {C D : CType} → Triple C → Triple D → Set where
             {p : τ' ≤ ctx-time (toCtx S)} → 
             {V : (toCtx S -ᶜ τ' ⊢V⦂ [_]_ τ' A)} → 
             {M : toCtx S ∷ A ⊢C⦂ C } → 
-            -----------------------------------------------------------------------
-            ⟨ τ , S , unbox p V M ⟩ ↝ ⟨ τ , S , M  [ {!  Hd !} ↦ V ]c ⟩
+            ---------------------------------------------------------------------------------------------
+            ⟨ τ , S , unbox p V M ⟩ ↝ ⟨ τ , S , M  [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ' p) (resource-use V) ]c ⟩
 
--- should we add absurd constructor and op?
+
 data progresses : {τ τ' : Time} → 
                 {S : 𝕊 τ} {A : VType} → 
                 (M : toCtx S ⊢C⦂ A ‼ τ') →  Set where
+                
     is-value : {τ : Time} {S : 𝕊 τ} {A : VType} → 
             {V : toCtx S ⊢V⦂ A} →
             ---------------------
             progresses (return V) 
-    steps : {τ τ' τ'' : Time} → {τ ≤ τ'} → 
+
+    -- steps : {τ τ' τ'' : Time} → {τ ≤ τ'} → 
+    --         {S : 𝕊 τ} {S' : 𝕊 τ'} {A : VType} → 
+    --         {M : toCtx S ⊢C⦂ A ‼ τ''} →
+    --         {M' : toCtx S' ⊢C⦂  A ‼ (τ'' ∸ (τ' ∸ τ)) } → 
+    --         ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ →
+    --         ----------------------------------
+    --         progresses M 
+
+    steps : {τ τ' τ'' τ''' : Time} → {q : τ ≤ τ'} → 
             {S : 𝕊 τ} {S' : 𝕊 τ'} {A : VType} → 
             {M : toCtx S ⊢C⦂ A ‼ τ''} →
-            {M' : toCtx S' ⊢C⦂  A ‼ (τ'' ∸ (τ' ∸ τ)) } → 
+            {M' : toCtx S' ⊢C⦂  A ‼ τ''' } → 
+            {p : τ + τ'' ≡ τ' + τ'''} → 
             ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ →
-            ------------
+            ----------------------------------
             progresses M 
+
+τ≡τ∸τ'+τ' : ∀ τ τ' → τ ∸ (τ' ∸ τ') ≡ τ
+τ≡τ∸τ'+τ' τ τ' = 
+    begin 
+        τ ∸ (τ' ∸ τ') ≡⟨ cong (τ ∸_) (n∸n≡0 τ') ⟩  
+        τ ∸ 0 ≡⟨ refl ⟩ 
+        τ
+    ∎
 
 
 progress : {τ τ' : Time} {S : 𝕊 τ} {A : VType} → (M : toCtx S ⊢C⦂ A ‼ τ') → progresses M 
 progress (return V) = is-value
-progress (M ; N) with progress M -- maybe special case for operation performing? 
-... | is-value = steps {! SEQ_RET  !}
-... | steps M↝M' = steps {! SEQ_FST  !}  
-progress (lam V · N) = steps {! APP !}
+progress (M ; N) with progress M
+... | is-value = steps {q = ≤-refl} {p = refl } SEQ_RET
+... | steps M↝M' = steps {!   !}  
+progress {τ} {τ'} {S} (lam M · V) = steps {q = ≤-refl} {p = refl} APP
 progress (var V · N) = {!   !} -- this shouldn't be the case
-progress (delay τ M ) = steps {! DELAY  !}
+progress {τ} {τ'} (delay {τ' = τ₁} τ₂ M ) = steps {q = ≤-stepsʳ τ₂ ≤-refl } {p = sym (+-assoc τ τ₂ τ₁)} DELAY
 progress (match var V `in M) = {!   !} -- this shouldn't be the case
-progress (match ⦉ V₁ , V₂ ⦊ `in M) = {!   !}
+progress (match ⦉ V , W ⦊ `in M) = steps {q = ≤-refl } {p = refl} MATCH
 progress (absurd V) = {!   !}
 progress (perform op V M) = {!   !}
 progress (handle M `with H `in N) with progress M 
-... | is-value = {! HANDLE_RET  !}
+... | is-value = {! !}
 ... | steps M↝M' = {!   !}
-progress (unbox τ≤ctx-time V M) = steps {!  UNBOX !}
-progress (box V M) = steps {!  BOX !}
+progress (unbox τ≤ctx-time V M) = steps {q = ≤-refl } {p = refl} UNBOX
+progress (box V M) = steps {q = ≤-refl } {p = refl} BOX
