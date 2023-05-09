@@ -43,11 +43,18 @@ mutual
     toCtx : {τ : Time} → 𝕊 τ → Ctx
     toCtx ∅ = []
     toCtx (S ⟨ τ'' ⟩ₘ) = (toCtx S) ⟨ τ'' ⟩
-    toCtx (_∷ₘ[_]_ {A = A₁} S τ' A) = (toCtx S) ∷ [_]_ τ' A₁
+    toCtx (_∷ₘ[_]_ {A = A₁} S τ' A) = (toCtx S) ∷ [ τ' ] A₁
 
 -- subst transport resp (HOTT)
 τ-subst-state : ∀ {τ τ'} → (p : τ ≡ τ') → (S : 𝕊 τ) → 𝕊 τ'
 τ-subst-state refl S = S 
+
+τ-subst-ren : ∀ {τ τ' Γ} → τ ≡ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ ⟩) → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
+τ-subst-ren refl ρ = ρ 
+
+m≡n⇒m≤n : ∀ {m n} → m ≡ n → m ≤ n
+m≡n⇒m≤n {zero} {n} p = z≤n
+m≡n⇒m≤n {suc m} {suc n} p = s≤s (m≡n⇒m≤n (suc-injective p))
 
 time-pass : ∀ {τ} → (S : 𝕊 τ) → (τ' : Time) → 𝕊 (τ + τ')
 time-pass S τ = S ⟨ τ ⟩ₘ 
@@ -61,15 +68,15 @@ extend-state S τ' V = S ∷ₘ[ τ' ] V
 --                 toCtx S ⊢V⦂ A
 -- resource-use {τ} {τ'} {τ''} {A} S p q = {!   !}
 
-
 resource-use : ∀ {τ τ' A} → (S : 𝕊 τ) → 
-                (p : τ' ≤ ctx-time (toCtx S)) → 
-                (V : toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A) →  
+                (p : τ' ≤ ctx-time (toCtx S)) →
+                (V : toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A) →
                 toCtx S ⊢V⦂ A
-resource-use {A} S p V with toCtx S 
+resource-use S p V with toCtx S 
 ... | [] = ⊥-elim {!   !}
-... | Γ ∷ hd = {!   !}
-... | Γ ⟨ τ ⟩ = {!   !}
+... | Γ ∷ x = {!   !}
+... | Γ ⟨ x ⟩ = {!   !}
+
 
 record Config (C : CType) : Set where
     constructor ⟨_,_,_⟩
@@ -103,7 +110,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {N : ((toCtx S) ⟨ τ₂ ⟩ ∷ A) ⊢C⦂ B ‼ τ₃} → 
             {M' : toCtx S ⟨ τ₁ ⟩ ⊢C⦂ A ‼ τ₄} →
             (q : τ₂ ≡ τ₁ + τ₄) → 
-            ⟨ τ , S , M ⟩ ↝ ⟨ τ + τ₁ , S ⟨ τ₁ ⟩ₘ  , M' ⟩ → 
+            ⟨ τ , S , M ⟩ ↝ ⟨ τ + τ₁ , time-pass S τ₁ , M' ⟩ → -- i should probably change state too, since step of M might change it
             --------------------------------------------------------------------
             ⟨ τ , S , M ; N ⟩ ↝ 
             ⟨ τ + τ₁ , time-pass S τ₁ , M' ; 
@@ -120,8 +127,54 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {S : 𝕊 τ} →
             {A : VType} →  
             {M : toCtx S ⟨ τ' ⟩ ⊢C⦂ A ‼ τ''} → 
-            -------------------------------------------------------------------------------------
+            ---------------------------------------------------------------------
             ⟨ τ , S , (delay {τ' = τ''} τ' M) ⟩ ↝ ⟨ τ + τ' , time-pass S τ' , M ⟩
+
+    PERFORM : {τ τ₁ : Time} → 
+            {S : 𝕊 τ} →
+            {A : VType} → 
+            {op : Op} → 
+            {V : toCtx S ⊢V⦂ type-of-gtype (param op)} → 
+            {M : (toCtx S) ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ} → 
+            ----------------------------------------------------------------------------------
+            ⟨ τ , S , perform op V M ⟩ ↝ 
+            ⟨ τ + (op-time op) , time-pass S ((op-time op)) , {!   !} [ {!  !} ↦ {!   !} ]c ⟩
+
+    HANDLE-RET : {τ τ' : Time} →
+            {S : 𝕊 τ} → 
+            {A B : VType} → 
+            {V : toCtx S ⊢V⦂ A} →
+            {H : (op : Op) → (τ'' : Time) →
+                toCtx S ∷ type-of-gtype (param op)
+                  ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
+                ⊢C⦂ B ‼ (op-time op + τ'')} → 
+            {N : toCtx S ⟨ 0 ⟩ ∷ A ⊢C⦂ B ‼ τ'} → 
+            --------------------------------------------------------------------------
+            ⟨ τ , S , handle return V `with H `in N ⟩ ↝ 
+            ⟨ τ , S , (C-rename (cong-∷-ren ⟨⟩-η-ren) N) [ Hd ↦ V ]c ⟩ 
+
+    HANDLE-STEP : {A B : VType} →
+            {τ τ₁ τ₂ τ₄ τ₅ τ₆ : Time} → 
+            {S : 𝕊 τ} → 
+            {M : toCtx S ⊢C⦂ A ‼ τ₄} → 
+            {H : (op : Op) → 
+                 (τ₃ : Time) →
+                 toCtx S ∷ type-of-gtype (param op)
+                   ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ₃)
+                 ⊢C⦂ B ‼ (op-time op + τ₃)} → 
+            {N : toCtx S ⟨ τ₄ ⟩ ∷ A ⊢C⦂ B ‼ τ₁} → 
+            {M' : toCtx S ⟨ τ₅ ⟩  ⊢C⦂ A ‼ τ₆ } →  
+            (q : τ₄ ≡ τ₅ + τ₆) → 
+            ⟨ τ , S , M ⟩ ↝ ⟨ τ + τ₅ , time-pass S τ₅ , M' ⟩ → 
+            -----------------------------------------------------------------------
+            ⟨ τ , S , handle M `with H `in N ⟩ ↝ 
+            ⟨ τ + τ₅ , time-pass S τ₅ , 
+                    handle M' 
+                    `with 
+                        (λ op τ'' → C-rename (cong-∷-ren (cong-∷-ren wk-⟨⟩-ren)) (H op τ'')) 
+                    `in (C-rename (cong-∷-ren (⟨⟩-μ-ren ∘ʳ τ-subst-ren q id-ren)) N) ⟩
+    
+    -- TODO: HANDLE-PERFORM
 
     BOX :   {τ τ' τ'' : Time} → {S : 𝕊 τ} → {A B : VType} → 
             {V : toCtx S ⟨ τ' ⟩ ⊢V⦂ A} →  
@@ -206,11 +259,11 @@ progress {τ} {τ'} (delay {τ' = τ₁} τ₂ M ) = steps (≤-stepsʳ τ₂ �
 progress (match ⦉ V , W ⦊ `in M) = steps ≤-refl refl MATCH
 progress (perform op V M) = {!   !}
 progress (handle M `with H `in N) with progress M 
-... | is-value = {! !}
+... | is-value = steps ≤-refl refl HANDLE-RET
 ... | steps p q M↝M' = {!   !}
 progress (unbox τ≤ctx-time V M) = steps ≤-refl refl (UNBOX τ≤ctx-time)
 progress (box V M) = steps ≤-refl refl BOX
 progress (absurd (var V)) = ⊥-elim (Empty-not-in-ctx V)
 progress (var V · N) = ⊥-elim (⇒-not-in-ctx V)
 progress (match var V `in M) = ⊥-elim (⦉⦊-not-in-ctx V)
- 
+  
