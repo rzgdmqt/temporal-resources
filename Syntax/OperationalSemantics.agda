@@ -115,6 +115,18 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             ⟨ τ , S , M ; N ⟩ ↝ 
             ⟨ τ + τ₁ , time-pass S τ₁ , M' ; 
                 C-rename (cong-∷-ren ⟨⟩-μ-ren) (τ-subst⟨⟩ q N) ⟩ 
+    
+    SEQ-FST-TEST : {τ τ₁ τ₂ τ₃ τ₄ τ₅ τ₆ : Time} → (p : τ₁ ≤ τ₂) → (r : τ ≤ τ₆) → 
+            {A B : VType} → {S : 𝕊 τ} → {S₁ : 𝕊 τ₆} → 
+            {M : toCtx S ⊢C⦂ A ‼ τ₂} → 
+            {N : ((toCtx S) ⟨ τ₂ ⟩ ∷ A) ⊢C⦂ B ‼ τ₃} → 
+            {M' : toCtx S₁ ⊢C⦂ A ‼ τ₄} →
+            (q : τ₂ + τ ≡ τ₆ + τ₄) → 
+            (s : ) → 
+            ⟨ τ , S , M ⟩ ↝ ⟨ τ₆ , S₁ , M' ⟩ → -- i should probably change state too, since step of M might change it
+            --------------------------------------------------------------------
+            ⟨ τ , S , M ; N ⟩ ↝ 
+            ⟨ τ₆ , S₁ , M' ; (C-rename (cong-∷-ren {!   !}) N) ⟩ 
 
     SEQ-RET : {τ τ' : Time} → 
             {A B : VType} → {S : 𝕊 τ} → 
@@ -138,7 +150,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {M : (toCtx S) ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ} → 
             ----------------------------------------------------------------------------------
             ⟨ τ , S , perform op V M ⟩ ↝ 
-            ⟨ τ + (op-time op) , time-pass S ((op-time op)) , {!   !} [ {!  !} ↦ {!   !} ]c ⟩
+            ⟨ τ + (op-time op) , time-pass S ((op-time op)) , M [ Hd ↦ V-rename wk-⟨⟩-ren {!  V !} ]c ⟩
 
     HANDLE-RET : {τ τ' : Time} →
             {S : 𝕊 τ} → 
@@ -211,6 +223,7 @@ data progresses : {τ' τ : Time} →
             ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ →
             ----------------------------------
             progresses M 
+    -- i need to add Op here
 
 τ≡τ∸τ'+τ' : ∀ τ τ' → τ ∸ (τ' ∸ τ') ≡ τ
 τ≡τ∸τ'+τ' τ τ' = 
@@ -257,10 +270,10 @@ progress {τ} {τ'} (M ; N) with progress M
 progress {τ} {τ'} {S} (lam M · V) = steps ≤-refl refl APP
 progress {τ} {τ'} (delay {τ' = τ₁} τ₂ M ) = steps (≤-stepsʳ τ₂ ≤-refl) (sym (+-assoc τ τ₂ τ₁)) DELAY
 progress (match ⦉ V , W ⦊ `in M) = steps ≤-refl refl MATCH
-progress (perform op V M) = {!   !}
+progress (perform op V M) = steps {!   !} {!   !} {!  !}
 progress (handle M `with H `in N) with progress M 
 ... | is-value = steps ≤-refl refl HANDLE-RET
-... | steps p q M↝M' = {!   !}
+... | steps p q M↝M' = steps {!   !} {!   !} (HANDLE-STEP {!   !} {!   !})
 progress (unbox τ≤ctx-time V M) = steps ≤-refl refl (UNBOX τ≤ctx-time)
 progress (box V M) = steps ≤-refl refl BOX
 progress (absurd (var V)) = ⊥-elim (Empty-not-in-ctx V)
