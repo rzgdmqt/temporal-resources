@@ -353,3 +353,7 @@ mutual
   C-rename ρ (unbox {τ = τ} p V M) =
     unbox (≤-trans p (ren-≤-ctx-time ρ)) (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
   C-rename ρ (box V M)         = box (V-rename (cong-ren ρ) V) (C-rename (cong-ren ρ) M)
+
+
+τ-subst-ren : ∀ {τ τ' Γ} → τ ≡ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ ⟩) → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
+τ-subst-ren refl ρ = ρ 
