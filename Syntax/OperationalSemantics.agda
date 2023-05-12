@@ -54,6 +54,16 @@ a+b∸a≡b {a} {b} {p} =
         τ
     ∎
 
+handle-step-time-eq : ∀ τ τ₁ τ' τ'' τ''' → (q : τ + τ₁ ≡ τ'' + τ''') → τ + (τ₁ + τ') ≡ τ'' + (τ''' + τ')
+handle-step-time-eq τ τ₁ τ' τ'' τ''' q = 
+    begin 
+        τ + (τ₁ + τ') ≡⟨ sym (+-assoc τ τ₁ τ') ⟩
+        (τ + τ₁) + τ' ≡⟨ cong (_+ τ') q ⟩
+        (τ'' + τ''') + τ' ≡⟨ +-assoc τ'' τ''' τ' ⟩
+        τ'' + (τ''' + τ')
+    ∎
+
+
 lemma : ∀ τ τ' τ₁ → τ ≤ τ₁ → τ + τ + (τ₁ ∸ τ + τ') ≡ τ + (τ₁ + τ')
 lemma τ τ' τ₁ p = 
     begin 
@@ -100,7 +110,7 @@ resource-use : ∀ {τ τ' A} → (S : 𝕊 τ) →
                 (p : τ' ≤ ctx-time (toCtx S)) →
                 (V : toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A) →
                 toCtx S ⊢V⦂ A
-resource-use {τ = τ} ∅ p (var x) = ⊥-elim (not-in-empty-ctx {τ = τ} {! !})
+resource-use {τ = .0} ∅ p V = {!   !} 
 resource-use (S ⟨ τ'' ⟩ₘ) p V = {!   !}
 resource-use {τ} {τ'} (S ∷ₘ[ τ'' ] x) p V =  {!   !} [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ' p ∘ʳ wk-⟨⟩-ren {τ = τ'}) V ]v
 
@@ -232,25 +242,25 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             ---------------------------------------------------------------------------------------------
             ⟨ τ , S , unbox p V M ⟩ ↝ ⟨ τ , S , M [ Hd ↦ resource-use S p V ]c ⟩
 
--- here i need to gather all the options of sucState
+
 possibleStates : {τ τ' τ'' τ''' : Time} → 
-                {τ≤τ' : τ ≤ τ'} → 
                 {S : 𝕊 τ} → {S' : 𝕊 τ'} → 
-                {A B : VType} → 
+                {A : VType} → 
                 {M : toCtx S ⊢C⦂ A ‼ τ''} → 
                 {M' : toCtx S' ⊢C⦂ A ‼ τ'''} → 
+                (τ≤τ' : τ ≤ τ') → 
                 (M↝M' : ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ ) → 
                 SucState S S'
-possibleStates APP = id-suc
-possibleStates MATCH = id-suc
-possibleStates SEQ-RET = id-suc
-possibleStates SEQ-OP = id-suc
-possibleStates DELAY = ⟨⟩-suc ≤-refl _ id-suc
-possibleStates HANDLE-RET = id-suc
-possibleStates BOX = ∷-suc ≤-refl _ _ id-suc
-possibleStates (UNBOX p) = id-suc 
-possibleStates (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = possibleStates M↝M' -- implicit args specify
-possibleStates (HANDLE-STEP τ≤τ₇ τ+τ₄≡τ₇+τ₆ sucState₁ sucState₂ M↝M') = possibleStates M↝M' -- implicit args specify
+possibleStates q APP = id-suc
+possibleStates q MATCH = id-suc
+possibleStates q SEQ-RET = id-suc
+possibleStates q SEQ-OP = id-suc
+possibleStates q HANDLE-RET = id-suc
+possibleStates q (UNBOX p) = id-suc 
+possibleStates q DELAY = ⟨⟩-suc ≤-refl _ id-suc
+possibleStates q BOX = ∷-suc ≤-refl _ _ id-suc
+possibleStates q (SEQ-FST {M = M} {M' = M'} τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = possibleStates τ≤τ₁  M↝M'
+possibleStates q (HANDLE-STEP {M = M} {M' = M'} τ≤τ₇ τ+τ₄≡τ₇+τ₆ sucState₁ sucState₂ M↝M') = possibleStates τ≤τ₇ M↝M'
 
 
 data progresses : {τ' τ : Time} → 
@@ -286,10 +296,10 @@ data progresses : {τ' τ : Time} →
 
 progress : {τ τ' : Time} {S : 𝕊 τ} {A : VType} → (M : toCtx S ⊢C⦂ A ‼ τ') → progresses M 
 progress (return V) = is-value
-progress {τ} {τ'} (M ; N) with progress M
+progress {τ} {τ'} {S = S} {A = A} (M ; N) with progress M
 ... | is-value = steps ≤-refl refl SEQ-RET 
-... | is-op = steps {!   !} {!   !} {!   !}
-... | steps {τ} {τ'} {τ''} {τ'''} p q M↝M' = steps p {!   !} (SEQ-FST q p {!  !} M↝M')
+... | is-op = steps ≤-refl refl (SEQ-OP {S = S})
+... | steps p {S = S} {S' = S'} q M↝M' = {!   !}
 progress {τ} {τ'} {S} (lam M · V) = steps ≤-refl refl APP
 progress {τ} {τ'} (delay {τ' = τ₁} τ₂ M ) = steps (≤-stepsʳ τ₂ ≤-refl) (sym (+-assoc τ τ₂ τ₁)) DELAY
 progress (match ⦉ V , W ⦊ `in M) = steps ≤-refl refl MATCH
@@ -297,10 +307,9 @@ progress (perform op V M) = is-op
 progress (handle M `with H `in N) with progress M 
 ... | is-value = steps ≤-refl refl HANDLE-RET
 ... | is-op = {!   !}
-... | steps p q M↝M' = steps p {!   !} (HANDLE-STEP p q {!   !} {!   !} M↝M')
+... | steps p q M↝M' = {!   !}
 progress (unbox τ≤ctx-time V M) = steps ≤-refl refl (UNBOX τ≤ctx-time)
 progress (box V M) = steps ≤-refl refl BOX
 progress (absurd (var V)) = ⊥-elim (Empty-not-in-ctx V)
 progress (var V · N) = ⊥-elim (⇒-not-in-ctx V)
 progress (match var V `in M) = ⊥-elim (⦉⦊-not-in-ctx V)
-  
