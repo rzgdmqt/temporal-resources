@@ -23,18 +23,18 @@ mutual
     toCtx (_∷ₘ[_]_ {A = A₁} S τ' A) = (toCtx S) ∷ [ τ' ] A₁
 
 -- Relation that tells that S' is a successor of S
-data SucState : {τ τ' : Time} → τ ≤ τ' → 𝕊 τ → 𝕊 τ' → Set where
-    id-suc : {τ : Time} → {S : 𝕊 τ} → SucState ≤-refl S S
+data SucState : {τ τ' : Time} → 𝕊 τ → 𝕊 τ' → Set where
+    id-suc : {τ : Time} → {S : 𝕊 τ} → SucState S S
     ⟨⟩-suc : {τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → (p : τ ≤ τ') → (τ'' : Time) → 
-        SucState p S S' → SucState (≤-stepsʳ τ'' p) S (S' ⟨ τ'' ⟩ₘ)
+        SucState S S' → SucState S (S' ⟨ τ'' ⟩ₘ)
     ∷-suc : {τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → {A : VType} → 
         (p : τ ≤ τ') → (τ'' : Time) → (V : (toCtx S') ⟨ τ'' ⟩ ⊢V⦂ A) → 
-        SucState p S S' → SucState p S (S' ∷ₘ[ τ'' ] V)
+        SucState S S' → SucState S (S' ∷ₘ[ τ'' ] V)
 
-SucState⇒Ren : {τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → (p : τ ≤ τ') → SucState p S S' → Ren (toCtx S) (toCtx S')
-SucState⇒Ren .≤-refl id-suc = id-ren
-SucState⇒Ren .(≤-stepsʳ τ'' p) (⟨⟩-suc p τ'' sucState) = wk-⟨⟩-ren ∘ʳ SucState⇒Ren p sucState
-SucState⇒Ren p (∷-suc .p τ'' V sucState) = wk-ren ∘ʳ SucState⇒Ren p sucState
+SucState⇒Ren : {τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → (p : τ ≤ τ') → SucState S S' → Ren (toCtx S) (toCtx S')
+SucState⇒Ren p id-suc = id-ren
+SucState⇒Ren p (⟨⟩-suc p₁ τ'' y) = wk-⟨⟩-ren ∘ʳ (SucState⇒Ren p₁ y)
+SucState⇒Ren p (∷-suc p₁ τ'' V y) = wk-ren ∘ʳ (SucState⇒Ren p₁ y)
 
 time-pass : ∀ {τ} → (S : 𝕊 τ) → (τ' : Time) → 𝕊 (τ + τ')
 time-pass S τ = S ⟨ τ ⟩ₘ 

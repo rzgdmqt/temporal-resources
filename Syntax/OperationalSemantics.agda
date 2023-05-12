@@ -29,6 +29,14 @@ open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)
 
 τ-subst⟨⟩ refl M = M
 
+τ-subst : ∀ {Γ A τ τ'}
+        → τ ≡ τ'
+        → Γ ⊢C⦂ A ‼ τ
+        ---------------
+        → Γ ⊢C⦂ A ‼ τ'
+
+τ-subst refl M = M
+
 a+b∸a≡b : ∀ {a b} → {p : a ≤ b} → a + (b ∸ a) ≡ b 
 a+b∸a≡b {a} {b} {p} = 
     begin 
@@ -94,7 +102,7 @@ resource-use : ∀ {τ τ' A} → (S : 𝕊 τ) →
                 toCtx S ⊢V⦂ A
 resource-use {τ = τ} ∅ p (var x) = ⊥-elim (not-in-empty-ctx {τ = τ} {! !})
 resource-use (S ⟨ τ'' ⟩ₘ) p V = {!   !}
-resource-use (S ∷ₘ[ τ' ] x) p V = {!  !}
+resource-use {τ} {τ'} (S ∷ₘ[ τ'' ] x) p V =  {!   !} [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ' p ∘ʳ wk-⟨⟩-ren {τ = τ'}) V ]v
 
 
 data _↝_ :  {C D : CType} → Config C → Config D → Set where
@@ -119,7 +127,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {M' : toCtx S₁ ⊢C⦂ A ‼ τ₄} →
             (τ+τ₂≡τ₁+τ₄ : τ + τ₂ ≡ τ₁ + τ₄) →  
             (τ≤τ₁ : τ ≤ τ₁) → 
-            (sucState : SucState (m≡n⇒m≤n τ+τ₂≡τ₁+τ₄) (S ⟨ τ₂ ⟩ₘ) (S₁ ⟨ τ₄ ⟩ₘ)) → 
+            (sucState : SucState (S ⟨ τ₂ ⟩ₘ) (S₁ ⟨ τ₄ ⟩ₘ)) → 
             ⟨ τ , S , M ⟩ ↝ ⟨ τ₁ , S₁ , M' ⟩ →
             --------------------------------------------------------------------
             ⟨ τ , S , M ; N ⟩ ↝ 
@@ -131,6 +139,22 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {N : ((toCtx S) ⟨ 0 ⟩ ∷ A) ⊢C⦂ B ‼ τ'} →  
             -----------------------------------------------------------------------------------
             ⟨ τ , S , return V ; N ⟩ ↝ ⟨ τ , S , C-rename (cong-∷-ren ⟨⟩-η-ren) N [ Hd ↦ V ]c ⟩
+    
+    SEQ-OP : {τ τ' τ'' : Time} → 
+            {S : 𝕊 τ''} → 
+            {op : Op} → 
+            {A B : VType} → {S : 𝕊 τ''} → 
+            {V : (toCtx S) ⊢V⦂ type-of-gtype (param op)} 
+            {M : toCtx S ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ} →  
+            {N : toCtx S ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ'} → 
+            -----------------------------------------------------------------------------------
+            ⟨ τ'' , S , perform op V M ; N  ⟩ ↝ ⟨ τ'' , S ,  τ-subst (sym (+-assoc (op-time op) τ τ'))
+                         (perform op V
+                            (M ;
+                             C-rename 
+                             (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} 
+                                wk-ren ∘ʳ cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren)
+                             N))  ⟩
     
     DELAY : {τ τ' τ'' : Time} → 
             {S : 𝕊 τ} →
@@ -166,8 +190,8 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {M' : toCtx S₁  ⊢C⦂ A ‼ τ₆ } →  
             (τ≤τ₇ : τ ≤ τ₇) → 
             (τ+τ₄≡τ₇+τ₆ : τ + τ₄ ≡ τ₇ + τ₆) → 
-            (sucState₁ : SucState τ≤τ₇ S S₁) → 
-            (sucState₂ : SucState (m≡n⇒m≤n τ+τ₄≡τ₇+τ₆) (S ⟨ τ₄ ⟩ₘ) (S₁ ⟨ τ₆ ⟩ₘ)) → 
+            (sucState₁ : SucState S S₁) → 
+            (sucState₂ : SucState (S ⟨ τ₄ ⟩ₘ) (S₁ ⟨ τ₆ ⟩ₘ)) → 
             ⟨ τ , S , M ⟩ ↝ ⟨ τ₇ , S₁ , M' ⟩ → 
             -----------------------------------------------------------------------
             ⟨ τ , S , handle M `with H `in N ⟩ ↝ 
@@ -176,7 +200,24 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
                             (λ op τ'' → C-rename (cong-∷-ren (cong-∷-ren (SucState⇒Ren τ≤τ₇ sucState₁))) (H op τ'')) 
                         `in (C-rename (cong-∷-ren (SucState⇒Ren (m≡n⇒m≤n τ+τ₄≡τ₇+τ₆) sucState₂)) N) ⟩
     
-    -- TODO: HANDLE-PERFORM
+    -- HANDLE-OP : {τ τ' τ'' : Time} →
+    --         {S : 𝕊 τ} → 
+    --         {op : Op} → 
+    --         {A B : VType} → 
+    --         {V : toCtx S ⊢V⦂ type-of-gtype (param op)} →
+    --         {M : toCtx S ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ''} →
+    --         {H : (op : Op) → (τ'' : Time) →
+    --             toCtx S ∷ type-of-gtype (param op)
+    --               ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
+    --             ⊢C⦂ B ‼ (op-time op + τ'')} → 
+    --         {N : toCtx S ⟨ op-time op + τ'' ⟩ ∷ A ⊢C⦂ B ‼ τ'} → 
+    --         --------------------------------------------------------------------------
+    --         ⟨ τ , S , handle perform op V M `with H `in N ⟩ ↝ 
+    --         ⟨ τ , S , 
+    --             (τ-subst (sym (+-assoc (op-time op) τ'' τ')) 
+    --             (H op (τ'' + τ')) 
+    --             [ Tl-∷ Hd ↦ V ]c) 
+    --             [ Hd ↦ {!   !} ]c ⟩
 
     BOX :   {τ τ' τ'' : Time} → {S : 𝕊 τ} → {A B : VType} → 
             {V : toCtx S ⟨ τ' ⟩ ⊢V⦂ A} →  
@@ -190,6 +231,26 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {M : toCtx S ∷ A ⊢C⦂ C } → 
             ---------------------------------------------------------------------------------------------
             ⟨ τ , S , unbox p V M ⟩ ↝ ⟨ τ , S , M [ Hd ↦ resource-use S p V ]c ⟩
+
+-- here i need to gather all the options of sucState
+possibleStates : {τ τ' τ'' τ''' : Time} → 
+                {τ≤τ' : τ ≤ τ'} → 
+                {S : 𝕊 τ} → {S' : 𝕊 τ'} → 
+                {A B : VType} → 
+                {M : toCtx S ⊢C⦂ A ‼ τ''} → 
+                {M' : toCtx S' ⊢C⦂ A ‼ τ'''} → 
+                (M↝M' : ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ ) → 
+                SucState S S'
+possibleStates APP = id-suc
+possibleStates MATCH = id-suc
+possibleStates SEQ-RET = id-suc
+possibleStates SEQ-OP = id-suc
+possibleStates DELAY = ⟨⟩-suc ≤-refl _ id-suc
+possibleStates HANDLE-RET = id-suc
+possibleStates BOX = ∷-suc ≤-refl _ _ id-suc
+possibleStates (UNBOX p) = id-suc 
+possibleStates (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = possibleStates M↝M' -- implicit args specify
+possibleStates (HANDLE-STEP τ≤τ₇ τ+τ₄≡τ₇+τ₆ sucState₁ sucState₂ M↝M') = possibleStates M↝M' -- implicit args specify
 
 
 data progresses : {τ' τ : Time} → 
@@ -227,7 +288,7 @@ progress : {τ τ' : Time} {S : 𝕊 τ} {A : VType} → (M : toCtx S ⊢C⦂ A 
 progress (return V) = is-value
 progress {τ} {τ'} (M ; N) with progress M
 ... | is-value = steps ≤-refl refl SEQ-RET 
-... | is-op = {!   !}
+... | is-op = steps {!   !} {!   !} {!   !}
 ... | steps {τ} {τ'} {τ''} {τ'''} p q M↝M' = steps p {!   !} (SEQ-FST q p {!  !} M↝M')
 progress {τ} {τ'} {S} (lam M · V) = steps ≤-refl refl APP
 progress {τ} {τ'} (delay {τ' = τ₁} τ₂ M ) = steps (≤-stepsʳ τ₂ ≤-refl) (sym (+-assoc τ τ₂ τ₁)) DELAY
