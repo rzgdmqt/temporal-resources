@@ -53,6 +53,13 @@ a+b∸a≡b {a} {b} {p} =
         τ
     ∎
 
+τ+⟨τ₁+τ₂+τ₃⟩≡τ+⟨τ₁+⟨τ₂+τ₃⟩⟩ : ∀ τ τ₁ τ₂ τ₃ → τ + (τ₁ + τ₂ + τ₃) ≡ τ + (τ₁ + (τ₂ + τ₃))
+τ+⟨τ₁+τ₂+τ₃⟩≡τ+⟨τ₁+⟨τ₂+τ₃⟩⟩ τ τ₁ τ₂ τ₃ = 
+    begin 
+        τ + (τ₁ + τ₂ + τ₃) ≡⟨ cong (τ +_) (+-assoc τ₁ τ₂ τ₃) ⟩  
+        τ + (τ₁ + (τ₂ + τ₃))
+    ∎
+
 step-time-eq : ∀ τ τ₁ τ' τ'' τ''' → (q : τ + τ₁ ≡ τ'' + τ''') → τ + (τ₁ + τ') ≡ τ'' + (τ''' + τ')
 step-time-eq τ τ₁ τ' τ'' τ''' q = 
     begin 
@@ -64,7 +71,7 @@ step-time-eq τ τ₁ τ' τ'' τ''' q =
 
 
 lemma : ∀ τ τ' τ₁ → τ ≤ τ₁ → τ + τ + (τ₁ ∸ τ + τ') ≡ τ + (τ₁ + τ')
-lemma τ τ' τ₁ p = 
+lemma τ τ' τ₁ p =
     begin 
         τ + τ + (τ₁ ∸ τ + τ') ≡⟨ +-assoc τ τ (τ₁ ∸ τ + τ') ⟩  
         τ + (τ + (τ₁ ∸ τ + τ')) ≡⟨ cong (τ +_ ) (cong (τ +_) ( sym (+-∸-comm τ' p))) ⟩ 
@@ -78,6 +85,11 @@ lemma τ τ' τ₁ p =
         τ + (τ₁ + τ')
     ∎
 
+τ∸τ'≤τ : ∀ τ τ' → τ ∸ τ' ≤ τ
+τ∸τ'≤τ zero zero = ≤-refl
+τ∸τ'≤τ zero (suc τ') = ≤-refl
+τ∸τ'≤τ (suc τ) zero = ≤-refl
+τ∸τ'≤τ (suc τ) (suc τ') = ≤-trans (τ∸τ'≤τ τ τ') (n≤1+n τ)
 
 m≡n⇒m≤n : ∀ {m n} → m ≡ n → m ≤ n
 m≡n⇒m≤n {zero} {n} p = z≤n
@@ -114,38 +126,31 @@ resource-use (S ⟨ τ'' ⟩ₘ) p V = {!   !}
 resource-use {τ = τ} {τ' = τ'} {A = A} (S ∷ₘ[ τ'' ] x) p V = {!   !} 
 
 
-
-
-
-
--- TODO: ctx-time (toCtx S) == τ
-
-resource-use' : ∀ {τ τ' A} → (S : 𝕊 τ) → 
-                (p : τ' ≤ τ) →
-                (V : toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A) →
-                toCtx S ⊢V⦂ A
-resource-use' {τ = .0} ∅ z≤n (var ())
-resource-use' {τ' = zero} (S ⟨ τ'' ⟩ₘ) p (var x) = V-rename {!!} (resource-use' S z≤n (var {!!}))
-resource-use' {τ' = suc τ'} (S ⟨ τ'' ⟩ₘ) p V = {!!}
-resource-use' {τ = τ} {τ' = τ'} {A = A} (S ∷ₘ[ τ'' ] x) p V = {!   !} 
-
-
-
-
-
+-- resource-use' : ∀ {τ τ' A} → (S : 𝕊 τ) → 
+--                 (p : τ' ≤ τ) →
+--                 (V : toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A) →
+--                 toCtx S ⊢V⦂ A
+-- resource-use' {τ = .0} ∅ z≤n (var ())
+-- resource-use' {τ' = zero} (S ⟨ τ'' ⟩ₘ) p (var x) = V-rename wk-⟨⟩-ren (resource-use' S z≤n (var {!!}))
+-- resource-use' {τ' = suc τ'} (S ⟨ τ'' ⟩ₘ) p V = {!!}
+-- resource-use' {τ = τ} {τ' = τ'} {A = A} (S ∷ₘ[ τ'' ] x) p V = {!   !} 
 
 resource-use'' : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) → 
-                (p : τ' ≤ τ) →
+                (p : τ' ≤ τ) → 
                 (x : [ τ' ] A ∈[ τ'' ] toCtx S -ᶜ τ') →
                 toCtx S ⊢V⦂ A
-
 resource-use'' {.0} {.zero} {τ''} ∅ z≤n ()
 resource-use'' {.(_ + τ''')} {zero} {.(τ''' + _)} (S ⟨ τ''' ⟩ₘ) p (Tl-⟨⟩ x) =
-  V-rename {!!} (resource-use'' S z≤n x)
-resource-use'' {.(_ + τ''')} {suc τ'} {τ''} (S ⟨ τ''' ⟩ₘ) p x = {!!}
-resource-use'' {τ} {zero} {.0} (S ∷ₘ[ .zero ] V) p Hd = {!!}
-resource-use'' {τ} {zero} {τ''} (S ∷ₘ[ τ''' ] V) p (Tl-∷ x) = {!!}
-resource-use'' {τ} {suc τ'} {τ''} (S ∷ₘ[ τ''' ] V) p x = {!!}
+  V-rename wk-⟨⟩-ren (resource-use'' S z≤n x)
+resource-use'' {.(_ + τ''')} {suc τ'} {τ''} {A} (S ⟨ τ''' ⟩ₘ) p x  with suc τ' ≤? τ''' 
+resource-use'' {.(_ + τ''')} {suc τ'} {.(τ''' ∸ suc τ' + _)} {A} (S ⟨ τ''' ⟩ₘ) p (Tl-⟨⟩ x) | yes q = 
+    V-rename
+        (⟨⟩-≤-ren (τ∸τ'≤τ τ''' (suc τ'))) 
+        (resource-use'' (S ⟨ (τ''' ∸ suc τ') ⟩ₘ) {!   !}  {!   !}) 
+... | no ¬q = V-rename wk-⟨⟩-ren (resource-use'' S {!   !} {!   !})
+resource-use'' {τ} {zero} {.0} (S ∷ₘ[ .zero ] V) p Hd = V-rename (wk-ren ∘ʳ ⟨⟩-η-ren) V
+resource-use'' {τ} {zero} {τ''} (S ∷ₘ[ τ''' ] V) p (Tl-∷ x) = V-rename wk-ren (resource-use'' S z≤n x)
+resource-use'' {τ} {suc τ'} {τ''} (S ∷ₘ[ τ''' ] V) p x = V-rename wk-ren (resource-use'' S p x)
 
 
 
@@ -155,10 +160,6 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {S : 𝕊 τ} → {M : ((toCtx S) ∷ A) ⊢C⦂ B ‼ τ'} → {V : (toCtx S) ⊢V⦂ A} →
             -------------------------------------------------------------
             ⟨ τ , S , lam M · V ⟩ ↝ ⟨ τ , S , M [ Hd ↦ V ]c ⟩
-
-
-    -- ⟨ τ , S , lam M · V ⟩ ↝ ⟨ τ , S , M [ Hd ↦ V ]c ⟩    ==>   [] |- (toComp S) [lam M · V] == (toComp S) [M [ Hd ↦ V ]c]
-  
 
     MATCH : {τ : Time} {S : 𝕊 τ} {A B : VType} {C : CType} → 
             {V : toCtx S ⊢V⦂ A } →
@@ -246,9 +247,6 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
                         `in (C-rename (cong-∷-ren (suc-comp-ren τ≤τ₇ sucState (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₄≡τ₇+τ₆))) 
                             N) ⟩
 
-
-
-
     HANDLE-OP : {τ τ' τ'' : Time} →
             {S : 𝕊 τ} → 
             {op : Op} → 
@@ -262,18 +260,14 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {N : toCtx S ⟨ op-time op + τ'' ⟩ ∷ A ⊢C⦂ B ‼ τ'} → 
             --------------------------------------------------------------------------
             ⟨ τ , S , handle perform op V M `with H `in N ⟩ ↝
-            ⟨ τ , S , {!   !} ⟩
-
-            -- H op [V/x , box (lam y . (handle M with H))/k]
-
-            -- box (lam y . (handle M with H)) as f in H op [V/x , f/k]
-
-
-            -- eq. th.:        box V as r in K[unbox r as x in M] == box V as r in K[M[V/x]]
-
-            --                 alloc V as l in K[read l as x in M] == alloc V as l in K[M[V/x]]
-
-
+            ⟨ τ , S , 
+            box (lam (handle M 
+                    `with (λ op₁ τ''' → 
+                            C-rename (cong-∷-ren (cong-∷-ren (wk-ren ∘ʳ wk-⟨⟩-ren))) 
+                        (H op₁ τ''')) 
+                    `in (C-rename (cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren)) 
+                        N))) 
+                ((H op (τ'' + τ')) [ Tl-∷ Hd ↦ V ]c) ⟩
 
     BOX :   {τ τ' τ'' : Time} → {S : 𝕊 τ} → {A B : VType} → 
             {V : toCtx S ⟨ τ' ⟩ ⊢V⦂ A} →  
@@ -289,7 +283,6 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             ⟨ τ , S , unbox p V M ⟩ ↝ ⟨ τ , S , M [ Hd ↦ resource-use S p V ]c ⟩
 
 
-{-
 possible-suc-state : {τ τ' τ'' τ''' : Time} → 
                 {S : 𝕊 τ} → {S' : 𝕊 τ'} → 
                 {A : VType} → 
@@ -303,7 +296,7 @@ possible-suc-state SEQ-RET = id-suc
 possible-suc-state SEQ-OP = id-suc
 possible-suc-state HANDLE-RET = id-suc
 possible-suc-state (UNBOX p) = id-suc 
--- possible-suc-state q HANDLE-OP = id-suc
+possible-suc-state HANDLE-OP = id-suc
 possible-suc-state DELAY = ⟨⟩-suc ≤-refl _ id-suc
 possible-suc-state BOX = ∷-suc ≤-refl _ _ id-suc
 possible-suc-state (SEQ-FST {M = M} {M' = M'} τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = possible-suc-state  M↝M'
@@ -353,7 +346,7 @@ progress (match ⦉ V , W ⦊ `in M) = steps ≤-refl refl MATCH
 progress (perform op V M) = is-op
 progress {τ} (handle_`with_`in {τ' = τ₁} M H N) with progress M 
 ... | is-value = steps ≤-refl refl HANDLE-RET
-... | is-op = {!   !}
+... | is-op {τ' = τ'} {op = op} = steps ≤-refl (τ+⟨τ₁+τ₂+τ₃⟩≡τ+⟨τ₁+⟨τ₂+τ₃⟩⟩ τ (op-time op) τ' τ₁) HANDLE-OP
 ... | steps {τ' = τ₂} {τ'' = τ₃} {τ''' = τ₄} p q M↝M' = 
     steps p (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (HANDLE-STEP p q (possible-suc-state M↝M') M↝M')
 progress (unbox τ≤ctx-time V M) = steps ≤-refl refl (UNBOX τ≤ctx-time)
@@ -361,4 +354,3 @@ progress (box V M) = steps ≤-refl refl BOX
 progress (absurd (var V)) = ⊥-elim (Empty-not-in-ctx V)
 progress (var V · N) = ⊥-elim (⇒-not-in-ctx V)
 progress (match var V `in M) = ⊥-elim (⦉⦊-not-in-ctx V)
--}
