@@ -23,6 +23,7 @@ mutual
     toCtx (_∷ₘ[_]_ {A = A₁} S τ' A) = (toCtx S) ∷ [ τ' ] A₁
 
 -- Relation that tells that S' is a successor of S
+
 data SucState : {τ τ' : Time} → 𝕊 τ → 𝕊 τ' → Set where
     id-suc : {τ : Time} → {S : 𝕊 τ} → SucState S S
     ⟨⟩-suc : {τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → (p : τ ≤ τ') → (τ'' : Time) → 
@@ -62,7 +63,6 @@ suc-comp-ren : {τ τ' τ'' τ''' τ'''' : Time} →
                 SucState S S' →  
                 (M : toCtx S ⟨ τ'' ⟩ ⊢C⦂ A ‼ τ'''') →
                 (q : τ + τ'' ≤ τ' + τ''') →  
-                -- (N : toCtx S' ⟨ τ''' ⟩ ⊢C⦂ A ‼ τ'''') → 
                 Ren (toCtx S ⟨ τ'' ⟩) (toCtx S' ⟨ τ''' ⟩)
 suc-comp-ren {τ} p id-suc M q = ⟨⟩-≤-ren (+-cancelˡ-≤ τ q)
 suc-comp-ren {τ} {τ'} {τ'' = τ₂} {τ'''} p (⟨⟩-suc {τ' = τ₃} p₁ τ'' sucSS') M q = 

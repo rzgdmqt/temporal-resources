@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Syntax.OperationalSemantics where
 
 
@@ -161,7 +160,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             ⟨ τ'' , S , perform op V M ; N  ⟩ ↝ ⟨ τ'' , S ,  τ-subst (sym (+-assoc (op-time op) τ τ'))
                          (perform op V
                             (M ;
-                             C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren)
+                             C-rename (cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren))
                              N))  ⟩
     
     DELAY : {τ τ' τ'' : Time} → 
@@ -214,22 +213,18 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
     --         {A B : VType} → 
     --         {V : toCtx S ⊢V⦂ type-of-gtype (param op)} →
     --         {M : toCtx S ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ''} →
-    --         {H : (op : Op) → (τ'' : Time) →
+    --         {H : (op : Op) → (τ₁ : Time) →
     --             toCtx S ∷ type-of-gtype (param op)
-    --               ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
-    --             ⊢C⦂ B ‼ (op-time op + τ'')} → 
+    --               ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ₁)
+    --             ⊢C⦂ B ‼ (op-time op + τ₁)} → 
     --         {N : toCtx S ⟨ op-time op + τ'' ⟩ ∷ A ⊢C⦂ B ‼ τ'} → 
     --         --------------------------------------------------------------------------
-    --         ⟨ τ , S , handle perform op V M `with H `in N ⟩ ↝ 
-    --         ⟨ τ , S , 
-    --             (τ-subst (sym (+-assoc (op-time op) τ'' τ')) 
-    --             (H op (τ'' + τ')) 
-    --             [ Tl-∷ Hd ↦ V ]c) 
-    --             [ Hd ↦ {!   !} ]c ⟩
+    --         ⟨ τ , S , handle perform op V M `with H `in N ⟩ ↝
+    --         ⟨ τ , S , {!   !} ⟩ 
 
     BOX :   {τ τ' τ'' : Time} → {S : 𝕊 τ} → {A B : VType} → 
             {V : toCtx S ⟨ τ' ⟩ ⊢V⦂ A} →  
-            {M : toCtx S ∷ [_]_ τ' A ⊢C⦂ B ‼ τ''} →
+            {M : toCtx S ∷ [ τ' ] A ⊢C⦂ B ‼ τ''} →
             -----------------------------------------------------------------------
             ⟨ τ , S , (box V M) ⟩ ↝ ⟨ τ , extend-state S τ' V , M ⟩
 
@@ -239,6 +234,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {M : toCtx S ∷ A ⊢C⦂ C } → 
             ---------------------------------------------------------------------------------------------
             ⟨ τ , S , unbox p V M ⟩ ↝ ⟨ τ , S , M [ Hd ↦ resource-use S p V ]c ⟩
+
 
 
 possible-suc-state : {τ τ' τ'' τ''' : Time} → 
@@ -255,11 +251,11 @@ possible-suc-state q SEQ-RET = id-suc
 possible-suc-state q SEQ-OP = id-suc
 possible-suc-state q HANDLE-RET = id-suc
 possible-suc-state q (UNBOX p) = id-suc 
+-- possible-suc-state q HANDLE-OP = id-suc
 possible-suc-state q DELAY = ⟨⟩-suc ≤-refl _ id-suc
 possible-suc-state q BOX = ∷-suc ≤-refl _ _ id-suc
 possible-suc-state q (SEQ-FST {M = M} {M' = M'} τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = possible-suc-state τ≤τ₁  M↝M'
 possible-suc-state q (HANDLE-STEP {M = M} {M' = M'} τ≤τ₇ τ+τ₄≡τ₇+τ₆ sucState M↝M') = possible-suc-state τ≤τ₇ M↝M'
-
 
 data progresses : {τ' τ : Time} → 
                 {S : 𝕊 τ} → 
