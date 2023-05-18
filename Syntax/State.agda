@@ -70,6 +70,26 @@ suc-comp-ren {τ} {τ'} {τ'' = τ₂} {τ'''} p (⟨⟩-suc {τ' = τ₃} p₁ 
 suc-comp-ren p (∷-suc p₁ τ'' V sucSS') M q = cong-⟨⟩-ren wk-ren ∘ʳ 
         suc-comp-ren p sucSS' M q 
 
+suc-state-trans : { τ τ' τ'' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → {S'' : 𝕊 τ''} → 
+            SucState S S' → SucState S' S'' → SucState S S''
+suc-state-trans id-suc sucS'S'' = sucS'S''
+suc-state-trans (⟨⟩-suc p τ'' sucSS') id-suc = ⟨⟩-suc p τ'' sucSS'
+suc-state-trans (⟨⟩-suc p τ'' sucSS') (⟨⟩-suc p₁ τ''' sucS'S'') = 
+    ⟨⟩-suc (≤-trans p (≤-trans (≤-stepsʳ τ'' ≤-refl) p₁)) τ''' (suc-state-trans (⟨⟩-suc p τ'' sucSS') sucS'S'')
+suc-state-trans (⟨⟩-suc p τ'' sucSS') (∷-suc p₁ τ''' V sucS'S'') = 
+    ∷-suc (≤-trans p (≤-trans (≤-stepsʳ τ'' ≤-refl) p₁)) τ''' V (suc-state-trans (⟨⟩-suc p τ'' sucSS') sucS'S'')
+suc-state-trans (∷-suc p τ'' V sucSS') id-suc = ∷-suc p τ'' V sucSS'
+suc-state-trans (∷-suc p τ'' V sucSS') (⟨⟩-suc p₁ τ''' sucS'S'') = 
+    ⟨⟩-suc (≤-trans p p₁) τ''' (suc-state-trans (∷-suc p τ'' V sucSS') sucS'S'')
+suc-state-trans (∷-suc p τ'' V sucSS') (∷-suc p₁ τ''' V₁ sucS'S'') = 
+    ∷-suc (≤-trans p p₁) τ''' V₁ (suc-state-trans (∷-suc (≤-trans ≤-refl p) τ'' V sucSS') sucS'S'')
+
+ctx-timeSτ≡τ : {τ : Time} → (S : 𝕊 τ) → ctx-time (toCtx S) ≡ τ
+ctx-timeSτ≡τ ∅ = refl
+ctx-timeSτ≡τ (S ⟨ τ'' ⟩ₘ) = cong (_+ τ'') (ctx-timeSτ≡τ S)
+ctx-timeSτ≡τ (S ∷ₘ[ τ' ] x) = ctx-timeSτ≡τ S
+
+
 time-pass : ∀ {τ} → (S : 𝕊 τ) → (τ' : Time) → 𝕊 (τ + τ')
 time-pass S τ = S ⟨ τ ⟩ₘ 
 
@@ -86,3 +106,5 @@ record Config (C : CType) : Set where
         τ : Time
         state : 𝕊 τ
         computation : toCtx state ⊢C⦂ C
+
+

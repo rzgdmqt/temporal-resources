@@ -60,6 +60,9 @@ a+b∸a≡b {a} {b} {p} =
         τ + (τ₁ + (τ₂ + τ₃))
     ∎
 
+τ-≤-substᵣ : ∀ {τ τ' τ''} → τ' ≡ τ'' → τ ≤ τ'' → τ ≤ τ'
+τ-≤-substᵣ refl q = q
+
 step-time-eq : ∀ τ τ₁ τ' τ'' τ''' → (q : τ + τ₁ ≡ τ'' + τ''') → τ + (τ₁ + τ') ≡ τ'' + (τ''' + τ')
 step-time-eq τ τ₁ τ' τ'' τ''' q = 
     begin 
@@ -110,20 +113,19 @@ Empty-not-in-ctx {τ} {τ'} {S ∷ₘ[ τ'' ] x} (Tl-∷ y) = Empty-not-in-ctx y
 not-in-empty-ctx : {τ : Time} {A : VType} → A ∈[ τ ] [] → ⊥
 not-in-empty-ctx ()
 
-
 -- resource-use : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) → 
 --                 (p : τ' ≤ τ'') → 
 --                 (q : ([ τ' ] A) ∈[ τ'' ] toCtx S) →  
 --                 toCtx S ⊢V⦂ A
 -- resource-use {τ} {τ'} {τ''} {A} S p q = {!   !}
 
-resource-use : ∀ {τ τ' A} → (S : 𝕊 τ) → 
-                (p : τ' ≤ ctx-time (toCtx S)) →
-                (V : toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A) →
-                toCtx S ⊢V⦂ A
-resource-use {τ = .0} ∅ p V = {!   !} 
-resource-use (S ⟨ τ'' ⟩ₘ) p V = {!   !} 
-resource-use {τ = τ} {τ' = τ'} {A = A} (S ∷ₘ[ τ'' ] x) p V = {!   !} 
+-- resource-use : ∀ {τ τ' A} → (S : 𝕊 τ) → 
+--                 (p : τ' ≤ ctx-time (toCtx S)) →
+--                 (V : toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A) →
+--                 toCtx S ⊢V⦂ A
+-- resource-use {τ = .0} ∅ p V = {!   !} 
+-- resource-use (S ⟨ τ'' ⟩ₘ) p V = {!   !} 
+-- resource-use {τ = τ} {τ' = τ'} {A = A} (S ∷ₘ[ τ'' ] x) p V = {!   !} 
 
 
 -- resource-use' : ∀ {τ τ' A} → (S : 𝕊 τ) → 
@@ -131,9 +133,9 @@ resource-use {τ = τ} {τ' = τ'} {A = A} (S ∷ₘ[ τ'' ] x) p V = {!   !}
 --                 (V : toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A) →
 --                 toCtx S ⊢V⦂ A
 -- resource-use' {τ = .0} ∅ z≤n (var ())
--- resource-use' {τ' = zero} (S ⟨ τ'' ⟩ₘ) p (var x) = V-rename wk-⟨⟩-ren (resource-use' S z≤n (var {!!}))
--- resource-use' {τ' = suc τ'} (S ⟨ τ'' ⟩ₘ) p V = {!!}
--- resource-use' {τ = τ} {τ' = τ'} {A = A} (S ∷ₘ[ τ'' ] x) p V = {!   !} 
+-- resource-use' {τ' = zero} (S ⟨ τ'' ⟩ₘ) p (var x) = V-rename wk-⟨⟩-ren (resource-use' S z≤n (var {!   !}))
+-- resource-use' {τ' = suc τ'} (S ⟨ τ'' ⟩ₘ) p V = {!  !}
+-- resource-use' {τ = τ} {τ' = τ'} {A = A} (S ∷ₘ[ τ'' ] x) p (var x₁) = V-rename {!   !} (resource-use' S p (var (proj₂ (proj₂ (var-rename {!   !} x₁))))) 
 
 resource-use'' : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) → 
                 (p : τ' ≤ τ) → 
@@ -275,32 +277,52 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             -----------------------------------------------------------------------
             ⟨ τ , S , (box V M) ⟩ ↝ ⟨ τ , extend-state S τ' V , M ⟩
 
-    UNBOX : {τ τ' : Time} → {S : 𝕊 τ} →  {A : VType} → {C : CType} → 
+    UNBOX : {τ τ' τ'' : Time} → {S : 𝕊 τ} →  {A : VType} → {C : CType} → 
             (p : τ' ≤ ctx-time (toCtx S)) → 
-            {V : (toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A)} → 
+            {V : [ τ' ] A ∈[ τ'' ] toCtx S -ᶜ τ'} → 
+            -- {V : (toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A)} → 
             {M : toCtx S ∷ A ⊢C⦂ C } → 
             ---------------------------------------------------------------------------------------------
-            ⟨ τ , S , unbox p V M ⟩ ↝ ⟨ τ , S , M [ Hd ↦ resource-use S p V ]c ⟩
+            ⟨ τ , S , unbox p (var V) M ⟩ ↝ ⟨ τ , S , M [ Hd ↦ resource-use'' S (τ-≤-subst p (ctx-timeSτ≡τ S)) V ]c ⟩
 
 
-possible-suc-state : {τ τ' τ'' τ''' : Time} → 
+step-extends-state : {τ τ' τ'' τ''' : Time} → 
                 {S : 𝕊 τ} → {S' : 𝕊 τ'} → 
                 {A : VType} → 
                 {M : toCtx S ⊢C⦂ A ‼ τ''} → 
                 {M' : toCtx S' ⊢C⦂ A ‼ τ'''} → 
                 (M↝M' : ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ ) → 
                 SucState S S'
-possible-suc-state APP = id-suc
-possible-suc-state MATCH = id-suc
-possible-suc-state SEQ-RET = id-suc
-possible-suc-state SEQ-OP = id-suc
-possible-suc-state HANDLE-RET = id-suc
-possible-suc-state (UNBOX p) = id-suc 
-possible-suc-state HANDLE-OP = id-suc
-possible-suc-state DELAY = ⟨⟩-suc ≤-refl _ id-suc
-possible-suc-state BOX = ∷-suc ≤-refl _ _ id-suc
-possible-suc-state (SEQ-FST {M = M} {M' = M'} τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = possible-suc-state  M↝M'
-possible-suc-state (HANDLE-STEP {M = M} {M' = M'} τ≤τ₇ τ+τ₄≡τ₇+τ₆ sucState M↝M') = possible-suc-state M↝M'
+step-extends-state APP = id-suc
+step-extends-state MATCH = id-suc
+step-extends-state SEQ-RET = id-suc
+step-extends-state SEQ-OP = id-suc
+step-extends-state HANDLE-RET = id-suc
+step-extends-state (UNBOX p) = id-suc 
+step-extends-state HANDLE-OP = id-suc
+step-extends-state DELAY = ⟨⟩-suc ≤-refl _ id-suc
+step-extends-state BOX = ∷-suc ≤-refl _ _ id-suc
+step-extends-state (SEQ-FST {M = M} {M' = M'} τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = step-extends-state  M↝M'
+step-extends-state (HANDLE-STEP {M = M} {M' = M'} τ≤τ₇ τ+τ₄≡τ₇+τ₆ sucState M↝M') = step-extends-state M↝M'
+
+step-increases-time : {τ τ' τ'' τ''' : Time} → 
+                {S : 𝕊 τ} → {S' : 𝕊 τ'} → 
+                {A : VType} → 
+                {M : toCtx S ⊢C⦂ A ‼ τ''} → 
+                {M' : toCtx S' ⊢C⦂ A ‼ τ'''} → 
+                (M↝M' : ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ ) → 
+                τ ≤ τ'
+step-increases-time APP = ≤-refl
+step-increases-time MATCH = ≤-refl
+step-increases-time SEQ-RET = ≤-refl
+step-increases-time SEQ-OP = ≤-refl
+step-increases-time HANDLE-RET = ≤-refl
+step-increases-time HANDLE-OP = ≤-refl
+step-increases-time BOX = ≤-refl
+step-increases-time (UNBOX p) = ≤-refl
+step-increases-time (DELAY {τ' = τ'}) = ≤-stepsʳ τ' ≤-refl
+step-increases-time (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState x) = τ≤τ₁
+step-increases-time (HANDLE-STEP τ≤τ₇ τ+τ₄≡τ₇+τ₆ sucState x) = τ≤τ₇
 
 data progresses : {τ' τ : Time} → 
                 {S : 𝕊 τ} → 
@@ -339,7 +361,7 @@ progress {τ} {τ'} {S = S} {A = A} ((_;_) {τ' = τ₁} M N) with progress M
 ... | is-value = steps ≤-refl refl SEQ-RET 
 ... | is-op = steps ≤-refl refl (SEQ-OP {S = S})
 ... | steps {τ' = τ₂} {τ'' = τ₃} {τ''' = τ₄} p q M↝M' = 
-    steps p (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (SEQ-FST q p (possible-suc-state M↝M') M↝M')
+    steps p (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (SEQ-FST q p (step-extends-state M↝M') M↝M')
 progress {τ} {τ'} {S} (lam M · V) = steps ≤-refl refl APP
 progress {τ} {τ'} (delay {τ' = τ₁} τ₂ M ) = steps (≤-stepsʳ τ₂ ≤-refl) (sym (+-assoc τ τ₂ τ₁)) DELAY
 progress (match ⦉ V , W ⦊ `in M) = steps ≤-refl refl MATCH
@@ -348,9 +370,10 @@ progress {τ} (handle_`with_`in {τ' = τ₁} M H N) with progress M
 ... | is-value = steps ≤-refl refl HANDLE-RET
 ... | is-op {τ' = τ'} {op = op} = steps ≤-refl (τ+⟨τ₁+τ₂+τ₃⟩≡τ+⟨τ₁+⟨τ₂+τ₃⟩⟩ τ (op-time op) τ' τ₁) HANDLE-OP
 ... | steps {τ' = τ₂} {τ'' = τ₃} {τ''' = τ₄} p q M↝M' = 
-    steps p (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (HANDLE-STEP p q (possible-suc-state M↝M') M↝M')
-progress (unbox τ≤ctx-time V M) = steps ≤-refl refl (UNBOX τ≤ctx-time)
+    steps p (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (HANDLE-STEP p q (step-extends-state M↝M') M↝M')
+progress (unbox τ≤ctx-time (var V) M) = steps ≤-refl refl (UNBOX τ≤ctx-time)
 progress (box V M) = steps ≤-refl refl BOX
 progress (absurd (var V)) = ⊥-elim (Empty-not-in-ctx V)
 progress (var V · N) = ⊥-elim (⇒-not-in-ctx V)
 progress (match var V `in M) = ⊥-elim (⦉⦊-not-in-ctx V)
+ 

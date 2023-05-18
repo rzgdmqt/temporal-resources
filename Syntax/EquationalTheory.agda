@@ -335,29 +335,16 @@ mutual
                    → (N : Γ ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ')
                    ----------------------------------------------------------------
                    → Γ ⊢C⦂ handle perform op V M `with H `in N 
-                      == τ-subst 
-                        (sym (+-assoc (op-time op) τ τ')) 
-                        (((H op (τ + τ')) 
-                        [ Tl-∷ Hd ↦ V ]c) 
-                        [ Hd ↦ {!  !} ]c)
-
-    --                ------------------------------------------------------------------------------------------
-    --                → Γ ⊢C⦂ handle perform op V M `with H `in N
-    --                    == τ-subst
-    --                         (sym (+-assoc (op-time op) τ τ'))
-    --                         (H op (τ + τ')
-    --                           [ Tl-∷ Hd ↦ V ]c
-    --                           [ Hd ↦ box (lam (handle M
-    --                                            `with (λ op' τ'' →
-    --                                                    C-rename
-    --                                                      (cong-ren {Γ'' = [] ∷ _ ∷ [ _ ] (_ ⇒ _)} wk-ctx-ren)
-    --                                                      (H op' τ''))
-    --                                            `in (C-rename
-    --                                                  (cong-ren {Γ'' = [] ∷ A}
-    --                                                    (   cong-ren {Γ'' = [] ⟨ τ ⟩} wk-ren
-    --                                                     ∘ʳ ⟨⟩-μ-ren))
-    --                                                  N))) ]c)
-
+                      == box (lam 
+                        (handle M 
+                        `with (λ op₁ τ'' → 
+                            C-rename (cong-∷-ren (cong-∷-ren (wk-ren ∘ʳ wk-⟨⟩-ren))) 
+                            (H op₁ τ'')) 
+                        `in (C-rename (cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren)) 
+                          N))) 
+                        ((τ-subst (sym (+-assoc (op-time op) τ τ')) 
+                        (H op (τ + τ')) 
+                          [ Tl-∷ Hd ↦ V ]c))
 
     
     handle-delay : ∀ {A B τ τ' τ''}
@@ -440,4 +427,15 @@ mutual
 
   infix 18 _⊢C⦂_==_
 
-      
+
+
+
+    -- ⟨ τ , S , lam M · V ⟩ ↝ ⟨ τ , S , M [ Hd ↦ V ]c ⟩    ==>   [] |- (toComp S) [lam M · V] == (toComp S) [M [ Hd ↦ V ]c]
+              -- H op [V/x , box (lam y . (handle M with H))/k]
+
+            -- box (lam y . (handle M with H)) as f in H op [V/x , f/k]
+
+
+            -- eq. th.:        box V as r in K[unbox r as x in M] == box V as r in K[M[V/x]]
+
+            --                 alloc V as l in K[read l as x in M] == alloc V as l in K[M[V/x]]
