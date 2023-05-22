@@ -1,6 +1,7 @@
 ------------------------------------------------------------
 -- Context renamings and their action on well-typed terms --
 ------------------------------------------------------------
+{-# OPTIONS --allow-unsolved-metas #-}
 
 module Syntax.Renamings where
 
@@ -45,6 +46,12 @@ data Ren : Ctx → Ctx → Set where
   cong-⟨⟩-ren : ∀ {Γ Γ' τ} → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
 
 infixr 20 _∘ʳ_
+
+τ-subst-ren : ∀ {τ τ' Γ} → τ ≡ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ ⟩) → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
+τ-subst-ren refl ρ = ρ 
+
+τ-subst-zero : ∀ {τ Γ} → τ ≡ zero → Ren (Γ ⟨ τ ⟩) Γ
+τ-subst-zero refl = ⟨⟩-η-ren
 
 -- Extending a renaming with a variable
 
@@ -125,8 +132,8 @@ ren-≤-ctx-time (cong-⟨⟩-ren {τ = τ} ρ) =
 -ᶜ-⟨⟩-ren {Γ} zero p =
   ⟨⟩-η-ren
 -ᶜ-⟨⟩-ren {Γ ∷ A} (suc τ) p =
-     wk-ren
-  ∘ʳ -ᶜ-⟨⟩-ren (suc τ) p
+     wk-ren 
+     ∘ʳ -ᶜ-⟨⟩-ren (suc τ) p
 -ᶜ-⟨⟩-ren {Γ ⟨ τ' ⟩} (suc τ) p with suc τ ≤? τ'
 ... | yes q =
      ⟨⟩-≤-ren (≤-reflexive (m∸n+n≡m q))
@@ -136,6 +143,19 @@ ren-≤-ctx-time (cong-⟨⟩-ren {τ = τ} ρ) =
                    (≤-trans (∸-monoˡ-≤ τ' p) (≤-reflexive (m+n∸n≡m _ τ'))))
   ∘ʳ ⟨⟩-μ-ren
   ∘ʳ ⟨⟩-≤-ren (≤-reflexive (sym (m∸n+n≡m {suc τ} {τ'} (≰⇒≥ ¬q))))
+
+⟨⟩-ᶜ-ren : ∀ {Γ} → {τ : Time} → Ren (Γ ⟨ τ ⟩ -ᶜ τ) Γ
+⟨⟩-ᶜ-ren {Γ} {zero} = ⟨⟩-η-ren
+⟨⟩-ᶜ-ren {Γ} {suc τ} with suc τ ≤? suc τ 
+... | yes q = τ-subst-zero (n∸n≡0 τ)
+... | no ¬q = ⊥-elim (¬q ≤-refl)
+
+⟨⟩-ᶜ-ren' : ∀ {Γ} → {τ : Time} → Ren Γ (Γ ⟨ τ ⟩ -ᶜ τ)
+⟨⟩-ᶜ-ren' {Γ} {zero} = ⟨⟩-η⁻¹-ren
+⟨⟩-ᶜ-ren' {Γ} {suc τ} with suc τ ≤? suc τ 
+... | yes q = wk-⟨⟩-ren
+... | no ¬q = ⊥-elim (¬q ≤-refl)
+
 
 -- Weakening renaming for the time-travelling operation on contexts
 
@@ -353,7 +373,3 @@ mutual
   C-rename ρ (unbox {τ = τ} p V M) =
     unbox (≤-trans p (ren-≤-ctx-time ρ)) (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
   C-rename ρ (box V M)         = box (V-rename (cong-ren ρ) V) (C-rename (cong-ren ρ) M)
-
-
-τ-subst-ren : ∀ {τ τ' Γ} → τ ≡ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ ⟩) → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
-τ-subst-ren refl ρ = ρ 

@@ -9,8 +9,6 @@ open import Syntax.Renamings
 
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
 
-
-
 mutual 
     data 𝕊 : (τ : Time) → Set where
         ∅ : 𝕊 0
