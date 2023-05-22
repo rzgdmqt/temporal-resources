@@ -372,15 +372,11 @@ mutual
 
     unbox-beta : ∀ {A C τ τ'}
                → (p : τ ≤ ctx-time Γ)
-               → (V : (Γ -ᶜ τ) ⟨ τ ⟩ ⊢V⦂ A)
-               → (N : Γ ∷ A ⊢C⦂ C ‼ τ') -- → (N : Γ ∷ [ τ ] A ⊢C⦂ C ‼ τ')
+               → (V : [ τ ] A ∈[ τ' ] Γ -ᶜ τ)
+               → (N : Γ ∷ A ⊢C⦂ C)
                -----------------------------------------------
-               → Γ ⊢C⦂ box (V-rename ((-ᶜ-⟨⟩-ren τ (≤-trans p {!   !})) ∘ʳ {!   !}) V) {!   !} 
-              --  unbox p 
-              --     (V-rename {!   !} {!   !})
-              --     N
-                   -- (box (V-rename (exch-⟨⟩-var-ren ∘ʳ ((wk-ren ∘ʳ wk-⟨⟩-ren) ∘ʳ (-ᶜ-⟨⟩-ren τ p))) V ) (C-rename wk-ren N))
-                   == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ p) V ]c)
+               → Γ ⊢C⦂ unbox p (var V) N
+                   == (N [ Hd ↦ {!   !} ]c)
 
     -- unbox-beta : ∀ {A C τ}
     --            → (p : τ ≤ ctx-time Γ)
@@ -396,13 +392,21 @@ mutual
               → (V : Γ -ᶜ τ ⊢V⦂ [ τ ] A)
               → (M : Γ ∷ [ τ ] A ⊢C⦂ C ‼ τ') 
               --------------------------------------------
-              → Γ ⊢C⦂ M [ Hd ↦  V-rename (-ᶜ-wk-ren τ) V ]c
-                  == unbox p V 
+              → Γ ⊢C⦂ unbox p V 
                     (box 
                         ( var Hd [ Hd ↦ var (Tl-⟨⟩ (Tl-∷ Hd)) ]v) 
                         (C-rename 
                           ( exch-ren ∘ʳ (wk-ren ∘ʳ exch-ren) ∘ʳ wk-ren ) 
                           M) [ Hd ↦ var Hd ]c)  
+                  == M [ Hd ↦  V-rename (-ᶜ-wk-ren τ) V ]c
+
+
+    -- unbox V as x in (unbox W as y in M) == unbox W as y in (unbox V as x in M) 
+    -- box V as x in (box W as y in M) == box W as y in (box V as x in M) 
+    -- box V as x in M [x not in M] == M
+    -- box V as x in (unbox W as y in M) == unbox W as y in (box V as x in M)
+    -- box_t₁ V as x in (box_t₂ var(x) as y in M) == box_{t₁ + t₂} as x in M
+
 
     {-
     -- NOTE: potential extension of the equational theory 
