@@ -114,8 +114,6 @@ not-in-empty-ctx : {τ : Time} {A : VType} → A ∈[ τ ] [] → ⊥
 not-in-empty-ctx ()
 
 
--- TODO: maybe rewrite this to ctx since it will be needed in equational theory as well
--- skip this resource-use part if you like yourself
 {-
 resource-use'' : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) → 
                 (p : τ' ≤ τ) →
@@ -124,48 +122,56 @@ resource-use'' : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) →
                 toCtx S ⊢V⦂ A
 -}
 
-resource-use'' : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) → 
-                (p : τ' ≤ τ) →
-                (x : [ τ' ] A ∈[ τ'' ] toCtx S -ᶜ τ') →
+resource-use'' : ∀ {τ τ' τ'' τ''' A} → (S : 𝕊 τ) → 
+                (p : τ''' ≤ τ) →
+                (q : τ' ≤ τ''' ) → 
+                (x : [ τ' ] A ∈[ τ'' ] toCtx S -ᶜ τ''') →
                 toCtx S ⊢V⦂ A
-resource-use''  ∅ z≤n ()
-resource-use'' {τ' = zero} (S ⟨ τ'' ⟩ₘ) p (Tl-⟨⟩ x) = V-rename wk-⟨⟩-ren (resource-use'' S z≤n x)
+                
+resource-use'' {τ''' = τ'''} ∅ p q x = 
+    ⊥-elim (not-in-empty-ctx (proj₂ (proj₂ (var-rename (-ᶜ-wk-ren τ''') x))))
 
-resource-use'' {τ' = suc τ'} (S ⟨ τ'' ⟩ₘ) p x with suc τ' ≤? τ'' 
-resource-use'' {_} {suc τ'} {τ₁} (_⟨_⟩ₘ {τ' = τ} S τ''') p (Tl-⟨⟩ {_} {τ₃} {τ₂} x) | yes q with suc τ' ≤? suc τ' 
-... | yes r = {!!} --V-rename (⟨⟩-≤-ren q) (resource-use'' (S ⟨ suc τ' ⟩ₘ) (≤-stepsˡ τ ≤-refl) (proj₂ (proj₂ (var-rename (⟨⟩-ᶜ-ren' {τ = suc τ'}) x))))
-... | no ¬r = ⊥-elim (¬r ≤-refl) 
-resource-use'' {_} {suc τ'} (_⟨_⟩ₘ {τ} S zero) p x | no ¬q = 
-    V-rename ⟨⟩-η⁻¹-ren (resource-use'' S (τ-≤-subst p (+-identityʳ τ)) x)
-resource-use'' {_} {suc τ'} (S ⟨ suc τ'' ⟩ₘ) p x | no ¬q =
-  V-rename wk-⟨⟩-ren (resource-use'' {τ' = τ' ∸ τ''} {τ'' = {!!}} S {!!} {!!})
-  --  V-rename wk-⟨⟩-ren (resource-use'' S {!   !} {!   !} )
+resource-use'' {τ' = zero} {τ'' = .(τ₁ + _)} {τ''' = zero} (S ⟨ τ₁ ⟩ₘ) p z≤n (Tl-⟨⟩ x) = 
+    V-rename wk-⟨⟩-ren (resource-use'' S z≤n z≤n x)
+resource-use'' {τ' = zero} {τ'' = τ''} {τ''' = suc τ'''} (S ⟨ τ₁ ⟩ₘ) p z≤n x with suc τ''' ≤? τ₁
+resource-use'' {_} {zero} {τ'' = .(τ₁ ∸ suc τ''' + _)} {suc τ'''} (S ⟨ τ₁ ⟩ₘ) p z≤n (Tl-⟨⟩ x) | yes q = 
+    V-rename wk-⟨⟩-ren (resource-use'' S z≤n z≤n x)
+... | no ¬q = 
+    V-rename wk-⟨⟩-ren 
+        (resource-use'' S z≤n ≤-refl (proj₂ (proj₂ (var-rename (-ᶜ-wk-ren (suc τ''' ∸ τ₁)) x))))
+resource-use'' {τ' = suc τ'} {τ''' = suc τ'''} (S ⟨ τ'' ⟩ₘ) p q x with suc τ''' ≤? τ'' 
+resource-use'' {_} {suc τ'} {_} {suc τ'''} (S ⟨ τ'' ⟩ₘ) p q (Tl-⟨⟩ x) | yes r = 
+    V-rename (wk-⟨⟩-ren) 
+        (resource-use'' {τ''' = zero} -- we are forced to set τ''' = zero, otherwice we won't have a renaming for x 
+            S z≤n {!   !} x)         -- if we set it to zero, this is not provable
+... | no ¬r = V-rename wk-⟨⟩-ren (resource-use'' {τ''' = (suc τ''') ∸ τ''} S {!   !} {!   !} x) -- we can prove 1 but not 2
+
+resource-use'' {τ' = zero} {τ''' = zero} (S ∷ₘ[ .zero ] V) p z≤n Hd = 
+    V-rename (wk-ren ∘ʳ ⟨⟩-η-ren) V
+resource-use'' {τ' = zero} {τ''' = zero} (S ∷ₘ[ τ' ] V) p z≤n (Tl-∷ x) = 
+    V-rename wk-ren (resource-use'' S z≤n z≤n x)
+resource-use'' {τ' = zero} {τ''' = suc τ'''} (S ∷ₘ[ τ' ] V) p q x = 
+    V-rename wk-ren (resource-use'' S p z≤n x)
+resource-use'' {τ' = suc τ'} {τ''' = suc τ'''} (S ∷ₘ[ τ'' ] V) p q x = 
+    V-rename wk-ren (resource-use'' S p q x) 
+
+-- resource-use''  ∅ z≤n z≤n ()
+-- resource-use'' {τ' = zero} (S ⟨ τ'' ⟩ₘ) p q (Tl-⟨⟩ x) = V-rename wk-⟨⟩-ren (resource-use'' S z≤n z≤n x)
+
+-- resource-use'' {τ' = suc τ'} (S ⟨ τ'' ⟩ₘ) p x with suc τ' ≤? τ'' 
+-- resource-use'' {_} {suc τ'} {τ₁} (_⟨_⟩ₘ {τ' = τ} S τ''') p (Tl-⟨⟩ {_} {τ₃} {τ₂} x) | yes q with suc τ' ≤? suc τ' 
+-- ... | yes r = {! !} --V-rename (⟨⟩-≤-ren q) (resource-use'' (S ⟨ suc τ' ⟩ₘ) (≤-stepsˡ τ ≤-refl) (proj₂ (proj₂ (var-rename (⟨⟩-ᶜ-ren' {τ = suc τ'}) x))))
+-- ... | no ¬r = ⊥-elim (¬r ≤-refl) 
+-- resource-use'' {_} {suc τ'} (_⟨_⟩ₘ {τ} S zero) p x | no ¬q = 
+--     V-rename ⟨⟩-η⁻¹-ren (resource-use'' S (τ-≤-subst p (+-identityʳ τ)) x)
+-- resource-use'' {_} {suc τ'} (S ⟨ suc τ'' ⟩ₘ) p x | no ¬q =
+--   V-rename wk-⟨⟩-ren (resource-use'' {τ' = τ' ∸ τ''} {τ'' = {! !}} S {! !} {! !})
+
+-- resource-use'' {τ' = zero} (S ∷ₘ[ zero ] V) p Hd = V-rename (wk-ren ∘ʳ ⟨⟩-η-ren) V
+-- resource-use'' {τ' = zero} (S ∷ₘ[ τ'' ] V) p (Tl-∷ x) = V-rename wk-ren (resource-use'' S p x)
+-- resource-use'' {τ' = suc τ'} (S ∷ₘ[ τ'' ] V) p x = V-rename wk-ren (resource-use'' S p x)
 
 {-
-resource-use'' {_} {suc τ'} (∅ ⟨ τ'' ⟩ₘ) p (Tl-⟨⟩ x) | yes q = V-rename wk-⟨⟩-ren (⊥-elim (not-in-empty-ctx x))
-resource-use'' {_} {suc τ'} ((_⟨_⟩ₘ {τ₁} S τ''') ⟨ τ'' ⟩ₘ) p x | yes q = 
-    V-rename ⟨⟩-μ-ren 
-        (resource-use'' 
-            (S ⟨ τ''' + τ'' ⟩ₘ) 
-            (τ-≤-substᵣ (sym (+-assoc τ₁ τ''' τ'')) p) 
-            (proj₂ (proj₂ (var-rename ({!   !} ∘ʳ ⟨⟩-μ⁻¹-ren) x)))) -- this is possible to prove
-resource-use'' {_} {suc τ'} {A = A} ((_∷ₘ[_]_ {A = A₁} S τ'''  x₁) ⟨ τ'' ⟩ₘ) p (Tl-⟨⟩ x) | yes q  = {!   !} -- we should check if A = A₁ if yes we return it else we skip it
-
-resource-use'' {_} {suc τ'} (∅ ⟨ τ'' ⟩ₘ) p x | no ¬q = 
-    V-rename wk-⟨⟩-ren (⊥-elim (not-in-empty-ctx (proj₂ (proj₂ (var-rename (-ᶜ-wk-ren (suc τ' ∸ τ'')) x)))))
-resource-use'' {_} {suc τ'} ((_⟨_⟩ₘ {τ₁} S τ''') ⟨ τ'' ⟩ₘ) p x | no ¬q = 
-    V-rename ⟨⟩-μ-ren 
-        (resource-use'' (S ⟨ (τ''' + τ'') ⟩ₘ) 
-        ((τ-≤-substᵣ (sym (+-assoc τ₁ τ''' τ'')) p)) 
-        (proj₂ (proj₂ (var-rename {!   !} x))))
-resource-use'' {_} {suc τ'} ((S ∷ₘ[ τ''' ] x₁) ⟨ τ'' ⟩ₘ) p x | no ¬q = 
-    V-rename (cong-⟨⟩-ren wk-ren) (resource-use'' (S ⟨ τ'' ⟩ₘ) p (proj₂ (proj₂ (var-rename {!   !} x)))) 
--}
-resource-use'' {τ' = zero} (S ∷ₘ[ zero ] V) p Hd = V-rename (wk-ren ∘ʳ ⟨⟩-η-ren) V
-resource-use'' {τ' = zero} (S ∷ₘ[ τ'' ] V) p (Tl-∷ x) = V-rename wk-ren (resource-use'' S p x)
-resource-use'' {τ' = suc τ'} (S ∷ₘ[ τ'' ] V) p x = V-rename wk-ren (resource-use'' S p x)
-
-
 data _↝_ :  {C D : CType} → Config C → Config D → Set where
     
     APP :   {A B : VType} {τ τ' : Time} 
@@ -386,3 +392,4 @@ progress (box V M) = steps ≤-refl refl BOX
 progress (absurd (var V)) = ⊥-elim (Empty-not-in-ctx V)
 progress (var V · N) = ⊥-elim (⇒-not-in-ctx V)
 progress (match var V `in M) = ⊥-elim (⦉⦊-not-in-ctx V)
+-}
