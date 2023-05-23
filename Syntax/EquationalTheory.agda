@@ -385,7 +385,8 @@ mutual
     --            -----------------------------------------------
     --            → Γ ⊢C⦂ unbox p (box V) N
     --                == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ p) V ]c)
-    -- -- eta equation for boxing-unboxing
+
+    -- eta equation for boxing-unboxing
 
     unbox-eta : ∀ {A C τ τ'}
               → (p : τ ≤ ctx-time Γ)
@@ -400,12 +401,70 @@ mutual
                           M) [ Hd ↦ var Hd ]c)  
                   == M [ Hd ↦  V-rename (-ᶜ-wk-ren τ) V ]c
 
+    unbox-comm : ∀ {A B C τ τ' τ''} →
+                (p : τ ≤ ctx-time Γ) → 
+                (q : τ' ≤ ctx-time Γ) → 
+                (V : Γ -ᶜ τ ⊢V⦂ [ τ ] A) → 
+                (W : Γ -ᶜ τ' ⊢V⦂ [ τ' ] B) → 
+                (M : Γ ∷ A ∷ B ⊢C⦂ C ‼ τ'') → 
+                ---------------------------------------------
+                Γ ⊢C⦂ unbox p V 
+                        (unbox q 
+                            (V-rename (wk-ren -ʳ τ') W) 
+                            M
+                        ) 
+                    == 
+                    unbox q W 
+                        (unbox p 
+                            (V-rename ((wk-ren -ʳ τ)) V) 
+                            (C-rename exch-ren M)
+                        )
 
-    -- unbox V as x in (unbox W as y in M) == unbox W as y in (unbox V as x in M) 
-    -- box V as x in (box W as y in M) == box W as y in (box V as x in M) 
-    -- box V as x in M [x not in M] == M
+    box-comm : ∀ {A B C τ τ' τ''} → 
+              (V : Γ ⟨ τ ⟩ ⊢V⦂ A) →
+              (W : Γ ⟨ τ' ⟩ ⊢V⦂ B) → 
+              (M : Γ ∷ [ τ ] A ∷ [ τ' ] B ⊢C⦂ C ‼ τ'') → 
+              ----------------------------------------
+              Γ ⊢C⦂ box V 
+                      (box 
+                        (V-rename (cong-⟨⟩-ren wk-ren) W) 
+                        M)
+                  ==
+                  box W 
+                      (box 
+                        (V-rename (cong-⟨⟩-ren wk-ren) V) 
+                        (C-rename exch-ren M))
+
+    boxed-not-used : ∀ {A C τ τ'} → 
+                    (V : Γ ⟨ τ ⟩ ⊢V⦂ A) → 
+                    (M : Γ ⊢C⦂ C ‼ τ') → 
+                    --------------------
+                    Γ ⊢C⦂ box V (C-rename wk-ren M)
+                        ==
+                        M
+    
+    box-unbox-comm : ∀ {A B C τ τ' τ''} → 
+                    (p : τ' ≤ ctx-time Γ) → 
+                    (V : Γ ⟨ τ ⟩ ⊢V⦂ A) → 
+                    (W : Γ -ᶜ τ' ⊢V⦂ [ τ' ] B) → 
+                    (M : Γ ∷ [ τ ] A ∷ B ⊢C⦂ C ‼ τ'') → 
+                    -------------------------------
+                    Γ ⊢C⦂ box V 
+                            (unbox p 
+                              (V-rename (wk-ren -ʳ τ') W) 
+                              M) 
+                        ==
+                         unbox p 
+                            W 
+                            (box 
+                              (V-rename (cong-⟨⟩-ren wk-ren) V) 
+                              (C-rename exch-ren M))
+
     -- box V as x in (unbox W as y in M) == unbox W as y in (box V as x in M)
-    -- box_t₁ V as x in (box_t₂ var(x) as y in M) == box_{t₁ + t₂} as x in M
+    -- box V as x in M [x not in M] == M
+    -- box V as x in (box W as y in M) == box W as y in (box V as x in M) 
+    -- unbox V as x in (unbox W as y in M) == unbox W as y in (unbox V as x in M) 
+    -- box_t₁ V as x in (box_t₂ var(x) as y in M) == box_{t₁ + t₂} as x in M  -- this one holds just one way
 
 
     {-
