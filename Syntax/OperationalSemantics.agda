@@ -116,22 +116,32 @@ not-in-empty-ctx ()
 
 -- TODO: maybe rewrite this to ctx since it will be needed in equational theory as well
 -- skip this resource-use part if you like yourself
+{-
 resource-use'' : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) → 
-                (p : τ' ≤ τ) → 
+                (p : τ' ≤ τ) →
+                (q : toCtx S -ᶜ τ''' ≡ Γ) → 
+                (x : [ τ' ] A ∈[ τ'' ] Γ) →
+                toCtx S ⊢V⦂ A
+-}
+
+resource-use'' : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) → 
+                (p : τ' ≤ τ) →
                 (x : [ τ' ] A ∈[ τ'' ] toCtx S -ᶜ τ') →
                 toCtx S ⊢V⦂ A
 resource-use''  ∅ z≤n ()
 resource-use'' {τ' = zero} (S ⟨ τ'' ⟩ₘ) p (Tl-⟨⟩ x) = V-rename wk-⟨⟩-ren (resource-use'' S z≤n x)
 
 resource-use'' {τ' = suc τ'} (S ⟨ τ'' ⟩ₘ) p x with suc τ' ≤? τ'' 
--- resource-use'' {_} {suc τ'} {τ₁} (_⟨_⟩ₘ {τ' = τ} S τ''') p (Tl-⟨⟩ {_} {τ₃} {τ₂} x) | yes q with suc τ' ≤? suc τ' 
--- ... | yes r = V-rename (⟨⟩-≤-ren q) (resource-use'' (S ⟨ suc τ' ⟩ₘ) (≤-stepsˡ τ ≤-refl) (proj₂ (proj₂ (var-rename (⟨⟩-ᶜ-ren' {τ = suc τ'}) x))))
--- ... | no ¬r = ⊥-elim (¬r ≤-refl) 
--- resource-use'' {_} {suc τ'} (_⟨_⟩ₘ {τ} S zero) p x | no ¬q = 
---     V-rename ⟨⟩-η⁻¹-ren (resource-use'' S (τ-≤-subst p (+-identityʳ τ)) x)
--- resource-use'' {_} {suc τ'} (S ⟨ suc τ'' ⟩ₘ) p x | no ¬q = 
---     V-rename wk-⟨⟩-ren (resource-use'' S {!   !} {!   !} )
+resource-use'' {_} {suc τ'} {τ₁} (_⟨_⟩ₘ {τ' = τ} S τ''') p (Tl-⟨⟩ {_} {τ₃} {τ₂} x) | yes q with suc τ' ≤? suc τ' 
+... | yes r = {!!} --V-rename (⟨⟩-≤-ren q) (resource-use'' (S ⟨ suc τ' ⟩ₘ) (≤-stepsˡ τ ≤-refl) (proj₂ (proj₂ (var-rename (⟨⟩-ᶜ-ren' {τ = suc τ'}) x))))
+... | no ¬r = ⊥-elim (¬r ≤-refl) 
+resource-use'' {_} {suc τ'} (_⟨_⟩ₘ {τ} S zero) p x | no ¬q = 
+    V-rename ⟨⟩-η⁻¹-ren (resource-use'' S (τ-≤-subst p (+-identityʳ τ)) x)
+resource-use'' {_} {suc τ'} (S ⟨ suc τ'' ⟩ₘ) p x | no ¬q =
+  V-rename wk-⟨⟩-ren (resource-use'' {τ' = τ' ∸ τ''} {τ'' = {!!}} S {!!} {!!})
+  --  V-rename wk-⟨⟩-ren (resource-use'' S {!   !} {!   !} )
 
+{-
 resource-use'' {_} {suc τ'} (∅ ⟨ τ'' ⟩ₘ) p (Tl-⟨⟩ x) | yes q = V-rename wk-⟨⟩-ren (⊥-elim (not-in-empty-ctx x))
 resource-use'' {_} {suc τ'} ((_⟨_⟩ₘ {τ₁} S τ''') ⟨ τ'' ⟩ₘ) p x | yes q = 
     V-rename ⟨⟩-μ-ren 
@@ -139,7 +149,8 @@ resource-use'' {_} {suc τ'} ((_⟨_⟩ₘ {τ₁} S τ''') ⟨ τ'' ⟩ₘ) p x
             (S ⟨ τ''' + τ'' ⟩ₘ) 
             (τ-≤-substᵣ (sym (+-assoc τ₁ τ''' τ'')) p) 
             (proj₂ (proj₂ (var-rename ({!   !} ∘ʳ ⟨⟩-μ⁻¹-ren) x)))) -- this is possible to prove
-resource-use'' {_} {suc τ'} {A = A} ((_∷ₘ[_]_ {A = A₁} S τ'''  x₁) ⟨ τ'' ⟩ₘ) p (Tl-⟨⟩ x) | yes q  = {!   !} -- we should check if A = A₁ if yes we return it else we skip it 
+resource-use'' {_} {suc τ'} {A = A} ((_∷ₘ[_]_ {A = A₁} S τ'''  x₁) ⟨ τ'' ⟩ₘ) p (Tl-⟨⟩ x) | yes q  = {!   !} -- we should check if A = A₁ if yes we return it else we skip it
+
 resource-use'' {_} {suc τ'} (∅ ⟨ τ'' ⟩ₘ) p x | no ¬q = 
     V-rename wk-⟨⟩-ren (⊥-elim (not-in-empty-ctx (proj₂ (proj₂ (var-rename (-ᶜ-wk-ren (suc τ' ∸ τ'')) x)))))
 resource-use'' {_} {suc τ'} ((_⟨_⟩ₘ {τ₁} S τ''') ⟨ τ'' ⟩ₘ) p x | no ¬q = 
@@ -149,7 +160,7 @@ resource-use'' {_} {suc τ'} ((_⟨_⟩ₘ {τ₁} S τ''') ⟨ τ'' ⟩ₘ) p x
         (proj₂ (proj₂ (var-rename {!   !} x))))
 resource-use'' {_} {suc τ'} ((S ∷ₘ[ τ''' ] x₁) ⟨ τ'' ⟩ₘ) p x | no ¬q = 
     V-rename (cong-⟨⟩-ren wk-ren) (resource-use'' (S ⟨ τ'' ⟩ₘ) p (proj₂ (proj₂ (var-rename {!   !} x)))) 
-
+-}
 resource-use'' {τ' = zero} (S ∷ₘ[ zero ] V) p Hd = V-rename (wk-ren ∘ʳ ⟨⟩-η-ren) V
 resource-use'' {τ' = zero} (S ∷ₘ[ τ'' ] V) p (Tl-∷ x) = V-rename wk-ren (resource-use'' S p x)
 resource-use'' {τ' = suc τ'} (S ∷ₘ[ τ'' ] V) p x = V-rename wk-ren (resource-use'' S p x)
@@ -279,7 +290,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
     UNBOX : {τ τ' τ'' : Time} → {S : 𝕊 τ} →  {A : VType} → {C : CType} → 
             (p : τ' ≤ ctx-time (toCtx S)) → 
             {V : [ τ' ] A ∈[ τ'' ] toCtx S -ᶜ τ'} → 
-            -- {V : (toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A)} → 
+            -- {V : (toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A)} → -- TODO: put this back
             {M : toCtx S ∷ A ⊢C⦂ C } → 
             ---------------------------------------------------------------------------------------------
             ⟨ τ , S , unbox p (var V) M ⟩ ↝ ⟨ τ , S , M [ Hd ↦ resource-use'' S (τ-≤-subst p (ctx-timeSτ≡τ S)) V ]c ⟩

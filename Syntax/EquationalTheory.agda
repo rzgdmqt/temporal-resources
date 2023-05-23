@@ -179,6 +179,9 @@ mutual
                  ---------------------------------------------------------------
                  → Γ ⊢C⦂ perform op V M == perform op W N
 
+    -- box W as r in (op V (unbox r as x in N)) == box W as r in (op V N[W/x])
+
+
     delay-cong  : ∀ {A τ τ'}
                 → {M N : Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ'}
                 → Γ ⟨ τ ⟩ ⊢C⦂ M == N
@@ -376,7 +379,33 @@ mutual
                → (N : Γ ∷ A ⊢C⦂ C)
                -----------------------------------------------
                → Γ ⊢C⦂ unbox p (var V) N
-                   == (N [ Hd ↦ {!   !} ]c)
+                   == (N [ Hd ↦ {!!} ]c)
+
+    -- box V as r in K[(unbox r as x in N)] == box V as r in K[N[V/x]]
+
+
+    -- K ::= []
+    --     | op V y.K
+    --     | let x = K in N
+    --     | let x = M in K
+    --     | handle ...
+    --     | box ...
+    --     | unbox ...
+    --     | delay ...
+
+
+    -- Gamma |-[Gamma' ; D] K : C
+
+
+    -- Gamma |-[ Gamma' ; C ] [] : C
+
+
+    -- Gamma |-[Gamma' ; D] K : C   &&   Gamma,Gamma' |- M : D    ==>    Gamma |- K[M] : C
+
+
+
+    -- box V as r in (op W y.N) = op W y. (box V as r in N)
+
 
     -- unbox-beta : ∀ {A C τ}
     --            → (p : τ ≤ ctx-time Γ)
@@ -464,7 +493,7 @@ mutual
     -- box V as x in M [x not in M] == M
     -- box V as x in (box W as y in M) == box W as y in (box V as x in M) 
     -- unbox V as x in (unbox W as y in M) == unbox W as y in (unbox V as x in M) 
-    -- box_t₁ V as x in (box_t₂ var(x) as y in M) == box_{t₁ + t₂} as x in M  -- this one holds just one way
+    -- box_t₁ V as x in (box_t₂ x as y in M) == box_{t₁ + t₂} as x in M  -- this one holds just one way
 
 
     {-
