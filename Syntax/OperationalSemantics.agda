@@ -36,8 +36,8 @@ open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)
 
 τ-subst refl M = M
 
-a+b∸a≡b : ∀ {a b} → {p : a ≤ b} → a + (b ∸ a) ≡ b 
-a+b∸a≡b {a} {b} {p} = 
+a+[b∸a]≡b : ∀ {a b} → {p : a ≤ b} → a + (b ∸ a) ≡ b 
+a+[b∸a]≡b {a} {b} {p} = 
     begin 
         a + (b ∸ a) ≡⟨ sym (+-∸-assoc a p) ⟩ 
         (a + b) ∸ a ≡⟨ +-∸-comm {m = a} b {o = a} ≤-refl ⟩ 
@@ -83,7 +83,7 @@ lemma τ τ' τ₁ p =
         τ + (τ + (τ' + (τ₁ ∸ τ))) ≡⟨ cong (τ +_ ) (sym (+-assoc τ τ' (τ₁ ∸ τ))) ⟩ 
         τ + (τ + τ' + (τ₁ ∸ τ)) ≡⟨ cong (τ +_) (cong (_+ (τ₁ ∸ τ)) (+-comm τ τ')) ⟩
         τ + (τ' + τ + (τ₁ ∸ τ)) ≡⟨ cong (τ +_)  (+-assoc τ' τ (τ₁ ∸ τ))  ⟩
-        τ + (τ' + (τ + (τ₁ ∸ τ))) ≡⟨ cong (τ +_) (cong (τ' +_) (a+b∸a≡b {a = τ } {b = τ₁} {p = p})) ⟩
+        τ + (τ' + (τ + (τ₁ ∸ τ))) ≡⟨ cong (τ +_) (cong (τ' +_) (a+[b∸a]≡b {a = τ } {b = τ₁} {p = p})) ⟩
         τ + (τ' + τ₁) ≡⟨ cong (τ +_) (+-comm τ' τ₁) ⟩
         τ + (τ₁ + τ')
     ∎
@@ -113,65 +113,20 @@ Empty-not-in-ctx {τ} {τ'} {S ∷ₘ[ τ'' ] x} (Tl-∷ y) = Empty-not-in-ctx y
 not-in-empty-ctx : {τ : Time} {A : VType} → A ∈[ τ ] [] → ⊥
 not-in-empty-ctx ()
 
+resource-use'' : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) →
+                (x : [ τ' ] A ∈[ τ'' ] toCtx S) →
+                (toCtx S -ᶜ τ'') ⟨ τ' ⟩ ⊢V⦂ A
+resource-use'' (S ⟨ τ'' ⟩ₘ) (Tl-⟨⟩ {τ' = τ'} x) = 
+    V-rename (cong-⟨⟩-ren (η-⟨⟩--ᶜ-ren τ' τ'')) (resource-use'' S x)
+resource-use'' (S ∷ₘ[ τ' ] V) Hd = V-rename (cong-⟨⟩-ren wk-ren) V
+resource-use'' (S ∷ₘ[ τ' ] V) (Tl-∷ {τ = τ} x) = 
+    V-rename (cong-⟨⟩-ren (wk-ren -ʳ τ)) (resource-use'' S x)
 
-{-
-resource-use'' : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) → 
-                (p : τ' ≤ τ) →
-                (q : toCtx S -ᶜ τ''' ≡ Γ) → 
-                (x : [ τ' ] A ∈[ τ'' ] Γ) →
-                toCtx S ⊢V⦂ A
--}
+var-in-ctx : ∀ {τ τ' τ'' A} → {S : 𝕊 τ} → 
+            (V : (toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A)) → 
+            [ τ' ] A ∈[ τ'' ] toCtx S
+var-in-ctx {τ' = τ'} (var {τ = τ} x) = proj₂ (proj₂ (var-rename {!   !} x))
 
-resource-use'' : ∀ {τ τ' τ'' τ''' A} → (S : 𝕊 τ) → 
-                (p : τ''' ≤ τ) →
-                (q : τ' ≤ τ''' ) → 
-                (x : [ τ' ] A ∈[ τ'' ] toCtx S -ᶜ τ''') →
-                toCtx S ⊢V⦂ A
-                
-resource-use'' {τ''' = τ'''} ∅ p q x = 
-    ⊥-elim (not-in-empty-ctx (proj₂ (proj₂ (var-rename (-ᶜ-wk-ren τ''') x))))
-
-resource-use'' {τ' = zero} {τ'' = .(τ₁ + _)} {τ''' = zero} (S ⟨ τ₁ ⟩ₘ) p z≤n (Tl-⟨⟩ x) = 
-    V-rename wk-⟨⟩-ren (resource-use'' S z≤n z≤n x)
-resource-use'' {τ' = zero} {τ'' = τ''} {τ''' = suc τ'''} (S ⟨ τ₁ ⟩ₘ) p z≤n x with suc τ''' ≤? τ₁
-resource-use'' {_} {zero} {τ'' = .(τ₁ ∸ suc τ''' + _)} {suc τ'''} (S ⟨ τ₁ ⟩ₘ) p z≤n (Tl-⟨⟩ x) | yes q = 
-    V-rename wk-⟨⟩-ren (resource-use'' S z≤n z≤n x)
-... | no ¬q = 
-    V-rename wk-⟨⟩-ren 
-        (resource-use'' S z≤n ≤-refl (proj₂ (proj₂ (var-rename (-ᶜ-wk-ren (suc τ''' ∸ τ₁)) x))))
-resource-use'' {τ' = suc τ'} {τ''' = suc τ'''} (S ⟨ τ'' ⟩ₘ) p q x with suc τ''' ≤? τ'' 
-resource-use'' {_} {suc τ'} {_} {suc τ'''} (S ⟨ τ'' ⟩ₘ) p q (Tl-⟨⟩ x) | yes r = 
-    V-rename (wk-⟨⟩-ren) 
-        (resource-use'' {τ''' = zero} -- we are forced to set τ''' = zero, otherwice we won't have a renaming for x 
-            S z≤n {!   !} x)         -- if we set it to zero, this is not provable
-... | no ¬r = V-rename wk-⟨⟩-ren (resource-use'' {τ''' = (suc τ''') ∸ τ''} S {!   !} {!   !} x) -- we can prove 1 but not 2
-
-resource-use'' {τ' = zero} {τ''' = zero} (S ∷ₘ[ .zero ] V) p z≤n Hd = 
-    V-rename (wk-ren ∘ʳ ⟨⟩-η-ren) V
-resource-use'' {τ' = zero} {τ''' = zero} (S ∷ₘ[ τ' ] V) p z≤n (Tl-∷ x) = 
-    V-rename wk-ren (resource-use'' S z≤n z≤n x)
-resource-use'' {τ' = zero} {τ''' = suc τ'''} (S ∷ₘ[ τ' ] V) p q x = 
-    V-rename wk-ren (resource-use'' S p z≤n x)
-resource-use'' {τ' = suc τ'} {τ''' = suc τ'''} (S ∷ₘ[ τ'' ] V) p q x = 
-    V-rename wk-ren (resource-use'' S p q x) 
-
--- resource-use''  ∅ z≤n z≤n ()
--- resource-use'' {τ' = zero} (S ⟨ τ'' ⟩ₘ) p q (Tl-⟨⟩ x) = V-rename wk-⟨⟩-ren (resource-use'' S z≤n z≤n x)
-
--- resource-use'' {τ' = suc τ'} (S ⟨ τ'' ⟩ₘ) p x with suc τ' ≤? τ'' 
--- resource-use'' {_} {suc τ'} {τ₁} (_⟨_⟩ₘ {τ' = τ} S τ''') p (Tl-⟨⟩ {_} {τ₃} {τ₂} x) | yes q with suc τ' ≤? suc τ' 
--- ... | yes r = {! !} --V-rename (⟨⟩-≤-ren q) (resource-use'' (S ⟨ suc τ' ⟩ₘ) (≤-stepsˡ τ ≤-refl) (proj₂ (proj₂ (var-rename (⟨⟩-ᶜ-ren' {τ = suc τ'}) x))))
--- ... | no ¬r = ⊥-elim (¬r ≤-refl) 
--- resource-use'' {_} {suc τ'} (_⟨_⟩ₘ {τ} S zero) p x | no ¬q = 
---     V-rename ⟨⟩-η⁻¹-ren (resource-use'' S (τ-≤-subst p (+-identityʳ τ)) x)
--- resource-use'' {_} {suc τ'} (S ⟨ suc τ'' ⟩ₘ) p x | no ¬q =
---   V-rename wk-⟨⟩-ren (resource-use'' {τ' = τ' ∸ τ''} {τ'' = {! !}} S {! !} {! !})
-
--- resource-use'' {τ' = zero} (S ∷ₘ[ zero ] V) p Hd = V-rename (wk-ren ∘ʳ ⟨⟩-η-ren) V
--- resource-use'' {τ' = zero} (S ∷ₘ[ τ'' ] V) p (Tl-∷ x) = V-rename wk-ren (resource-use'' S p x)
--- resource-use'' {τ' = suc τ'} (S ∷ₘ[ τ'' ] V) p x = V-rename wk-ren (resource-use'' S p x)
-
-{-
 data _↝_ :  {C D : CType} → Config C → Config D → Set where
     
     APP :   {A B : VType} {τ τ' : Time} 
@@ -293,14 +248,15 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             -----------------------------------------------------------------------
             ⟨ τ , S , (box V M) ⟩ ↝ ⟨ τ , extend-state S τ' V , M ⟩
 
-    UNBOX : {τ τ' τ'' : Time} → {S : 𝕊 τ} →  {A : VType} → {C : CType} → 
+    UNBOX : {τ τ' : Time} → {S : 𝕊 τ} →  {A : VType} → {C : CType} → 
             (p : τ' ≤ ctx-time (toCtx S)) → 
-            {V : [ τ' ] A ∈[ τ'' ] toCtx S -ᶜ τ'} → 
-            -- {V : (toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A)} → -- TODO: put this back
+            {V : (toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A)} →
             {M : toCtx S ∷ A ⊢C⦂ C } → 
             ---------------------------------------------------------------------------------------------
-            ⟨ τ , S , unbox p (var V) M ⟩ ↝ ⟨ τ , S , M [ Hd ↦ resource-use'' S (τ-≤-subst p (ctx-timeSτ≡τ S)) V ]c ⟩
-
+            ⟨ τ , S , unbox p V M ⟩ ↝ 
+            ⟨ τ , S , 
+            M [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ' p) (resource-use'' {τ'' = τ'} S (var-in-ctx V)) ]c ⟩
+          
 
 step-extends-state : {τ τ' τ'' τ''' : Time} → 
                 {S : 𝕊 τ} → {S' : 𝕊 τ'} → 
@@ -387,9 +343,8 @@ progress {τ} (handle_`with_`in {τ' = τ₁} M H N) with progress M
 ... | is-op {τ' = τ'} {op = op} = steps ≤-refl (τ+⟨τ₁+τ₂+τ₃⟩≡τ+⟨τ₁+⟨τ₂+τ₃⟩⟩ τ (op-time op) τ' τ₁) HANDLE-OP
 ... | steps {τ' = τ₂} {τ'' = τ₃} {τ''' = τ₄} p q M↝M' = 
     steps p (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (HANDLE-STEP p q (step-extends-state M↝M') M↝M')
-progress (unbox τ≤ctx-time (var V) M) = steps ≤-refl refl (UNBOX τ≤ctx-time)
+progress (unbox τ≤ctx-time V M) = steps ≤-refl refl (UNBOX τ≤ctx-time)
 progress (box V M) = steps ≤-refl refl BOX
 progress (absurd (var V)) = ⊥-elim (Empty-not-in-ctx V)
 progress (var V · N) = ⊥-elim (⇒-not-in-ctx V)
 progress (match var V `in M) = ⊥-elim (⦉⦊-not-in-ctx V)
--}

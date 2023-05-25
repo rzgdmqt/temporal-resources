@@ -53,6 +53,9 @@ infixr 20 _∘ʳ_
 τ-subst-zero : ∀ {τ Γ} → τ ≡ zero → Ren (Γ ⟨ τ ⟩) Γ
 τ-subst-zero refl = ⟨⟩-η-ren
 
+τ-subst--ᶜ : ∀ {Γ Γ' τ τ'} → τ ≡ τ' → Ren Γ (Γ' -ᶜ τ) → Ren Γ (Γ' -ᶜ τ')
+τ-subst--ᶜ refl ρ = ρ
+
 -- Extending a renaming with a variable
 
 extend-ren : ∀ {Γ Γ' A τ} → Ren Γ Γ' → A ∈[ τ ] Γ' → Ren (Γ ∷ A) Γ'
@@ -144,18 +147,17 @@ ren-≤-ctx-time (cong-⟨⟩-ren {τ = τ} ρ) =
   ∘ʳ ⟨⟩-μ-ren
   ∘ʳ ⟨⟩-≤-ren (≤-reflexive (sym (m∸n+n≡m {suc τ} {τ'} (≰⇒≥ ¬q))))
 
-⟨⟩-ᶜ-ren : ∀ {Γ} → {τ : Time} → Ren (Γ ⟨ τ ⟩ -ᶜ τ) Γ
-⟨⟩-ᶜ-ren {Γ} {zero} = ⟨⟩-η-ren
-⟨⟩-ᶜ-ren {Γ} {suc τ} with suc τ ≤? suc τ 
+⟨⟩-ᶜ-ren : ∀ {Γ} → (τ : Time) → Ren (Γ ⟨ τ ⟩ -ᶜ τ) Γ
+⟨⟩-ᶜ-ren {Γ} zero = ⟨⟩-η-ren
+⟨⟩-ᶜ-ren {Γ} (suc τ) with suc τ ≤? suc τ 
 ... | yes q = τ-subst-zero (n∸n≡0 τ)
 ... | no ¬q = ⊥-elim (¬q ≤-refl)
 
-⟨⟩-ᶜ-ren' : ∀ {Γ} → {τ : Time} → Ren Γ (Γ ⟨ τ ⟩ -ᶜ τ)
-⟨⟩-ᶜ-ren' {Γ} {zero} = ⟨⟩-η⁻¹-ren
-⟨⟩-ᶜ-ren' {Γ} {suc τ} with suc τ ≤? suc τ 
+⟨⟩-ᶜ-ren' : ∀ {Γ} → (τ : Time) → Ren Γ (Γ ⟨ τ ⟩ -ᶜ τ)
+⟨⟩-ᶜ-ren' {Γ} zero = ⟨⟩-η⁻¹-ren
+⟨⟩-ᶜ-ren' {Γ} (suc τ) with suc τ ≤? suc τ 
 ... | yes q = wk-⟨⟩-ren
 ... | no ¬q = ⊥-elim (¬q ≤-refl)
-
 
 -- Weakening renaming for the time-travelling operation on contexts
 
@@ -180,6 +182,41 @@ ren-≤-ctx-time (cong-⟨⟩-ren {τ = τ} ρ) =
          ∘ʳ eq-ren (++ᶜ-ᶜ-+ {Γ} {τ₁} {τ₂ ∸ τ₁}))
      ∘ʳ eq-ren (cong (Γ -ᶜ_) (+-∸-assoc τ₁ {τ₂} {τ₁} p)))
   ∘ʳ eq-ren (cong (Γ -ᶜ_) (sym (m+n∸m≡n τ₁ τ₂)))
+
+sucn≤n⇒⊥ : ∀ τ → suc τ ≤ τ → ⊥
+sucn≤n⇒⊥ (suc τ) (s≤s p) = sucn≤n⇒⊥ τ p
+
+sucn≡n+1 : ∀ {n} → n + 1 ≡ suc n
+sucn≡n+1 {zero} = refl
+sucn≡n+1 {suc n} = cong suc (sucn≡n+1 {n})
+
+τ-≤-substₗ : ∀ {τ τ' τ''} → τ ≡ τ'' → τ ≤ τ' → τ'' ≤ τ'
+τ-≤-substₗ refl q = q
+
+n+sucm≤n⇒⊥ : ∀ {m n} → n + suc m ≤ n → ⊥
+n+sucm≤n⇒⊥ {zero} {suc n} (s≤s p) = sucn≤n⇒⊥ n (τ-≤-substₗ sucn≡n+1 p)
+n+sucm≤n⇒⊥ {suc m} {suc n} (s≤s p) = n+sucm≤n⇒⊥ p
+
+a+b∸a≡b : ∀ {a b} → a + b ∸ a ≡ b 
+a+b∸a≡b {a} {b} = 
+    begin 
+        (a + b) ∸ a ≡⟨ +-∸-comm {m = a} b {o = a} ≤-refl ⟩ 
+        (a ∸ a) + b ≡⟨ cong (_+ b) (n∸n≡0 a) ⟩  
+        0 + b 
+    ∎
+
+η-⟨⟩--ᶜ-ren : ∀ {Γ} τ τ' → Ren (Γ -ᶜ τ) (Γ ⟨ τ' ⟩ -ᶜ (τ' + τ))
+η-⟨⟩--ᶜ-ren zero τ' = 
+    τ-subst--ᶜ (sym (+-identityʳ τ')) (⟨⟩-ᶜ-ren' τ')
+η-⟨⟩--ᶜ-ren (suc τ) zero = id-ren
+η-⟨⟩--ᶜ-ren (suc τ) (suc τ') with (suc τ' + suc τ) ≤? suc τ' 
+... | yes (s≤s q) = ⊥-elim (n+sucm≤n⇒⊥ q)
+... | no ¬q = -ᶜ-≤-ren (τ-≤-substₗ (sym (a+b∸a≡b {τ'})) ≤-refl)
+
+wk-⟨⟩--ᶜ-ren : ∀ {Γ τ τ'} → τ ≤ τ' → τ' ≤ ctx-time Γ → Ren ((Γ -ᶜ τ') ⟨ τ ⟩) Γ
+wk-⟨⟩--ᶜ-ren {_} {zero} {τ'} p q = -ᶜ-wk-ren τ' ∘ʳ ⟨⟩-η-ren
+wk-⟨⟩--ᶜ-ren {Γ ∷ x} {suc τ} {suc τ'} p q = {!   !}
+wk-⟨⟩--ᶜ-ren {Γ ⟨ τ'' ⟩} {suc τ} {suc τ'} p q = {!   !}
 
 -- Time-travelling operation on renamings
 
