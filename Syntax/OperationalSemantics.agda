@@ -113,19 +113,45 @@ Empty-not-in-ctx {τ} {τ'} {S ∷ₘ[ τ'' ] x} (Tl-∷ y) = Empty-not-in-ctx y
 not-in-empty-ctx : {τ : Time} {A : VType} → A ∈[ τ ] [] → ⊥
 not-in-empty-ctx ()
 
-resource-use'' : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) →
+resource-use : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) →
                 (x : [ τ' ] A ∈[ τ'' ] toCtx S) →
                 (toCtx S -ᶜ τ'') ⟨ τ' ⟩ ⊢V⦂ A
-resource-use'' (S ⟨ τ'' ⟩ₘ) (Tl-⟨⟩ {τ' = τ'} x) = 
-    V-rename (cong-⟨⟩-ren (η-⟨⟩--ᶜ-ren τ' τ'')) (resource-use'' S x)
-resource-use'' (S ∷ₘ[ τ' ] V) Hd = V-rename (cong-⟨⟩-ren wk-ren) V
-resource-use'' (S ∷ₘ[ τ' ] V) (Tl-∷ {τ = τ} x) = 
-    V-rename (cong-⟨⟩-ren (wk-ren -ʳ τ)) (resource-use'' S x)
+resource-use (S ⟨ τ'' ⟩ₘ) (Tl-⟨⟩ {τ' = τ'} x) = 
+    V-rename (cong-⟨⟩-ren (η-⟨⟩--ᶜ-ren τ' τ'')) (resource-use S x)
+resource-use (S ∷ₘ[ τ' ] V) Hd = V-rename (cong-⟨⟩-ren wk-ren) V
+resource-use (S ∷ₘ[ τ' ] V) (Tl-∷ {τ = τ} x) = 
+    V-rename (cong-⟨⟩-ren (wk-ren -ʳ τ)) (resource-use S x)
 
-var-in-ctx : ∀ {τ τ' τ'' A} → {S : 𝕊 τ} → 
-            (V : (toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A)) → 
-            [ τ' ] A ∈[ τ'' ] toCtx S
-var-in-ctx {τ' = τ'} (var {τ = τ} x) = proj₂ (proj₂ (var-rename {!   !} x))
+resource-pass-to-ctx : ∀ {τ τ' τ'' A} → (S : 𝕊 τ) → 
+            (p : τ' ≤ τ'') → 
+            (q : τ'' ≤ τ) → 
+            (V : (toCtx S -ᶜ τ'') ⟨ τ' ⟩ ⊢V⦂ A) → 
+            toCtx S ⊢V⦂ A
+resource-pass-to-ctx S p q V = V-rename (wk-⟨⟩--ᶜ-ren p (τ-≤-subst q (sym (ctx-timeSτ≡τ S)))) V
+
+var-in-ctx : ∀ { Γ τ' A} → 
+            (V : Γ ⊢V⦂ [ τ' ] A) → 
+            Σ[ τ'' ∈ Time ] ([ τ' ] A ∈[ τ'' ] Γ )
+var-in-ctx (var {τ = τ} x) = τ , x
+
+push-time-further : ∀ {Γ A τ τ'} → 
+                (p : τ ≤ ctx-time Γ) →
+                (x : A ∈[ τ' ] Γ -ᶜ τ ) → 
+                Σ[ τ'' ∈ Time ] (τ + τ' ≤ τ'' × A ∈[ τ'' ] Γ )
+push-time-further {Γ} {A} {τ} {τ'} p x = (var-rename (-ᶜ-⟨⟩-ren τ p) (Tl-⟨⟩ {τ = τ} x))
+
+≤-extend : ∀ τ' τ'' τ → τ'' ≤ τ → τ' + τ'' ≤ τ' + τ
+≤-extend zero τ'' τ p = p
+≤-extend (suc τ') τ'' τ p = s≤s (≤-extend τ' τ'' τ p)
+
+from-head-time-positive : ∀ {Γ A τ} →
+                        (x : A ∈[ τ ] Γ) → 
+                        τ ≤ ctx-time Γ
+from-head-time-positive Hd = z≤n
+from-head-time-positive (Tl-∷ x) = from-head-time-positive x
+from-head-time-positive {Γ = Γ ⟨ τ' ⟩} {τ = .(τ' + τ'')} (Tl-⟨⟩ {τ = τ'} {τ''} x) = 
+    τ-≤-subst (≤-extend τ' τ'' (ctx-time Γ) (from-head-time-positive x)) (+-comm τ' (ctx-time Γ))
+
 
 data _↝_ :  {C D : CType} → Config C → Config D → Set where
     
@@ -255,8 +281,27 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             ---------------------------------------------------------------------------------------------
             ⟨ τ , S , unbox p V M ⟩ ↝ 
             ⟨ τ , S , 
-            M [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ' p) (resource-use'' {τ'' = τ'} S (var-in-ctx V)) ]c ⟩
-          
+            M [ Hd ↦ 
+                resource-pass-to-ctx 
+                    S 
+                    (m+n≤o⇒m≤o 
+                        τ' 
+                        (proj₁ (proj₂ (
+                            push-time-further 
+                                p 
+                                (proj₂ (var-in-ctx V))
+                                    )
+                                )
+                        )
+                    ) 
+                    (τ-≤-subst 
+                        (from-head-time-positive (proj₂ (proj₂ (push-time-further p (proj₂ (var-in-ctx V)))))) (ctx-timeSτ≡τ S)
+                    )
+                    (resource-use 
+                        S 
+                        (proj₂ (proj₂ (
+                            push-time-further p (proj₂ (var-in-ctx V)))))) ]c ⟩ 
+        
 
 step-extends-state : {τ τ' τ'' τ''' : Time} → 
                 {S : 𝕊 τ} → {S' : 𝕊 τ'} → 
@@ -348,3 +393,4 @@ progress (box V M) = steps ≤-refl refl BOX
 progress (absurd (var V)) = ⊥-elim (Empty-not-in-ctx V)
 progress (var V · N) = ⊥-elim (⇒-not-in-ctx V)
 progress (match var V `in M) = ⊥-elim (⦉⦊-not-in-ctx V)
+  

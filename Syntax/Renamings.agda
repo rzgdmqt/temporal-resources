@@ -215,9 +215,10 @@ a+b∸a≡b {a} {b} =
 
 wk-⟨⟩--ᶜ-ren : ∀ {Γ τ τ'} → τ ≤ τ' → τ' ≤ ctx-time Γ → Ren ((Γ -ᶜ τ') ⟨ τ ⟩) Γ
 wk-⟨⟩--ᶜ-ren {_} {zero} {τ'} p q = -ᶜ-wk-ren τ' ∘ʳ ⟨⟩-η-ren
-wk-⟨⟩--ᶜ-ren {Γ ∷ x} {suc τ} {suc τ'} p q = {!   !}
-wk-⟨⟩--ᶜ-ren {Γ ⟨ τ'' ⟩} {suc τ} {suc τ'} p q = {!   !}
-
+wk-⟨⟩--ᶜ-ren {Γ ∷ x} {suc τ} {suc τ'} p q = wk-ren ∘ʳ wk-⟨⟩--ᶜ-ren p q
+wk-⟨⟩--ᶜ-ren {Γ ⟨ τ'' ⟩} {suc τ} {suc τ'} p q with suc τ' ≤? τ'' 
+... | yes r = {!   !}
+... | no ¬r = {!   !}
 -- Time-travelling operation on renamings
 
 _-ʳ_ : ∀ {Γ Γ'} → Ren Γ Γ' → (τ : Time) → Ren (Γ -ᶜ τ) (Γ' -ᶜ τ)
