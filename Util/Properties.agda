@@ -1,10 +1,7 @@
 module Util.Properties where 
 
 open import Data.Nat.Base
-open import Data.Sum
 open import Data.Empty
-open import Data.Product
-open import Relation.Nullary
 open import Util.Time
 
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
