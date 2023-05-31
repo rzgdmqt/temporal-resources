@@ -1,8 +1,6 @@
 ------------------------------------------------------------
 -- Context renamings and their action on well-typed terms --
 ------------------------------------------------------------
-{-# OPTIONS --allow-unsolved-metas #-}
-
 module Syntax.Renamings where
 
 open import Function hiding (const)
@@ -21,6 +19,7 @@ open import Syntax.Language
 
 open import Util.Equality
 open import Util.Time
+open import Util.Properties
 
 -- Variable renamings (as the least relation closed under
 -- identities, composition, ordinary variable renamings,
@@ -46,6 +45,8 @@ data Ren : Ctx → Ctx → Set where
   cong-⟨⟩-ren : ∀ {Γ Γ' τ} → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
 
 infixr 20 _∘ʳ_
+
+-- some usefull subtitutions for renaming
 
 τ-subst-ren : ∀ {τ τ' Γ} → τ ≡ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ ⟩) → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
 τ-subst-ren refl ρ = ρ 
@@ -129,7 +130,7 @@ ren-≤-ctx-time (cong-∷-ren ρ) =
 ren-≤-ctx-time (cong-⟨⟩-ren {τ = τ} ρ) =
   +-monoˡ-≤ τ (ren-≤-ctx-time ρ)
 
--- Interaction between the time-travelling operation on contexts and the ⟨_⟩ modality
+-- Interactions between the time-travelling operation on contexts and the ⟨_⟩ modality
 
 -ᶜ-⟨⟩-ren : ∀ {Γ} → (τ : Time) → (τ ≤ ctx-time Γ) → Ren ((Γ -ᶜ τ) ⟨ τ ⟩) Γ
 -ᶜ-⟨⟩-ren {Γ} zero p =
@@ -183,27 +184,7 @@ ren-≤-ctx-time (cong-⟨⟩-ren {τ = τ} ρ) =
      ∘ʳ eq-ren (cong (Γ -ᶜ_) (+-∸-assoc τ₁ {τ₂} {τ₁} p)))
   ∘ʳ eq-ren (cong (Γ -ᶜ_) (sym (m+n∸m≡n τ₁ τ₂)))
 
-sucn≤n⇒⊥ : ∀ τ → suc τ ≤ τ → ⊥
-sucn≤n⇒⊥ (suc τ) (s≤s p) = sucn≤n⇒⊥ τ p
-
-sucn≡n+1 : ∀ {n} → n + 1 ≡ suc n
-sucn≡n+1 {zero} = refl
-sucn≡n+1 {suc n} = cong suc (sucn≡n+1 {n})
-
-τ-≤-substₗ : ∀ {τ τ' τ''} → τ ≡ τ'' → τ ≤ τ' → τ'' ≤ τ'
-τ-≤-substₗ refl q = q
-
-n+sucm≤n⇒⊥ : ∀ {m n} → n + suc m ≤ n → ⊥
-n+sucm≤n⇒⊥ {zero} {suc n} (s≤s p) = sucn≤n⇒⊥ n (τ-≤-substₗ sucn≡n+1 p)
-n+sucm≤n⇒⊥ {suc m} {suc n} (s≤s p) = n+sucm≤n⇒⊥ p
-
-a+b∸a≡b : ∀ {a b} → a + b ∸ a ≡ b 
-a+b∸a≡b {a} {b} = 
-    begin 
-        (a + b) ∸ a ≡⟨ +-∸-comm {m = a} b {o = a} ≤-refl ⟩ 
-        (a ∸ a) + b ≡⟨ cong (_+ b) (n∸n≡0 a) ⟩  
-        0 + b 
-    ∎
+-- Time travel and time passage renaming
 
 η-⟨⟩--ᶜ-ren : ∀ {Γ} τ τ' → Ren (Γ -ᶜ τ) (Γ ⟨ τ' ⟩ -ᶜ (τ' + τ))
 η-⟨⟩--ᶜ-ren zero τ' = 
@@ -211,14 +192,8 @@ a+b∸a≡b {a} {b} =
 η-⟨⟩--ᶜ-ren (suc τ) zero = id-ren
 η-⟨⟩--ᶜ-ren (suc τ) (suc τ') with (suc τ' + suc τ) ≤? suc τ' 
 ... | yes (s≤s q) = ⊥-elim (n+sucm≤n⇒⊥ q)
-... | no ¬q = -ᶜ-≤-ren (τ-≤-substₗ (sym (a+b∸a≡b {τ'})) ≤-refl)
+... | no ¬q = -ᶜ-≤-ren (τ-≤-substₗ (sym (a+b∸a≡b {τ'})) ≤-refl) 
 
-wk-⟨⟩--ᶜ-ren : ∀ {Γ τ τ'} → τ ≤ τ' → τ' ≤ ctx-time Γ → Ren ((Γ -ᶜ τ') ⟨ τ ⟩) Γ
-wk-⟨⟩--ᶜ-ren {_} {zero} {τ'} p q = -ᶜ-wk-ren τ' ∘ʳ ⟨⟩-η-ren
-wk-⟨⟩--ᶜ-ren {Γ ∷ x} {suc τ} {suc τ'} p q = wk-ren ∘ʳ wk-⟨⟩--ᶜ-ren p q
-wk-⟨⟩--ᶜ-ren {Γ ⟨ τ'' ⟩} {suc τ} {suc τ'} p q with suc τ' ≤? τ'' 
-... | yes r = {!   !}
-... | no ¬r = {!   !}
 -- Time-travelling operation on renamings
 
 _-ʳ_ : ∀ {Γ Γ'} → Ren Γ Γ' → (τ : Time) → Ren (Γ -ᶜ τ) (Γ' -ᶜ τ)
@@ -287,6 +262,27 @@ cong-⟨⟩-ren {τ = τ'} ρ  -ʳ suc τ with suc τ ≤? τ'
 ... | no ¬p = ρ -ʳ (suc τ ∸ τ')
 
 infixl 30 _-ʳ_
+
+-- Lemma that allows to substract and add the same time
+
++-∸-id-ren : ∀ {Γ} τ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ ∸ τ' + τ' ⟩)
++-∸-id-ren τ zero = ⟨⟩-≤-ren (≤-stepsʳ zero ≤-refl)
++-∸-id-ren τ (suc τ') = ⟨⟩-≤-ren (τ-≤-substᵣ (+-comm (τ ∸ suc τ') (suc τ')) (m≤n+m∸n τ (suc τ')))
+
+-- Another time travel and time passage relation
+
+wk-⟨⟩--ᶜ-ren : ∀ {Γ τ τ'} → τ ≤ τ' → τ' ≤ ctx-time Γ → Ren ((Γ -ᶜ τ') ⟨ τ ⟩) Γ
+wk-⟨⟩--ᶜ-ren {_} {zero} {τ'} p q = -ᶜ-wk-ren τ' ∘ʳ ⟨⟩-η-ren
+wk-⟨⟩--ᶜ-ren {Γ ∷ x} {suc τ} {suc τ'} p q = wk-ren ∘ʳ wk-⟨⟩--ᶜ-ren p q
+wk-⟨⟩--ᶜ-ren {Γ ⟨ τ'' ⟩} {suc τ} {suc τ'} p q with suc τ' ≤? τ'' 
+... | yes r = ⟨⟩-≤-ren (τ''∸τ'+τ≤τ'' τ'' (suc τ') (suc τ) p r) ∘ʳ ⟨⟩-μ⁻¹-ren
+wk-⟨⟩--ᶜ-ren {Γ ⟨ τ'' ⟩} {suc τ} {suc τ'} p q | no ¬r = 
+     (cong-⟨⟩-ren (wk-⟨⟩--ᶜ-ren {τ' = suc τ' ∸ τ'' } 
+                    (∸-monoˡ-≤ τ'' p) 
+                    (m≤n+k⇒m∸k≤n (suc τ') (ctx-time Γ) τ'' q)) 
+      ∘ʳ ⟨⟩-μ-ren {Γ = Γ -ᶜ (suc τ' ∸ τ'')} {τ = suc τ ∸ τ''} {τ' = τ''}) 
+        ∘ʳ +-∸-id-ren (suc τ) τ''
+
 
 -- Action of renamings on variables (showing that reamings
 -- allow one to move any variable under more ⟨_⟩ modalities)
