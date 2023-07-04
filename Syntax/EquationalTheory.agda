@@ -8,6 +8,7 @@ open import Data.Product
 
 open import Syntax.Types
 open import Syntax.Contexts
+open import Syntax.ContextsHoles
 open import Syntax.Language
 open import Syntax.Renamings
 open import Syntax.Substitutions
@@ -15,16 +16,6 @@ open import Syntax.Substitutions
 open import Util.Equality
 open import Util.Operations
 open import Util.Time
-
--- Explicit equality coercion for time gradings
-
-τ-subst : ∀ {Γ A τ τ'}
-        → τ ≡ τ'
-        → Γ ⊢C⦂ A ‼ τ
-        ---------------
-        → Γ ⊢C⦂ A ‼ τ'
-
-τ-subst refl M = M
 
 -- Equations between well-typed values and computations
 
@@ -371,27 +362,19 @@ mutual
                                     N)))
 
 
-    -- -- computational/beta equation for boxing-unboxing
-
-    unbox-beta : ∀ {A C τ τ'}
-               → (p : τ ≤ ctx-time Γ)
-               → (V : [ τ ] A ∈[ τ' ] Γ -ᶜ τ)
-               → (N : Γ ∷ A ⊢C⦂ C)
+    unbox-beta : ∀ {Δ A B τ τ'}
+               → (p : τ ≤ ctx-time (BCtx→Ctx Δ))
+               → (V : Γ ⟨ τ ⟩ ⊢V⦂ A )
+               → (K : Γ ∷ [ τ ] A ⊢K[ Δ ]⦂ B ‼ τ')
+               → (N : (Γ ∷ [ τ ] A ⋈ Δ) ∷ A ⊢C⦂ (holeTy K)) -- i don't like this
                -----------------------------------------------
-               → Γ ⊢C⦂ unbox p (var V) N
-                   == (N [ Hd ↦ {!!} ]c)
+               → Γ ⊢C⦂ box V (K ₖ[ unbox {A = A} {τ = τ} {!   !} (var {!   !}) N ]) 
+                    == 
+                      box V (K ₖ[ N [ Hd ↦ {!   !} ]c ])
 
     -- box V as r in K[(unbox r as x in N)] == box V as r in K[N[V/x]]
 
 
-    -- K ::= []
-    --     | op V y.K
-    --     | let x = K in N
-    --     | let x = M in K
-    --     | handle ...
-    --     | box ...
-    --     | unbox ...
-    --     | delay ...
 
 
     -- Gamma |-[Gamma' ; D] K : C
@@ -489,8 +472,8 @@ mutual
                               (V-rename (cong-⟨⟩-ren wk-ren) V) 
                               (C-rename exch-ren M))
 
-    -- box V as x in (unbox W as y in M) == unbox W as y in (box V as x in M)
-    -- box V as x in M [x not in M] == M
+    -- box V as x in (unbox W as y in M) == unbox W as y in (box V as x in M) 
+    -- box V as x in M [x not in M] == M 
     -- box V as x in (box W as y in M) == box W as y in (box V as x in M) 
     -- unbox V as x in (unbox W as y in M) == unbox W as y in (unbox V as x in M) 
     -- box_t₁ V as x in (box_t₂ x as y in M) == box_{t₁ + t₂} as x in M  -- this one holds just one way
@@ -518,16 +501,3 @@ mutual
   -}
 
   infix 18 _⊢C⦂_==_
-
-
-
-
-    -- ⟨ τ , S , lam M · V ⟩ ↝ ⟨ τ , S , M [ Hd ↦ V ]c ⟩    ==>   [] |- (toComp S) [lam M · V] == (toComp S) [M [ Hd ↦ V ]c]
-              -- H op [V/x , box (lam y . (handle M with H))/k]
-
-            -- box (lam y . (handle M with H)) as f in H op [V/x , f/k]
-
-
-            -- eq. th.:        box V as r in K[unbox r as x in M] == box V as r in K[M[V/x]]
-
-            --                 alloc V as l in K[read l as x in M] == alloc V as l in K[M[V/x]]

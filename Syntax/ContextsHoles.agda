@@ -25,6 +25,11 @@ _⋈_ : Ctx → BCtx → Ctx
 Γ ⋈ (x ∷ₗ Δ) = ((Γ ∷ x)) ⋈ Δ
 Γ ⋈ (⟨ τ ⟩ₗ Δ) = (Γ ⟨ τ ⟩) ⋈ Δ 
 
+BCtx→Ctx : BCtx → Ctx 
+BCtx→Ctx []ₗ = []
+BCtx→Ctx (x ∷ₗ Δ) = ([] ∷ x) ++ᶜ BCtx→Ctx Δ
+BCtx→Ctx (⟨ τ ⟩ₗ Δ) = ([] ⟨ τ ⟩) ++ᶜ BCtx→Ctx Δ
+
 infixl 30 _⋈_ 
 
 -- program with typed hole in it
@@ -80,14 +85,14 @@ data _⊢K[_]⦂_ (Γ : Ctx) : BCtx → CType → Set where
         -------------------------------
         → Γ ⊢K[ ⟨ τ ⟩ₗ Δ ]⦂ A ‼ (τ + τ')
     
-    unbox : ∀ {Δ A C τ}
+    unboxₖ : ∀ {Δ A C τ}
         → τ ≤ ctx-time Γ
         → Γ -ᶜ τ ⊢V⦂ [ τ ] A
         → Γ ∷ A  ⊢K[ Δ ]⦂ C
         --------------------
         → Γ ⊢K[ A ∷ₗ Δ ]⦂ C
 
-    box : ∀ {Δ A B τ τ'}
+    boxₖ : ∀ {Δ A B τ τ'}
         → Γ ⟨ τ ⟩ ⊢V⦂ A
         → Γ ∷ [ τ ] A ⊢K[ Δ ]⦂ B ‼ τ'
         ----------------------------
@@ -103,8 +108,8 @@ holeTy (performₖ op K) = holeTy K
 holeTy (handleₖ K `with H `in M) = holeTy K
 holeTy (handle M `with H `inₖ K) = holeTy K
 holeTy (delayₖ τ K) = holeTy K
-holeTy (unbox τ≤ctxTimeΓ V K) = holeTy K
-holeTy (box V K) = holeTy K
+holeTy (unboxₖ τ≤ctxTimeΓ V K) = holeTy K
+holeTy (boxₖ V K) = holeTy K
 
 
 -- hole filling function
@@ -119,17 +124,8 @@ performₖ {op = op} V K ₖ[ M ] = perform op V (K ₖ[ M ])
 handleₖ K `with H `in N ₖ[ M ] = handle K ₖ[ M ] `with H `in N
 handle N `with H `inₖ K ₖ[ M ] = handle N `with H `in (K ₖ[ M ])
 delayₖ τ K ₖ[ M ] = delay τ (K ₖ[ M ])
-unbox τ≤ctxTimeΓ V K ₖ[ M ] = unbox τ≤ctxTimeΓ V (K ₖ[ M ])
-box V K ₖ[ M ] = box V (K ₖ[ M ])
-
-    -- K ::= []
-    --     | op V y.K
-    --     | let x = K in N
-    --     | let x = M in K
-    --     | handle ...
-    --     | box ...
-    --     | unbox ...
-    --     | delay ...
+unboxₖ τ≤ctxTimeΓ V K ₖ[ M ] = unbox τ≤ctxTimeΓ V (K ₖ[ M ])
+boxₖ V K ₖ[ M ] = box V (K ₖ[ M ])
 
 
     -- Gamma |-[Gamma' ; D] K : C
