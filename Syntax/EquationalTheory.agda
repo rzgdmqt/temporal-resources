@@ -8,7 +8,7 @@ open import Data.Product
 
 open import Syntax.Types
 open import Syntax.Contexts
-open import Syntax.ContextsHoles
+open import Syntax.EvaluatingContext
 open import Syntax.Language
 open import Syntax.Renamings
 open import Syntax.Substitutions
@@ -169,9 +169,6 @@ mutual
                  → Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ M == N
                  ---------------------------------------------------------------
                  → Γ ⊢C⦂ perform op V M == perform op W N
-
-    -- box W as r in (op V (unbox r as x in N)) == box W as r in (op V N[W/x])
-
 
     delay-cong  : ∀ {A τ τ'}
                 → {M N : Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ'}
@@ -361,57 +358,18 @@ mutual
                                     (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren)
                                     N)))
 
-
     unbox-beta : ∀ {Δ A B τ τ'}
                → (p : τ ≤ ctx-time (BCtx→Ctx Δ))
                → (V : Γ ⟨ τ ⟩ ⊢V⦂ A )
                → (K : Γ ∷ [ τ ] A ⊢K[ Δ ]⦂ B ‼ τ')
-               → (N : (Γ ∷ [ τ ] A ⋈ Δ) ∷ A ⊢C⦂ (holeTy K)) -- i don't like this
+               → (N : (Γ ∷ [ τ ] A ⋈ Δ) ∷ A ⊢C⦂ (holeTy K))
                -----------------------------------------------
-               → Γ ⊢C⦂ box V (K ₖ[ unbox {A = A} {τ = τ} {!   !} (var {!   !}) N ]) 
+               → Γ ⊢C⦂ box V 
+                      (K ₖ[ 
+                          unbox (τΔ≤τΓ⋈Δ {Γ = Γ ∷ [ τ ] A} {Δ = Δ} p) 
+                                (var (proj₂ (proj₂ (var-rename (Γ⋈Δ-ᶜτ {Δ = Δ} p) Hd)))) N ]) 
                     == 
-                      box V (K ₖ[ N [ Hd ↦ {!   !} ]c ])
-
-    -- box V as r in K[(unbox r as x in N)] == box V as r in K[N[V/x]]
-
-
-
-
-    -- Gamma |-[Gamma' ; D] K : C
-
-
-    -- Gamma |-[ Gamma' ; C ] [] : C
-
-
-    -- Gamma |-[Gamma' ; D] K : C   &&   Gamma,Gamma' |- M : D    ==>    Gamma |- K[M] : C
-
-
-
-    -- box V as r in (op W y.N) = op W y. (box V as r in N)
-
-
-    -- unbox-beta : ∀ {A C τ}
-    --            → (p : τ ≤ ctx-time Γ)
-    --            → (V : (Γ -ᶜ τ) ⟨ τ ⟩ ⊢V⦂ A)
-    --            → (N : Γ ∷ A ⊢C⦂ C)
-    --            -----------------------------------------------
-    --            → Γ ⊢C⦂ unbox p (box V) N
-    --                == (N [ Hd ↦ V-rename (-ᶜ-⟨⟩-ren τ p) V ]c)
-
-    -- eta equation for boxing-unboxing
-
-    unbox-eta : ∀ {A C τ τ'}
-              → (p : τ ≤ ctx-time Γ)
-              → (V : Γ -ᶜ τ ⊢V⦂ [ τ ] A)
-              → (M : Γ ∷ [ τ ] A ⊢C⦂ C ‼ τ') 
-              --------------------------------------------
-              → Γ ⊢C⦂ unbox p V 
-                    (box 
-                        ( var Hd [ Hd ↦ var (Tl-⟨⟩ (Tl-∷ Hd)) ]v) 
-                        (C-rename 
-                          ( exch-ren ∘ʳ (wk-ren ∘ʳ exch-ren) ∘ʳ wk-ren ) 
-                          M) [ Hd ↦ var Hd ]c)  
-                  == M [ Hd ↦  V-rename (-ᶜ-wk-ren τ) V ]c
+                      box V (K ₖ[ N [ Hd ↦ V-rename (renΓ⟨τ⟩-Γ⋈Δ {Δ = Δ} p) V ]c ])
 
     unbox-comm : ∀ {A B C τ τ' τ''} →
                 (p : τ ≤ ctx-time Γ) → 
@@ -454,6 +412,15 @@ mutual
                     Γ ⊢C⦂ box V (C-rename wk-ren M)
                         ==
                         M
+
+    unbox-not-used : ∀ {A C τ τ'} → 
+                    (p : τ ≤ ctx-time Γ) → 
+                    (V : Γ -ᶜ τ ⊢V⦂ [ τ ] A) → 
+                    (M : Γ ⊢C⦂ C ‼ τ') → 
+                    --------------------
+                    Γ ⊢C⦂ unbox p V (C-rename wk-ren M)
+                        ==
+                        M
     
     box-unbox-comm : ∀ {A B C τ τ' τ''} → 
                     (p : τ' ≤ ctx-time Γ) → 
@@ -470,14 +437,7 @@ mutual
                             W 
                             (box 
                               (V-rename (cong-⟨⟩-ren wk-ren) V) 
-                              (C-rename exch-ren M))
-
-    -- box V as x in (unbox W as y in M) == unbox W as y in (box V as x in M) 
-    -- box V as x in M [x not in M] == M 
-    -- box V as x in (box W as y in M) == box W as y in (box V as x in M) 
-    -- unbox V as x in (unbox W as y in M) == unbox W as y in (unbox V as x in M) 
-    -- box_t₁ V as x in (box_t₂ x as y in M) == box_{t₁ + t₂} as x in M  -- this one holds just one way
-
+                              (C-rename exch-ren M))    
 
     {-
     -- NOTE: potential extension of the equational theory 

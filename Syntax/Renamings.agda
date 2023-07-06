@@ -16,10 +16,17 @@ open import Relation.Binary.Definitions
 open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Language
+open import Syntax.EvaluatingContext
 
+open import Data.Nat public
+open import Data.Nat.Properties public
 open import Util.Equality
 open import Util.Time
 open import Util.Properties
+
+open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
+open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)
+
 
 -- Variable renamings (as the least relation closed under
 -- identities, composition, ordinary variable renamings,
@@ -407,3 +414,86 @@ mutual
   C-rename ρ (unbox {τ = τ} p V M) =
     unbox (≤-trans p (ren-≤-ctx-time ρ)) (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
   C-rename ρ (box V M)         = box (V-rename (cong-ren ρ) V) (C-rename (cong-ren ρ) M)
+
+-----------------------------------
+-- Renamings of binding contexts --
+-----------------------------------
+
+-- lemma that states that joining contexts is context sumation under the hood
+
+Γ⋈Δ≡Γ++ᶜctxΔ : (Γ : Ctx) → (Δ : BCtx) → Γ ⋈ Δ ≡ Γ ++ᶜ (BCtx→Ctx Δ)
+Γ⋈Δ≡Γ++ᶜctxΔ Γ []ₗ = refl
+Γ⋈Δ≡Γ++ᶜctxΔ Γ (X ∷ₗ Δ) = 
+  begin 
+      Γ ⋈ (X ∷ₗ Δ) ≡⟨ refl ⟩  
+      (Γ ∷ X) ⋈ Δ ≡⟨ Γ⋈Δ≡Γ++ᶜctxΔ (Γ ∷ X) Δ ⟩ 
+      (Γ ∷ X) ++ᶜ (BCtx→Ctx Δ) ≡⟨ (++ᶜ-assoc Γ ([] ∷ X) (BCtx→Ctx Δ)) ⟩
+      Γ ++ᶜ (([] ∷ X) ++ᶜ (BCtx→Ctx Δ))
+    ∎
+Γ⋈Δ≡Γ++ᶜctxΔ Γ (⟨ τ ⟩ₗ Δ) = 
+    begin 
+      Γ ⋈ (⟨ τ ⟩ₗ Δ) ≡⟨ refl ⟩  
+      (Γ ⟨ τ ⟩) ⋈ Δ ≡⟨ Γ⋈Δ≡Γ++ᶜctxΔ (Γ ⟨ τ ⟩) Δ ⟩ 
+      (Γ ⟨ τ ⟩) ++ᶜ (BCtx→Ctx Δ) ≡⟨ (++ᶜ-assoc Γ ([] ⟨ τ ⟩) (BCtx→Ctx Δ)) ⟩
+      Γ ++ᶜ (([] ⟨ τ ⟩) ++ᶜ (BCtx→Ctx Δ))
+    ∎
+
+-- substitute context under the ctx-time
+
+subst-ctx-time : ∀ {Γ Δ} → Γ ≡ Δ → ctx-time Γ ≡ ctx-time Δ
+subst-ctx-time refl = refl
+
+-- time on join is homogenous
+
+time[Γ⋈Δ]≡time[Γ]+time[Δ] : (Γ : Ctx) → (Δ : BCtx) → ctx-time (Γ ⋈ Δ) ≡ ctx-time Γ + (ctx-time (BCtx→Ctx Δ))
+time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ = 
+  begin 
+      ctx-time (Γ ⋈ Δ) ≡⟨ subst-ctx-time (Γ⋈Δ≡Γ++ᶜctxΔ Γ Δ) ⟩  
+      ctx-time (Γ ++ᶜ (BCtx→Ctx Δ)) ≡⟨ ctx-time-++ᶜ Γ ((BCtx→Ctx Δ)) ⟩  
+      ctx-time Γ + ctx-time (BCtx→Ctx Δ)
+    ∎
+
+-- Lemma: join with binding context increase time on left
+
+τΓ≤τΓ⋈Δ : ∀ {Γ Δ τ} → τ ≤ ctx-time Γ → τ ≤ ctx-time (Γ ⋈ Δ)
+τΓ≤τΓ⋈Δ {Γ} {Δ} p = τ-≤-substᵣ (time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ) (≤-stepsʳ (ctx-time (BCtx→Ctx Δ)) p)
+
+-- Lemma: join with binding context increase time on right
+
+τΔ≤τΓ⋈Δ : ∀ {Γ Δ τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → τ ≤ ctx-time (Γ ⋈ Δ)
+τΔ≤τΓ⋈Δ {Γ} {Δ} p = τ-≤-substᵣ (time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ) (≤-stepsˡ (ctx-time Γ) p)
+
+-- weakening lemma
+
+renΓΓ⟨τ'⟩-τ : ∀ {Γ τ τ'} → τ ≤ τ' → Ren Γ (Γ ⟨ τ' ⟩ -ᶜ τ)
+renΓΓ⟨τ'⟩-τ {Γ} {τ} {τ'} p = ⟨⟩-≤-ren p -ʳ τ ∘ʳ ⟨⟩-ᶜ-ren' τ
+
+-- weakening lemma 
+
+-ᶜ-++ᶜ-wk-ren : ∀ {Γ Γ' τ} → τ ≤ ctx-time Γ' → Ren Γ (Γ ++ᶜ Γ' -ᶜ τ)
+-ᶜ-++ᶜ-wk-ren {Γ} {Γ'} {τ} p = (eq-ren (++ᶜ-ᶜ {Γ} {Γ'} {τ} p)) ∘ʳ wk-ctx-ren
+
+-- -ᶜ for joined contexts lemmas
+
+Γ⋈Δ-ᶜτ : ∀ {Γ Δ τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → Ren Γ (Γ ⋈ Δ -ᶜ τ)
+Γ⋈Δ-ᶜτ {Γ} {Δ} {τ} p = eq-ren (sym (Γ⋈Δ≡Γ++ᶜctxΔ Γ Δ)) -ʳ τ ∘ʳ -ᶜ-++ᶜ-wk-ren p
+
+-- rename time to context
+
+ren⟨τ⟩-ctx : ∀ {Γ Γ' τ} → τ ≤ ctx-time Γ' → Ren (Γ ⟨ τ ⟩) (Γ ++ᶜ Γ')
+ren⟨τ⟩-ctx {Γ} {[]} {.zero} z≤n = ⟨⟩-η-ren
+ren⟨τ⟩-ctx {Γ} {Γ' ∷ X} {τ} p = wk-ren ∘ʳ ren⟨τ⟩-ctx p
+ren⟨τ⟩-ctx {Γ} {Γ' ⟨ τ' ⟩} {τ} p with τ ≤? τ'
+... | yes q = cong-⟨⟩-ren wk-ctx-ren ∘ʳ (⟨⟩-≤-ren q) 
+... | no ¬q = 
+        (cong-⟨⟩-ren (ren⟨τ⟩-ctx (m≤n+k⇒m∸k≤n τ (ctx-time Γ') τ' p)) 
+            ∘ʳ ⟨⟩-μ-ren {τ = τ ∸ τ'}) 
+        ∘ʳ +-∸-id-ren τ τ'
+
+-- elim nonused variables from the joined contex 
+
+renΓ⟨τ⟩-Γ⋈Δ : ∀ {Γ Δ A τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → Ren (Γ ⟨ τ ⟩) (Γ ∷ A ⋈ Δ)
+renΓ⟨τ⟩-Γ⋈Δ {Γ} {Δ} {A} {τ} p = 
+    ((eq-ren (sym (Γ⋈Δ≡Γ++ᶜctxΔ (Γ ∷ A) Δ))) 
+    ∘ʳ cong-ren wk-ren) 
+    ∘ʳ ren⟨τ⟩-ctx p 

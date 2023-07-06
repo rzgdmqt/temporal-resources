@@ -1,13 +1,9 @@
-module Syntax.ContextsHoles where
+module Syntax.EvaluatingContext where
 
-open import Data.Product
 open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Language
-open import Syntax.Renamings
-open import Syntax.Substitutions
 
-open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
@@ -29,6 +25,11 @@ BCtx→Ctx : BCtx → Ctx
 BCtx→Ctx []ₗ = []
 BCtx→Ctx (x ∷ₗ Δ) = ([] ∷ x) ++ᶜ BCtx→Ctx Δ
 BCtx→Ctx (⟨ τ ⟩ₗ Δ) = ([] ⟨ τ ⟩) ++ᶜ BCtx→Ctx Δ
+
+bctx-time : (Δ : BCtx) → Time
+bctx-time []ₗ = 0
+bctx-time (X ∷ₗ Δ) = bctx-time Δ
+bctx-time (⟨ τ ⟩ₗ Δ) = τ + (bctx-time Δ)
 
 infixl 30 _⋈_ 
 
