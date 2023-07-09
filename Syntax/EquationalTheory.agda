@@ -8,7 +8,7 @@ open import Data.Product
 
 open import Syntax.Types
 open import Syntax.Contexts
-open import Syntax.EvaluatingContext
+open import Syntax.CompContext
 open import Syntax.Language
 open import Syntax.Renamings
 open import Syntax.Substitutions
@@ -240,7 +240,8 @@ mutual
                   == τ-subst (sym (+-assoc τ τ' τ''))
                        (delay τ
                          (M ;
-                          C-rename (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) N))
+                          C-rename (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) 
+                          N))
 
     -- eta-equation for sequential composition
 
@@ -358,6 +359,8 @@ mutual
                                     (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren)
                                     N)))
 
+    -- beta rule for unbox
+
     unbox-beta : ∀ {Δ A B τ τ'}
                → (p : τ ≤ ctx-time (BCtx→Ctx Δ))
                → (V : Γ ⟨ τ ⟩ ⊢V⦂ A )
@@ -367,9 +370,12 @@ mutual
                → Γ ⊢C⦂ box V 
                       (K ₖ[ 
                           unbox (τΔ≤τΓ⋈Δ {Γ = Γ ∷ [ τ ] A} {Δ = Δ} p) 
-                                (var (proj₂ (proj₂ (var-rename (Γ⋈Δ-ᶜτ {Δ = Δ} p) Hd)))) N ]) 
-                    == 
-                      box V (K ₖ[ N [ Hd ↦ V-rename (renΓ⟨τ⟩-Γ⋈Δ {Δ = Δ} p) V ]c ])
+                                (var (proj₂ (proj₂ (var-rename (Γ⋈Δ-ᶜτ {Δ = Δ} p) Hd)))) 
+                                N 
+                          ]) 
+                    == box V (K ₖ[ N [ Hd ↦ V-rename (renΓ⟨τ⟩-Γ⋈Δ {Δ = Δ} p) V ]c ])
+
+    -- unboxing non-related values commute
 
     unbox-comm : ∀ {A B C τ τ' τ''} →
                 (p : τ ≤ ctx-time Γ) → 
@@ -379,16 +385,13 @@ mutual
                 (M : Γ ∷ A ∷ B ⊢C⦂ C ‼ τ'') → 
                 ---------------------------------------------
                 Γ ⊢C⦂ unbox p V 
-                        (unbox q 
-                            (V-rename (wk-ren -ʳ τ') W) 
-                            M
-                        ) 
-                    == 
-                    unbox q W 
+                        (unbox q (V-rename (wk-ren -ʳ τ') W) M) 
+                    ==  unbox q W 
                         (unbox p 
                             (V-rename ((wk-ren -ʳ τ)) V) 
-                            (C-rename exch-ren M)
-                        )
+                            (C-rename exch-ren M))
+
+    -- boxing resources commute 
 
     box-comm : ∀ {A B C τ τ' τ''} → 
               (V : Γ ⟨ τ ⟩ ⊢V⦂ A) →
@@ -396,22 +399,22 @@ mutual
               (M : Γ ∷ [ τ ] A ∷ [ τ' ] B ⊢C⦂ C ‼ τ'') → 
               ----------------------------------------
               Γ ⊢C⦂ box V 
-                      (box 
-                        (V-rename (cong-⟨⟩-ren wk-ren) W) 
-                        M)
-                  ==
-                  box W 
+                      (box (V-rename (cong-⟨⟩-ren wk-ren) W) M)
+                  == box W 
                       (box 
                         (V-rename (cong-⟨⟩-ren wk-ren) V) 
                         (C-rename exch-ren M))
+
+    -- eta rule for box
 
     boxed-not-used : ∀ {A C τ τ'} → 
                     (V : Γ ⟨ τ ⟩ ⊢V⦂ A) → 
                     (M : Γ ⊢C⦂ C ‼ τ') → 
                     --------------------
                     Γ ⊢C⦂ box V (C-rename wk-ren M)
-                        ==
-                        M
+                        == M
+    
+    -- eta rule for unbox
 
     unbox-not-used : ∀ {A C τ τ'} → 
                     (p : τ ≤ ctx-time Γ) → 
@@ -419,21 +422,21 @@ mutual
                     (M : Γ ⊢C⦂ C ‼ τ') → 
                     --------------------
                     Γ ⊢C⦂ unbox p V (C-rename wk-ren M)
-                        ==
-                        M
+                        == M
+
+    -- boxing and unboxing unrelated resources commute
     
     box-unbox-comm : ∀ {A B C τ τ' τ''} → 
                     (p : τ' ≤ ctx-time Γ) → 
                     (V : Γ ⟨ τ ⟩ ⊢V⦂ A) → 
                     (W : Γ -ᶜ τ' ⊢V⦂ [ τ' ] B) → 
                     (M : Γ ∷ [ τ ] A ∷ B ⊢C⦂ C ‼ τ'') → 
-                    -------------------------------
+                    -----------------------------------
                     Γ ⊢C⦂ box V 
                             (unbox p 
                               (V-rename (wk-ren -ʳ τ') W) 
                               M) 
-                        ==
-                         unbox p 
+                        == unbox p 
                             W 
                             (box 
                               (V-rename (cong-⟨⟩-ren wk-ren) V) 

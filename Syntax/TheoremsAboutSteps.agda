@@ -48,3 +48,5 @@ step-increases-time (UNBOX p) = ≤-refl
 step-increases-time (DELAY {τ' = τ'}) = ≤-stepsʳ τ' ≤-refl
 step-increases-time (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState x) = τ≤τ₁
 step-increases-time (HANDLE-STEP τ≤τ₇ τ+τ₄≡τ₇+τ₆ sucState x) = τ≤τ₇
+
+

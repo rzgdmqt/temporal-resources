@@ -1,4 +1,4 @@
-module Syntax.EvaluatingContext where
+module Syntax.CompContext where
 
 open import Syntax.Types
 open import Syntax.Contexts

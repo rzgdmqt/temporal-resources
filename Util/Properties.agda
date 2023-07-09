@@ -116,3 +116,13 @@ m≤n+k⇒m∸k≤n zero n (suc k) p = z≤n
 m≤n+k⇒m∸k≤n (suc m) zero (suc k) (s≤s p) = τ-≤-substₗ (sym (m≤n⇒m∸n≡0 p)) ≤-refl
 m≤n+k⇒m∸k≤n (suc m) (suc n) (suc k) (s≤s p) = 
     m≤n+k⇒m∸k≤n m (suc n) k (τ-≤-substᵣ (sym (+-suc n k)) p)
+
+0+[τ''+τ'+τ]≡τ'+[τ+τ''] : ∀ τ τ' τ'' → 0 + (τ'' + τ' + τ) ≡ τ' + (τ + τ'')
+0+[τ''+τ'+τ]≡τ'+[τ+τ''] τ τ' τ'' = 
+    begin 
+        0 + (τ'' + τ' + τ) ≡⟨ refl ⟩ 
+        τ'' + τ' + τ ≡⟨ +-assoc τ'' τ' τ ⟩  
+        τ'' + (τ' + τ) ≡⟨ +-comm τ'' (τ' + τ) ⟩  
+        τ' + τ + τ'' ≡⟨ +-assoc τ' τ τ'' ⟩  
+        τ' + (τ + τ'')
+    ∎

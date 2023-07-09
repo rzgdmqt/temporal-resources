@@ -16,7 +16,7 @@ open import Relation.Binary.Definitions
 open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Language
-open import Syntax.EvaluatingContext
+open import Syntax.CompContext
 
 open import Data.Nat public
 open import Data.Nat.Properties public
