@@ -1,4 +1,4 @@
-module Syntax.Semisoundness where
+module Syntax.Soundness where
 
 open import Syntax.EquationalTheory
 open import Syntax.PerservationTheorem
@@ -22,10 +22,8 @@ config-to-comp : ∀ {A τ}
         → [] ⊢C⦂ A ‼ (τ + Config.τ Cf)
 config-to-comp {τ = τ} ⟨ .0 , ∅ , M ⟩ _ _ = τ-subst (sym (+-identityʳ τ)) M
 config-to-comp {τ = τ'} ⟨ .(τ + τ'') , _⟨_⟩ₘ {τ} S τ'' , M ⟩ .(S ⟨ τ'' ⟩ₘ) refl = 
-    τ-subst (0+[τ''+τ'+τ]≡τ'+[τ+τ''] τ τ' τ'') 
-        (delay 0 
-            (C-rename wk-⟨⟩-ren 
-            (config-to-comp ⟨ τ , S , delay τ'' M ⟩ S refl)))
+    τ-subst (0+[τ''+τ'+τ]≡τ'+[τ+τ''] τ τ' τ'')
+      (config-to-comp ⟨ τ , S , delay τ'' M ⟩ S refl)
 config-to-comp ⟨ τ , S ∷ₘ[ τ' ] X , M ⟩ (.S ∷ₘ[ .τ' ] .X) refl = 
     config-to-comp ⟨ τ , S , box X M ⟩ S refl
 
@@ -41,14 +39,14 @@ step-induces-equationaly-equal-computations : ∀ {A τ τ' τ'' τ'''}
             τ-subst τ''+τ≡τ'''+τ' (config-to-comp ⟨ τ , S , M ⟩ S refl)
             == 
             config-to-comp ⟨ τ' , S' , M' ⟩ S' refl
-step-induces-equationaly-equal-computations p APP = {!   !}
-step-induces-equationaly-equal-computations p MATCH = {!   !}
+step-induces-equationaly-equal-computations refl APP = {!   !}
+step-induces-equationaly-equal-computations refl MATCH = {!   !}
 step-induces-equationaly-equal-computations p (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = {!   !}
-step-induces-equationaly-equal-computations p SEQ-RET = {!   !}
-step-induces-equationaly-equal-computations p SEQ-OP = {!   !}
+step-induces-equationaly-equal-computations refl SEQ-RET = {!   !}
+step-induces-equationaly-equal-computations refl SEQ-OP = {!   !}
 step-induces-equationaly-equal-computations p DELAY = {!   !}
-step-induces-equationaly-equal-computations p HANDLE-RET = {!   !}
+step-induces-equationaly-equal-computations refl HANDLE-RET = {!   !}
 step-induces-equationaly-equal-computations p (HANDLE-STEP τ≤τ₄ τ+τ₂≡τ₄+τ₃ sucState M↝M') = {!   !}
-step-induces-equationaly-equal-computations p HANDLE-OP = {!   !}
-step-induces-equationaly-equal-computations p BOX = {!   !}
-step-induces-equationaly-equal-computations p (UNBOX p₁) = {!   !}
+step-induces-equationaly-equal-computations p HANDLE-OP = {!  !}
+step-induces-equationaly-equal-computations refl BOX = C-refl
+step-induces-equationaly-equal-computations refl (UNBOX p₁) = {!  !}
