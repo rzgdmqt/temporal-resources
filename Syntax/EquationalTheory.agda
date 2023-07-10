@@ -442,10 +442,6 @@ mutual
                               (V-rename (cong-⟨⟩-ren wk-ren) V) 
                               (C-rename exch-ren M))    
 
-    {-
-    -- NOTE: potential extension of the equational theory 
-    -- with equations for collapsing successive delays
-
     delay-zero : ∀ {A τ}
                → (M : Γ ⟨ 0 ⟩ ⊢C⦂ A ‼ τ)
                --------------------------
@@ -461,6 +457,5 @@ mutual
                          (delay
                            (τ₁ + τ₂)
                            (C-rename ⟨⟩-μ⁻¹-ren M))
-  -}
 
   infix 18 _⊢C⦂_==_
