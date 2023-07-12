@@ -228,8 +228,7 @@ mutual
                     == τ-subst (sym (+-assoc (op-time op) τ τ'))
                          (perform op V
                             (M ;
-                             C-rename (cong-ren {Γ'' = [] ⟨ τ ⟩ ∷ A} wk-ren ∘ʳ
-                                 cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren)
+                             C-rename ((cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren)))
                              N))
 
     seq-delay : ∀ {A B τ τ' τ''}
