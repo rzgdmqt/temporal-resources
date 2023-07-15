@@ -69,3 +69,30 @@ progress (box V M) = steps ≤-refl refl BOX
 progress (absurd (var V)) = ⊥-elim (Empty-not-in-ctx V)
 progress (var V · N) = ⊥-elim (⇒-not-in-ctx V)
 progress (match var V `in M) = ⊥-elim (⦉⦊-not-in-ctx V)
+
+
+-- Theorem: is-value is indeed final state (make no further steps)
+
+finality-value : ∀ {A B τ τ₁ τ₂}
+                → {S : 𝕊 τ}
+                → {S₁ : 𝕊 τ₁}
+                → {V : toCtx S ⊢V⦂ A}
+                → progresses (return V)
+                → {M₁ : toCtx S₁ ⊢C⦂ B ‼ τ₂}
+                → ⟨ τ , S , return V ⟩ ↝ ⟨ τ₁ , S₁ , M₁ ⟩
+                → ⊥
+finality-value is-value ()
+
+
+-- Theorem: is-op is indeed final state (make no further steps)
+
+finality-op : ∀ {A B op τ τ₁ τ₂ τ₃}
+                → {S : 𝕊 τ}
+                → {S₁ : 𝕊 τ₁}
+                → {V : toCtx S ⊢V⦂ type-of-gtype (param op) }
+                → {M : toCtx S ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ₂}
+                → progresses (perform op V M)
+                → {M₁ : toCtx S₁ ⊢C⦂ B ‼ τ₃}
+                → ⟨ τ , S , perform op V M ⟩ ↝ ⟨ τ₁ , S₁ , M₁ ⟩
+                → ⊥
+finality-op is-op ()
