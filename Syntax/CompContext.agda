@@ -52,6 +52,12 @@ data _⊢K[_]⦂_ (Γ : Ctx) : BCtx → CType → Set where
         ------------------------------------
         → Γ ⊢K[ ⟨ τ ⟩ₗ A ∷ₗ Δₖ ]⦂ Aₖ ‼ (τ + τₖ)
     
+    match_`inₖ_ : ∀ {Δₖ Aₖ A B τₖ}
+        → Γ ⊢V⦂ A |×| B
+        → Γ ∷ A ∷ B ⊢K[ Δₖ ]⦂ Aₖ ‼ τₖ
+        ----------------------------
+        → Γ ⊢K[ A ∷ₗ (B ∷ₗ Δₖ) ]⦂ Aₖ ‼ τₖ
+
     performₖ : ∀ {Δ A τ op}
         → Γ ⊢V⦂ type-of-gtype (param op)
         → Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢K[ Δ ]⦂ A ‼ τ
@@ -111,6 +117,7 @@ holeTy (handle M `with H `inₖ K) = holeTy K
 holeTy (delayₖ τ K) = holeTy K
 holeTy (unboxₖ τ≤ctxTimeΓ V K) = holeTy K
 holeTy (boxₖ V K) = holeTy K
+holeTy (match V `inₖ K) = holeTy K
 
 
 -- hole filling function
@@ -127,6 +134,7 @@ handle N `with H `inₖ K ₖ[ M ] = handle N `with H `in (K ₖ[ M ])
 delayₖ τ K ₖ[ M ] = delay τ (K ₖ[ M ])
 unboxₖ τ≤ctxTimeΓ V K ₖ[ M ] = unbox τ≤ctxTimeΓ V (K ₖ[ M ])
 boxₖ V K ₖ[ M ] = box V (K ₖ[ M ])
+(match V `inₖ K) ₖ[ M ] = match V `in (K ₖ[ M ])
 
 
     -- Gamma |-[Gamma' ; D] K : C
