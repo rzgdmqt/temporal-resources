@@ -13,7 +13,7 @@ open import Data.Product
 
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
 
--- record type for Configuratin that encapsulates time state and computation
+-- record type for Configuratin that encapsulates time, state and computation
 
 record Config (C : CType) : Set where
     constructor ⟨_,_,_⟩
@@ -22,7 +22,7 @@ record Config (C : CType) : Set where
         state : 𝕊 τ
         computation : toCtx state  ⊢C⦂ C
 
--- perservation theorem
+-- small-step operational semantics
 
 data _↝_ :  {C D : CType} → Config C → Config D → Set where
     
@@ -157,7 +157,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
     BOX :   {τ τ' τ'' : Time} → {S : 𝕊 τ} → {A B : VType} → 
             {V : toCtx S ⟨ τ' ⟩ ⊢V⦂ A} →  
             {M : toCtx S ∷ [ τ' ] A ⊢C⦂ B ‼ τ''} →
-            -----------------------------------------------------------------------
+            -------------------------------------------------------
             ⟨ τ , S , (box V M) ⟩ ↝ ⟨ τ , extend-state S τ' V , M ⟩
 
     -- step for unbox: we just substitute in M with unboxed resource (finding the right one is tricky)
@@ -189,3 +189,24 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
                         S 
                         (proj₂ (proj₂ (
                             push-time-further p (proj₂ (var-in-ctx V)))))) ]c ⟩ 
+
+-- perservation theorem
+
+perseration-theorem : ∀ {A B τ τ' τ'' τ'''}
+                → {S : 𝕊 τ}
+                → {S' : 𝕊 τ'}
+                → {M : toCtx S ⊢C⦂ A ‼ τ''}
+                → {M' : toCtx S' ⊢C⦂ B ‼ τ'''}
+                → ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩
+                → A ≡ B
+perseration-theorem APP = refl
+perseration-theorem MATCH = refl
+perseration-theorem (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = refl
+perseration-theorem SEQ-RET = refl
+perseration-theorem SEQ-OP = refl
+perseration-theorem DELAY = refl
+perseration-theorem HANDLE-RET = refl
+perseration-theorem (HANDLE-STEP τ≤τ₄ τ+τ₂≡τ₄+τ₃ sucState M↝M') = refl
+perseration-theorem HANDLE-OP = refl
+perseration-theorem BOX = refl
+perseration-theorem (UNBOX p) = refl
