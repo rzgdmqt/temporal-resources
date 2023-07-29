@@ -53,8 +53,11 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             ⟨ τ , S , M ⟩ ↝ ⟨ τ₁ , S₁ , M₁ ⟩ →
             --------------------------------------------------------------------
             ⟨ τ , S , M ; N ⟩ ↝ 
-            ⟨ τ₁ , S₁ , M₁ ; (C-rename (cong-∷-ren (suc-comp-ren τ≤τ₁ sucState (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₁+τ₄))) N) ⟩  
-
+            ⟨ τ₁ , S₁ , M₁ ;  
+                C-rename 
+                    (cong-∷-ren (suc-comp-ren τ≤τ₁ sucState (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₁+τ₄))) 
+                    N ⟩
+                    
     -- usual step for return in sequencing
     SEQ-RET : {τ τ' : Time} → 
             {A B : VType} → {S : 𝕊 τ} → 
@@ -149,7 +152,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
                     `with (λ op₁ τ''' → 
                             C-rename (cong-∷-ren (cong-∷-ren (wk-ren ∘ʳ wk-⟨⟩-ren))) 
                         (H op₁ τ''')) 
-                    `in (C-rename (cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren)) 
+                    `in (C-rename ((cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren)))
                         N))) 
                 ((H op (τ'' + τ')) [ Tl-∷ Hd ↦ V ]c) ⟩
 
@@ -192,21 +195,25 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
 
 -- perservation theorem
 
-perseration-theorem : ∀ {A B τ τ' τ'' τ'''}
+perservation-theorem : ∀ {A B τ τ' τ'' τ'''}
                 → {S : 𝕊 τ}
                 → {S' : 𝕊 τ'}
                 → {M : toCtx S ⊢C⦂ A ‼ τ''}
                 → {M' : toCtx S' ⊢C⦂ B ‼ τ'''}
                 → ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩
-                → A ≡ B
-perseration-theorem APP = refl
-perseration-theorem MATCH = refl
-perseration-theorem (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = refl
-perseration-theorem SEQ-RET = refl
-perseration-theorem SEQ-OP = refl
-perseration-theorem DELAY = refl
-perseration-theorem HANDLE-RET = refl
-perseration-theorem (HANDLE-STEP τ≤τ₄ τ+τ₂≡τ₄+τ₃ sucState M↝M') = refl
-perseration-theorem HANDLE-OP = refl
-perseration-theorem BOX = refl
-perseration-theorem (UNBOX p) = refl
+                → A ≡ B × τ + τ'' ≡ τ' + τ'''
+perservation-theorem APP = refl , refl
+perservation-theorem MATCH = refl , refl
+perservation-theorem {τ = τ} {τ'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = 
+    refl , τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] τ τ' τ₂ τ₃ τ₄ τ+τ₂≡τ₁+τ₄
+perservation-theorem SEQ-RET = refl , refl
+perservation-theorem SEQ-OP = refl , refl
+perservation-theorem {τ = τ} {τ''' = τ'''} (DELAY {τ' = τ'}) = 
+    refl , sym (+-assoc τ τ' τ''')
+perservation-theorem HANDLE-RET = refl , refl
+perservation-theorem {τ = τ} {τ'} (HANDLE-STEP {τ₁ = τ₁} {τ₂} {τ₃} τ≤τ₄ τ+τ₂≡τ₄+τ₃ sucState M↝M') = 
+    refl , τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] τ τ' τ₂ τ₁ τ₃ τ+τ₂≡τ₄+τ₃
+perservation-theorem {τ = τ} (HANDLE-OP {τ' = τ'} {τ'' = τ''} {op = op}) = 
+    refl , cong (τ +_) (+-assoc (op-time op) τ'' τ')
+perservation-theorem BOX = refl , refl
+perservation-theorem (UNBOX p) = refl , refl 

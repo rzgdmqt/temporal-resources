@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Syntax.Soundness where
 
 open import Syntax.EquationalTheory
@@ -17,34 +18,6 @@ open import Util.Properties
 open import Util.Operations
 open import Data.Empty
 open import Data.Product
-
-data compCtx : ∀ {Γ A τ} → (Γ ⊢C⦂ A ‼ τ) → Set where
-    [_]c : ∀ {A τ} 
-        → (M : [] ⊢C⦂ A ‼ τ) 
-        → compCtx M
-
-    boxc : ∀ {Γ A B τ τ'} 
-        → (V : Γ ⟨ τ ⟩ ⊢V⦂ A) 
-        → (M : Γ ∷ [ τ ] A ⊢C⦂ B ‼ τ')
-        → compCtx M
-        → compCtx (box V M) 
-
-    delayc : ∀ {Γ A τ'} 
-        → (τ : Time) 
-        → (M : Γ ⟨ τ ⟩ ⊢C⦂ A ‼ τ')
-        → compCtx (delay τ M)
-
-
--- config-to-comp' : ∀ {A τ} 
---         → (Cf : Config (A ‼ τ)) 
---         → (S : 𝕊 (Config.τ Cf))  -- this and next line are just to fix termination error in Agda
---         → S ≡ Config.state Cf 
---         → compCtx (Config.computation Cf)
--- config-to-comp' {τ = τ} ⟨ .0 , ∅ , M ⟩ _ _ = [ M ]c
--- config-to-comp' {τ = τ'} ⟨ .(τ + τ'') , _⟨_⟩ₘ {τ} S τ'' , M ⟩ .(S ⟨ τ'' ⟩ₘ) refl = 
---     {!  delayc ? ?  !}
--- config-to-comp' ⟨ τ , S ∷ₘ[ τ' ] V , M ⟩ (.S ∷ₘ[ .τ' ] .V) refl = {! boxc !}
-
 
 config-to-comp : ∀ {A τ} 
         → (Cf : Config (A ‼ τ)) 
@@ -69,12 +42,12 @@ M==N⇒confM==confN : ∀ {A τ τ'}
             config-to-comp ⟨ τ , S , M ⟩ S refl
             == 
             config-to-comp ⟨ τ , S , M' ⟩ S refl
-M==N⇒confM==confN C-refl = C-refl
-M==N⇒confM==confN (C-sym M==M') = 
-    C-sym (M==N⇒confM==confN M==M')
-M==N⇒confM==confN (C-trans M==M' M==M'') = 
-    C-trans (M==N⇒confM==confN M==M') (M==N⇒confM==confN M==M'')
-M==N⇒confM==confN {τ = τ} {S = S} {M = M} {M' = M'} M==M' = {!   !} 
+M==N⇒confM==confN {τ = .0} {τ'} {S = ∅} {M = M} {M' = M'} M==M' = 
+    congruence M==M' (τ-subst (sym (+-identityʳ τ')))
+M==N⇒confM==confN {τ = .(τ''' + τ'')} {τ'} {S = _⟨_⟩ₘ {τ'''} S τ''} {M = M} {M' = M'} M==M' = 
+    congruence (M==N⇒confM==confN (delay-cong M==M')) (λ x → τ-subst (0+[τ''+τ'+τ]≡τ'+[τ+τ''] τ''' τ' τ'') x) 
+M==N⇒confM==confN {τ = τ} {S = S ∷ₘ[ τ' ] x} {M = M} {M' = M'} M==M' = 
+    M==N⇒confM==confN (box-cong V-refl M==M') 
 
 -- Soundness theorem
 
@@ -93,17 +66,29 @@ soundness refl (APP {M = M} {V = V}) =
     M==N⇒confM==confN (fun-beta M V)
 soundness refl (MATCH {V = V} {W} {M}) = 
     M==N⇒confM==confN (match-beta V W M)
-soundness p (SEQ-FST {τ} {τ₁} {τ₂} {_} {τ₄} {M = M} {N} {M₁ = M₁} τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = 
-    {!   !}
+soundness {τ = τ} {S = S} p (SEQ-FST {τ} {τ₁} {τ₂} {_} {τ₄} {M = M} {N} {M₁ = M₁} τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = {!   !}
 soundness refl (SEQ-RET {V = V} {N}) = 
     M==N⇒confM==confN (seq-return V N)
 soundness refl (SEQ-OP {op = op} {V = V} {M} {N}) = 
     M==N⇒confM==confN (seq-perform op V M N)
-soundness {τ = τ} {τ' = .(τ + τ')} {τ'''} {S = S} {S' = S'} {M = M} {M' = M'} p (DELAY {τ' = τ'}) = {!   !}
+soundness {τ = τ} {τ' = .(τ + τ')} {τ'''} {S = S} {S' = S'} {M = M} {M' = M'} p (DELAY {τ' = τ'}) = 
+    {!   !}
 soundness refl (HANDLE-RET {V = V} {H} {N}) = 
     M==N⇒confM==confN (handle-return V H N)
 soundness p (HANDLE-STEP τ≤τ₄ τ+τ₂≡τ₄+τ₃ sucState M↝M') = {!   !}
 soundness p (HANDLE-OP {S = S} {op = op} {V = V} {M} {H} {N}) = {!   !}
 soundness refl BOX = C-refl
-soundness {S = S} refl (UNBOX p₁ {V} {M = M}) = 
-    M==N⇒confM==confN {M = unbox p₁ V M} {!   !} 
+soundness {S = S} refl (UNBOX p₁ {V} {M = M}) = {!   !}
+    -- M==N⇒confM==confN {M = unbox p₁ V M} {!   !} 
+
+-- another approach with hole contexts
+
+-- conf-to-comp : ∀ {A τ} 
+--         → (Cf : Config (A ‼ τ)) 
+--         → (S : 𝕊 (Config.τ Cf))  -- this and next line are just to fix termination error in Agda
+--         → S ≡ Config.state Cf 
+--         → [] ⊢K[ Ctx→Bctx (toCtx S) ⊢ A ‼ (τ + Config.τ Cf) ]⦂ A ‼ (τ + Config.τ Cf)
+-- conf-to-comp ⟨ .0 , ∅ , M ⟩ .∅ refl = []ₖ
+-- conf-to-comp ⟨ .(_ + τ'') , S ⟨ τ'' ⟩ₘ , M ⟩ .(S ⟨ τ'' ⟩ₘ) refl = 
+--     {!   !}
+-- conf-to-comp ⟨ τ , S ∷ₘ[ τ' ] x , M ⟩ .(S ∷ₘ[ τ' ] x) refl = {!   !}

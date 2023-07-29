@@ -26,6 +26,16 @@ BCtx→Ctx []ₗ = []
 BCtx→Ctx (x ∷ₗ Δ) = ([] ∷ x) ++ᶜ BCtx→Ctx Δ
 BCtx→Ctx (⟨ τ ⟩ₗ Δ) = ([] ⟨ τ ⟩) ++ᶜ BCtx→Ctx Δ
 
+_++ₗ_ : BCtx → BCtx → BCtx
+[]ₗ ++ₗ Δ' = Δ'
+(V ∷ₗ Δ) ++ₗ Δ' = V ∷ₗ (Δ ++ₗ Δ')
+(⟨ τ ⟩ₗ Δ) ++ₗ Δ' = ⟨ τ ⟩ₗ (Δ ++ₗ Δ')
+
+Ctx→Bctx : Ctx → BCtx
+Ctx→Bctx [] = []ₗ
+Ctx→Bctx (Γ ∷ V) = Ctx→Bctx Γ ++ₗ (V ∷ₗ []ₗ)
+Ctx→Bctx (Γ ⟨ τ ⟩) = (Ctx→Bctx Γ) ++ₗ (⟨ τ ⟩ₗ []ₗ)
+
 bctx-time : (Δ : BCtx) → Time
 bctx-time []ₗ = 0
 bctx-time (X ∷ₗ Δ) = bctx-time Δ
@@ -34,96 +44,81 @@ bctx-time (⟨ τ ⟩ₗ Δ) = τ + (bctx-time Δ)
 infixl 30 _⋈_ 
 
 -- program with typed hole in it
-data _⊢K[_]⦂_ (Γ : Ctx) : BCtx → CType → Set where
+data _⊢K[_⊢_]⦂_ (Γ : Ctx) : BCtx → CType → CType → Set where
 
     []ₖ : ∀ {A τ} 
-        -------------------
-        → Γ ⊢K[ []ₗ ]⦂ A ‼ τ
+        ---------------------------
+        → Γ ⊢K[ []ₗ ⊢ A ‼ τ ]⦂ A ‼ τ
         
-    _ₖ;_ : ∀ {Δₖ Aₖ A τₖ τ} 
-        → Γ ⊢K[ Δₖ ]⦂ Aₖ ‼ τₖ 
+    _ₖ;_ : ∀ {Δₖ Aₖ A C τₖ τ} 
+        → Γ ⊢K[ Δₖ ⊢ C ]⦂ Aₖ ‼ τₖ 
         → Γ ⟨ τₖ ⟩ ∷ Aₖ ⊢C⦂ A ‼ τ
-        -------------------------
-        → Γ ⊢K[ Δₖ ]⦂ A ‼ (τₖ + τ)
+        -----------------------------------
+        → Γ ⊢K[ Δₖ ⊢ C ]⦂ A ‼ (τₖ + τ)
 
-    _;ₖ_ : ∀ {Δₖ Aₖ A τₖ τ} 
+    _;ₖ_ : ∀ {Δₖ Aₖ A C τₖ τ} 
         → Γ ⊢C⦂ A ‼ τ
-        → Γ ⟨ τ ⟩ ∷ A ⊢K[ Δₖ ]⦂ Aₖ ‼ τₖ 
-        ------------------------------------
-        → Γ ⊢K[ ⟨ τ ⟩ₗ A ∷ₗ Δₖ ]⦂ Aₖ ‼ (τ + τₖ)
+        → Γ ⟨ τ ⟩ ∷ A ⊢K[ Δₖ ⊢ C ]⦂ Aₖ ‼ τₖ 
+        ----------------------------------------------
+        → Γ ⊢K[ ⟨ τ ⟩ₗ A ∷ₗ Δₖ ⊢ C ]⦂ Aₖ ‼ (τ + τₖ)
     
-    match_`inₖ_ : ∀ {Δₖ Aₖ A B τₖ}
+    match_`inₖ_ : ∀ {Δₖ Aₖ A B C τₖ}
         → Γ ⊢V⦂ A |×| B
-        → Γ ∷ A ∷ B ⊢K[ Δₖ ]⦂ Aₖ ‼ τₖ
-        ----------------------------
-        → Γ ⊢K[ A ∷ₗ (B ∷ₗ Δₖ) ]⦂ Aₖ ‼ τₖ
+        → Γ ∷ A ∷ B ⊢K[ Δₖ ⊢ C ]⦂ Aₖ ‼ τₖ
+        ----------------------------------------
+        → Γ ⊢K[ A ∷ₗ (B ∷ₗ Δₖ) ⊢ C ]⦂ Aₖ ‼ τₖ
 
-    performₖ : ∀ {Δ A τ op}
+    performₖ : ∀ {Δ A C τ op}
         → Γ ⊢V⦂ type-of-gtype (param op)
-        → Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢K[ Δ ]⦂ A ‼ τ
-        ---------------------------------------------------------------------------
-        → Γ ⊢K[ ⟨ op-time op ⟩ₗ type-of-gtype (arity op) ∷ₗ Δ ]⦂ A ‼ (op-time op + τ)
+        → Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢K[ Δ ⊢ C ]⦂ A ‼ τ
+        ------------------------------------------------------------------------------------
+        → Γ ⊢K[ ⟨ op-time op ⟩ₗ type-of-gtype (arity op) ∷ₗ Δ ⊢ C ]⦂ A ‼ (op-time op + τ)
 
     handleₖ_`with_`in
-        : ∀ {Δ A B τ τ'}
-        → Γ ⊢K[ Δ ]⦂ A ‼ τ
+        : ∀ {Δ A B C τ τ'}
+        → Γ ⊢K[ Δ ⊢ C ]⦂ A ‼ τ
         → ((op : Op) → (τ'' : Time) →
              Γ ∷ type-of-gtype (param op)
                ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
              ⊢C⦂ B ‼ (op-time op + τ''))
         → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
         ------------------------------------------------------------
-        → Γ ⊢K[ Δ ]⦂ B ‼ (τ + τ')
+        → Γ ⊢K[ Δ ⊢ C ]⦂ B ‼ (τ + τ')
     
     handle_`with_`inₖ
-        : ∀ {Δ A B τ τ'}
+        : ∀ {Δ A B C τ τ'}
         → Γ ⊢C⦂ A ‼ τ
         → ((op : Op) → (τ'' : Time) →
              Γ ∷ type-of-gtype (param op)
                ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
              ⊢C⦂ B ‼ (op-time op + τ''))
-        → Γ ⟨ τ ⟩ ∷ A ⊢K[ Δ ]⦂ B ‼ τ'
+        → Γ ⟨ τ ⟩ ∷ A ⊢K[ Δ ⊢ C ]⦂ B ‼ τ'
         ------------------------------------------------------------
-        → Γ ⊢K[ ⟨ τ ⟩ₗ A ∷ₗ Δ ]⦂ B ‼ (τ + τ')
+        → Γ ⊢K[ ⟨ τ ⟩ₗ A ∷ₗ Δ ⊢ C ]⦂ B ‼ (τ + τ')
     
-    delayₖ : ∀ {Δ A τ'}
+    delayₖ : ∀ {Δ A C τ'}
         → (τ : Time)
-        → Γ ⟨ τ ⟩ ⊢K[ Δ ]⦂ A ‼ τ'
-        -------------------------------
-        → Γ ⊢K[ ⟨ τ ⟩ₗ Δ ]⦂ A ‼ (τ + τ')
+        → Γ ⟨ τ ⟩ ⊢K[ Δ ⊢ C ]⦂ A ‼ τ'
+        -----------------------------------------
+        → Γ ⊢K[ ⟨ τ ⟩ₗ Δ ⊢ C ]⦂ A ‼ (τ + τ')
     
-    unboxₖ : ∀ {Δ A C τ}
+    unboxₖ : ∀ {Δ A C D τ}
         → τ ≤ ctx-time Γ
         → Γ -ᶜ τ ⊢V⦂ [ τ ] A
-        → Γ ∷ A  ⊢K[ Δ ]⦂ C
-        --------------------
-        → Γ ⊢K[ A ∷ₗ Δ ]⦂ C
-
-    boxₖ : ∀ {Δ A B τ τ'}
-        → Γ ⟨ τ ⟩ ⊢V⦂ A
-        → Γ ∷ [ τ ] A ⊢K[ Δ ]⦂ B ‼ τ'
+        → Γ ∷ A  ⊢K[ Δ ⊢ D ]⦂ C
         ----------------------------
-        → Γ ⊢K[ [ τ ] A ∷ₗ Δ ]⦂ B ‼ τ'
-        
+        → Γ ⊢K[ A ∷ₗ Δ ⊢ D ]⦂ C
 
--- hole type
-holeTy : ∀ {Γ Δ C} → Γ ⊢K[ Δ ]⦂ C → CType
-holeTy {_} {_} {C} []ₖ = C
-holeTy (K ₖ; M) = holeTy K
-holeTy (M ;ₖ K) = holeTy K
-holeTy (performₖ op K) = holeTy K
-holeTy (handleₖ K `with H `in M) = holeTy K
-holeTy (handle M `with H `inₖ K) = holeTy K
-holeTy (delayₖ τ K) = holeTy K
-holeTy (unboxₖ τ≤ctxTimeΓ V K) = holeTy K
-holeTy (boxₖ V K) = holeTy K
-holeTy (match V `inₖ K) = holeTy K
-
+    boxₖ : ∀ {Δ A B C τ τ'}
+        → Γ ⟨ τ ⟩ ⊢V⦂ A
+        → Γ ∷ [ τ ] A ⊢K[ Δ ⊢ C ]⦂ B ‼ τ'
+        ---------------------------------------
+        → Γ ⊢K[ [ τ ] A ∷ₗ Δ ⊢ C ]⦂ B ‼ τ'
 
 -- hole filling function
-_ₖ[_] : ∀ {Γ Δ C} 
-        → (K : Γ ⊢K[ Δ ]⦂ C) 
-        → (M : Γ ⋈ Δ ⊢C⦂ (holeTy K)) 
+_ₖ[_] : ∀ {Γ Δ D C} 
+        → (K : Γ ⊢K[ Δ ⊢ D ]⦂ C) 
+        → (M : Γ ⋈ Δ ⊢C⦂ D) 
         → Γ ⊢C⦂ C
 []ₖ ₖ[ M ] = M
 (K ₖ; N) ₖ[ M ] = (K ₖ[ M ]) ; N
@@ -135,17 +130,3 @@ delayₖ τ K ₖ[ M ] = delay τ (K ₖ[ M ])
 unboxₖ τ≤ctxTimeΓ V K ₖ[ M ] = unbox τ≤ctxTimeΓ V (K ₖ[ M ])
 boxₖ V K ₖ[ M ] = box V (K ₖ[ M ])
 (match V `inₖ K) ₖ[ M ] = match V `in (K ₖ[ M ])
-
-
-    -- Gamma |-[Gamma' ; D] K : C
-
-
-    -- Gamma |-[ Gamma' ; C ] [] : C
-
-
-    -- Gamma |-[Gamma' ; D] K : C   &&   Gamma,Gamma' |- M : D    ==>    Gamma |- K[M] : C
-
-
-
-    -- box V as r in (op W y.N) = op W y. (box V as r in N)
-   

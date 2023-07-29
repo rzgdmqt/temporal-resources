@@ -360,11 +360,11 @@ mutual
 
     -- beta rule for unbox
 
-    unbox-beta : ∀ {Δ A B τ τ'}
+    unbox-beta : ∀ {Δ A B C τ τ'}
                → (p : τ ≤ ctx-time (BCtx→Ctx Δ))
                → (V : Γ ⟨ τ ⟩ ⊢V⦂ A )
-               → (K : Γ ∷ [ τ ] A ⊢K[ Δ ]⦂ B ‼ τ')
-               → (N : (Γ ∷ [ τ ] A ⋈ Δ) ∷ A ⊢C⦂ (holeTy K))
+               → (K : Γ ∷ [ τ ] A ⊢K[ Δ ⊢ C ]⦂ B ‼ τ')
+               → (N : (Γ ∷ [ τ ] A ⋈ Δ) ∷ A ⊢C⦂ C)
                -----------------------------------------------
                → Γ ⊢C⦂ box V 
                       (K ₖ[ 
@@ -456,5 +456,13 @@ mutual
                          (delay
                            (τ₁ + τ₂)
                            (C-rename ⟨⟩-μ⁻¹-ren M))
+
+    -- this should be derivable
+    congruence : ∀ {C D}
+        → {M M' : Γ ⊢C⦂ C}
+        → (Γ ⊢C⦂ M == M') 
+        → (f : (Γ ⊢C⦂ C) → (Γ ⊢C⦂ D)) 
+        ------------------------------
+        → Γ ⊢C⦂ f M == f M'
 
   infix 18 _⊢C⦂_==_
