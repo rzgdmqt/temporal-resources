@@ -1,14 +1,14 @@
-module Syntax.ProgressTheorem where
+module OperationalSemantics.ProgressTheorem where
 
 
 open import Util.Time
 open import Util.Properties
-open import Syntax.TheoremsAboutSteps
-open import Syntax.PerservationTheorem
+open import OperationalSemantics.TheoremsAboutSteps
+open import OperationalSemantics.PerservationTheorem
 open import Syntax.Types
 open import Syntax.Language
 open import Syntax.Contexts
-open import Syntax.State
+open import OperationalSemantics.State
 open import Util.Operations
 open import Util.Equality
 open import Data.Empty

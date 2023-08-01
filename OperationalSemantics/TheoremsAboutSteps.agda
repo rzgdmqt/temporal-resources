@@ -1,11 +1,11 @@
-module Syntax.TheoremsAboutSteps where
+module OperationalSemantics.TheoremsAboutSteps where
 
 
 open import Util.Time
 open import Syntax.Types
-open import Syntax.PerservationTheorem
+open import OperationalSemantics.PerservationTheorem
 open import Syntax.Language
-open import Syntax.State
+open import OperationalSemantics.State
 open import Util.Operations
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)

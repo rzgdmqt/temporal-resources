@@ -443,7 +443,7 @@ mutual
 subst-ctx-time : ∀ {Γ Δ} → Γ ≡ Δ → ctx-time Γ ≡ ctx-time Δ
 subst-ctx-time refl = refl
 
--- time on join is homogenous
+-- time on ⋈ is homogenous
 
 time[Γ⋈Δ]≡time[Γ]+time[Δ] : (Γ : Ctx) → (Δ : BCtx) → ctx-time (Γ ⋈ Δ) ≡ ctx-time Γ + (ctx-time (BCtx→Ctx Δ))
 time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ = 
@@ -453,12 +453,12 @@ time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ =
       ctx-time Γ + ctx-time (BCtx→Ctx Δ)
     ∎
 
--- Lemma: join with binding context increase time on left
+-- Lemma: ⋈ with binding context increase time on left
 
 τΓ≤τΓ⋈Δ : ∀ {Γ Δ τ} → τ ≤ ctx-time Γ → τ ≤ ctx-time (Γ ⋈ Δ)
 τΓ≤τΓ⋈Δ {Γ} {Δ} p = τ-≤-substᵣ (time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ) (≤-stepsʳ (ctx-time (BCtx→Ctx Δ)) p)
 
--- Lemma: join with binding context increase time on right
+-- Lemma: ⋈  with binding context increase time on right
 
 τΔ≤τΓ⋈Δ : ∀ {Γ Δ τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → τ ≤ ctx-time (Γ ⋈ Δ)
 τΔ≤τΓ⋈Δ {Γ} {Δ} p = τ-≤-substᵣ (time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ) (≤-stepsˡ (ctx-time Γ) p)

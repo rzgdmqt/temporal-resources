@@ -1,4 +1,4 @@
-module Syntax.State where
+module OperationalSemantics.State where
 
 open import Syntax.Types
 open import Syntax.Language
@@ -105,7 +105,7 @@ suc-state-trans (∷-suc p τ'' V sucSS') (⟨⟩-suc p₁ τ''' sucS'S'') =
 suc-state-trans (∷-suc p τ'' V sucSS') (∷-suc p₁ τ''' V₁ sucS'S'') = 
     ∷-suc (≤-trans p p₁) τ''' V₁ (suc-state-trans (∷-suc (≤-trans ≤-refl p) τ'' V sucSS') sucS'S'')
 
--- suc relation is antisymetric
+-- if states are suc of one another they must have equal time
 
 aux-suc-state-antisym : { τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → 
             SucState S S' → SucState S' S → τ' ≡ τ
@@ -120,23 +120,7 @@ aux-suc-state-antisym (∷-suc p τ'' V sucSS') (⟨⟩-suc p₁ τ''' sucS'S) =
     a≤b⇒b≤a⇒a≡b (≤-trans p₁ (≤-stepsʳ τ''' ≤-refl)) p
 aux-suc-state-antisym (∷-suc p τ'' V sucSS') (∷-suc p₁ τ''' V₁ sucS'S) = a≤b⇒b≤a⇒a≡b p₁ p
 
--- suc-state-antisym : { τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → 
---             (SS' : SucState S S') → (S'S : SucState S' S) → (p : τ' ≡ τ) → S ≡ τ-subst-state p S'
--- suc-state-antisym {.0} {.0} {∅} {.∅} _ id-suc refl = refl
--- suc-state-antisym {.(_ + τ'')} {.(_ + τ'')} {S ⟨ τ'' ⟩ₘ} {.(S ⟨ τ'' ⟩ₘ)} SS' id-suc refl = refl
--- suc-state-antisym {.(zero + zero)} {.(zero + zero)} {_⟨_⟩ₘ {zero} S zero} {S'} SS' (⟨⟩-suc z≤n .zero S'S) refl = {!   !}
--- suc-state-antisym {.(suc τ' + zero)} {.(suc τ' + zero)} {_⟨_⟩ₘ {suc τ'} S zero} {S'} SS' (⟨⟩-suc p .zero S'S) refl = {!   !}
--- suc-state-antisym {.(_ + suc τ'')} {.(_ + suc τ'')} {S ⟨ suc τ'' ⟩ₘ} {S'} SS' (⟨⟩-suc p .(suc τ'') S'S) refl = ⊥-elim {!   !}
--- suc-state-antisym {.(_ + zero)} {.(_ + zero)} {S ∷ₘ[ τ' ] x} {S' ⟨ zero ⟩ₘ} (⟨⟩-suc p .zero SS') (∷-suc p₁ .τ' .x S'S) refl = {!   !}
--- suc-state-antisym {.(_ + suc τ'')} {.(_ + suc τ'')} {S ∷ₘ[ τ' ] x} {S' ⟨ suc τ'' ⟩ₘ} (⟨⟩-suc p .(suc τ'') SS') (∷-suc p₁ .τ' .x S'S) refl = ⊥-elim {!   !}
--- suc-state-antisym {τ} {τ} {S ∷ₘ[ τ' ] x} {S' ∷ₘ[ τ'' ] x₁} SS' S'S refl = {!   !} 
--- -- suc-state-antisym {S = S} {S' = .S} id-suc sucS'S refl = refl
--- -- suc-state-antisym {S = S} {S' = .(S' ⟨ zero ⟩ₘ)} (⟨⟩-suc {τ' = τ'} {S' = S'} p₁ zero sucSS') sucS'S refl = {!  !}
--- -- suc-state-antisym {S = S} {S' = .(_ ⟨ suc τ'' ⟩ₘ)} (⟨⟩-suc p₁ (suc τ'') sucSS') sucS'S refl = ⊥-elim {!   !}
--- -- suc-state-antisym {S = .(_ ∷ₘ[ τ'' ] V)} {S' = .(_ ∷ₘ[ τ'' ] V)} (∷-suc p₁ τ'' V sucSS') id-suc refl = refl
--- -- suc-state-antisym {S = .(_ ⟨ τ''' ⟩ₘ)} {S' = .(_ ∷ₘ[ τ'' ] V)} (∷-suc p₁ τ'' V sucSS') (⟨⟩-suc p τ''' sucS'S) refl = ⊥-elim {!   !}
--- -- suc-state-antisym {τ} {S = .(_ ∷ₘ[ τ''' ] V₁)} {S' = .(_ ∷ₘ[ τ'' ] V)} (∷-suc p₁ τ'' V sucSS') (∷-suc p τ''' V₁ sucS'S) refl = {!   !}
--- -- operations on state - just for better readability in perservation theorem
+-- operations on state - just for better readability in perservation theorem
 
 time-pass : ∀ {τ} → (S : 𝕊 τ) → (τ' : Time) → 𝕊 (τ + τ')
 time-pass S τ = S ⟨ τ ⟩ₘ 

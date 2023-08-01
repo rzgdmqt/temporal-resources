@@ -17,6 +17,13 @@
 --     prescribed execution times and whose execution makes time pass --
 --     (both in the semantics and also in the static typing rules)    --
 --                                                                    --
+--   - small-step operational semantic                                --
+--                                                                    --
+--   - progress and perservation theorem                              --
+--                                                                    --
+--   - equational theory                                              --
+--                                                                    --
+--   - soundness theorem                                              --
 ------------------------------------------------------------------------
 
 module MasterThesis where
@@ -57,19 +64,19 @@ open import Syntax.Substitutions
 
 ---- State
 
-open import Syntax.State
+open import OperationalSemantics.State
 
 ---- Small-steps operational semantics and perservation theorem 
 
-open import Syntax.PerservationTheorem
+open import OperationalSemantics.PerservationTheorem
 
 ---- Some usefull theorems about step relation 
 
-open import Syntax.TheoremsAboutSteps
+open import OperationalSemantics.TheoremsAboutSteps
 
 ---- Progress theorem
 
-open import Syntax.ProgressTheorem
+open import OperationalSemantics.ProgressTheorem
 
 ----Computational contexts
 
@@ -81,4 +88,4 @@ open import Syntax.EquationalTheory
 
 ---- Soundness theorem
 
-open import Syntax.Soundness
+open import OperationalSemantics.Soundness

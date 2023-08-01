@@ -1,6 +1,6 @@
-module Syntax.PerservationTheorem where
+module OperationalSemantics.PerservationTheorem where
 
-open import Syntax.State
+open import OperationalSemantics.State
 open import Util.Time
 open import Util.Properties
 open import Syntax.Types

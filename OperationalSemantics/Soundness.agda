@@ -1,14 +1,14 @@
 {-# OPTIONS --allow-unsolved-metas #-}
-module Syntax.Soundness where
+module OperationalSemantics.Soundness where
 
 open import Syntax.EquationalTheory
-open import Syntax.PerservationTheorem
-open import Syntax.ProgressTheorem
+open import OperationalSemantics.PerservationTheorem
+open import OperationalSemantics.ProgressTheorem
+open import Syntax.CompContext
 open import Syntax.Types
 open import Syntax.Contexts
-open import Syntax.CompContext
 open import Syntax.Language
-open import Syntax.State
+open import OperationalSemantics.State
 open import Syntax.Renamings
 open import Syntax.Substitutions
 
@@ -49,6 +49,23 @@ M==N⇒confM==confN {τ = .(τ''' + τ'')} {τ'} {S = _⟨_⟩ₘ {τ'''} S τ''
 M==N⇒confM==confN {τ = τ} {S = S ∷ₘ[ τ' ] x} {M = M} {M' = M'} M==M' = 
     M==N⇒confM==confN (box-cong V-refl M==M') 
 
+τ-subst-merge : ∀ {Γ A}
+        → {τ τ' τ'' : Time}
+        → (p : τ ≡ τ'')
+        → (q : τ ≡ τ')
+        → (r : τ' ≡ τ'')
+        → (M : Γ ⊢C⦂ A ‼ τ)
+        → τ-subst p M ≡ τ-subst r (τ-subst q M)
+τ-subst-merge refl refl refl M = refl
+
+eq-subst : ∀ {Γ A τ}
+        → {M M' N : Γ ⊢C⦂ A ‼ τ}
+        → (M ≡ M')
+        → Γ ⊢C⦂ N == M
+        ---------------
+        → Γ ⊢C⦂ N == M'
+eq-subst refl N==M = N==M
+
 -- Soundness theorem
 
 soundness : ∀ {A τ τ' τ'' τ'''}
@@ -71,24 +88,44 @@ soundness refl (SEQ-RET {V = V} {N}) =
     M==N⇒confM==confN (seq-return V N)
 soundness refl (SEQ-OP {op = op} {V = V} {M} {N}) = 
     M==N⇒confM==confN (seq-perform op V M N)
-soundness {τ = τ} {τ' = .(τ + τ')} {τ'''} {S = S} {S' = S'} {M = M} {M' = M'} p (DELAY {τ' = τ'}) = 
-    {!   !}
+soundness {τ = τ} {τ' = .(τ + τ')} {.(τ' + τ''')} {τ'''} {S = S} {S' = .(time-pass S τ')} {M = .(delay τ' M')} {M' = M'} p (DELAY {τ' = τ'}) = 
+    (eq-subst (τ-subst-merge refl p (τ'''+[τ+τ']≡τ'+τ'''+τ τ {! τ'  !} {!   !}) (config-to-comp ⟨ τ , S , delay τ' M' ⟩ S refl)) C-refl)
+    -- eq-subst (τ-subst-merge {!   !} {!   !} {!   !} (τ-subst {!   !} ((config-to-comp ⟨ τ , S , delay τ' M' ⟩ S refl)))) {!   !}
 soundness refl (HANDLE-RET {V = V} {H} {N}) = 
     M==N⇒confM==confN (handle-return V H N)
 soundness p (HANDLE-STEP τ≤τ₄ τ+τ₂≡τ₄+τ₃ sucState M↝M') = {!   !}
 soundness p (HANDLE-OP {S = S} {op = op} {V = V} {M} {H} {N}) = {!   !}
 soundness refl BOX = C-refl
-soundness {S = S} refl (UNBOX p₁ {V} {M = M}) = {!   !}
-    -- M==N⇒confM==confN {M = unbox p₁ V M} {!   !} 
+soundness {S = S} refl (UNBOX p₁ {V} {M = M}) =
+    M==N⇒confM==confN {M = unbox p₁ V M} {!   !} 
 
--- another approach with hole contexts
 
--- conf-to-comp : ∀ {A τ} 
---         → (Cf : Config (A ‼ τ)) 
---         → (S : 𝕊 (Config.τ Cf))  -- this and next line are just to fix termination error in Agda
---         → S ≡ Config.state Cf 
---         → [] ⊢K[ Ctx→Bctx (toCtx S) ⊢ A ‼ (τ + Config.τ Cf) ]⦂ A ‼ (τ + Config.τ Cf)
--- conf-to-comp ⟨ .0 , ∅ , M ⟩ .∅ refl = []ₖ
--- conf-to-comp ⟨ .(_ + τ'') , S ⟨ τ'' ⟩ₘ , M ⟩ .(S ⟨ τ'' ⟩ₘ) refl = 
---     {!   !}
--- conf-to-comp ⟨ τ , S ∷ₘ[ τ' ] x , M ⟩ .(S ∷ₘ[ τ' ] x) refl = {!   !}
+-- -- another approach with hole contexts
+
+-- -- program with typed hole in it
+-- data _⊢[_⊢_]⦂_ (Γ : Ctx) : BCtx → CType → CType → Set where
+
+--     []ₖ : ∀ {A τ} 
+--         ---------------------------
+--         → Γ ⊢[ []ₗ ⊢ A ‼ τ ]⦂ A ‼ τ
+        
+--     delayₖ : ∀ {Δ A C τ'}
+--         → (τ : Time)
+--         → Γ ⟨ τ ⟩ ⊢[ Δ ⊢ C ]⦂ A ‼ τ'
+--         -----------------------------------------
+--         → Γ ⊢[ ⟨ τ ⟩ₗ Δ ⊢ C ]⦂ A ‼ (τ + τ')
+
+--     boxₖ : ∀ {Δ A B C τ τ'}
+--         → Γ ⟨ τ ⟩ ⊢V⦂ A
+--         → Γ ∷ [ τ ] A ⊢[ Δ ⊢ C ]⦂ B ‼ τ'
+--         ---------------------------------------
+--         → Γ ⊢[ [ τ ] A ∷ₗ Δ ⊢ C ]⦂ B ‼ τ'
+
+-- -- hole filling function
+-- -- _ₖ[_] : ∀ {Γ Δ D C} 
+-- --         → (K : Γ ⊢[ Δ ⊢ D ]⦂ C) 
+-- --         → (M : Γ ⋈ Δ ⊢C⦂ D) 
+-- --         → Γ ⊢C⦂ C
+-- -- []ₖ ₖ[ M ] = M
+-- -- delayₖ τ K ₖ[ M ] = delay τ (K ₖ[ M ])
+-- -- boxₖ V K ₖ[ M ] = box V (K ₖ[ M ])
