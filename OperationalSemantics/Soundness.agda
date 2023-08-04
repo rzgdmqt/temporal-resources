@@ -93,7 +93,8 @@ soundness refl (APP {M = M} {V = V})  =
     config-to-comp-cong (fun-beta M V)
 soundness refl (MATCH {V = V} {W = W} {M = M}) = 
     config-to-comp-cong (match-beta V W M)
-soundness p (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = {!   !}
+soundness p (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = 
+    {!   !}
 soundness refl (SEQ-RET {V = V} {N = N}) = 
     config-to-comp-cong (seq-return V N)
 soundness refl (SEQ-OP {op = op} {V = V} {M = M} {N = N}) =     

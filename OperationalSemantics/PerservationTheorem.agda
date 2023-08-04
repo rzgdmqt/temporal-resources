@@ -49,13 +49,13 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {M₁ : toCtx S₁ ⊢C⦂ A ‼ τ₄} →
             (τ+τ₂≡τ₁+τ₄ : τ + τ₂ ≡ τ₁ + τ₄) →  
             (τ≤τ₁ : τ ≤ τ₁) → 
-            (sucState : SucState S S₁) → 
+            (S≤ₛS₁ : S ≤ₛ S₁) → 
             ⟨ τ , S , M ⟩ ↝ ⟨ τ₁ , S₁ , M₁ ⟩ →
             --------------------------------------------------------------------
             ⟨ τ , S , M ; N ⟩ ↝ 
             ⟨ τ₁ , S₁ , M₁ ;  
                 C-rename 
-                    (cong-∷-ren (suc-comp-ren τ≤τ₁ sucState (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₁+τ₄))) 
+                    (cong-∷-ren (suc-comp-ren τ≤τ₁ S≤ₛS₁ (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₁+τ₄))) 
                     N ⟩
                     
     -- usual step for return in sequencing
@@ -118,7 +118,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {M₁ : toCtx S₁  ⊢C⦂ A ‼ τ₃ } →  
             (τ≤τ₄ : τ ≤ τ₄) → 
             (τ+τ₂≡τ₄+τ₃ : τ + τ₂ ≡ τ₄ + τ₃) → 
-            (sucState : SucState S S₁) → 
+            (S≤ₛS₁ : S ≤ₛ S₁) → 
             ⟨ τ , S , M ⟩ ↝ ⟨ τ₄ , S₁ , M₁ ⟩ → 
             -----------------------------------------------------------------------
             ⟨ τ , S , handle M `with H `in N ⟩ ↝ 
@@ -126,10 +126,10 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
                         `with 
                             (λ op τ'' → 
                                 C-rename 
-                                    (cong-∷-ren (cong-∷-ren (SucState⇒Ren τ≤τ₄ sucState))) 
+                                    (cong-∷-ren (cong-∷-ren (≤ₛ⇒Ren τ≤τ₄ S≤ₛS₁))) 
                                 (H op τ'')) 
                         `in (C-rename 
-                                (cong-∷-ren (suc-comp-ren τ≤τ₄ sucState (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₄+τ₃))) 
+                                (cong-∷-ren (suc-comp-ren τ≤τ₄ S≤ₛS₁ (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₄+τ₃))) 
                             N) ⟩
 
     -- operaion handle where we box up result so that time in the rest of the 
@@ -188,7 +188,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
                         (sym (ctx-timeSτ≡τ S))
                         (from-head-time-positive (proj₂ (proj₂ (push-time-further p (proj₂ (var-in-ctx V))))))
                     )
-                    (resource-use 
+                    (resource-lookup 
                         S 
                         (proj₂ (proj₂ (
                             push-time-further p (proj₂ (var-in-ctx V)))))) ]c ⟩ 
@@ -204,14 +204,14 @@ perservation-theorem : ∀ {A B τ τ' τ'' τ'''}
                 → A ≡ B × τ + τ'' ≡ τ' + τ'''
 perservation-theorem APP = refl , refl
 perservation-theorem MATCH = refl , refl
-perservation-theorem {τ = τ} {τ'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = 
+perservation-theorem {τ = τ} {τ'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ τ≤τ₁ S≤ₛS₁ M↝M') = 
     refl , τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] τ τ' τ₂ τ₃ τ₄ τ+τ₂≡τ₁+τ₄
 perservation-theorem SEQ-RET = refl , refl
 perservation-theorem SEQ-OP = refl , refl
 perservation-theorem {τ = τ} {τ''' = τ'''} (DELAY {τ' = τ'}) = 
     refl , sym (+-assoc τ τ' τ''')
 perservation-theorem HANDLE-RET = refl , refl
-perservation-theorem {τ = τ} {τ'} (HANDLE-STEP {τ₁ = τ₁} {τ₂} {τ₃} τ≤τ₄ τ+τ₂≡τ₄+τ₃ sucState M↝M') = 
+perservation-theorem {τ = τ} {τ'} (HANDLE-STEP {τ₁ = τ₁} {τ₂} {τ₃} τ≤τ₄ τ+τ₂≡τ₄+τ₃ S≤ₛS₁ M↝M') = 
     refl , τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] τ τ' τ₂ τ₁ τ₃ τ+τ₂≡τ₄+τ₃
 perservation-theorem {τ = τ} (HANDLE-OP {τ' = τ'} {τ'' = τ''} {op = op}) = 
     refl , cong (τ +_) (+-assoc (op-time op) τ'' τ')

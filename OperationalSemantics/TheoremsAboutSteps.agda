@@ -18,7 +18,7 @@ step-extends-state : {τ τ' τ'' τ''' : Time} →
                 {M : toCtx S ⊢C⦂ A ‼ τ''} → 
                 {M' : toCtx S' ⊢C⦂ A ‼ τ'''} → 
                 (M↝M' : ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ ) → 
-                SucState S S'
+                S ≤ₛ S'
 step-extends-state APP = id-suc
 step-extends-state MATCH = id-suc
 step-extends-state SEQ-RET = id-suc
