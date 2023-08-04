@@ -333,7 +333,7 @@ mutual
                             (H op₁ τ'')) 
                         `in (C-rename (cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren)) 
                           N))) 
-                        ((τ-subst (sym (+-assoc (op-time op) τ τ')) 
+                        ((τ-subst ((sym (+-assoc (op-time op) τ τ'))) 
                         (H op (τ + τ')) 
                           [ Tl-∷ Hd ↦ V ]c))
 
@@ -456,13 +456,5 @@ mutual
                          (delay
                            (τ₁ + τ₂)
                            (C-rename ⟨⟩-μ⁻¹-ren M))
-
-    -- this should be derivable
-    congruence : ∀ {C D}
-        → {M M' : Γ ⊢C⦂ C}
-        → (Γ ⊢C⦂ M == M') 
-        → (f : (Γ ⊢C⦂ C) → (Γ ⊢C⦂ D)) 
-        ------------------------------
-        → Γ ⊢C⦂ f M == f M'
 
   infix 18 _⊢C⦂_==_
