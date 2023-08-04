@@ -66,9 +66,9 @@ progress {τ} (handle_`with_`in {τ' = τ₁} M H N) with progress M
     steps p (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (HANDLE-STEP p q (step-extends-state M↝M') M↝M')
 progress (unbox τ≤ctx-time V M) = steps ≤-refl refl (UNBOX τ≤ctx-time)
 progress (box V M) = steps ≤-refl refl BOX
-progress (absurd (var V)) = ⊥-elim (Empty-not-in-ctx V)
-progress (var V · N) = ⊥-elim (⇒-not-in-ctx V)
-progress (match var V `in M) = ⊥-elim (⦉⦊-not-in-ctx V)
+progress (absurd (var V)) = ⊥-elim (Empty-not-in-toCtx V)
+progress (var V · N) = ⊥-elim (⇒-not-in-toCtx V)
+progress (match var V `in M) = ⊥-elim (⦉⦊-not-in-toCtx V)
 
 
 -- Theorem: is-value is indeed final state (make no further steps)

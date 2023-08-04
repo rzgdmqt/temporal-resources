@@ -47,15 +47,14 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {M : toCtx S ⊢C⦂ A ‼ τ₂} → 
             {N : ((toCtx S) ⟨ τ₂ ⟩ ∷ A) ⊢C⦂ B ‼ τ₃} → 
             {M₁ : toCtx S₁ ⊢C⦂ A ‼ τ₄} →
-            (τ+τ₂≡τ₁+τ₄ : τ + τ₂ ≡ τ₁ + τ₄) →  
-            (τ≤τ₁ : τ ≤ τ₁) → 
+            (τ+τ₂≡τ₁+τ₄ : τ + τ₂ ≡ τ₁ + τ₄) →   
             (S≤ₛS₁ : S ≤ₛ S₁) → 
             ⟨ τ , S , M ⟩ ↝ ⟨ τ₁ , S₁ , M₁ ⟩ →
             --------------------------------------------------------------------
             ⟨ τ , S , M ; N ⟩ ↝ 
             ⟨ τ₁ , S₁ , M₁ ;  
                 C-rename 
-                    (cong-∷-ren (suc-comp-ren S≤ₛS₁ (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₁+τ₄))) 
+                    (cong-∷-ren (suc-comp-ren S≤ₛS₁ (m≡n⇒m≤n τ+τ₂≡τ₁+τ₄))) 
                     N ⟩
                     
     -- usual step for return in sequencing
@@ -126,10 +125,10 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
                         `with 
                             (λ op τ'' → 
                                 C-rename 
-                                    (cong-∷-ren (cong-∷-ren (≤ₛ⇒Ren τ≤τ₄ S≤ₛS₁))) 
+                                    (cong-∷-ren (cong-∷-ren (≤ₛ⇒Ren S≤ₛS₁))) 
                                 (H op τ'')) 
                         `in (C-rename 
-                                (cong-∷-ren (suc-comp-ren S≤ₛS₁ (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₄+τ₃))) 
+                                (cong-∷-ren (suc-comp-ren S≤ₛS₁ (m≡n⇒m≤n τ+τ₂≡τ₄+τ₃))) 
                             N) ⟩
 
     -- operaion handle where we box up result so that time in the rest of the 
@@ -204,7 +203,7 @@ perservation-theorem : ∀ {A B τ τ' τ'' τ'''}
                 → A ≡ B × τ + τ'' ≡ τ' + τ'''
 perservation-theorem APP = refl , refl
 perservation-theorem MATCH = refl , refl
-perservation-theorem {τ = τ} {τ'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ τ≤τ₁ S≤ₛS₁ M↝M') = 
+perservation-theorem {τ = τ} {τ'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ S≤ₛS₁ M↝M') = 
     refl , τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] τ τ' τ₂ τ₃ τ₄ τ+τ₂≡τ₁+τ₄
 perservation-theorem SEQ-RET = refl , refl
 perservation-theorem SEQ-OP = refl , refl

@@ -42,12 +42,19 @@ ctx-timeSτ≡τ ∅ = refl
 ctx-timeSτ≡τ (S ⟨ τ'' ⟩ₘ) = cong (_+ τ'') (ctx-timeSτ≡τ S)
 ctx-timeSτ≡τ (S ∷ₘ[ τ' ] x) = ctx-timeSτ≡τ S
 
+-- ≤ₛ increase time
+
+S≤ₛS'⇒τ≤τ' : ∀ {τ τ'} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → S ≤ₛ S' → τ ≤ τ'
+S≤ₛS'⇒τ≤τ' {S = S} {S' = .S} id-suc = ≤-refl
+S≤ₛS'⇒τ≤τ' {S = S} {S' = .(_ ⟨ τ'' ⟩ₘ)} (⟨⟩-suc p τ'' S≤ₛS') = ≤-stepsʳ τ'' p
+S≤ₛS'⇒τ≤τ' {S = S} {S' = .(_ ∷ₘ[ τ'' ] V)} (∷-suc p τ'' V S≤ₛS') = p
+
 -- if two states are successors they can be renamed contexts
 
-≤ₛ⇒Ren : {τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → (p : τ ≤ τ') → S ≤ₛ S' → Ren (toCtx S) (toCtx S')
-≤ₛ⇒Ren p id-suc = id-ren
-≤ₛ⇒Ren p (⟨⟩-suc p₁ τ'' y) = wk-⟨⟩-ren ∘ʳ (≤ₛ⇒Ren p₁ y)
-≤ₛ⇒Ren p (∷-suc p₁ τ'' V y) = wk-ren ∘ʳ (≤ₛ⇒Ren p₁ y)
+≤ₛ⇒Ren : {τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → S ≤ₛ S' → Ren (toCtx S) (toCtx S')
+≤ₛ⇒Ren id-suc = id-ren
+≤ₛ⇒Ren (⟨⟩-suc p₁ τ'' y) = wk-⟨⟩-ren ∘ʳ (≤ₛ⇒Ren y)
+≤ₛ⇒Ren (∷-suc p₁ τ'' V y) = wk-ren ∘ʳ (≤ₛ⇒Ren y)
 
 -- lemma: if one state is successor of another then time pass at the end 
 -- can be substituted
@@ -55,33 +62,30 @@ ctx-timeSτ≡τ (S ∷ₘ[ τ' ] x) = ctx-timeSτ≡τ S
 in-past-state : {τ τ' τ'' τ''' τ'''' : Time} → 
                 {A : VType} → 
                 {S : 𝕊 τ} → 
-                {S' : 𝕊 τ'} →  
-                (p : τ ≤ τ') →  
+                {S' : 𝕊 τ'} →    
                 S ≤ₛ S' →  
                 (M : toCtx S ⟨ τ'' ⟩ ⊢C⦂ A ‼ τ'''') →
                 (q : τ'' ≤ τ''') →  
                 toCtx S' ⟨ τ''' ⟩ ⊢C⦂ A ‼ τ''''
-in-past-state {τ} {S = S} {S' = .S} p id-suc M q = C-rename (⟨⟩-≤-ren q) M
-in-past-state {τ} {τ'} {τ''} {τ'''} {S = S} {S' = .(_ ⟨ τ₁ ⟩ₘ)} p (⟨⟩-suc {τ' = τ₂} p₁ τ₁ S≤ₛS') M q = 
-    C-rename (cong-⟨⟩-ren wk-⟨⟩-ren) (in-past-state p₁ S≤ₛS' M q)
-in-past-state {S = S} {S' = .(_ ∷ₘ[ τ'' ] V)} p (∷-suc p₁ τ'' V S≤ₛS') M q = 
-        C-rename (cong-⟨⟩-ren wk-ren) (in-past-state p S≤ₛS' M q) 
+in-past-state {τ} {S = S} {S' = .S} id-suc M q = C-rename (⟨⟩-≤-ren q) M
+in-past-state {τ} {τ'} {τ''} {τ'''} {S = S} {S' = .(_ ⟨ τ₁ ⟩ₘ)} (⟨⟩-suc {τ' = τ₂} p₁ τ₁ S≤ₛS') M q = 
+    C-rename (cong-⟨⟩-ren wk-⟨⟩-ren) (in-past-state S≤ₛS' M q)
+in-past-state {S = S} {S' = .(_ ∷ₘ[ τ'' ] V)} (∷-suc p₁ τ'' V S≤ₛS') M q = 
+        C-rename (cong-⟨⟩-ren wk-ren) (in-past-state S≤ₛS' M q) 
 
 -- if one state is suc of another and final times are equal then states can rename
 
-suc-comp-ren : {τ τ' τ'' τ''' τ'''' : Time} → 
-                {A : VType} → 
+suc-comp-ren : {τ τ' τ'' τ''' : Time} → 
                 {S : 𝕊 τ} → 
                 {S' : 𝕊 τ'} →  
                 S ≤ₛ S' →  
-                (M : toCtx S ⟨ τ'' ⟩ ⊢C⦂ A ‼ τ'''') →
                 (q : τ + τ'' ≤ τ' + τ''') →  
                 Ren (toCtx S ⟨ τ'' ⟩) (toCtx S' ⟨ τ''' ⟩)
-suc-comp-ren {τ} id-suc M q = ⟨⟩-≤-ren (+-cancelˡ-≤ τ q)
-suc-comp-ren {τ} {τ'} {τ'' = τ₂} {τ'''} (⟨⟩-suc {τ' = τ₃} p₁ τ'' S≤ₛS') M q = 
-        ⟨⟩-μ-ren ∘ʳ suc-comp-ren S≤ₛS' M (τ-≤-substᵣ (sym (+-assoc τ₃ τ'' τ''')) q)
-suc-comp-ren (∷-suc p₁ τ'' V S≤ₛS') M q = cong-⟨⟩-ren wk-ren ∘ʳ 
-        suc-comp-ren S≤ₛS' M q 
+suc-comp-ren {τ} id-suc q = ⟨⟩-≤-ren (+-cancelˡ-≤ τ q)
+suc-comp-ren {τ} {τ'} {τ'' = τ₂} {τ'''} (⟨⟩-suc {τ' = τ₃} p₁ τ'' S≤ₛS') q = 
+        ⟨⟩-μ-ren ∘ʳ suc-comp-ren S≤ₛS' (τ-≤-substᵣ (sym (+-assoc τ₃ τ'' τ''')) q)
+suc-comp-ren (∷-suc p₁ τ'' V S≤ₛS') q = cong-⟨⟩-ren wk-ren ∘ʳ 
+        suc-comp-ren S≤ₛS' q 
 
 -- suc relation is reflexive
 
@@ -129,17 +133,17 @@ extend-state S τ' V = S ∷ₘ[ τ' ] V
 
 -- Lemmas about what can and what can't be in toCtx S (only var can be)
 
-⇒-not-in-ctx : {τ τ' : Time} {S : 𝕊 τ} {A : VType} {C : CType} → A ⇒ C ∈[ τ' ] toCtx S → ⊥
-⇒-not-in-ctx {.(_ + τ'')} {.(τ'' + _)} {S ⟨ τ'' ⟩ₘ} (Tl-⟨⟩ x) = ⇒-not-in-ctx x
-⇒-not-in-ctx {τ} {τ'} {S ∷ₘ[ τ'' ] x₁} (Tl-∷ x) = ⇒-not-in-ctx x
+⇒-not-in-toCtx : {τ τ' : Time} {S : 𝕊 τ} {A : VType} {C : CType} → A ⇒ C ∈[ τ' ] toCtx S → ⊥
+⇒-not-in-toCtx {.(_ + τ'')} {.(τ'' + _)} {S ⟨ τ'' ⟩ₘ} (Tl-⟨⟩ x) = ⇒-not-in-toCtx x
+⇒-not-in-toCtx {τ} {τ'} {S ∷ₘ[ τ'' ] x₁} (Tl-∷ x) = ⇒-not-in-toCtx x
 
-⦉⦊-not-in-ctx : {τ τ' : Time} {S : 𝕊 τ} {A B : VType} → A |×| B ∈[ τ' ] toCtx S → ⊥
-⦉⦊-not-in-ctx {.(_ + τ'')} {.(τ'' + _)} {S ⟨ τ'' ⟩ₘ} (Tl-⟨⟩ y) = ⦉⦊-not-in-ctx y
-⦉⦊-not-in-ctx {τ} {τ'} {S ∷ₘ[ τ'' ] x} (Tl-∷ y) = ⦉⦊-not-in-ctx y
+⦉⦊-not-in-toCtx : {τ τ' : Time} {S : 𝕊 τ} {A B : VType} → A |×| B ∈[ τ' ] toCtx S → ⊥
+⦉⦊-not-in-toCtx {.(_ + τ'')} {.(τ'' + _)} {S ⟨ τ'' ⟩ₘ} (Tl-⟨⟩ y) = ⦉⦊-not-in-toCtx y
+⦉⦊-not-in-toCtx {τ} {τ'} {S ∷ₘ[ τ'' ] x} (Tl-∷ y) = ⦉⦊-not-in-toCtx y
 
-Empty-not-in-ctx : {τ τ' : Time} {S : 𝕊 τ} → Empty ∈[ τ' ] toCtx S → ⊥
-Empty-not-in-ctx {.(_ + τ'')} {.(τ'' + _)} {S ⟨ τ'' ⟩ₘ} (Tl-⟨⟩ y) = Empty-not-in-ctx y
-Empty-not-in-ctx {τ} {τ'} {S ∷ₘ[ τ'' ] x} (Tl-∷ y) = Empty-not-in-ctx y 
+Empty-not-in-toCtx : {τ τ' : Time} {S : 𝕊 τ} → Empty ∈[ τ' ] toCtx S → ⊥
+Empty-not-in-toCtx {.(_ + τ'')} {.(τ'' + _)} {S ⟨ τ'' ⟩ₘ} (Tl-⟨⟩ y) = Empty-not-in-toCtx y
+Empty-not-in-toCtx {τ} {τ'} {S ∷ₘ[ τ'' ] x} (Tl-∷ y) = Empty-not-in-toCtx y 
 
 not-in-empty-ctx : {τ : Time} {A : VType} → A ∈[ τ ] [] → ⊥
 not-in-empty-ctx ()

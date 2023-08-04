@@ -28,8 +28,8 @@ step-extends-state (UNBOX p) = id-suc
 step-extends-state HANDLE-OP = id-suc
 step-extends-state DELAY = ⟨⟩-suc ≤-refl _ id-suc
 step-extends-state BOX = ∷-suc ≤-refl _ _ id-suc
-step-extends-state (SEQ-FST {M = M} {M₁ = M'} τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = step-extends-state  M↝M'
-step-extends-state (HANDLE-STEP {M = M} {M₁ = M'} τ≤τ₇ τ+τ₄≡τ₇+τ₆ sucState M↝M') = step-extends-state M↝M'
+step-extends-state (SEQ-FST {M = M} {M₁ = M'} τ+τ₂≡τ₁+τ₄ S≤ₛS' M↝M') = step-extends-state  M↝M'
+step-extends-state (HANDLE-STEP {M = M} {M₁ = M'} τ≤τ₇ τ+τ₄≡τ₇+τ₆ S≤ₛS' M↝M') = step-extends-state M↝M'
 
 -- Theorem that step only increases time
 
@@ -49,8 +49,8 @@ step-increases-time HANDLE-OP = ≤-refl
 step-increases-time BOX = ≤-refl
 step-increases-time (UNBOX p) = ≤-refl
 step-increases-time (DELAY {τ' = τ'}) = ≤-stepsʳ τ' ≤-refl
-step-increases-time (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState x) = τ≤τ₁
-step-increases-time (HANDLE-STEP τ≤τ₇ τ+τ₄≡τ₇+τ₆ sucState x) = τ≤τ₇
+step-increases-time (SEQ-FST τ+τ₂≡τ₁+τ₄ S≤ₛS' x) = S≤ₛS'⇒τ≤τ' S≤ₛS'
+step-increases-time (HANDLE-STEP τ≤τ₇ τ+τ₄≡τ₇+τ₆ S≤ₛS' x) = τ≤τ₇
 
 -- step perserves overall time
 
@@ -63,7 +63,7 @@ conf-time+comp-time≡const : ∀ {A τ τ' τ'' τ'''}
                 → τ + τ'' ≡ τ' + τ'''
 conf-time+comp-time≡const APP = refl
 conf-time+comp-time≡const MATCH = refl
-conf-time+comp-time≡const {τ = τ} {τ'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = 
+conf-time+comp-time≡const {τ = τ} {τ'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ S≤ₛS' M↝M') = 
      begin 
         τ + (τ₂ + τ₃) ≡⟨ sym (+-assoc τ τ₂ τ₃) ⟩  
         τ + τ₂ + τ₃ ≡⟨ cong (_+ τ₃) τ+τ₂≡τ₁+τ₄ ⟩  
@@ -75,7 +75,7 @@ conf-time+comp-time≡const SEQ-OP = refl
 conf-time+comp-time≡const {τ = τ} {τ''' = τ'''} (DELAY {τ' = τ'}) = 
     sym (+-assoc τ τ' τ''')
 conf-time+comp-time≡const HANDLE-RET = refl
-conf-time+comp-time≡const {τ = τ} {τ'} (HANDLE-STEP {τ₁ = τ₁} {τ₂ = τ₂} {τ₃} τ≤τ₄ τ+τ₂≡τ₄+τ₃ sucState M↝M') = 
+conf-time+comp-time≡const {τ = τ} {τ'} (HANDLE-STEP {τ₁ = τ₁} {τ₂ = τ₂} {τ₃} τ≤τ₄ τ+τ₂≡τ₄+τ₃ S≤ₛS' M↝M') = 
     begin 
         τ + (τ₂ + τ₁) ≡⟨ sym (+-assoc τ τ₂ τ₁) ⟩  
         τ + τ₂ + τ₁ ≡⟨ cong (_+ τ₁) τ+τ₂≡τ₄+τ₃ ⟩  

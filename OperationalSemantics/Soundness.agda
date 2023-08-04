@@ -93,7 +93,7 @@ soundness refl (APP {M = M} {V = V})  =
     config-to-comp-cong (fun-beta M V)
 soundness refl (MATCH {V = V} {W = W} {M = M}) = 
     config-to-comp-cong (match-beta V W M)
-soundness p (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ sucState M↝M') = 
+soundness p (SEQ-FST τ+τ₂≡τ₁+τ₄ τ≤τ₁ S≤ₛS' M↝M') = 
     {!   !}
 soundness refl (SEQ-RET {V = V} {N = N}) = 
     config-to-comp-cong (seq-return V N)
@@ -113,7 +113,7 @@ soundness {A} {τ} {τ''' = τ'''} {S = S} {M = M} p (DELAY {τ' = τ'}) =
                 (config-to-comp S M)))
 soundness refl (HANDLE-RET {V = V} {H = H} {N = N}) = 
     config-to-comp-cong (handle-return V H N)
-soundness p (HANDLE-STEP τ≤τ₄ τ+τ₂≡τ₄+τ₃ sucState M↝M') = {!   !}
+soundness p (HANDLE-STEP τ≤τ₄ τ+τ₂≡τ₄+τ₃ S≤ₛS' M↝M') = {!   !}
 soundness p HANDLE-OP = {!  !}
 soundness refl (BOX {S = S}) = 
     config-to-comp-cong {S = S} C-refl
