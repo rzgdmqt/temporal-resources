@@ -29,10 +29,10 @@ mutual
 
 data _≤ₛ_ : {τ τ' : Time} → 𝕊 τ → 𝕊 τ' → Set where
     id-suc : {τ : Time} → {S : 𝕊 τ} → S ≤ₛ S
-    ⟨⟩-suc : {τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → (p : τ ≤ τ') → (τ'' : Time) → 
+    ⟨⟩-suc : {τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → (τ'' : Time) → 
         S ≤ₛ S' → S ≤ₛ (S' ⟨ τ'' ⟩ₘ)
     ∷-suc : {τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → {A : VType} → 
-        (p : τ ≤ τ') → (τ'' : Time) → (V : (toCtx S') ⟨ τ'' ⟩ ⊢V⦂ A) → 
+        (τ'' : Time) → (V : (toCtx S') ⟨ τ'' ⟩ ⊢V⦂ A) → 
         S ≤ₛ S' → S ≤ₛ (S' ∷ₘ[ τ'' ] V)
 
 -- lemma that ctx-time of toCtx (S τ) is τ
@@ -42,19 +42,27 @@ ctx-timeSτ≡τ ∅ = refl
 ctx-timeSτ≡τ (S ⟨ τ'' ⟩ₘ) = cong (_+ τ'') (ctx-timeSτ≡τ S)
 ctx-timeSτ≡τ (S ∷ₘ[ τ' ] x) = ctx-timeSτ≡τ S
 
--- ≤ₛ increase time
-
-S≤ₛS'⇒τ≤τ' : ∀ {τ τ'} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → S ≤ₛ S' → τ ≤ τ'
-S≤ₛS'⇒τ≤τ' {S = S} {S' = .S} id-suc = ≤-refl
-S≤ₛS'⇒τ≤τ' {S = S} {S' = .(_ ⟨ τ'' ⟩ₘ)} (⟨⟩-suc p τ'' S≤ₛS') = ≤-stepsʳ τ'' p
-S≤ₛS'⇒τ≤τ' {S = S} {S' = .(_ ∷ₘ[ τ'' ] V)} (∷-suc p τ'' V S≤ₛS') = p
-
 -- if two states are successors they can be renamed contexts
 
 ≤ₛ⇒Ren : {τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → S ≤ₛ S' → Ren (toCtx S) (toCtx S')
 ≤ₛ⇒Ren id-suc = id-ren
-≤ₛ⇒Ren (⟨⟩-suc p₁ τ'' y) = wk-⟨⟩-ren ∘ʳ (≤ₛ⇒Ren y)
-≤ₛ⇒Ren (∷-suc p₁ τ'' V y) = wk-ren ∘ʳ (≤ₛ⇒Ren y)
+≤ₛ⇒Ren (⟨⟩-suc τ'' y) = wk-⟨⟩-ren ∘ʳ (≤ₛ⇒Ren y)
+≤ₛ⇒Ren (∷-suc τ'' V y) = wk-ren ∘ʳ (≤ₛ⇒Ren y)
+
+-- ≤ₛ increase time
+
+S≤ₛS'⇒τ≤τ' : ∀ {τ τ'} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → S ≤ₛ S' → τ ≤ τ'
+S≤ₛS'⇒τ≤τ' {S = S} {S' = .S} id-suc = ≤-refl
+S≤ₛS'⇒τ≤τ' {S = S} {S' = .(S' ⟨ τ'' ⟩ₘ)} (⟨⟩-suc {S' = S'} τ'' S≤ₛS') = 
+    ≤-stepsʳ τ'' 
+        (τ-≤-substᵣ (sym (ctx-timeSτ≡τ S')) 
+        (τ-≤-substₗ (ctx-timeSτ≡τ S) 
+    (ren-≤-ctx-time (≤ₛ⇒Ren S≤ₛS'))))
+S≤ₛS'⇒τ≤τ' {S = S} {S' = .(S' ∷ₘ[ τ'' ] V)} (∷-suc {S' = S'} τ'' V S≤ₛS') = 
+    τ-≤-substᵣ (sym (ctx-timeSτ≡τ S')) 
+    (τ-≤-substₗ (ctx-timeSτ≡τ S) 
+    (ren-≤-ctx-time (≤ₛ⇒Ren S≤ₛS')))
+
 
 -- lemma: if one state is successor of another then time pass at the end 
 -- can be substituted
@@ -68,9 +76,9 @@ in-past-state : {τ τ' τ'' τ''' τ'''' : Time} →
                 (q : τ'' ≤ τ''') →  
                 toCtx S' ⟨ τ''' ⟩ ⊢C⦂ A ‼ τ''''
 in-past-state {τ} {S = S} {S' = .S} id-suc M q = C-rename (⟨⟩-≤-ren q) M
-in-past-state {τ} {τ'} {τ''} {τ'''} {S = S} {S' = .(_ ⟨ τ₁ ⟩ₘ)} (⟨⟩-suc {τ' = τ₂} p₁ τ₁ S≤ₛS') M q = 
+in-past-state {τ} {τ'} {τ''} {τ'''} {S = S} {S' = .(_ ⟨ τ₁ ⟩ₘ)} (⟨⟩-suc {τ' = τ₂} τ₁ S≤ₛS') M q = 
     C-rename (cong-⟨⟩-ren wk-⟨⟩-ren) (in-past-state S≤ₛS' M q)
-in-past-state {S = S} {S' = .(_ ∷ₘ[ τ'' ] V)} (∷-suc p₁ τ'' V S≤ₛS') M q = 
+in-past-state {S = S} {S' = .(_ ∷ₘ[ τ'' ] V)} (∷-suc τ'' V S≤ₛS') M q = 
         C-rename (cong-⟨⟩-ren wk-ren) (in-past-state S≤ₛS' M q) 
 
 -- if one state is suc of another and final times are equal then states can rename
@@ -82,9 +90,9 @@ suc-comp-ren : {τ τ' τ'' τ''' : Time} →
                 (q : τ + τ'' ≤ τ' + τ''') →  
                 Ren (toCtx S ⟨ τ'' ⟩) (toCtx S' ⟨ τ''' ⟩)
 suc-comp-ren {τ} id-suc q = ⟨⟩-≤-ren (+-cancelˡ-≤ τ q)
-suc-comp-ren {τ} {τ'} {τ'' = τ₂} {τ'''} (⟨⟩-suc {τ' = τ₃} p₁ τ'' S≤ₛS') q = 
+suc-comp-ren {τ} {τ'} {τ'' = τ₂} {τ'''} (⟨⟩-suc {τ' = τ₃} τ'' S≤ₛS') q = 
         ⟨⟩-μ-ren ∘ʳ suc-comp-ren S≤ₛS' (τ-≤-substᵣ (sym (+-assoc τ₃ τ'' τ''')) q)
-suc-comp-ren (∷-suc p₁ τ'' V S≤ₛS') q = cong-⟨⟩-ren wk-ren ∘ʳ 
+suc-comp-ren (∷-suc τ'' V S≤ₛS') q = cong-⟨⟩-ren wk-ren ∘ʳ 
         suc-comp-ren S≤ₛS' q 
 
 -- suc relation is reflexive
@@ -97,31 +105,40 @@ suc-state-refl = id-suc
 suc-state-trans : { τ τ' τ'' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → {S'' : 𝕊 τ''} → 
             S ≤ₛ S' → S' ≤ₛ S'' → S ≤ₛ S''
 suc-state-trans id-suc S'≤ₛS'' = S'≤ₛS''
-suc-state-trans (⟨⟩-suc p τ'' S≤ₛS') id-suc = ⟨⟩-suc p τ'' S≤ₛS'
-suc-state-trans (⟨⟩-suc p τ'' S≤ₛS') (⟨⟩-suc p₁ τ''' S'≤ₛS'') = 
-    ⟨⟩-suc (≤-trans p (≤-trans (≤-stepsʳ τ'' ≤-refl) p₁)) τ''' (suc-state-trans (⟨⟩-suc p τ'' S≤ₛS') S'≤ₛS'')
-suc-state-trans (⟨⟩-suc p τ'' S≤ₛS') (∷-suc p₁ τ''' V S'≤ₛS'') = 
-    ∷-suc (≤-trans p (≤-trans (≤-stepsʳ τ'' ≤-refl) p₁)) τ''' V (suc-state-trans (⟨⟩-suc p τ'' S≤ₛS') S'≤ₛS'')
-suc-state-trans (∷-suc p τ'' V S≤ₛS') id-suc = ∷-suc p τ'' V S≤ₛS'
-suc-state-trans (∷-suc p τ'' V S≤ₛS') (⟨⟩-suc p₁ τ''' S'≤ₛS'') = 
-    ⟨⟩-suc (≤-trans p p₁) τ''' (suc-state-trans (∷-suc p τ'' V S≤ₛS') S'≤ₛS'')
-suc-state-trans (∷-suc p τ'' V S≤ₛS') (∷-suc p₁ τ''' V₁ S'≤ₛS'') = 
-    ∷-suc (≤-trans p p₁) τ''' V₁ (suc-state-trans (∷-suc (≤-trans ≤-refl p) τ'' V S≤ₛS') S'≤ₛS'')
+suc-state-trans (⟨⟩-suc τ'' S≤ₛS') id-suc = ⟨⟩-suc τ'' S≤ₛS'
+suc-state-trans (⟨⟩-suc τ'' S≤ₛS') (⟨⟩-suc τ''' S'≤ₛS'') = 
+    ⟨⟩-suc τ''' (suc-state-trans (⟨⟩-suc τ'' S≤ₛS') S'≤ₛS'')
+suc-state-trans (⟨⟩-suc τ'' S≤ₛS') (∷-suc τ''' V S'≤ₛS'') = 
+    ∷-suc τ''' V (suc-state-trans (⟨⟩-suc τ'' S≤ₛS') S'≤ₛS'')
+suc-state-trans (∷-suc τ'' V S≤ₛS') id-suc = ∷-suc τ'' V S≤ₛS'
+suc-state-trans (∷-suc τ'' V S≤ₛS') (⟨⟩-suc τ''' S'≤ₛS'') = 
+    ⟨⟩-suc τ''' (suc-state-trans (∷-suc τ'' V S≤ₛS') S'≤ₛS'')
+suc-state-trans (∷-suc τ'' V S≤ₛS') (∷-suc τ''' V₁ S'≤ₛS'') = 
+    ∷-suc τ''' V₁ (suc-state-trans (∷-suc τ'' V S≤ₛS') S'≤ₛS'')
 
 -- if states are suc of one another they must have equal time
 
 aux-suc-state-antisym : { τ τ' : Time} → {S : 𝕊 τ} → {S' : 𝕊 τ'} → 
             S ≤ₛ S' → S' ≤ₛ S → τ' ≡ τ
-aux-suc-state-antisym id-suc sucS'S = refl
-aux-suc-state-antisym (⟨⟩-suc p τ'' S≤ₛS') id-suc = refl
-aux-suc-state-antisym (⟨⟩-suc p τ'' S≤ₛS') (⟨⟩-suc p₁ τ''' sucS'S) = 
-    a≤b⇒b≤a⇒a≡b (≤-trans p₁ (≤-stepsʳ τ''' ≤-refl)) (≤-trans p (≤-stepsʳ τ'' ≤-refl))
-aux-suc-state-antisym (⟨⟩-suc p τ'' S≤ₛS') (∷-suc p₁ τ''' V sucS'S) = 
-    a≤b⇒b≤a⇒a≡b p₁ (≤-trans p (≤-stepsʳ τ'' ≤-refl))
-aux-suc-state-antisym (∷-suc p τ'' V S≤ₛS') id-suc = refl
-aux-suc-state-antisym (∷-suc p τ'' V S≤ₛS') (⟨⟩-suc p₁ τ''' sucS'S) = 
-    a≤b⇒b≤a⇒a≡b (≤-trans p₁ (≤-stepsʳ τ''' ≤-refl)) p
-aux-suc-state-antisym (∷-suc p τ'' V S≤ₛS') (∷-suc p₁ τ''' V₁ sucS'S) = a≤b⇒b≤a⇒a≡b p₁ p
+aux-suc-state-antisym id-suc S'≤ₛS = refl
+aux-suc-state-antisym (⟨⟩-suc τ'' S≤ₛS') id-suc = refl
+aux-suc-state-antisym (⟨⟩-suc τ'' S≤ₛS') (⟨⟩-suc τ''' S'≤ₛS) = 
+    a≤b⇒b≤a⇒a≡b 
+        (≤-trans (S≤ₛS'⇒τ≤τ' S'≤ₛS) (≤-stepsʳ τ''' ≤-refl)) 
+        (≤-trans (S≤ₛS'⇒τ≤τ' S≤ₛS') (≤-stepsʳ τ'' ≤-refl))
+aux-suc-state-antisym (⟨⟩-suc τ'' S≤ₛS') (∷-suc τ''' V S'≤ₛS) = 
+    a≤b⇒b≤a⇒a≡b 
+        (S≤ₛS'⇒τ≤τ' S'≤ₛS) 
+        (≤-trans (S≤ₛS'⇒τ≤τ' S≤ₛS') (≤-stepsʳ τ'' ≤-refl))
+aux-suc-state-antisym (∷-suc τ'' V S≤ₛS') id-suc = refl
+aux-suc-state-antisym (∷-suc τ'' V S≤ₛS') (⟨⟩-suc τ''' S'≤ₛS) = 
+    a≤b⇒b≤a⇒a≡b 
+        (≤-trans (S≤ₛS'⇒τ≤τ' S'≤ₛS) 
+        (≤-stepsʳ τ''' ≤-refl)) (S≤ₛS'⇒τ≤τ' S≤ₛS')
+aux-suc-state-antisym (∷-suc τ'' V S≤ₛS') (∷-suc τ''' V₁ S'≤ₛS) = 
+    a≤b⇒b≤a⇒a≡b 
+        (S≤ₛS'⇒τ≤τ' S'≤ₛS) 
+        (S≤ₛS'⇒τ≤τ' S≤ₛS')
 
 -- operations on state - just for better readability in perservation theorem
 

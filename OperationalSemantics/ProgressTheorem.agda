@@ -52,7 +52,7 @@ progress {τ} {τ'} {S = S} {A = A} ((_;_) {τ' = τ₁} M N) with progress M
 ... | is-value = steps ≤-refl refl SEQ-RET 
 ... | is-op = steps ≤-refl refl (SEQ-OP {S = S})
 ... | steps {τ' = τ₂} {τ'' = τ₃} {τ''' = τ₄} p q M↝M' = 
-    steps p (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (SEQ-FST q p (step-extends-state M↝M') M↝M')
+    steps p (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (SEQ-FST q (step-extends-state M↝M') M↝M')
 progress {τ} {τ'} {S} (lam M · V) = steps ≤-refl refl APP
 progress {τ} {τ'} (delay {τ' = τ₁} τ₂ M ) = 
     steps (≤-stepsʳ τ₂ ≤-refl) (sym (+-assoc τ τ₂ τ₁)) DELAY

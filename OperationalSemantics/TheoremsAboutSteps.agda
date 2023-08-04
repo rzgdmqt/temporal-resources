@@ -26,8 +26,8 @@ step-extends-state SEQ-OP = id-suc
 step-extends-state HANDLE-RET = id-suc
 step-extends-state (UNBOX p) = id-suc 
 step-extends-state HANDLE-OP = id-suc
-step-extends-state DELAY = ⟨⟩-suc ≤-refl _ id-suc
-step-extends-state BOX = ∷-suc ≤-refl _ _ id-suc
+step-extends-state DELAY = ⟨⟩-suc _ id-suc
+step-extends-state BOX = ∷-suc _ _ id-suc
 step-extends-state (SEQ-FST {M = M} {M₁ = M'} τ+τ₂≡τ₁+τ₄ S≤ₛS' M↝M') = step-extends-state  M↝M'
 step-extends-state (HANDLE-STEP {M = M} {M₁ = M'} τ≤τ₇ τ+τ₄≡τ₇+τ₆ S≤ₛS' M↝M') = step-extends-state M↝M'
 
