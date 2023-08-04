@@ -55,7 +55,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             ⟨ τ , S , M ; N ⟩ ↝ 
             ⟨ τ₁ , S₁ , M₁ ;  
                 C-rename 
-                    (cong-∷-ren (suc-comp-ren τ≤τ₁ S≤ₛS₁ (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₁+τ₄))) 
+                    (cong-∷-ren (suc-comp-ren S≤ₛS₁ (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₁+τ₄))) 
                     N ⟩
                     
     -- usual step for return in sequencing
@@ -129,7 +129,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
                                     (cong-∷-ren (cong-∷-ren (≤ₛ⇒Ren τ≤τ₄ S≤ₛS₁))) 
                                 (H op τ'')) 
                         `in (C-rename 
-                                (cong-∷-ren (suc-comp-ren τ≤τ₄ S≤ₛS₁ (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₄+τ₃))) 
+                                (cong-∷-ren (suc-comp-ren S≤ₛS₁ (C-rename wk-⟨⟩-ren M) (m≡n⇒m≤n τ+τ₂≡τ₄+τ₃))) 
                             N) ⟩
 
     -- operaion handle where we box up result so that time in the rest of the 

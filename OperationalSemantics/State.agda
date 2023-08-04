@@ -73,16 +73,15 @@ suc-comp-ren : {τ τ' τ'' τ''' τ'''' : Time} →
                 {A : VType} → 
                 {S : 𝕊 τ} → 
                 {S' : 𝕊 τ'} →  
-                (p : τ ≤ τ') →  
                 S ≤ₛ S' →  
                 (M : toCtx S ⟨ τ'' ⟩ ⊢C⦂ A ‼ τ'''') →
                 (q : τ + τ'' ≤ τ' + τ''') →  
                 Ren (toCtx S ⟨ τ'' ⟩) (toCtx S' ⟨ τ''' ⟩)
-suc-comp-ren {τ} p id-suc M q = ⟨⟩-≤-ren (+-cancelˡ-≤ τ q)
-suc-comp-ren {τ} {τ'} {τ'' = τ₂} {τ'''} p (⟨⟩-suc {τ' = τ₃} p₁ τ'' S≤ₛS') M q = 
-        ⟨⟩-μ-ren ∘ʳ suc-comp-ren p₁ S≤ₛS' M (τ-≤-substᵣ (sym (+-assoc τ₃ τ'' τ''')) q)
-suc-comp-ren p (∷-suc p₁ τ'' V S≤ₛS') M q = cong-⟨⟩-ren wk-ren ∘ʳ 
-        suc-comp-ren p S≤ₛS' M q 
+suc-comp-ren {τ} id-suc M q = ⟨⟩-≤-ren (+-cancelˡ-≤ τ q)
+suc-comp-ren {τ} {τ'} {τ'' = τ₂} {τ'''} (⟨⟩-suc {τ' = τ₃} p₁ τ'' S≤ₛS') M q = 
+        ⟨⟩-μ-ren ∘ʳ suc-comp-ren S≤ₛS' M (τ-≤-substᵣ (sym (+-assoc τ₃ τ'' τ''')) q)
+suc-comp-ren (∷-suc p₁ τ'' V S≤ₛS') M q = cong-⟨⟩-ren wk-ren ∘ʳ 
+        suc-comp-ren S≤ₛS' M q 
 
 -- suc relation is reflexive
 
