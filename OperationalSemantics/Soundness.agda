@@ -93,8 +93,8 @@ soundness refl (APP {M = M} {V = V})  =
     config-to-comp-cong (fun-beta M V)
 soundness refl (MATCH {V = V} {W = W} {M = M}) = 
     config-to-comp-cong (match-beta V W M)
-soundness p (SEQ-FST τ+τ₂≡τ₁+τ₄ S≤ₛS' M↝M') = 
-    {!   !}
+soundness {S = S} p (SEQ-FST {S = S} {S₁ = S₁} {M = M} {N = N} {M₁} τ+τ₂≡τ₁+τ₄ S≤ₛS' M↝M') with soundness (sym τ+τ₂≡τ₁+τ₄) M↝M' 
+... | M==M' = {!   !}
 soundness refl (SEQ-RET {V = V} {N = N}) = 
     config-to-comp-cong (seq-return V N)
 soundness refl (SEQ-OP {op = op} {V = V} {M = M} {N = N}) =     
@@ -113,8 +113,20 @@ soundness {A} {τ} {τ''' = τ'''} {S = S} {M = M} p (DELAY {τ' = τ'}) =
                 (config-to-comp S M)))
 soundness refl (HANDLE-RET {V = V} {H = H} {N = N}) = 
     config-to-comp-cong (handle-return V H N)
-soundness p (HANDLE-STEP τ≤τ₄ τ+τ₂≡τ₄+τ₃ S≤ₛS' M↝M') = {!   !}
-soundness p HANDLE-OP = {!  !}
+soundness p (HANDLE-STEP τ+τ₂≡τ₄+τ₃ S≤ₛS' M↝M') with soundness (sym τ+τ₂≡τ₄+τ₃) M↝M'
+... | M==M' = {!   !}
+soundness p (HANDLE-OP {op = op} {V = V} {M = M} {H = H} {N = N}) = 
+    C-trans 
+        (config-to-comp-cong 
+            (handle-perform op V M H N)) 
+        {!   !}
 soundness refl (BOX {S = S}) = 
     config-to-comp-cong {S = S} C-refl
-soundness refl (UNBOX p₁) = {!   !} 
+soundness {S = ∅} refl (UNBOX {S = .∅} z≤n) = 
+    {!   !}  -- resource is at head we should just substitute
+soundness {A} {τ} {τ} {τ''} {τ''} {S =  _⟨_⟩ₘ {τ''''} S τ'''} refl (UNBOX {τ' = τ'} p₁ {V = V}) = 
+    τ-subst-cong 
+        (sym (+-assoc τ'''' τ''' τ'')) 
+        (sym (+-assoc τ'''' τ''' τ'')) 
+        {!   !} -- delay cong
+soundness {S = S ∷ₘ[ τ' ] V} refl (UNBOX {S = .(S ∷ₘ[ τ' ] V)} p₁ {V = W}) = {!   !} -- we split case wether W ≡ V or not. if yes, unbox-beta else cong-box recursive call

@@ -13,7 +13,7 @@ data BCtx : Set where
   _∷ₗ_  : VType → BCtx → BCtx 
   ⟨_⟩ₗ_ : Time → BCtx → BCtx  
 
-infixl 32 _∷ₗ_
+infixr 32 _∷ₗ_
 infix  31 ⟨_⟩ₗ_
 
 _⋈_ : Ctx → BCtx → Ctx
@@ -66,7 +66,7 @@ data _⊢K[_⊢_]⦂_ (Γ : Ctx) : BCtx → CType → CType → Set where
         → Γ ⊢V⦂ A |×| B
         → Γ ∷ A ∷ B ⊢K[ Δₖ ⊢ C ]⦂ Aₖ ‼ τₖ
         ----------------------------------------
-        → Γ ⊢K[ A ∷ₗ (B ∷ₗ Δₖ) ⊢ C ]⦂ Aₖ ‼ τₖ
+        → Γ ⊢K[ A ∷ₗ B ∷ₗ Δₖ ⊢ C ]⦂ Aₖ ‼ τₖ
 
     performₖ : ∀ {Δ A C τ op}
         → Γ ⊢V⦂ type-of-gtype (param op)

@@ -115,7 +115,6 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
                  ⊢C⦂ B ‼ (op-time op + τ₃)} → 
             {N : toCtx S ⟨ τ₂ ⟩ ∷ A ⊢C⦂ B ‼ τ₁} → 
             {M₁ : toCtx S₁  ⊢C⦂ A ‼ τ₃ } →  
-            (τ≤τ₄ : τ ≤ τ₄) → 
             (τ+τ₂≡τ₄+τ₃ : τ + τ₂ ≡ τ₄ + τ₃) → 
             (S≤ₛS₁ : S ≤ₛ S₁) → 
             ⟨ τ , S , M ⟩ ↝ ⟨ τ₄ , S₁ , M₁ ⟩ → 
@@ -210,7 +209,7 @@ perservation-theorem SEQ-OP = refl , refl
 perservation-theorem {τ = τ} {τ''' = τ'''} (DELAY {τ' = τ'}) = 
     refl , sym (+-assoc τ τ' τ''')
 perservation-theorem HANDLE-RET = refl , refl
-perservation-theorem {τ = τ} {τ'} (HANDLE-STEP {τ₁ = τ₁} {τ₂} {τ₃} τ≤τ₄ τ+τ₂≡τ₄+τ₃ S≤ₛS₁ M↝M') = 
+perservation-theorem {τ = τ} {τ'} (HANDLE-STEP {τ₁ = τ₁} {τ₂} {τ₃} τ+τ₂≡τ₄+τ₃ S≤ₛS₁ M↝M') = 
     refl , τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] τ τ' τ₂ τ₁ τ₃ τ+τ₂≡τ₄+τ₃
 perservation-theorem {τ = τ} (HANDLE-OP {τ' = τ'} {τ'' = τ''} {op = op}) = 
     refl , cong (τ +_) (+-assoc (op-time op) τ'' τ')

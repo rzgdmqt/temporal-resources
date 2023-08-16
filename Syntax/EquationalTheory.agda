@@ -405,13 +405,15 @@ mutual
                         (C-rename exch-ren M))
 
     -- eta rule for box
-
-    boxed-not-used : ∀ {A C τ τ'} → 
-                    (V : Γ ⟨ τ ⟩ ⊢V⦂ A) → 
-                    (M : Γ ⊢C⦂ C ‼ τ') → 
-                    --------------------
-                    Γ ⊢C⦂ box V (C-rename wk-ren M)
-                        == M
+    -- we don't have garbage collector, so this rule 
+    -- is not coverd by operational semantic, since boxed resource
+    -- remains in state.
+    -- boxed-not-used : ∀ {A C τ τ'} → 
+    --                 (V : Γ ⟨ τ ⟩ ⊢V⦂ A) → 
+    --                 (M : Γ ⊢C⦂ C ‼ τ') → 
+    --                 --------------------
+    --                 Γ ⊢C⦂ box V (C-rename wk-ren M)
+    --                     == M
     
     -- eta rule for unbox
 
