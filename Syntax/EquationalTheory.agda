@@ -242,6 +242,23 @@ mutual
                           C-rename (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren) 
                           N))
 
+    seq-box : ∀ {A B C τ τ' τ''}
+              → (V : Γ ⟨ τ ⟩ ⊢V⦂ A)
+              → (M : Γ ∷ [ τ ] A ⊢C⦂ B ‼ τ')
+              → (N : Γ ⟨ τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
+              -------------------------------------------------------
+              → Γ ⊢C⦂ box V M ; N 
+                  == box V (M ; C-rename (cong-∷-ren (cong-⟨⟩-ren wk-ren)) N)
+
+    seq-unbox : ∀ {A B C τ τ' τ''}
+              → (p : τ ≤ ctx-time Γ)
+              → (V : Γ -ᶜ τ  ⊢V⦂ [ τ ] A)
+              → (M : Γ ∷ A ⊢C⦂ B ‼ τ')
+              → (N : Γ ⟨ τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
+              -------------------------------------------------------
+              → Γ ⊢C⦂ unbox p V M ; N 
+                  == unbox p V (M ; C-rename (cong-∷-ren (cong-⟨⟩-ren wk-ren)) N)
+
     -- eta-equation for sequential composition
 
     seq-eta : ∀ {A τ}
