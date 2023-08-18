@@ -375,6 +375,44 @@ mutual
                                     (cong-ren {Γ'' = [] ∷ A} ⟨⟩-μ-ren)
                                     N)))
 
+    handle-box : ∀ {A B C τ τ' τ''}
+                 → (V : Γ ⟨ τ ⟩ ⊢V⦂ A)
+                 → (M : Γ ∷ [ τ ] A ⊢C⦂ B ‼ τ')
+                 → (H : (op : Op) → (τ''' : Time) →
+                          Γ ∷ type-of-gtype (param op)
+                            ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ C ‼ τ''')
+                          ⊢C⦂ C ‼ (op-time op + τ'''))
+                 → (N : Γ ⟨ τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
+                 ------------------------------------------------------------------------------
+                 → Γ ⊢C⦂ handle box V M `with H `in N
+                     == box V 
+                        (handle M `with 
+                          (λ op τ''' → 
+                            C-rename 
+                              (cong-∷-ren (cong-∷-ren wk-ren)) 
+                              (H op τ''')) 
+                        `in (C-rename (cong-∷-ren (cong-⟨⟩-ren wk-ren)) N))
+
+
+    handle-unbox : ∀ {A B C τ τ' τ''}
+                 → (p : τ ≤ ctx-time Γ)
+                 → (V : Γ -ᶜ τ ⊢V⦂ [ τ ] A)
+                 → (M : Γ ∷ A ⊢C⦂ B ‼ τ')
+                 → (H : (op : Op) → (τ''' : Time) →
+                          Γ ∷ type-of-gtype (param op)
+                            ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ C ‼ τ''')
+                          ⊢C⦂ C ‼ (op-time op + τ'''))
+                 → (N : Γ ⟨ τ' ⟩ ∷ B ⊢C⦂ C ‼ τ'')
+                 ------------------------------------------------------------------------------
+                 → Γ ⊢C⦂ handle unbox p V M `with H `in N
+                     == unbox p V 
+                        (handle M `with 
+                          (λ op τ''' → 
+                            C-rename 
+                              (cong-∷-ren (cong-∷-ren wk-ren)) 
+                              (H op τ''')) 
+                        `in (C-rename (cong-∷-ren (cong-⟨⟩-ren wk-ren)) N))
+
     -- beta rule for unbox
 
     unbox-beta : ∀ {Δ A B C τ τ'}
