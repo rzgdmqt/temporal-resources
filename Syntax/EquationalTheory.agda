@@ -6,12 +6,12 @@ module Syntax.EquationalTheory where
 
 open import Data.Product
 
-open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.CompContext
 open import Syntax.Language
 open import Syntax.Renamings
 open import Syntax.Substitutions
+open import Syntax.Types
 
 open import Util.Equality
 open import Util.Operations
@@ -497,6 +497,8 @@ mutual
                             (box 
                               (V-rename (cong-⟨⟩-ren wk-ren) V) 
                               (C-rename exch-ren M))    
+
+    -- equations for collapsing successive delays
 
     delay-zero : ∀ {A τ}
                → (M : Γ ⟨ 0 ⟩ ⊢C⦂ A ‼ τ)

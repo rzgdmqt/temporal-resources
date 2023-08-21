@@ -4,8 +4,8 @@
 
 module Syntax.Language where
 
-open import Syntax.Types
 open import Syntax.Contexts
+open import Syntax.Types
 
 open import Util.Equality
 open import Util.Operations

@@ -1,13 +1,14 @@
 module Syntax.CompContext where
 
-open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Language
+open import Syntax.Types
 
 open import Util.Operations
 open import Util.Time
 
 -- Context with appending on the left end
+
 data BCtx : Set where
   []ₗ   : BCtx               
   _∷ₗ_  : VType → BCtx → BCtx 
@@ -16,25 +17,41 @@ data BCtx : Set where
 infixr 32 _∷ₗ_
 infix  31 ⟨_⟩ₗ_
 
+-- Operation that merges context and binding context, by
+-- transfering resources and time passages one by one from
+-- binding context to regular context
+
 _⋈_ : Ctx → BCtx → Ctx
 Γ ⋈ []ₗ = Γ
 Γ ⋈ (x ∷ₗ Δ) = ((Γ ∷ x)) ⋈ Δ
 Γ ⋈ (⟨ τ ⟩ₗ Δ) = (Γ ⟨ τ ⟩) ⋈ Δ 
+
+-- function transforming binding context to regular context
+-- one might use simpler expression BCtx→Ctx Δ = [] ⋈ Δ, but
+-- we have powerfull lemmas for _ ++ᶜ_ that are more of a use
+-- along the following definition
 
 BCtx→Ctx : BCtx → Ctx 
 BCtx→Ctx []ₗ = []
 BCtx→Ctx (x ∷ₗ Δ) = ([] ∷ x) ++ᶜ BCtx→Ctx Δ
 BCtx→Ctx (⟨ τ ⟩ₗ Δ) = ([] ⟨ τ ⟩) ++ᶜ BCtx→Ctx Δ
 
+-- joining binding contexts
+
 _++ₗ_ : BCtx → BCtx → BCtx
 []ₗ ++ₗ Δ' = Δ'
 (V ∷ₗ Δ) ++ₗ Δ' = V ∷ₗ (Δ ++ₗ Δ')
 (⟨ τ ⟩ₗ Δ) ++ₗ Δ' = ⟨ τ ⟩ₗ (Δ ++ₗ Δ')
 
+-- transforming context to binding context
+
 Ctx→Bctx : Ctx → BCtx
 Ctx→Bctx [] = []ₗ
 Ctx→Bctx (Γ ∷ V) = Ctx→Bctx Γ ++ₗ (V ∷ₗ []ₗ)
 Ctx→Bctx (Γ ⟨ τ ⟩) = (Ctx→Bctx Γ) ++ₗ (⟨ τ ⟩ₗ []ₗ)
+
+-- binding context time. Just for convenience. We could
+-- use: ctx-time (BCtx→Ctx Δ)
 
 bctx-time : (Δ : BCtx) → Time
 bctx-time []ₗ = 0
@@ -43,7 +60,8 @@ bctx-time (⟨ τ ⟩ₗ Δ) = τ + (bctx-time Δ)
 
 infixl 30 _⋈_ 
 
--- program with typed hole in it
+-- program with typed hole in it - basicly just computations
+-- where in place of computation we can use hole 𝕂
 data _⊢K[_⊢_]⦂_ (Γ : Ctx) : BCtx → CType → CType → Set where
 
     []ₖ : ∀ {A τ} 

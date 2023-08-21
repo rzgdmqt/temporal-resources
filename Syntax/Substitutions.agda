@@ -12,10 +12,10 @@ open import Data.Sum
 
 open import Relation.Nullary
 
-open import Syntax.Types
 open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Renamings
+open import Syntax.Types
 
 open import Util.Equality
 open import Util.Time

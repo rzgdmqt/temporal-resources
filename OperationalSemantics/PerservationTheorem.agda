@@ -1,17 +1,17 @@
 module OperationalSemantics.PerservationTheorem where
 
 open import OperationalSemantics.State
-open import Util.Time
-open import Util.Properties
-open import Syntax.Types
-open import Syntax.Language
-open import Syntax.Contexts
-open import Util.Operations
-open import Syntax.Substitutions
-open import Syntax.Renamings
-open import Data.Product
 
+open import Syntax.Contexts
+open import Syntax.Language
+open import Syntax.Renamings
+open import Syntax.Substitutions
+open import Syntax.Types
+
+open import Data.Product
+open import Util.Operations
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
+open import Util.Time
 
 -- record type for Configuratin that encapsulates time, state and computation
 
@@ -77,8 +77,7 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             ⟨ τ'' , S , perform op V M ; N  ⟩ ↝ ⟨ τ'' , S ,  τ-subst (sym (+-assoc (op-time op) τ τ'))
                          (perform op V
                             (M ;
-                             C-rename (cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren))
-                             N))  ⟩
+                             C-rename (cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren)) N))  ⟩
     
     -- delay just pass time further
     DELAY : {τ τ' τ'' : Time} → 
@@ -130,8 +129,8 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
                                 (cong-∷-ren (suc-comp-ren S≤ₛS₁ (m≡n⇒m≤n τ+τ₂≡τ₄+τ₃))) 
                             N) ⟩
 
-    -- operaion handle where we box up result so that time in the rest of the 
-    -- program doesn't break
+    -- operation handle where we box up result so that the resources
+    -- in the result are not used before enough time has passed
     HANDLE-OP : {τ τ' τ'' : Time} →
             {S : 𝕊 τ} → 
             {op : Op} → 
@@ -145,14 +144,13 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {N : toCtx S ⟨ op-time op + τ'' ⟩ ∷ A ⊢C⦂ B ‼ τ'} → 
             --------------------------------------------------------------------------
             ⟨ τ , S , handle perform op V M `with H `in N ⟩ ↝
-            ⟨ τ , S , 
-            box (lam (handle M 
-                    `with (λ op₁ τ''' → 
-                            C-rename (cong-∷-ren (cong-∷-ren (wk-ren ∘ʳ wk-⟨⟩-ren))) 
-                        (H op₁ τ''')) 
-                    `in (C-rename ((cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren)))
-                        N))) 
-                ((H op (τ'' + τ')) [ Tl-∷ Hd ↦ V ]c) ⟩
+            ⟨ τ , S , box (lam (handle M 
+                        `with (λ op₁ τ''' → 
+                                C-rename (cong-∷-ren (cong-∷-ren (wk-ren ∘ʳ wk-⟨⟩-ren))) 
+                            (H op₁ τ''')) 
+                        `in (C-rename ((cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren)))
+                            N))) 
+                        ((H op (τ'' + τ')) [ Tl-∷ Hd ↦ V ]c) ⟩
 
     -- step for box: we just extend our state with new resource
     BOX :   {τ τ' τ'' : Time} → {S : 𝕊 τ} → {A B : VType} → 
@@ -167,29 +165,19 @@ data _↝_ :  {C D : CType} → Config C → Config D → Set where
             {V : (toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A)} →
             {M : toCtx S ∷ A ⊢C⦂ C } → 
             ---------------------------------------------------------------------------------------------
+            let Σ[τ''∈Time][τ+τ'≤τ''×A∈[τ'']Γ] = (push-time-further p (proj₂ (var-in-ctx V))) in
+            let all-time-smaller = m+n≤o⇒m≤o τ' (proj₁ (proj₂ Σ[τ''∈Time][τ+τ'≤τ''×A∈[τ'']Γ])) in
+            let time-travel-to-past-smaller-than-ctx-time = τ-≤-substᵣ 
+                            (sym (ctx-timeSτ≡τ S))
+                            (from-head-time-positive (proj₂ (proj₂ Σ[τ''∈Time][τ+τ'≤τ''×A∈[τ'']Γ]))) in
             ⟨ τ , S , unbox p V M ⟩ ↝ 
             ⟨ τ , S , 
-            M [ Hd ↦ 
-                resource-pass-to-ctx 
-                    S 
-                    (m+n≤o⇒m≤o 
-                        τ' 
-                        (proj₁ (proj₂ (
-                            push-time-further 
-                                p 
-                                (proj₂ (var-in-ctx V))
-                                    )
-                                )
-                        )
-                    ) 
-                    (τ-≤-substᵣ 
-                        (sym (ctx-timeSτ≡τ S))
-                        (from-head-time-positive (proj₂ (proj₂ (push-time-further p (proj₂ (var-in-ctx V))))))
-                    )
-                    (resource-lookup 
+                M [ Hd ↦ 
+                    resource-pass-to-ctx 
                         S 
-                        (proj₂ (proj₂ (
-                            push-time-further p (proj₂ (var-in-ctx V)))))) ]c ⟩ 
+                        all-time-smaller
+                        time-travel-to-past-smaller-than-ctx-time
+                        (resource-lookup S (proj₂ (proj₂ Σ[τ''∈Time][τ+τ'≤τ''×A∈[τ'']Γ]))) ]c ⟩ 
 
 -- perservation theorem
 

@@ -43,11 +43,6 @@ open import Util.Time
 
 open import Util.Operations
 
----- Properties - mostly equalities between natural numbers
-
-open import Util.Properties
-
-
 -- SYNTAX
 ---------
 
@@ -61,6 +56,9 @@ open import Syntax.Language
 
 open import Syntax.Renamings
 open import Syntax.Substitutions
+
+-- SEMANTICS
+------------
 
 ---- State
 

@@ -10,19 +10,18 @@ open import Data.Empty
 open import Data.Product
 open import Data.Sum
 
-open import Relation.Nullary
 open import Relation.Binary.Definitions
+open import Relation.Nullary
 
-open import Syntax.Types
+open import Syntax.CompContext
 open import Syntax.Contexts
 open import Syntax.Language
-open import Syntax.CompContext
+open import Syntax.Types
 
 open import Data.Nat public
 open import Data.Nat.Properties public
 open import Util.Equality
 open import Util.Time
-open import Util.Properties
 
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)

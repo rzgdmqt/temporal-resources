@@ -1,13 +1,16 @@
 module OperationalSemantics.TheoremsAboutSteps where
 
 
-open import Util.Time
-open import Syntax.Types
-open import OperationalSemantics.PerservationTheorem
 open import Syntax.Language
+open import Syntax.Types
+
+open import OperationalSemantics.PerservationTheorem
 open import OperationalSemantics.State
-open import Util.Operations
+
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
+open import Util.Operations
+open import Util.Time
+
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)
 
 -- Theorem that step only extends state
@@ -40,17 +43,7 @@ step-increases-time : {τ τ' τ'' τ''' : Time} →
                 {M' : toCtx S' ⊢C⦂ A ‼ τ'''} → 
                 (M↝M' : ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ ) → 
                 τ ≤ τ'
-step-increases-time APP = ≤-refl
-step-increases-time MATCH = ≤-refl
-step-increases-time SEQ-RET = ≤-refl
-step-increases-time SEQ-OP = ≤-refl
-step-increases-time HANDLE-RET = ≤-refl
-step-increases-time HANDLE-OP = ≤-refl
-step-increases-time BOX = ≤-refl
-step-increases-time (UNBOX p) = ≤-refl
-step-increases-time (DELAY {τ' = τ'}) = ≤-stepsʳ τ' ≤-refl
-step-increases-time (SEQ-FST τ+τ₂≡τ₁+τ₄ S≤ₛS' x) = S≤ₛS'⇒τ≤τ' S≤ₛS'
-step-increases-time (HANDLE-STEP τ+τ₄≡τ₇+τ₆ S≤ₛS' x) = S≤ₛS'⇒τ≤τ' S≤ₛS'
+step-increases-time M↝M' = S≤ₛS'⇒τ≤τ' (step-extends-state M↝M')
 
 -- step perserves overall time
 

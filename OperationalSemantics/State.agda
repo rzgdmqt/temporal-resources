@@ -1,14 +1,14 @@
 module OperationalSemantics.State where
 
-open import Syntax.Types
-open import Syntax.Language
 open import Syntax.Contexts
+open import Syntax.Language
 open import Syntax.Renamings
-open import Util.Time
-open import Util.Properties
-open import Util.Equality
+open import Syntax.Types
+
 open import Data.Empty
+open import Util.Equality
 open import Data.Product
+open import Util.Time
 
 -------------------------
 -- Definition of state --

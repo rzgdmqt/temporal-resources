@@ -1,21 +1,23 @@
 module OperationalSemantics.ProgressTheorem where
 
 
-open import Util.Time
-open import Util.Properties
-open import OperationalSemantics.TheoremsAboutSteps
 open import OperationalSemantics.PerservationTheorem
-open import Syntax.Types
-open import Syntax.Language
+open import OperationalSemantics.TheoremsAboutSteps
+
 open import Syntax.Contexts
+open import Syntax.Language
+open import Syntax.Types
+
 open import OperationalSemantics.State
-open import Util.Operations
-open import Util.Equality
+
 open import Data.Empty
+open import Util.Equality
+open import Util.Operations
+open import Util.Time
 
 -- Progress theorem. A term is either returned value, operation or makes step
 
-data progresses : {τ' τ : Time} → 
+data Progresses : {τ' τ : Time} → 
                 {S : 𝕊 τ} → 
                 {A : VType} → 
                 (M : toCtx S ⊢C⦂ A ‼ τ') →  Set where
@@ -25,7 +27,7 @@ data progresses : {τ' τ : Time} →
             {A : VType} → 
             {V : toCtx S ⊢V⦂ A} →
             ---------------------
-            progresses (return V) 
+            Progresses (return V) 
     
     is-op : {τ τ' : Time} → 
             {S : 𝕊 τ} → 
@@ -34,7 +36,7 @@ data progresses : {τ' τ : Time} →
             {V : toCtx S ⊢V⦂ type-of-gtype (param op) } → 
             {M : toCtx S ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ'} → 
             --------------------------------------------------------------------
-            progresses (perform op V M) 
+            Progresses (perform op V M) 
 
 
     steps : {τ τ' τ'' τ''' : Time} → 
@@ -44,9 +46,9 @@ data progresses : {τ' τ : Time} →
             (p : τ + τ'' ≡ τ' + τ''') → 
             ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ →
             ----------------------------------
-            progresses M 
+            Progresses M 
 
-progress : {τ τ' : Time} {S : 𝕊 τ} {A : VType} → (M : toCtx S ⊢C⦂ A ‼ τ') → progresses M 
+progress : {τ τ' : Time} {S : 𝕊 τ} {A : VType} → (M : toCtx S ⊢C⦂ A ‼ τ') → Progresses M 
 progress (return V) = is-value
 progress {τ} {τ'} {S = S} {A = A} ((_;_) {τ' = τ₁} M N) with progress M
 ... | is-value = steps refl SEQ-RET 
