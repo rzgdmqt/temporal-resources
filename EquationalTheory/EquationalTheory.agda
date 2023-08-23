@@ -2,12 +2,13 @@
 -- Equational theory of the language --
 ---------------------------------------
 
-module Syntax.EquationalTheory where
+module EquationalTheory.EquationalTheory where
 
 open import Data.Product
 
+open import EquationalTheory.CompContext
+
 open import Syntax.Contexts
-open import Syntax.CompContext
 open import Syntax.Language
 open import Syntax.Renamings
 open import Syntax.Substitutions

@@ -13,7 +13,8 @@ open import Data.Sum
 open import Relation.Binary.Definitions
 open import Relation.Nullary
 
-open import Syntax.CompContext
+open import EquationalTheory.CompContext
+
 open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Types

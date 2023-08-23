@@ -1,13 +1,14 @@
 {-# OPTIONS --allow-unsolved-metas #-}
-module OperationalSemantics.Soundness where
+module EquationalTheory.Soundness where
 
 open import OperationalSemantics.PerservationTheorem
 open import OperationalSemantics.ProgressTheorem
 open import OperationalSemantics.State
 
-open import Syntax.CompContext
+open import EquationalTheory.CompContext
+open import EquationalTheory.EquationalTheory
+
 open import Syntax.Contexts
-open import Syntax.EquationalTheory
 open import Syntax.Language
 open import Syntax.Renamings
 open import Syntax.Substitutions
@@ -123,18 +124,17 @@ soundness refl (HANDLE-RET {V = V} {H = H} {N = N}) =
     config-to-comp-cong (handle-return V H N)
 soundness p (HANDLE-STEP τ+τ₂≡τ₄+τ₃ S≤ₛS' M↝M') with soundness (sym τ+τ₂≡τ₄+τ₃) M↝M'
 ... | M==M' = {!   !}
-soundness {S = S} p (HANDLE-OP {op = op} {V = V} {M = M} {H = H} {N = N}) = 
-    C-trans 
-        (config-to-comp-cong 
-            (handle-perform op V M H N)) 
+soundness {S = S} p (HANDLE-OP {τ = τ} {τ' = τ'} {τ'' = τ''} {op = op} {V = V} {M = M} {H = H} {N = N}) = 
+    C-trans
+        (config-to-comp-cong (handle-perform op V M H N))
         {!   !}
 soundness refl (BOX {S = S}) = 
     config-to-comp-cong {S = S} C-refl
-soundness {S = ∅} refl (UNBOX {S = .∅} z≤n) = 
-    {!   !}  -- we don't have any resources so this would imply ill-scoped program
+soundness {S = ∅} refl (UNBOX {S = .∅} z≤n {V = V}) = 
+    ⊥-elim (not-in-empty-ctx (proj₂ (var-in-ctx V)))
 soundness {A} {τ} {τ} {τ''} {τ''} {S =  _⟨_⟩ₘ {τ''''} S τ'''} refl (UNBOX {τ' = τ'} p₁ {V = V} {M = M}) = 
     τ-subst-cong 
         (sym (+-assoc τ'''' τ''' τ'')) 
         (sym (+-assoc τ'''' τ''' τ'')) 
-        {!   !} -- delay cong
-soundness {S = S ∷ₘ[ τ' ] V} refl (UNBOX {S = .(S ∷ₘ[ τ' ] V)} p₁ {V = W}) = {!   !} -- we split case wether W ≡ V or not. if yes, unbox-beta else cong-box recursive call 
+        {!   !}
+soundness {S = S ∷ₘ[ τ' ] V} refl (UNBOX {S = .(S ∷ₘ[ τ' ] V)} p₁ {V = W}) = {!   !} -- we split case wether W ≡ V or not. if yes, unbox-beta else cong-box recursive call  

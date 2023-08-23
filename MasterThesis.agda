@@ -78,12 +78,12 @@ open import OperationalSemantics.ProgressTheorem
 
 ----Computational contexts
 
-open import Syntax.CompContext
+open import EquationalTheory.CompContext
 
 ---- Equational theory
 
-open import Syntax.EquationalTheory
+open import EquationalTheory.EquationalTheory
 
 ---- Soundness theorem
 
-open import OperationalSemantics.Soundness
+open import EquationalTheory.Soundness

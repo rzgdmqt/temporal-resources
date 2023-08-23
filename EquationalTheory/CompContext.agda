@@ -1,4 +1,4 @@
-module Syntax.CompContext where
+module EquationalTheory.CompContext where
 
 open import Syntax.Contexts
 open import Syntax.Language
