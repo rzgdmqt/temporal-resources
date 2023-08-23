@@ -9,182 +9,67 @@ to wait for (car) parts to dry after the paint operation.
 
 The **main features** of this core language are:
 
-* Fitch-style, *temporally-graded modal types* `[ tau ] X` are used to
+- Fitch-style, _temporally-graded modal types_ `[ tau ] X` are used to
   capture temporal resources, expressing that an `X`-value will be
   available in at most `tau` time steps, after which it becomes
   possible to unbox it.
-  
-* A novel notion of *temporally-aware algebraic effects*, where
+- A novel notion of _temporally-aware algebraic effects_, where
   operations' specifications include their execution times, and
   their continuations know that an operation's worth of additional
   time has passed before they start executing, making it possible to
   safely access further temporal resources in it.
-  
-* *Effect handlers*, also temporally-aware, that have to respect the
+- _Effect handlers_, also temporally-aware, that have to respect the
   temporal discipline of algebraic operations.
-  
-* A *graded monads-based effect system* (with some added temporal
+- A _graded monads-based effect system_ (with some added temporal
   awareness) that modularly tracks the execution times of
   computations.
-  
+
 The formalisation is developed and tested with Agda version 2.6.2.2
 and Agda Standard Library version 1.7.1.
 
 The formalisation consists of **three main parts**:
 
-### Core language, type system, equations, basic meta-theory
+### Core language, type system
 
 The main modules presenting the core language are:
 
-* `Syntax/Types.agda` defines types.
+- `Syntax/Types.agda` defines types.
 
-* `Syntax/Contexts.agda` defines contexts and operations on them.
+- `Syntax/Contexts.agda` defines contexts and operations on them.
 
-* `Syntax/Language.agda` defines well-typed values and computations.
+- `Syntax/Language.agda` defines well-typed values and computations.
 
-* `Syntax/Renamings.agda` defines an inductive notion of renamings and
+- `Syntax/Renamings.agda` defines an inductive notion of renamings and
   its action on well-typed terms (i.e., proves admissibility of
   renaming).
-  
-* `Syntax/Substitutions.agda` defines/proves substitution for
+- `Syntax/Substitutions.agda` defines/proves substitution for
   well-typed terms.
-  
-* `Syntax/EquationalTheory.agda` defines a natural beta/eta-equational
+- `Syntax/EquationalTheory.agda` defines a natural beta/eta-equational
   theory for well-typed terms.
 
-### Abstract category-theoretic denotational semantics 
+### Operational semantics, progress theorem
 
-The abstract model is summarised in `Semantics/Model.agda`. The main
-modules presenting this model are:
+- `OperationalSemantics/State.agda` defines state for stateful operational semantics, and proves some state properties.
 
-* `Semantics/Model/Category.agda` axiomatises the basic abstract
-  category-theoretic structures used in the interpretation (e.g.,
-  products, exponentials, etc).
-  
-* `Semantics/Model/Modality/Future.agda` axiomatises the (future)
-  modality used to model the modal temporal resource type `[ tau ] X`,
-  as a (covariant) strong monoidal functor.
-  
-* `Semantics/Model/Modality/Past.agda` axiomatises the (past) modality
-  used to model the Fitch-style temporal modality on contexts, as a
-  (contravariant) strong monoidal functor.
-  
-* `Semantics/Model/Modality/Adjunction.agda` axiomatises an adjunction
-  between the two modalities used in the interpretation of computation
-  terms (boxing, unboxing, but also sequential composition, etc).
-  
-* `Semantics/Model/Monad.agda` axiomatises `[-]`-strong graded monad
-  structure used to model computation types and terms.
-  
-* `Semantics/Model/Monad/ET-equiv-T.agda` proves that `[-]`-strength
-  is equivalent to asking the graded monad to be `[-]`-enriched.
-  
-This abstract model is then used to give the core language a denotational
-semantics and prove it sound, in the following modules:
+- `OperationalSemantics/PerservationTheorem.agda` defines steps for stateful operational semantics, and proves perservation theorem.
 
-* `Semantics/Interpretation.agda` defines the interpretation of types, 
-  contexts, and terms.
-  
-* `Semantics/Renamings.agda` defines the interpretation of renamings.
+- `OperationalSemantics/TheoremsAboutSteps.agda` proves some basic theorems about steps.
 
-* `Semantics/Renamings/Properties/VC-rename.agda` proves a semantic
-  renaming lemma.
-  
-* `Semantics/Substitutions/Properties/VC-subst.agda` proves a semantic
-  substitution lemma.
-  
-* `Semantics/Soundness.agda` proves the soundness of the
-  interpretation.
+- `OperationalSemantics/ProgressTheorem.agda` proves progress theorem.
 
-### Concrete presheaf model
+### EquationalTheory
 
-We provide a natural concrete example of the abstract setup using
-time-indexed presheaves in `Semantics/Model/Example/TSets/`. The 
-structure of this model follows the modules of the abstract setup.
+- `EquationalTheory/CompContext.agda` defines binding contexts and programs with typed holes.
+- `EquationalTheory/EquationalTheory.agda` defines a natural beta/eta-equational theory for well-typed terms.
+- `EquationalTheory/Soundness.agda` proves that operational semantics as defined are sound with respect to equational theory.
 
 ## The work in progress aspect
 
-Not all the desired results are currently written up in Agda, for
-three main reasons: paper submission deadline; running into Agda's bug
-where due to excessive eta-contraction `with`-abstractions end up
-producing ill-typed Agda terms
-([#2732](https://github.com/agda/agda/issues/2732)); and the (naive,
-straightforward attempt at the) concrete presheaf model producing
-humongous inequational Agda terms in composite equations/diagrams.
+Proof of soundness theorem is not yet finished, but we believe we can complet it in current setting.
 
-What we currently have:
+## Difference from original work
 
-* In `Syntax/`, all the desired definitions and proofs are finished.
-
-* In `Semantics/`, the interpretation is defined, and the high-level
-  arguments for renaming and substitution lemmas, and the soundness
-  theorem are finished.
-  
-* In `Semantics/Model/Example/TSets/`, the presheaf category, with the
-  modalities and graded monad on it, with all properties of modalities
-  written up and most of the graded-monadic properties written up.
-
-What we currently do not have:
-
-* In `Semantics/`, some of the auxiliary lemmas used in the high-level
-  proofs are currently partially finished (bugs) or postulated (time), 
-  specifically:
-  
-  * `Semantics/Renamings/Properties/env-⟨⟩-ᶜ-ren-naturality.agda` runs
-    into the problem with `with`-abstractions producing ill-typed
-    Agda-terms.
-    
-  * `Semantics/Renamings/Properties/env-⟨⟩-ᶜ-split-env-naturality.agda`
-    is postulated for time.
-    
-  * `Semantics/Renamings/Properties/var-not-in-ctx-after-ᶜ-wk-ren.agda`
-    runs into the `with`-abstraction problem, but has the corresponding
-    cases proved manually as separate auxiliary lemmas.
-    
-* Further, in `Semantics/Model/Example/TSets/Monad/`, termination of
-  some functions is postulated where Agda does not immediately see it.
-  
-  The reason for this is that the monad is defined simultaneously with
-  its monotonicity proof, meaning that when defining operations such
-  as monad multiplication, the types involved in these definitions
-  have recursive calls of the form `μˢ (Tˢ-≤t p k)`, where Agda does
-  not see that `Tˢ-≤t p k` is indeed smaller than the original
-  argument to `μˢ` (with `k` one of its subterms) because `Tˢ-≤t` does
-  not change the given tree height.
-    
-* In `Semantics/Model/Example/TSets/`, some of them modules typecheck
-  extremely slowly due to the current definition of the presheaf model
-  and the structure on it producing humongous inequational Agda terms
-  in composite equations/diagrams, specifically:
-  
-  * `Semantics/Model/Example/TSets/Monad/Strength/Properties/CartesianStructure.agda`
-    typechecks very slowly, with `--experimental-lossy-unification`
-    option helping Agda to be a bit faster.
-    
-  * `Semantics/Model/Example/TSets/Monad/Strength/Properties/Algebraicity.agda`
-    postulates the algebraicity law for algebraic operations due to
-    typechecking slowness (the corresponding proof for the unary delay
-    operations is written up).
-    
-  * `Semantics/Model/Example/TSets/Monad/Handling/Properties/` is
-    missing the write-up of the proof of the handling-of-operation law
-    due to typechecking slowness (even for writing the law down with
-    the current concrete model definition).
-    
-What and how could be improved:
-
-* For the `with`-abstraction problem, the official suggestion seems to
-  be to rewrite the definition with pattern-matching in auxiliary
-  functions as opposed to using `with`-abstractions. As a stop-gap
-  measure, we could also work out the types of the individual cases
-  and prove them as auxiliary lemmas (analogously to
-  `Semantics/Renamings/Properties/var-not-in-ctx-after-ᶜ-wk-ren.agda`).
-  
-* For the slowness of typechecking, we likely need to make some
-  aspects of the concrete model abstract, and manually simplify the
-  generated inequational proof terms in composite equations/diagrams.
-  
-* Regarding the postulated termination of some of the functions in
-  `Semantics/Model/Example/TSets/Monad/`, we could additionally index
-  the monad's data structure with its tree-height, which should be
-  enough to convince Agda of termination.
+This formalization has been made as part of a master thesis.
+In order to provide operational semantics we had to change `box`
+to be a computation. Because of that substitutions had to slightly change
+and equations for equational theory aswell.
