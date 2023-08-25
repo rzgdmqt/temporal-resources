@@ -54,7 +54,7 @@ progress {τ} {τ'} {S = S} {A = A} ((_;_) {τ' = τ₁} M N) with progress M
 ... | is-value = steps refl SEQ-RET 
 ... | is-op = steps refl (SEQ-OP {S = S})
 ... | steps {τ' = τ₂} {τ'' = τ₃} {τ''' = τ₄} q M↝M' = 
-    steps (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (SEQ-FST q (step-extends-state M↝M') M↝M')
+    steps (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (SEQ-FST q M↝M')
 progress {τ} {τ'} {S} (lam M · V) = steps refl APP
 progress {τ} {τ'} (delay {τ' = τ₁} τ₂ M ) = 
     steps (sym (+-assoc τ τ₂ τ₁)) DELAY
@@ -65,7 +65,7 @@ progress {τ} (handle_`with_`in {τ' = τ₁} M H N) with progress M
 ... | is-op {τ' = τ'} {op = op} = 
         steps (τ+⟨τ₁+τ₂+τ₃⟩≡τ+⟨τ₁+⟨τ₂+τ₃⟩⟩ τ (op-time op) τ' τ₁) HANDLE-OP
 ... | steps {τ' = τ₂} {τ'' = τ₃} {τ''' = τ₄} q M↝M' = 
-    steps (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (HANDLE-STEP q (step-extends-state M↝M') M↝M')
+    steps (step-time-eq τ τ₃ τ₁ τ₂ τ₄ q) (HANDLE-STEP q M↝M')
 progress (unbox τ≤ctx-time V M) = steps refl (UNBOX τ≤ctx-time)
 progress (box V M) = steps refl BOX
 progress (absurd (var V)) = ⊥-elim (Empty-not-in-toCtx V)
