@@ -4,6 +4,7 @@ open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Types
 
+open import Util.Equality
 open import Util.Operations
 open import Util.Time
 
@@ -23,8 +24,10 @@ infix  31 ⟨_⟩ₗ_
 
 _⋈_ : Ctx → BCtx → Ctx
 Γ ⋈ []ₗ = Γ
-Γ ⋈ (x ∷ₗ Δ) = ((Γ ∷ x)) ⋈ Δ
-Γ ⋈ (⟨ τ ⟩ₗ Δ) = (Γ ⟨ τ ⟩) ⋈ Δ 
+Γ ⋈ (A ∷ₗ Δ) = ((Γ ∷ A)) ⋈ Δ
+Γ ⋈ (⟨ τ ⟩ₗ Δ) = (Γ ⟨ τ ⟩) ⋈ Δ
+
+infixl 30 _⋈_
 
 -- function transforming binding context to regular context
 -- one might use simpler expression BCtx→Ctx Δ = [] ⋈ Δ, but
@@ -33,32 +36,114 @@ _⋈_ : Ctx → BCtx → Ctx
 
 BCtx→Ctx : BCtx → Ctx 
 BCtx→Ctx []ₗ = []
-BCtx→Ctx (x ∷ₗ Δ) = ([] ∷ x) ++ᶜ BCtx→Ctx Δ
+BCtx→Ctx (A ∷ₗ Δ) = ([] ∷ A) ++ᶜ BCtx→Ctx Δ
 BCtx→Ctx (⟨ τ ⟩ₗ Δ) = ([] ⟨ τ ⟩) ++ᶜ BCtx→Ctx Δ
 
--- joining binding contexts
+-- concatenating binding contexts
 
 _++ₗ_ : BCtx → BCtx → BCtx
 []ₗ ++ₗ Δ' = Δ'
-(V ∷ₗ Δ) ++ₗ Δ' = V ∷ₗ (Δ ++ₗ Δ')
+(A ∷ₗ Δ) ++ₗ Δ' = A ∷ₗ (Δ ++ₗ Δ')
 (⟨ τ ⟩ₗ Δ) ++ₗ Δ' = ⟨ τ ⟩ₗ (Δ ++ₗ Δ')
+
+infixl 6 _++ₗ_
+
+-- associativity of concatenating binding contexts
+
+++ₗ-assoc : (Δ Δ' Δ'' : BCtx)
+          → Δ ++ₗ Δ' ++ₗ Δ'' ≡ Δ ++ₗ (Δ' ++ₗ Δ'')
+          
+++ₗ-assoc []ₗ Δ' Δ'' = refl
+++ₗ-assoc (A ∷ₗ Δ) Δ' Δ'' = cong (A ∷ₗ_) (++ₗ-assoc Δ Δ' Δ'')
+++ₗ-assoc (⟨ τ ⟩ₗ Δ) Δ' Δ'' = cong (⟨ τ ⟩ₗ_) (++ₗ-assoc Δ Δ' Δ'')
+
+-- unitality of concatenating binding contexts
+
+++ₗ-identityˡ : ∀ {Δ}
+              → []ₗ ++ₗ Δ ≡ Δ
+              
+++ₗ-identityˡ = refl
+
+++ₗ-identityʳ : ∀ {Δ}
+              → Δ ++ₗ []ₗ ≡ Δ
+              
+++ₗ-identityʳ {[]ₗ} = refl
+++ₗ-identityʳ {A ∷ₗ Δ} = cong (A ∷ₗ_) (++ₗ-identityʳ {Δ})
+++ₗ-identityʳ {⟨ τ ⟩ₗ Δ} = cong (⟨ τ ⟩ₗ_) (++ₗ-identityʳ {Δ})
 
 -- transforming context to binding context
 
 Ctx→Bctx : Ctx → BCtx
 Ctx→Bctx [] = []ₗ
-Ctx→Bctx (Γ ∷ V) = Ctx→Bctx Γ ++ₗ (V ∷ₗ []ₗ)
+Ctx→Bctx (Γ ∷ A) = Ctx→Bctx Γ ++ₗ (A ∷ₗ []ₗ)
 Ctx→Bctx (Γ ⟨ τ ⟩) = (Ctx→Bctx Γ) ++ₗ (⟨ τ ⟩ₗ []ₗ)
+
+-- Relating ⋈ and Ctx→Bctx
+
+⋈-++ₗ : (Γ Γ' : Ctx)
+      → (Δ : BCtx)
+      → Γ ⋈ (Ctx→Bctx Γ' ++ₗ Δ) ≡ (Γ ++ᶜ Γ') ⋈ Δ
+
+⋈-++ₗ Γ [] Δ =
+  refl
+⋈-++ₗ Γ (Γ' ∷ A) Δ =
+  trans
+    (cong (Γ ⋈_) (++ₗ-assoc (Ctx→Bctx Γ') (A ∷ₗ []ₗ) Δ))
+    (⋈-++ₗ Γ Γ' (A ∷ₗ Δ))
+⋈-++ₗ Γ (Γ' ⟨ τ ⟩) Δ =
+  trans
+    (cong (Γ ⋈_) (++ₗ-assoc (Ctx→Bctx Γ') (⟨ τ ⟩ₗ []ₗ) Δ)) 
+    (⋈-++ₗ Γ Γ' (⟨ τ ⟩ₗ Δ))
+
+⋈-BCtx→Ctx : (Γ Γ' : Ctx)
+           → Γ ⋈ Ctx→Bctx Γ' ≡ Γ ++ᶜ Γ'
+
+⋈-BCtx→Ctx Γ Γ' =
+  trans
+    (cong (Γ ⋈_) (sym (++ₗ-identityʳ {Ctx→Bctx Γ'})))
+    (⋈-++ₗ Γ Γ' []ₗ)
 
 -- binding context time. Just for convenience. We could
 -- use: ctx-time (BCtx→Ctx Δ)
 
 bctx-time : (Δ : BCtx) → Time
 bctx-time []ₗ = 0
-bctx-time (X ∷ₗ Δ) = bctx-time Δ
+bctx-time (A ∷ₗ Δ) = bctx-time Δ
 bctx-time (⟨ τ ⟩ₗ Δ) = τ + (bctx-time Δ)
 
-infixl 30 _⋈_ 
+-- Linearity of bctx
+
+bctx-time-linear : (Δ Δ' : BCtx)
+                 → bctx-time (Δ ++ₗ Δ') ≡ bctx-time Δ + bctx-time Δ'
+
+bctx-time-linear []ₗ Δ' =
+  refl
+bctx-time-linear (A ∷ₗ Δ) Δ' =
+  bctx-time-linear Δ Δ'
+bctx-time-linear (⟨ τ ⟩ₗ Δ) Δ' =
+  trans
+    (cong (τ +_) (bctx-time-linear Δ Δ'))
+    (sym (+-assoc τ (bctx-time Δ) (bctx-time Δ')))
+
+-- Relating bctx-time to ctx-time
+
+bctx-time-ctx-time : (Γ : Ctx)
+                   → bctx-time (Ctx→Bctx Γ) ≡ ctx-time Γ
+
+bctx-time-ctx-time [] =
+  refl
+bctx-time-ctx-time (Γ ∷ A) =
+  trans 
+    (bctx-time-linear (Ctx→Bctx Γ) (A ∷ₗ []ₗ))
+    (trans
+      (+-identityʳ _)
+      (bctx-time-ctx-time Γ))
+bctx-time-ctx-time (Γ ⟨ τ ⟩) =
+  trans
+    (bctx-time-linear (Ctx→Bctx Γ) (⟨ τ ⟩ₗ []ₗ))
+    (trans
+      (cong (bctx-time (Ctx→Bctx Γ) +_) (+-identityʳ _))
+      (cong (_+ τ) (bctx-time-ctx-time Γ)))
 
 -- program with typed hole in it - basicly just computations
 -- where in place of computation we can use hole 𝕂
