@@ -56,6 +56,9 @@ infixl 30 _++ᶜ_
 ++ᶜ-assoc Γ Γ' (Γ'' ∷ A)   = cong (_∷ A) (++ᶜ-assoc Γ Γ' Γ'')
 ++ᶜ-assoc Γ Γ' (Γ'' ⟨ τ ⟩) = cong (_⟨ τ ⟩) (++ᶜ-assoc Γ Γ' Γ'')
 
+++ᶜ-inj : (Γ Γ' Γ'' : Ctx) → Γ' ≡ Γ'' → (Γ ++ᶜ Γ') ≡ (Γ ++ᶜ Γ'')
+++ᶜ-inj Γ Γ' Γ'' p = cong (Γ ++ᶜ_) p
+
 -- Amount of time-passage modelled by a context 
 
 ctx-time : Ctx → Time

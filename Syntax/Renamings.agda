@@ -497,3 +497,6 @@ renΓ⟨τ⟩-Γ⋈Δ {Γ} {Δ} {A} {τ} p =
     ((eq-ren (sym (Γ⋈Δ≡Γ++ᶜctxΔ (Γ ∷ A) Δ))) 
     ∘ʳ cong-ren wk-ren) 
     ∘ʳ ren⟨τ⟩-ctx p 
+
+ren-++-⋈ : ∀ {Γ Δ Γ'} → BCtx→Ctx Δ ≡ Γ' → Ren (Γ ++ᶜ Γ') (Γ ⋈ Δ)
+ren-++-⋈ {Γ} {Δ} {Γ'} p = eq-ren (sym (trans (Γ⋈Δ≡Γ++ᶜctxΔ Γ Δ) (++ᶜ-inj Γ (BCtx→Ctx Δ) Γ' p)))

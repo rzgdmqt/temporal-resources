@@ -113,16 +113,16 @@ bctx-time (⟨ τ ⟩ₗ Δ) = τ + (bctx-time Δ)
 
 -- Linearity of bctx
 
-bctx-time-linear : (Δ Δ' : BCtx)
+bctx-time-aditive : (Δ Δ' : BCtx)
                  → bctx-time (Δ ++ₗ Δ') ≡ bctx-time Δ + bctx-time Δ'
 
-bctx-time-linear []ₗ Δ' =
+bctx-time-aditive []ₗ Δ' =
   refl
-bctx-time-linear (A ∷ₗ Δ) Δ' =
-  bctx-time-linear Δ Δ'
-bctx-time-linear (⟨ τ ⟩ₗ Δ) Δ' =
+bctx-time-aditive (A ∷ₗ Δ) Δ' =
+  bctx-time-aditive Δ Δ'
+bctx-time-aditive (⟨ τ ⟩ₗ Δ) Δ' =
   trans
-    (cong (τ +_) (bctx-time-linear Δ Δ'))
+    (cong (τ +_) (bctx-time-aditive Δ Δ'))
     (sym (+-assoc τ (bctx-time Δ) (bctx-time Δ')))
 
 -- Relating bctx-time to ctx-time
@@ -134,16 +134,29 @@ bctx-time-ctx-time [] =
   refl
 bctx-time-ctx-time (Γ ∷ A) =
   trans 
-    (bctx-time-linear (Ctx→Bctx Γ) (A ∷ₗ []ₗ))
+    (bctx-time-aditive (Ctx→Bctx Γ) (A ∷ₗ []ₗ))
     (trans
       (+-identityʳ _)
       (bctx-time-ctx-time Γ))
 bctx-time-ctx-time (Γ ⟨ τ ⟩) =
   trans
-    (bctx-time-linear (Ctx→Bctx Γ) (⟨ τ ⟩ₗ []ₗ))
+    (bctx-time-aditive (Ctx→Bctx Γ) (⟨ τ ⟩ₗ []ₗ))
     (trans
       (cong (bctx-time (Ctx→Bctx Γ) +_) (+-identityʳ _))
       (cong (_+ τ) (bctx-time-ctx-time Γ)))
+
+ctx-time-bctx-time : (Δ : BCtx)
+                   → ctx-time (BCtx→Ctx Δ) ≡ bctx-time Δ
+ctx-time-bctx-time []ₗ = 
+  refl
+ctx-time-bctx-time (A ∷ₗ Δ) = 
+  trans 
+    (ctx-time-++ᶜ ([] ∷ A) (BCtx→Ctx Δ)) 
+    (ctx-time-bctx-time Δ)
+ctx-time-bctx-time (⟨ τ ⟩ₗ Δ) = 
+  trans 
+    (ctx-time-++ᶜ ([] ⟨ τ ⟩) (BCtx→Ctx Δ)) 
+    (cong (τ +_) (ctx-time-bctx-time Δ))
 
 -- program with typed hole in it - basicly just computations
 -- where in place of computation we can use hole 𝕂
