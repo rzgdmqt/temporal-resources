@@ -44,7 +44,7 @@ data Progresses : {τ' τ : Time} →
             {M : toCtx S ⊢C⦂ A ‼ τ''} →
             {M' : toCtx S' ⊢C⦂  A ‼ τ''' } → 
             (p : τ + τ'' ≡ τ' + τ''') → 
-            ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ →
+            ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩ →
             ----------------------------------
             Progresses M 
 
@@ -80,7 +80,7 @@ finality-value : ∀ {A B τ τ₁ τ₂}
                 → {S₁ : 𝕊 τ₁}
                 → {V : toCtx S ⊢V⦂ A}
                 → {M₁ : toCtx S₁ ⊢C⦂ B ‼ τ₂}
-                → ⟨ τ , S , return V ⟩ ↝ ⟨ τ₁ , S₁ , M₁ ⟩
+                → ⟨ S , return V ⟩ ↝ ⟨ S₁ , M₁ ⟩
                 → ⊥
 finality-value ()
 
@@ -93,6 +93,6 @@ finality-op : ∀ {A B op τ τ₁ τ₂ τ₃}
                 → {V : toCtx S ⊢V⦂ type-of-gtype (param op) }
                 → {M : toCtx S ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ₂}
                 → {M₁ : toCtx S₁ ⊢C⦂ B ‼ τ₃}
-                → ⟨ τ , S , perform op V M ⟩ ↝ ⟨ τ₁ , S₁ , M₁ ⟩
+                → ⟨ S , perform op V M ⟩ ↝ ⟨ S₁ , M₁ ⟩
                 → ⊥
 finality-op ()

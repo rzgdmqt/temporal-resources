@@ -20,7 +20,7 @@ step-increases-time : {τ τ' τ'' τ''' : Time} →
                 {A : VType} → 
                 {M : toCtx S ⊢C⦂ A ‼ τ''} → 
                 {M' : toCtx S' ⊢C⦂ A ‼ τ'''} → 
-                (M↝M' : ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩ ) → 
+                (M↝M' : ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩ ) → 
                 τ ≤ τ'
 step-increases-time M↝M' = S≤ₛS'⇒τ≤τ' (step-extends-state M↝M')
 
@@ -31,7 +31,7 @@ conf-time+comp-time≡const : ∀ {A τ τ' τ'' τ'''}
                 → {S' : 𝕊 τ'}
                 → {M : toCtx S ⊢C⦂ A ‼ τ''}
                 → {M' : toCtx S' ⊢C⦂ A ‼ τ'''}
-                → ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩
+                → ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩
                 → τ + τ'' ≡ τ' + τ'''
 conf-time+comp-time≡const APP = refl
 conf-time+comp-time≡const MATCH = refl
