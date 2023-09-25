@@ -40,6 +40,16 @@ open import Util.Time
              → Γ ⊢C⦂ τ-subst p M == τ-subst q M'
 τ-subst-cong refl refl r = r
 
+-- Transitivity ot τ-subst
+
+τ-subst-trans : ∀ {Γ A}
+        → {τ τ' τ'' : Time}
+        → (p : τ ≡ τ')
+        → (q : τ' ≡ τ'')
+        → (M : Γ ⊢C⦂ A ‼ τ)
+        → τ-subst (trans p q) M ≡ τ-subst q (τ-subst p M)
+τ-subst-trans refl refl M = refl
+
 -- Computation contexts corresponding to states
 
 data _⊢SK[_] (Γ : Ctx) : BCtx → Set where
@@ -59,6 +69,29 @@ data _⊢SK[_] (Γ : Ctx) : BCtx → Set where
             → Γ ⟨ τ ⟩ ⊢SK[ Δ ]
             -------------------
             → Γ ⊢SK[ ⟨ τ ⟩ₗ Δ ]
+
+data _⊢EK[_⊢_]⦂_ (Γ : Ctx) : BCtx → CType → CType → Set where
+
+  []ₑₖ : ∀ {A τ}
+      -----------------------
+      → Γ ⊢EK[ []ₗ ⊢ A ‼ τ ]⦂ A ‼ τ
+
+  _ₑ;_ : ∀ {Δₖ Aₖ A C τₖ τ} 
+        → Γ ⊢EK[ Δₖ ⊢ C ]⦂ Aₖ ‼ τₖ 
+        → Γ ⟨ τₖ ⟩ ∷ Aₖ ⊢C⦂ A ‼ τ
+        -----------------------------------
+        → Γ ⊢EK[ Δₖ ⊢ C ]⦂ A ‼ (τₖ + τ)
+  
+  handleₑ_`with_`in
+        : ∀ {Δ A B C τ τ'}
+        → Γ ⊢EK[ Δ ⊢ C ]⦂ A ‼ τ
+        → ((op : Op) → (τ'' : Time) →
+             Γ ∷ type-of-gtype (param op)
+               ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
+             ⊢C⦂ B ‼ (op-time op + τ''))
+        → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
+        ------------------------------------------------------------
+        → Γ ⊢EK[ Δ ⊢ C ]⦂ B ‼ (τ + τ')
 
 -- Translating a state into a corresponding computation context
 
@@ -101,32 +134,17 @@ _[_]ₛₖ {Γ} {.([ _ ] _ ∷ₗ _)} {A} {τ} (boxₛₖ V K) M =
 _[_]ₛₖ {Γ} {.(⟨ τ' ⟩ₗ _)} {A} {τ} (delayₛₖ {Δ = Δ} τ' K) M =
   τ-subst (sym (+-assoc τ' (bctx-time Δ) τ)) (delay τ' (K [ M ]ₛₖ))
 
-{-
-_[_∣_]ₛₖ : ∀ {Γ Γ' Δ A τ} 
-       → (K : Γ ⊢SK[ Δ ])
-       → Γ' ≡ Γ ⋈ Δ
-       → (M : Γ' ⊢C⦂ A ‼ τ)
-       → Γ ⊢C⦂ A ‼ (bctx-time Δ + τ)
+-- Filling a hole in a computation context E
 
-_[_∣_]ₛₖ {Γ} {.(Γ ⋈ []ₗ)} {.[]ₗ} {A} {τ} []ₛₖ refl M =
-  M
-_[_∣_]ₛₖ {Γ} {Γ'} {.([ _ ] _ ∷ₗ _)} {A} {τ} (boxₛₖ V K) p M =
-  box V (K [ p ∣ M ]ₛₖ)
-_[_∣_]ₛₖ {Γ} {Γ'} {.(⟨ τ' ⟩ₗ _)} {A} {τ} (delayₛₖ {Δ = Δ} τ' K) p M =
-  τ-subst (sym (+-assoc τ' (bctx-time Δ) τ)) (delay τ' (K [ p ∣ M ]ₛₖ))
-
-_[_]ₛₖ : ∀ {A τ τ'} {S : 𝕊 τ} 
-       → (K : [] ⊢SK[ Ctx→Bctx (toCtx S)])
-       → (M : toCtx S ⊢C⦂ A ‼ τ')
-       → [] ⊢C⦂ A ‼ (bctx-time (Ctx→Bctx (toCtx S)) + τ')
-
-_[_]ₛₖ {A} {τ} {τ'} {S} K M =
-  K [ sym (trans (⋈-BCtx→Ctx [] (toCtx S)) ++ᶜ-identityˡ) ∣ M ]ₛₖ
--}
-
+_[_]ₑₖ : ∀ {Γ Δ A C τ}
+      → (E : Γ ⊢EK[ Δ ⊢ C ]⦂ A ‼ τ)
+      → (M : Γ ⋈ Δ ⊢C⦂ C)
+      → Γ ⊢C⦂ A ‼ τ
+[]ₑₖ [ M ]ₑₖ = M
+(E ₑ; N) [ M ]ₑₖ = (E [ M ]ₑₖ) ; N
+handleₑ E `with H `in N [ M ]ₑₖ = handle E [ M ]ₑₖ `with H `in N
 
 -- Congruence rule for computation context hole filling (with respect to the equational theory)
-
 
 stateCtx-cong : ∀ {Γ Δ A τ}
               → (K : Γ ⊢SK[ Δ ])
@@ -155,14 +173,44 @@ stateCtx-cong {Γ} {.(⟨ τ' ⟩ₗ _)} {A} {τ} (delayₛₖ {Δ = Δ} τ' K) 
                            (sym (+-assoc (bctx-time Δ) τ τ' ))
                              (K [ M ;
                                   C-rename
-                                    (   {!!}
-                                     ∘ʳ cong-∷-ren (⟨⟩-μ-ren {τ = bctx-time Δ} {τ' = τ}))
+                                    ( cong-∷-ren (cong-⟨⟩-ren (ren-++-⋈ {Δ = Δ} {Γ' = BCtx→Ctx Δ} refl 
+                                      ∘ʳ (ren⟨τ⟩-ctx (τ-≤-substᵣ (ctx-time-bctx-time Δ) ≤-refl))))
+                                        ∘ʳ cong-∷-ren (⟨⟩-μ-ren {τ = bctx-time Δ} {τ' = τ}))
                                     N ]ₛₖ)
 
-[]ₛₖ-algebraicity = {!!}
+[]ₛₖ-algebraicity K M N = {!   !}
 
+Ectx-subst : ∀ {Γ Γ' Δ C D}
+          → Γ ≡ Γ'
+          → Γ ⊢EK[ Δ ⊢ C ]⦂ D
+          → Γ' ⊢EK[ Δ ⊢ C ]⦂ D
+Ectx-subst refl E = E
 
 -- Soundness theorem
+
+soundness : ∀ {A B τ τ' τ'' τ''' τ''''}
+        → {S : 𝕊 τ} 
+        → {S' : 𝕊 τ'}
+        → {M : toCtx S ⊢C⦂ A ‼ τ''}
+        → {M' : toCtx S' ⊢C⦂ A ‼ τ'''}
+        → (M↝M' : ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩)
+        → (E : toCtx S ⊢EK[ {!   !} ⊢ A ‼ τ'' ]⦂ B ‼ τ'''')              
+        -- → (E : [] ⊢EK[ Ctx→Bctx (toCtx S) ⊢ A ‼ τ'' ]⦂ B ‼ τ'''')              
+        → [] ⊢C⦂ 
+            (toStateCtx S)
+            [ 
+              Ectx-subst {!   !} E 
+              [ 
+                C-rename {!   !} M 
+              ]ₑₖ 
+            ]ₛₖ 
+          == 
+            τ-subst {!   !} (toStateCtx S' 
+              [ 
+                C-rename {!   !} (E [ τ-subst {!   !} (C-rename {!   !} M') ]ₑₖ)
+              ]ₛₖ)
+soundness = {!   !}
+
 
 {-
 soundness : ∀ {A τ τ' τ'' τ'''}
@@ -170,7 +218,7 @@ soundness : ∀ {A τ τ' τ'' τ'''}
         → {S' : 𝕊 τ'}
         → {M : toCtx S ⊢C⦂ A ‼ τ''}
         → {M' : toCtx S' ⊢C⦂ A ‼ τ'''}
-        → (M↝M' : ⟨ τ , S , M ⟩ ↝ ⟨ τ' , S' , M' ⟩)
+        → (M↝M' : ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩)
         → let p = trans (cong (_+ τ''') (trans (bctx-time-ctx-time (toCtx S')) (ctx-timeSτ≡τ S')))
                     (trans
                       (sym (proj₂ (perservation-theorem M↝M')))
@@ -218,3 +266,4 @@ soundness BOX = {!!}
 soundness (UNBOX p) = {!!}
 -}
 
+ 
