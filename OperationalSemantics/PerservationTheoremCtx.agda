@@ -18,7 +18,7 @@ open import Util.Time
 record Config (C : CType) : Set where
     constructor ⟨_,_⟩
     field
-        { Δ }       : SCtx
+        { Δ }       : Ctx
         state       : 𝕊 Δ
         computation : toCtx state  ⊢C⦂ C
 
@@ -150,7 +150,7 @@ mutual
                 {V : toCtx S ⟨ τ' ⟩ ⊢V⦂ A} →  
                 {M : toCtx S ∷ [ τ' ] A ⊢C⦂ B ‼ τ''} →
                 -------------------------------------------------------
-                ⟨ S , (box V M) ⟩ ↝ ⟨ extend-state S (V-rename (cong-⟨⟩-ren RenSΔ) V) , M ⟩
+                ⟨ S , (box V M) ⟩ ↝ ⟨ extend-state S (V-rename (cong-⟨⟩-ren (eq-ren (sym (Γ≡toCtxS S)))) V) , M ⟩
 
         -- step for unbox: we just substitute in M with unboxed resource (finding the right one is tricky)
         UNBOX : ∀ {Δ A C τ'} → {S : 𝕊 Δ} → 

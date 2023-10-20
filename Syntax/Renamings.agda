@@ -108,6 +108,13 @@ contract-ren = var-ren Hd
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren refl = id-ren
 
+-- Renaming from an empty context 
+
+empty-ren : ∀ {Γ} → Ren [] Γ 
+empty-ren {[]} = id-ren
+empty-ren {Γ ∷ A} = wk-ren ∘ʳ empty-ren
+empty-ren {Γ ⟨ τ ⟩} = wk-⟨⟩-ren ∘ʳ empty-ren
+
 -- Renamings preserve time-passage modelled by contexts
 
 ren-≤-ctx-time : ∀ {Γ Γ'}

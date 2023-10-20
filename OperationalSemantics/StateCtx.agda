@@ -14,79 +14,69 @@ open import Util.Time
 -- Definition of state --
 -------------------------
 
-data SCtx : Set where
-    []ₛ     : SCtx
-    _∷ₛ[_]_ : (Δ : SCtx) → (τ : Time) → (A : VType) → SCtx
-    _⟨_⟩ₛ   : (Δ : SCtx) → (τ : Time) → SCtx
+data 𝕊 : Ctx → Set where
+    ∅     : 𝕊 ([])
+    _⟨_⟩ₘ : ∀ {Γ} → 𝕊 Γ → (τ : Time) → 𝕊 (Γ ⟨ τ ⟩)  
+    _∷ₘ_ : ∀ {Γ A τ} → 𝕊 Γ → ((Γ ⟨ τ ⟩) ⊢V⦂ A) → 𝕊 (Γ ∷ ([ τ ] A))
 
-SCtx→Ctx : SCtx → Ctx
-SCtx→Ctx []ₛ = []
-SCtx→Ctx (Δ ∷ₛ[ τ ] A) = (SCtx→Ctx Δ) ∷ ([ τ ] A)
-SCtx→Ctx (Δ ⟨ τ ⟩ₛ) = (SCtx→Ctx Δ) ⟨ τ ⟩
-
-data 𝕊 : SCtx → Set where
-    ∅     : 𝕊 ([]ₛ)
-    _⟨_⟩ₘ : ∀ {Δ} → 𝕊 Δ → (τ : Time) → 𝕊 (Δ  ⟨ τ ⟩ₛ)  
-    _∷ₘ_ : ∀ {Δ A τ} → 𝕊 Δ → (SCtx→Ctx (Δ ⟨ τ ⟩ₛ) ⊢V⦂ A) → 𝕊 (Δ ∷ₛ[ τ ] A)
-
-toCtx : ∀ {Δ} → 𝕊 Δ → Ctx
+toCtx : ∀ {Γ} → 𝕊 Γ → Ctx
 toCtx ∅ = []
 toCtx (S ⟨ τ ⟩ₘ) = (toCtx S) ⟨ τ ⟩
 toCtx (_∷ₘ_ {A = A₁} {τ = τ} S A) = (toCtx S ∷ [ τ ] A₁)
 
 -- lemma that context from state is equal to context from state context
 
-SCtx→CtxΔ≡toCtxS : ∀ {Δ} → (S : 𝕊 Δ) → SCtx→Ctx Δ ≡ toCtx S
-SCtx→CtxΔ≡toCtxS ∅ = refl
-SCtx→CtxΔ≡toCtxS (S ⟨ τ ⟩ₘ) = cong (_⟨ τ ⟩) (SCtx→CtxΔ≡toCtxS S)
-SCtx→CtxΔ≡toCtxS (_∷ₘ_ {A = A₁} {τ = τ} S A) = cong (_∷ [ τ ] A₁) (SCtx→CtxΔ≡toCtxS S)
+Γ≡toCtxS : ∀ {Γ} → (S : 𝕊 Γ) → Γ ≡ toCtx S
+Γ≡toCtxS ∅ = refl
+Γ≡toCtxS (S ⟨ τ ⟩ₘ) = cong (_⟨ τ ⟩) (Γ≡toCtxS S)
+Γ≡toCtxS (_∷ₘ_ {A = A₁} {τ = τ} S A) = cong (_∷ [ τ ] A₁) (Γ≡toCtxS S)
 
 -- Relation that tells that S' is a successor of S
 
-data _≤ₛ_ : ∀ {Δ Δ'} → 𝕊 Δ → 𝕊 Δ' → Set where
-    id-suc : ∀ {Δ} 
-            → {S : 𝕊 Δ} 
+data _≤ₛ_ : ∀ {Γ Γ'} → 𝕊 Γ → 𝕊 Γ' → Set where
+    id-suc : ∀ {Γ} 
+            → {S : 𝕊 Γ} 
             -----------
             → S ≤ₛ S
 
-    ⟨⟩-suc : ∀ {Δ Δ'}
-            → {S : 𝕊 Δ} 
-            → {S' : 𝕊 Δ'} 
+    ⟨⟩-suc : ∀ {Γ Γ'}
+            → {S : 𝕊 Γ} 
+            → {S' : 𝕊 Γ'} 
             → (τ'' : Time) 
             → S ≤ₛ S' 
             --------------------
             → S ≤ₛ (S' ⟨ τ'' ⟩ₘ)
 
-    ∷-suc : ∀ {Δ Δ' τ A} 
-            → {S : 𝕊 Δ} 
-            → {S' : 𝕊 Δ'} 
-            → (V : (SCtx→Ctx (Δ' ⟨ τ ⟩ₛ)) ⊢V⦂ A) 
+    ∷-suc : ∀ {Γ Γ' τ A} 
+            → {S : 𝕊 Γ} 
+            → {S' : 𝕊 Γ'} 
+            → (V : (Γ' ⟨ τ ⟩) ⊢V⦂ A) 
             → S ≤ₛ S' 
             ----------------
             → S ≤ₛ (S' ∷ₘ V)
 
-state-time : ∀ {Δ} → (S : 𝕊 Δ) → Time
+state-time : ∀ {Γ} → (S : 𝕊 Γ) → Time
 state-time ∅ = 0
 state-time (S ⟨ τ ⟩ₘ) = state-time S + τ
 state-time (S ∷ₘ A) = state-time S
 
 -- lemma that ctx-time of toCtx S is the same as state-time S
 
-ctx-time≡state-time : ∀ {Δ} → (S : 𝕊 Δ) → ctx-time (toCtx S) ≡ (state-time S)
+ctx-time≡state-time : ∀ {Γ} → (S : 𝕊 Γ) → ctx-time (toCtx S) ≡ (state-time S)
 ctx-time≡state-time ∅ = refl 
 ctx-time≡state-time (S ⟨ τ ⟩ₘ) = cong (_+ τ) (ctx-time≡state-time S)
 ctx-time≡state-time (S ∷ₘ A) = ctx-time≡state-time S
 
 -- if two states are successors they can be renamed contexts
 
-≤ₛ⇒Ren : ∀ {Δ Δ'} → {S : 𝕊 Δ} → {S' : 𝕊 Δ'} → S ≤ₛ S' → Ren (toCtx S) (toCtx S')
+≤ₛ⇒Ren : ∀ {Γ Γ'} → {S : 𝕊 Γ} → {S' : 𝕊 Γ'} → S ≤ₛ S' → Ren (toCtx S) (toCtx S')
 ≤ₛ⇒Ren id-suc = id-ren
 ≤ₛ⇒Ren (⟨⟩-suc τ'' y) = wk-⟨⟩-ren ∘ʳ (≤ₛ⇒Ren y)
 ≤ₛ⇒Ren (∷-suc V y) = wk-ren ∘ʳ (≤ₛ⇒Ren y)
 
 -- ≤ₛ increase time
 
-S≤ₛS'⇒τ≤τ' : ∀ {Δ Δ'} → {S : 𝕊 Δ} → {S' : 𝕊 Δ'} → S ≤ₛ S' → (state-time S) ≤ (state-time S')
+S≤ₛS'⇒τ≤τ' : ∀ {Γ Γ'} → {S : 𝕊 Γ} → {S' : 𝕊 Γ'} → S ≤ₛ S' → (state-time S) ≤ (state-time S')
 S≤ₛS'⇒τ≤τ' {S = S} {S' = .S} id-suc = ≤-refl
 S≤ₛS'⇒τ≤τ' {S = S} {S' = .(S' ⟨ τ'' ⟩ₘ)} (⟨⟩-suc {S' = S'} τ'' S≤ₛS') = 
     ≤-stepsʳ τ'' 
@@ -101,11 +91,11 @@ S≤ₛS'⇒τ≤τ' {S = S} {S' = .(S' ∷ₘ V)} (∷-suc {S' = S'} V S≤ₛS
 -- lemma: if one state is successor of another then time pass at the end 
 -- can be substituted
 
-in-past-state : ∀ {Δ Δ'} 
+in-past-state : ∀ {Γ Γ'} 
                 → {τ'' τ''' τ'''' : Time} 
                 → {A : VType} 
-                → {S : 𝕊 Δ} 
-                → {S' : 𝕊 Δ'} 
+                → {S : 𝕊 Γ} 
+                → {S' : 𝕊 Γ'} 
                 → S ≤ₛ S' 
                 → (M : toCtx S ⟨ τ'' ⟩ ⊢C⦂ A ‼ τ'''') →(q : τ'' ≤ τ''') 
                 → toCtx S' ⟨ τ''' ⟩ ⊢C⦂ A ‼ τ''''
@@ -117,10 +107,10 @@ in-past-state (∷-suc V S≤ₛS') M q =
 
 -- if one state is suc of another and final times are equal then states can rename
 
-suc-comp-ren : ∀ {Δ Δ'} 
+suc-comp-ren : ∀ {Γ Γ'} 
         → { τ'' τ''' : Time} 
-        → {S : 𝕊 Δ} 
-        → {S' : 𝕊 Δ'} 
+        → {S : 𝕊 Γ} 
+        → {S' : 𝕊 Γ'} 
         → S ≤ₛ S' 
         → (q : state-time S + τ'' ≤ state-time S' + τ''') 
         → Ren (toCtx S ⟨ τ'' ⟩) (toCtx S' ⟨ τ''' ⟩)
@@ -131,13 +121,13 @@ suc-comp-ren (∷-suc V S≤ₛS') q = (cong-⟨⟩-ren wk-ren) ∘ʳ (suc-comp-
 
 -- suc relation is reflexive
 
-suc-state-refl : ∀ {Δ} → {S : 𝕊 Δ} → S ≤ₛ S
+suc-state-refl : ∀ {Γ} → {S : 𝕊 Γ} → S ≤ₛ S
 suc-state-refl = id-suc
 
 
 -- suc relation is transitive
 
-suc-state-trans : ∀ {Δ Δ' Δ''} → {S : 𝕊 Δ} → {S' : 𝕊 Δ'} → {S'' : 𝕊 Δ''} → 
+suc-state-trans : ∀ {Γ Γ' Γ''} → {S : 𝕊 Γ} → {S' : 𝕊 Γ'} → {S'' : 𝕊 Γ''} → 
             S ≤ₛ S' → S' ≤ₛ S'' → S ≤ₛ S''
 suc-state-trans id-suc S'≤ₛS'' = S'≤ₛS''
 suc-state-trans (⟨⟩-suc τ'' S≤ₛS') id-suc = ⟨⟩-suc τ'' S≤ₛS'
@@ -154,7 +144,7 @@ suc-state-trans (∷-suc V S≤ₛS') (∷-suc V₁ S'≤ₛS'') =
 
 -- if states are suc of one another they must have equal time
 
-aux-suc-state-antisym : ∀ {Δ Δ'} → {S : 𝕊 Δ} → {S' : 𝕊 Δ'} → 
+aux-suc-state-antisym : ∀ {Γ Γ'} → {S : 𝕊 Γ} → {S' : 𝕊 Γ'} → 
             S ≤ₛ S' → S' ≤ₛ S → state-time S' ≡ state-time S
 aux-suc-state-antisym id-suc S'≤ₛS = refl
 aux-suc-state-antisym (⟨⟩-suc τ'' S≤ₛS') id-suc = refl
@@ -178,23 +168,23 @@ aux-suc-state-antisym (∷-suc V S≤ₛS') (∷-suc V₁ S'≤ₛS) =
 
 -- operations on state - just for better readability in perservation theorem
 
-time-pass : ∀ {Δ} → (S : 𝕊 Δ) → (τ' : Time) → 𝕊 (Δ ⟨ τ' ⟩ₛ)
+time-pass : ∀ {Γ} → (S : 𝕊 Γ) → (τ' : Time) → 𝕊 (Γ ⟨ τ' ⟩)
 time-pass S τ = S ⟨ τ ⟩ₘ 
 
-extend-state : ∀ {Δ A τ'} → (S : 𝕊 Δ) → (SCtx→Ctx (Δ ⟨ τ' ⟩ₛ) ⊢V⦂ A) → 𝕊 (Δ ∷ₛ[ τ' ] A)
+extend-state : ∀ {Γ A τ'} → (S : 𝕊 Γ) → (Γ ⟨ τ' ⟩ ⊢V⦂ A) → 𝕊 (Γ ∷ ([ τ' ] A))
 extend-state S V = S ∷ₘ V 
 
 -- Lemmas about what can and what can't be in toCtx S (only var can be)
 
-⇒-not-in-toCtx : ∀ {Δ τ} {S : 𝕊 Δ} {A : VType} {C : CType} → A ⇒ C ∈[ τ ] toCtx S → ⊥
+⇒-not-in-toCtx : ∀ {Γ τ} {S : 𝕊 Γ} {A : VType} {C : CType} → A ⇒ C ∈[ τ ] toCtx S → ⊥
 ⇒-not-in-toCtx {S = S ⟨ τ ⟩ₘ} (Tl-⟨⟩ x) = ⇒-not-in-toCtx x
 ⇒-not-in-toCtx {S = S ∷ₘ V} (Tl-∷ x) = ⇒-not-in-toCtx x
 
-⦉⦊-not-in-toCtx : ∀ {Δ τ} {S : 𝕊 Δ} {A B : VType} → A |×| B ∈[ τ ] toCtx S → ⊥
+⦉⦊-not-in-toCtx : ∀ {Γ τ} {S : 𝕊 Γ} {A B : VType} → A |×| B ∈[ τ ] toCtx S → ⊥
 ⦉⦊-not-in-toCtx {S = S ⟨ τ'' ⟩ₘ} (Tl-⟨⟩ x) = ⦉⦊-not-in-toCtx x
 ⦉⦊-not-in-toCtx {S = S ∷ₘ V} (Tl-∷ x) = ⦉⦊-not-in-toCtx x
 
-Empty-not-in-toCtx : ∀ {Δ τ} {S : 𝕊 Δ} → Empty ∈[ τ ] toCtx S → ⊥
+Empty-not-in-toCtx : ∀ {Γ τ} {S : 𝕊 Γ} → Empty ∈[ τ ] toCtx S → ⊥
 Empty-not-in-toCtx {S = S ⟨ τ'' ⟩ₘ} (Tl-⟨⟩ x) = Empty-not-in-toCtx x
 Empty-not-in-toCtx {S = S ∷ₘ V} (Tl-∷ x) = Empty-not-in-toCtx x
 
@@ -212,19 +202,19 @@ var-in-ctx (var {τ = τ} x) = τ , x
 
 -- general resource-lookup lemma
 
-resource-lookup : ∀ {Δ τ' τ'' A} → (S : 𝕊 Δ) →
+resource-lookup : ∀ {Γ τ' τ'' A} → (S : 𝕊 Γ) →
                 (x : [ τ' ] A ∈[ τ'' ] toCtx S) →
                 (toCtx S -ᶜ τ'') ⟨ τ' ⟩ ⊢V⦂ A
 resource-lookup (S ⟨ τ'' ⟩ₘ) (Tl-⟨⟩ {τ' = τ'} x) = 
     V-rename (cong-⟨⟩-ren (η-⟨⟩--ᶜ-ren τ' τ'')) (resource-lookup S x)
 resource-lookup (_∷ₘ_ {τ = τ} S V) Hd = 
-    V-rename (cong-⟨⟩-ren wk-ren) (V-rename (eq-ren (SCtx→CtxΔ≡toCtxS (S ⟨ τ ⟩ₘ))) V)
+    V-rename (cong-⟨⟩-ren wk-ren) (V-rename (eq-ren (Γ≡toCtxS (S ⟨ τ ⟩ₘ))) V)
 resource-lookup (S ∷ₘ V) (Tl-∷ {τ = τ} x) = 
     V-rename (cong-⟨⟩-ren (wk-ren -ʳ τ)) (resource-lookup S x)
 
 -- renaming of the result of previous lemma to context S
 
-resource-pass-to-ctx : ∀ {Δ τ' τ'' A} → (S : 𝕊 Δ) → 
+resource-pass-to-ctx : ∀ {Γ τ' τ'' A} → (S : 𝕊 Γ) → 
             (p : τ' ≤ τ'') → 
             (q : τ'' ≤ state-time S) → 
             (V : (toCtx S -ᶜ τ'') ⟨ τ' ⟩ ⊢V⦂ A) → 
@@ -254,35 +244,34 @@ from-head-time-positive {Γ = Γ ⟨ τ' ⟩} { τ = .(τ' + τ'')} (Tl-⟨⟩ {
 -- spliting the state --
 ------------------------
 
-data _⊢_,_⊢_SSplit_⊢_ : (Δ : SCtx) → (S : 𝕊 Δ) 
-                    → (Δ' : SCtx) → (S' : 𝕊 Δ') 
-                    → (Δ'' : SCtx) → (S'' : 𝕊 Δ'') 
+data _⊢_,_⊢_SSplit_⊢_ : (Γ : Ctx) → (S : 𝕊 Γ) 
+                    → (Γ' : Ctx) → (S' : 𝕊 Γ') 
+                    → (Γ'' : Ctx) → (S'' : 𝕊 Γ'') 
                     → Set where
-    SSplit-[] : ∀ {Δ} 
-                → {S : 𝕊 Δ} 
-                ------------------------------
-                → Δ ⊢ S , []ₛ ⊢ ∅ SSplit Δ ⊢ S
+    SSplit-[] : ∀ {Γ} 
+                → {S : 𝕊 Γ} 
+                -----------------------------
+                → Γ ⊢ S , [] ⊢ ∅ SSplit Γ ⊢ S
 
-    SSplit-∷  : ∀ {Δ Δ' Δ'' A τ}
-                → {ρ : Ren (SCtx→Ctx Δ') (SCtx→Ctx Δ'')}
-                → {S : 𝕊 Δ}  
-                → {S' : 𝕊 Δ'}  
-                → {S'' : 𝕊 Δ''}
-                → {V : SCtx→Ctx (Δ' ⟨ τ ⟩ₛ) ⊢V⦂ A }  
-                → Δ ⊢ S , Δ' ⊢ S' SSplit Δ'' ⊢ S'' 
-                ------------------------------------------------------------------------------------------
-                → Δ ⊢ S , Δ' ∷ₛ[ τ ] A ⊢ S' ∷ₘ V SSplit Δ'' ∷ₛ[ τ ] A ⊢ (S'' ∷ₘ V-rename (cong-⟨⟩-ren ρ) V)
+    SSplit-∷  : ∀ {Γ Γ' Γ'' A τ}
+                → {ρ : Ren Γ' Γ''}
+                → {S : 𝕊 Γ}  
+                → {S' : 𝕊 Γ'}  
+                → {S'' : 𝕊 Γ''}
+                → {V : Γ' ⟨ τ ⟩ ⊢V⦂ A }  
+                → Γ ⊢ S , Γ' ⊢ S' SSplit Γ'' ⊢ S'' 
+                -------------------------------------------------------------------------------------------
+                → Γ ⊢ S , Γ' ∷ [ τ ] A ⊢ S' ∷ₘ V SSplit Γ'' ∷ [ τ ] A ⊢ (S'' ∷ₘ V-rename (cong-⟨⟩-ren ρ) V)
 
-    SSplit-⟨⟩  : ∀ {Δ Δ' Δ'' τ}
-                → {ρ : Ren (SCtx→Ctx Δ') (SCtx→Ctx Δ'')}
-                → {S : 𝕊 Δ}  
-                → {S' : 𝕊 Δ'}  
-                → {S'' : 𝕊 Δ''}  
-                → Δ ⊢ S , Δ' ⊢ S' SSplit Δ'' ⊢ S'' 
-                ---------------------------------------------------------------
-                → Δ ⊢ S , Δ' ⟨ τ ⟩ₛ ⊢ S' ⟨ τ ⟩ₘ SSplit Δ'' ⟨ τ ⟩ₛ ⊢ (S'' ⟨ τ ⟩ₘ)
+    SSplit-⟨⟩  : ∀ {Γ Γ' Γ'' τ}
+                → {S : 𝕊 Γ}  
+                → {S' : 𝕊 Γ'}  
+                → {S'' : 𝕊 Γ''}  
+                → Γ ⊢ S , Γ' ⊢ S' SSplit Γ'' ⊢ S'' 
+                --------------------------------------------------------------
+                → Γ ⊢ S , Γ' ⟨ τ ⟩ ⊢ S' ⟨ τ ⟩ₘ SSplit Γ'' ⟨ τ ⟩ ⊢ (S'' ⟨ τ ⟩ₘ)
 
-RenSΔ : ∀ {Δ} → {S : 𝕊 Δ} → Ren (toCtx S) (SCtx→Ctx Δ)
-RenSΔ {S = ∅} = id-ren
-RenSΔ {S = S ⟨ τ ⟩ₘ} = cong-⟨⟩-ren RenSΔ
-RenSΔ {S = S ∷ₘ x} = cong-∷-ren RenSΔ
+_++ₛ_ : ∀ {Γ Γ'} → (S : 𝕊 Γ) → (S' : 𝕊 Γ') → 𝕊 (Γ ++ᶜ Γ')
+S ++ₛ ∅ = S
+S ++ₛ (S' ⟨ τ ⟩ₘ) = (S ++ₛ S') ⟨ τ ⟩ₘ
+S ++ₛ (S' ∷ₘ V) = (S ++ₛ S') ∷ₘ V-rename (cong-⟨⟩-ren (cong-ren {Γ = []} empty-ren ∘ʳ eq-ren (sym ++ᶜ-identityˡ))) V
