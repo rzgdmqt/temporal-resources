@@ -212,19 +212,3 @@ from-head-time-positive Hd = z≤n
 from-head-time-positive (Tl-∷ x) = from-head-time-positive x
 from-head-time-positive {Γ = Γ ⟨ τ' ⟩} {τ = .(τ' + τ'')} (Tl-⟨⟩ {τ = τ'} {τ''} x) = 
     τ-≤-substᵣ (sym (+-comm τ' (ctx-time Γ))) (≤-extend τ' τ'' (ctx-time Γ) (from-head-time-positive x))
-
-data _,_[_]splitState_ : ∀{τ τ' τ''} → (S : 𝕊 τ) → (S' : 𝕊 τ') → (p : τ + τ' ≡ τ'') → (S'' : 𝕊 τ'') → Set where
-  splitState-[] : ∀ {τ} 
-        → {S : 𝕊 τ} 
-        --------------------------------------
-        → S , ∅ [ +-identityʳ τ ]splitState S
-  
-  splitState-∷  : ∀ {A τ τ' τ'' τ'''} 
-        → {S : 𝕊 τ} → {S' : 𝕊 τ'} 
-        → {S'' : 𝕊 τ''} 
-        → {V : ((toCtx S) ++ᶜ (toCtx S')) ⟨ τ''' ⟩  ⊢V⦂ A} 
-        → {p : τ + τ' ≡ τ''} 
-        → S , S' [ p ]splitState S'' 
-        -----------------------------------------------------------
-        → S , S' ∷ₘ[ τ''' ] {!   !} [ p ]splitState (S'' ∷ₘ[ τ''' ] V-rename (cong-⟨⟩-ren {!   !}) V)
---   splitState-⟨⟩ : ∀ {S S' S'' τ} → S , S' splitState S'' → S , S' ⟨ τ ⟩ splitState S'' ⟨ τ ⟩
