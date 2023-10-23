@@ -147,12 +147,13 @@ mutual
 
     -- boxing up a value/resource that is ready for use in at least `τ` time steps
 
-    box     : {A B : VType}
-            → {τ τ' : Time}
+    box     : {A : VType}
+            → {C : CType}
+            → {τ : Time}
             → Γ ⟨ τ ⟩ ⊢V⦂ A
-            → Γ ∷ [ τ ] A ⊢C⦂ B ‼ τ'
+            → Γ ∷ [ τ ] A ⊢C⦂ C
             --------------------
-            → Γ ⊢C⦂ B ‼ τ'
+            → Γ ⊢C⦂ C
 
 
 -- some usefull Substitutions

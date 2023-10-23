@@ -422,6 +422,81 @@ mutual
     unbox (≤-trans p (ren-≤-ctx-time ρ)) (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
   C-rename ρ (box V M)         = box (V-rename (cong-ren ρ) V) (C-rename (cong-ren ρ) M)
 
+
+{-
+-- Transitivity of the actions of renaming
+
+mutual
+
+  V-rename-trans : ∀ {Γ Γ' Γ'' Γ''' A}
+                 → (ρ : Ren Γ Γ')
+                 → (ρ' : Ren Γ' Γ'')
+                 → (V : Γ ++ᶜ Γ''' ⊢V⦂ A)
+                 → V-rename (cong-ren (ρ' ∘ʳ ρ)) V
+                 ≡ V-rename (cong-ren ρ') (V-rename (cong-ren ρ) V)
+
+  V-rename-trans ρ ρ' (var x) =
+    {!!} -- need lemma relating var-rename with ∘ʳ
+  V-rename-trans ρ ρ' (const c) =
+    refl 
+  V-rename-trans ρ ρ' ⋆ =
+    refl
+  V-rename-trans ρ ρ' ⦉ V , W ⦊ =
+    cong₂ ⦉_,_⦊
+      (V-rename-trans ρ ρ' V)
+      (V-rename-trans ρ ρ' W)
+  V-rename-trans ρ ρ' (lam M) =
+    cong lam (C-rename-trans ρ ρ' M)
+
+  C-rename-trans : ∀ {Γ Γ' Γ'' Γ''' C}
+                 → (ρ : Ren Γ Γ')
+                 → (ρ' : Ren Γ' Γ'')
+                 → (M : Γ ++ᶜ Γ''' ⊢C⦂ C)
+                 → C-rename (cong-ren (ρ' ∘ʳ ρ)) M
+                 ≡ C-rename (cong-ren ρ') (C-rename (cong-ren ρ) M)
+
+  C-rename-trans ρ ρ' (return V) =
+    cong return
+      (V-rename-trans ρ ρ' V)
+  C-rename-trans ρ ρ' (M ; N) =
+    cong₂ _;_
+      (C-rename-trans ρ ρ' M)
+      (C-rename-trans _ _ N)
+  C-rename-trans ρ ρ' (V · W) =
+    cong₂ _·_
+      (V-rename-trans ρ ρ' V)
+      (V-rename-trans ρ ρ' W)
+  C-rename-trans ρ ρ' (match V `in N) =
+    cong₂ (match_`in_)
+      (V-rename-trans ρ ρ' V)
+      (C-rename-trans _ _ N)
+  C-rename-trans ρ ρ' (absurd V) =
+    cong absurd
+      (V-rename-trans ρ ρ' V)
+  C-rename-trans ρ ρ' (perform op V M) =
+    cong₂ (perform op)
+      (V-rename-trans ρ ρ' V)
+      (C-rename-trans _ _ M)
+  C-rename-trans ρ ρ' (delay τ M) =
+    cong (delay τ)
+      (C-rename-trans _ _ M)
+  C-rename-trans ρ ρ' (handle M `with H `in N) =
+    cong₃ (handle_`with_`in)
+      (C-rename-trans ρ ρ' M)
+      (fun-ext (λ op → fun-ext (λ τ'' →
+        C-rename-trans _ _ (H op τ''))))
+      (C-rename-trans _ _ N)
+  C-rename-trans ρ ρ' (unbox {τ = τ} p V M) =
+    cong₃ unbox
+      (≤-irrelevant _ _)
+      {!!} -- TODO: need lemma relating renaming with ∘ʳ and -ʳ
+      (C-rename-trans _ _ M)
+  C-rename-trans ρ ρ' (box V M) =
+    cong₂ box
+      (V-rename-trans _ _ V)
+      (C-rename-trans _ _ M)
+-}
+
 -----------------------------------
 -- Renamings of binding contexts --
 -----------------------------------
