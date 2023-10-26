@@ -101,6 +101,46 @@ mutual
   split-state-++ᶜ (_∷ₛ_ {A = A} {τ = τ} S V) (Tl-∷ x) =
     cong (_∷ [ τ ] A) (split-state-++ᶜ S x)
 
+fst-split-state≡split-ctx : ∀ {Γ A τ τ'}
+                  → (S : 𝕊 Γ)
+                  → (x : [ τ ] A ∈[ τ' ] (toCtx S))
+                  → toCtx (split-state-fst S x) ≡ proj₁ (var-split x)
+fst-split-state≡split-ctx (S ⟨ τ ⟩ₛ) (Tl-⟨⟩ x) = fst-split-state≡split-ctx S x
+fst-split-state≡split-ctx (S ∷ₛ V) Hd = refl
+fst-split-state≡split-ctx (S ∷ₛ V) (Tl-∷ x) = fst-split-state≡split-ctx S x
+
+split-state≡split-ctx : ∀ {Γ A τ τ'}
+                  → {S : 𝕊 Γ}
+                  → {x : [ τ ] A ∈[ τ' ] (toCtx S)}
+                  → toCtx (split-state-fst S x) ∷ [ τ ] A ++ᶜ (toCtx (split-state-snd S x))  
+                  ≡ 
+                  proj₁ (var-split x) ∷ [ τ ] A ++ᶜ (proj₁ (proj₂ (var-split x)))
+split-state≡split-ctx {S = S} {x = x} = 
+        trans (split-state-++ᶜ S x) 
+            (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x))))))
+
+cons-inj : ∀ {Γ Γ' A} → A ∷ₗ Γ ≡ A ∷ₗ Γ' → Γ ≡ Γ' 
+cons-inj refl = refl
+
+time-pass-inj : ∀ {Γ Γ' τ} → ⟨ τ ⟩ₗ Γ ≡ ⟨ τ ⟩ₗ Γ' → Γ ≡ Γ' 
+time-pass-inj refl = refl
+
+Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' : ∀ {Δ₁ Δ₁' Δ₂ Δ₂'} → Δ₁ ≡ Δ₂ → Δ₁ ++ₗ Δ₁' ≡ Δ₂ ++ₗ Δ₂' → Δ₁' ≡ Δ₂'
+Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {[]ₗ} refl q = q
+Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {x ∷ₗ Δ₁} refl q = Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {Δ₁ = Δ₁} refl (cons-inj q)
+Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {⟨ τ ⟩ₗ Δ₁} refl q = Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {Δ₁ = Δ₁} refl (time-pass-inj q)
+
+Ctx≡BCtx : ∀ {Γ Γ'} → Ctx→Bctx Γ ≡ Ctx→Bctx Γ' → Γ ≡ Γ'
+Ctx≡BCtx p = {!   !}
+
+Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' : ∀ {Γ₁ Γ₁' Γ₂ Γ₂'} → Γ₁ ≡ Γ₂ → Γ₁ ++ᶜ Γ₁' ≡ Γ₂ ++ᶜ Γ₂' → Γ₁' ≡ Γ₂'
+Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' {Γ₁} {Γ₁'} {.Γ₁} {Γ₂'} refl q = 
+    Ctx≡BCtx (Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' 
+        {Δ₁ = Ctx→Bctx Γ₁} 
+            refl 
+            (trans (Ctx→Bctx-hom Γ₁ Γ₁') 
+                (trans (cong Ctx→Bctx q) 
+                    (sym (Ctx→Bctx-hom Γ₁ Γ₂')))))
 -- Looking up a resource in the state
 
 resource-lookup : ∀ {Γ τ τ' A}
@@ -410,5 +450,6 @@ S ++ₛ ∅ = S
 S ++ₛ (S' ⟨ τ ⟩ₛ) = (S ++ₛ S') ⟨ τ ⟩ₛ
 S ++ₛ (S' ∷ₛ V) = (S ++ₛ S') ∷ₛ V-rename (cong-⟨⟩-ren (cong-ren {Γ = []} empty-ren ∘ʳ eq-ren (sym ++ᶜ-identityˡ))) V
 
-
+ 
 -}
+ 

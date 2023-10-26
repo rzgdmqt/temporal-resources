@@ -78,6 +78,15 @@ Ctx→Bctx [] = []ₗ
 Ctx→Bctx (Γ ∷ A) = Ctx→Bctx Γ ++ₗ (A ∷ₗ []ₗ)
 Ctx→Bctx (Γ ⟨ τ ⟩) = (Ctx→Bctx Γ) ++ₗ (⟨ τ ⟩ₗ []ₗ)
 
+Ctx→Bctx-hom : (Γ Γ' : Ctx) → Ctx→Bctx Γ ++ₗ Ctx→Bctx Γ' ≡ Ctx→Bctx (Γ ++ᶜ Γ')
+Ctx→Bctx-hom Γ [] = trans ++ₗ-identityʳ refl
+Ctx→Bctx-hom Γ (Γ' ∷ x) = 
+    trans (sym (++ₗ-assoc (Ctx→Bctx Γ) (Ctx→Bctx Γ') (x ∷ₗ []ₗ))) 
+        (cong (_++ₗ (x ∷ₗ []ₗ)) (Ctx→Bctx-hom Γ Γ'))
+Ctx→Bctx-hom Γ (Γ' ⟨ τ ⟩) =
+    trans (sym (++ₗ-assoc (Ctx→Bctx Γ) (Ctx→Bctx Γ') (⟨ τ ⟩ₗ []ₗ))) 
+        (cong (_++ₗ (⟨ τ ⟩ₗ []ₗ)) (Ctx→Bctx-hom Γ Γ'))
+
 -- Relating ⋈ and Ctx→Bctx
 
 ⋈-++ₗ : (Γ Γ' : Ctx)
