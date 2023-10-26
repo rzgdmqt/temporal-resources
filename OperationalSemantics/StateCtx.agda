@@ -141,6 +141,17 @@ Ctx≡BCtx p = {!   !}
             (trans (Ctx→Bctx-hom Γ₁ Γ₁') 
                 (trans (cong Ctx→Bctx q) 
                     (sym (Ctx→Bctx-hom Γ₁ Γ₂')))))
+
+
+snd-split-state≡split-ctx : ∀ {Γ A τ τ'}
+                  → (S : 𝕊 Γ)
+                  → (x : [ τ ] A ∈[ τ' ] (toCtx S))
+                  → toCtx (split-state-snd S x) ≡ proj₁ (proj₂ (var-split x))
+snd-split-state≡split-ctx {A = A} {τ = τ} S x = 
+    Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' 
+        (cong (_∷ [ τ ] A) (fst-split-state≡split-ctx S x)) 
+        split-state≡split-ctx
+
 -- Looking up a resource in the state
 
 resource-lookup : ∀ {Γ τ τ' A}
