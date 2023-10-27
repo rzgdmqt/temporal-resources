@@ -134,13 +134,17 @@ Ctx≡BCtx : ∀ {Γ Γ'} → Ctx→Bctx Γ ≡ Ctx→Bctx Γ' → Γ ≡ Γ'
 Ctx≡BCtx p = {!   !}
 
 Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' : ∀ {Γ₁ Γ₁' Γ₂ Γ₂'} → Γ₁ ≡ Γ₂ → Γ₁ ++ᶜ Γ₁' ≡ Γ₂ ++ᶜ Γ₂' → Γ₁' ≡ Γ₂'
-Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' {Γ₁} {Γ₁'} {.Γ₁} {Γ₂'} refl q = 
-    Ctx≡BCtx (Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' 
-        {Δ₁ = Ctx→Bctx Γ₁} 
-            refl 
-            (trans (Ctx→Bctx-hom Γ₁ Γ₁') 
-                (trans (cong Ctx→Bctx q) 
-                    (sym (Ctx→Bctx-hom Γ₁ Γ₂')))))
+Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' {[]} {Γ₁'} {.[]} {Γ₂'} refl q = 
+    trans (sym ++ᶜ-identityˡ) (trans q ++ᶜ-identityˡ)
+Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' {Γ₁ ∷ x} {Γ₁'} {.(Γ₁ ∷ x)} {Γ₂'} refl q = {!   !}
+Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' {Γ₁ ⟨ x ⟩} {Γ₁'} {.(Γ₁ ⟨ x ⟩)} {Γ₂'} refl q = {!   !}
+-- Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' {Γ₁} {Γ₁'} {.Γ₁} {Γ₂'} refl q =
+    -- Ctx≡BCtx (Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' 
+    --     {Δ₁ = Ctx→Bctx Γ₁} 
+    --         refl 
+    --         (trans (Ctx→Bctx-hom Γ₁ Γ₁') 
+    --             (trans (cong Ctx→Bctx q) 
+    --                 (sym (Ctx→Bctx-hom Γ₁ Γ₂')))))
 
 
 snd-split-state≡split-ctx : ∀ {Γ A τ τ'}
@@ -174,10 +178,12 @@ resource-pass-to-ctx : ∀ {Γ τ τ' A}
                      → (p : τ ≤ ctx-time (toCtx (split-state-snd S x)))           -- TODO: relate `toCtx (split-state-...)` with `var-split`
                      → (V : (Γ ++ᶜ toCtx (split-state-fst S x)) ⟨ τ ⟩ ⊢V⦂ A)
                      → Γ ++ᶜ toCtx S ⊢V⦂ A
-resource-pass-to-ctx {Γ} S x p V =
+resource-pass-to-ctx {Γ} {τ} {τ'} {A} S x p V =
   V-rename
-    (eq-ren (cong (Γ ++ᶜ_) (split-state-++ᶜ S x)) ∘ʳ
-     {!!})
+    (eq-ren (cong (Γ ++ᶜ_) (split-state-++ᶜ S x)) 
+        ∘ʳ ((eq-ren (++ᶜ-assoc Γ (toCtx (split-state-fst S x) ∷ [ τ ] A) (toCtx (split-state-snd S x)))) 
+            ∘ʳ cong-ren wk-ren) 
+                ∘ʳ (ren⟨τ⟩-ctx {Γ' = toCtx (split-state-snd S x)} p))
     V
 
 -- Translating states to computation term contexts
