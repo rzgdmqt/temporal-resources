@@ -78,14 +78,55 @@ Ctx→Bctx [] = []ₗ
 Ctx→Bctx (Γ ∷ A) = Ctx→Bctx Γ ++ₗ (A ∷ₗ []ₗ)
 Ctx→Bctx (Γ ⟨ τ ⟩) = (Ctx→Bctx Γ) ++ₗ (⟨ τ ⟩ₗ []ₗ)
 
-Ctx→Bctx-hom : (Γ Γ' : Ctx) → Ctx→Bctx Γ ++ₗ Ctx→Bctx Γ' ≡ Ctx→Bctx (Γ ++ᶜ Γ')
-Ctx→Bctx-hom Γ [] = trans ++ₗ-identityʳ refl
+-- context transforming functions are homomorphisms/linear
+
+Ctx→Bctx-hom : (Γ Γ' : Ctx) → Ctx→Bctx Γ ++ₗ Ctx→Bctx Γ' ≡ Ctx→Bctx (Γ ++ᶜ Γ') -- TODO: for aesthetics, swap LHS-RHS
+Ctx→Bctx-hom Γ [] =
+  trans ++ₗ-identityʳ refl
 Ctx→Bctx-hom Γ (Γ' ∷ x) = 
     trans (sym (++ₗ-assoc (Ctx→Bctx Γ) (Ctx→Bctx Γ') (x ∷ₗ []ₗ))) 
         (cong (_++ₗ (x ∷ₗ []ₗ)) (Ctx→Bctx-hom Γ Γ'))
 Ctx→Bctx-hom Γ (Γ' ⟨ τ ⟩) =
     trans (sym (++ₗ-assoc (Ctx→Bctx Γ) (Ctx→Bctx Γ') (⟨ τ ⟩ₗ []ₗ))) 
         (cong (_++ₗ (⟨ τ ⟩ₗ []ₗ)) (Ctx→Bctx-hom Γ Γ'))
+
+Bctx→Ctx-hom : (Δ Δ' : BCtx) → BCtx→Ctx Δ ++ᶜ BCtx→Ctx Δ' ≡ BCtx→Ctx (Δ ++ₗ Δ') -- TODO: for aesthetics, swap LHS-RHS
+Bctx→Ctx-hom []ₗ Δ' =
+  ++ᶜ-identityˡ 
+Bctx→Ctx-hom (A ∷ₗ Δ) Δ' =
+  trans
+    (++ᶜ-assoc ([] ∷ A) (BCtx→Ctx Δ) (BCtx→Ctx Δ'))
+    (cong ([] ∷ A ++ᶜ_) (Bctx→Ctx-hom Δ Δ'))
+Bctx→Ctx-hom (⟨ τ ⟩ₗ Δ) Δ' =
+  trans
+    (++ᶜ-assoc ([] ⟨ τ ⟩) (BCtx→Ctx Δ) (BCtx→Ctx Δ'))
+    (cong ([] ⟨ τ ⟩ ++ᶜ_) (Bctx→Ctx-hom Δ Δ'))
+
+-- BCtx→Ctx and Ctx→Bctx form an isomorphism
+
+Ctx→Bctx→Ctx-iso : (Γ : Ctx) → BCtx→Ctx (Ctx→Bctx Γ) ≡ Γ
+Ctx→Bctx→Ctx-iso [] =
+  refl
+Ctx→Bctx→Ctx-iso (Γ ∷ A) =
+  trans
+    (sym (Bctx→Ctx-hom (Ctx→Bctx Γ) (A ∷ₗ []ₗ)))
+    (cong (_∷ A) (Ctx→Bctx→Ctx-iso Γ))
+Ctx→Bctx→Ctx-iso (Γ ⟨ τ ⟩) =
+  trans
+    (sym (Bctx→Ctx-hom (Ctx→Bctx Γ) (⟨ τ ⟩ₗ []ₗ)))
+    (cong (_⟨ τ ⟩) (Ctx→Bctx→Ctx-iso Γ))
+
+Bctx→Ctx→Bctx-iso : (Δ : BCtx) → Ctx→Bctx (BCtx→Ctx Δ) ≡ Δ
+Bctx→Ctx→Bctx-iso []ₗ =
+  refl
+Bctx→Ctx→Bctx-iso (A ∷ₗ Δ) =
+  trans
+    (sym (Ctx→Bctx-hom ([] ∷ A) (BCtx→Ctx Δ)))
+    (cong (A ∷ₗ_) (Bctx→Ctx→Bctx-iso Δ))
+Bctx→Ctx→Bctx-iso (⟨ τ ⟩ₗ Δ) =
+  trans
+    (sym (Ctx→Bctx-hom ([] ⟨ τ ⟩) (BCtx→Ctx Δ)))
+    (cong (⟨ τ ⟩ₗ_) (Bctx→Ctx→Bctx-iso Δ))
 
 -- Relating ⋈ and Ctx→Bctx
 

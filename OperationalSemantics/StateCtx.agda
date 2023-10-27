@@ -131,7 +131,12 @@ time-pass-inj refl = refl
 Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {⟨ τ ⟩ₗ Δ₁} refl q = Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {Δ₁ = Δ₁} refl (time-pass-inj q)
 
 Ctx≡BCtx : ∀ {Γ Γ'} → Ctx→Bctx Γ ≡ Ctx→Bctx Γ' → Γ ≡ Γ'
-Ctx≡BCtx p = {!   !}
+Ctx≡BCtx {Γ} {Γ'} p =
+  trans
+    (sym (Ctx→Bctx→Ctx-iso Γ))
+    (trans
+      (cong BCtx→Ctx p)
+      (Ctx→Bctx→Ctx-iso Γ'))
 
 Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' : ∀ {Γ₁ Γ₁' Γ₂ Γ₂'} → Γ₁ ≡ Γ₂ → Γ₁ ++ᶜ Γ₁' ≡ Γ₂ ++ᶜ Γ₂' → Γ₁' ≡ Γ₂'
 Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' {Γ₁} {Γ₁'} {.Γ₁} {Γ₂'} refl q = 
