@@ -13,8 +13,6 @@ open import Data.Sum
 open import Relation.Binary.Definitions
 open import Relation.Nullary
 
-open import EquationalTheory.CompContext
-
 open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Types
@@ -27,6 +25,10 @@ open import Util.Time
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
 open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)
 
+-- Variable renamings
+
+var-τ-subst : ∀ {Γ A τ τ'} → τ ≡ τ' → A ∈[ τ ] Γ → A ∈[ τ' ] Γ
+var-τ-subst refl x = x
 
 -- Variable renamings
 
@@ -45,21 +47,95 @@ _∘ʳ_ ρ' ρ x with ρ x
 ... | τ' , p , y with ρ' y
 ... | τ'' , q , z = τ'' , ≤-trans p q , z
 
--- Weakening renaming
+-- Weakening renamings
 
 wk-ren : ∀ {Γ A} → Ren Γ (Γ ∷ A)
 wk-ren {Γ} {A} {B} {τ} x = τ , ≤-refl , Tl-∷ x
 
+wk-⟨⟩-ren : ∀ {Γ τ} → Ren Γ (Γ ⟨ τ ⟩)
+wk-⟨⟩-ren {Γ} {τ} {B} {τ'} x =
+  τ + τ' , m≤n+m τ' τ , Tl-⟨⟩ x
+
+-- Monotonicity renamings
+
+⟨⟩-≤-ren : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
+⟨⟩-≤-ren {Γ} {.zero} {τ'} z≤n {A} {τ''} (Tl-⟨⟩ x) =
+  τ' + τ'' , m≤n+m τ'' τ' , Tl-⟨⟩ x
+⟨⟩-≤-ren {Γ} {suc τ} {suc τ'} (s≤s p) {A} (Tl-⟨⟩ x) =
+  suc (τ' + _) , +-monoʳ-≤ 1 (+-monoˡ-≤ _ p) , Tl-⟨⟩ x
+
+-- Interaction between time-indexes of variables and -ᶜ
+
+var-ᶜ : ∀ {Γ A τ τ'} → τ ≤ τ' → A ∈[ τ' ] Γ → A ∈[ τ' ∸ τ ] (Γ -ᶜ τ)
+var-ᶜ {Γ ∷ A} {.A} {zero} {.0} p Hd =
+  Hd
+var-ᶜ {Γ ∷ B} {A} {zero} {τ'} p (Tl-∷ x) =
+  Tl-∷ x
+var-ᶜ {Γ ∷ B} {A} {suc τ} {τ'} p (Tl-∷ x) =
+  var-ᶜ p x
+var-ᶜ {Γ ⟨ τ'' ⟩} {A} {zero} p (Tl-⟨⟩ x) =
+  Tl-⟨⟩ x
+var-ᶜ {Γ ⟨ τ'' ⟩} {A} {suc τ} {.(τ'' + τ')} p (Tl-⟨⟩ {τ' = τ'} x) with suc τ ≤? τ''
+... | yes q =
+  var-τ-subst (sym (+-∸-comm _ q)) (Tl-⟨⟩ {τ = τ'' ∸ suc τ} x)
+... | no ¬q =
+  var-τ-subst
+    (sym
+      (trans
+        (cong (_∸ suc τ) (+-comm τ'' τ') )
+        (¬k≤m⇒k∸m≤n⇒n+m∸k≤n∸k∸m {τ'} {τ''} {suc τ} ¬q
+          (m≤n+k⇒m∸k≤n (suc τ) τ' τ''
+            (≤-trans
+              p
+              (≤-reflexive (+-comm τ'' τ')))))))
+    (var-ᶜ {τ = suc τ ∸ τ''} (
+      (m≤n+k⇒m∸k≤n (suc τ) τ' τ''
+        (≤-trans
+          p
+          (≤-reflexive (+-comm τ'' τ'))))) x)
+
+var-ᶜ-+ : ∀ {Γ A τ τ' τ''} → ¬(τ' ≤ τ'') → A ∈[ τ ] Γ -ᶜ (τ' ∸ τ'') → A ∈[ τ + τ'' ] Γ -ᶜ τ'
+var-ᶜ-+ {Γ} {A} {τ} {zero} {τ''} ¬p x =
+  ⊥-elim (¬p z≤n)
+var-ᶜ-+ {[]} {A} {τ} {suc τ'} {τ''} ¬p x rewrite -ᶜ-[]-id {suc τ' ∸ τ''} with x
+... | ()
+var-ᶜ-+ {Γ ∷ B} {A} {τ} {suc τ'} {τ''} ¬p x =
+  var-ᶜ-+ {Γ} ¬p
+    (subst (λ Γ → A ∈[ τ ] Γ) (-ᶜ-∷ {Γ} {B} {suc τ' ∸ τ''}
+      (≤-trans (≤-reflexive (sym (sucτ∸τ≡1 τ''))) (∸-monoˡ-≤ τ'' (≰⇒> ¬p)))) x)
+var-ᶜ-+ {Γ ⟨ τ''' ⟩} {A} {τ} {suc τ'} {τ''} ¬p x with suc τ' ≤? τ'''
+... | yes q = {!!}
+... | no ¬q = {!!}
+
 -- Time-travelling operation on renamings
-
+   
 _-ʳ_ : ∀ {Γ Γ'} → Ren Γ Γ' → (τ : Time) → Ren (Γ -ᶜ τ) (Γ' -ᶜ τ)
-(ρ -ʳ zero) x = ρ x
-_-ʳ_ {Γ ∷ A} {Γ'} ρ (suc τ) x = _-ʳ_ {Γ} {Γ'} (ρ ∘ʳ wk-ren) (suc τ) x 
+(ρ -ʳ zero) x =
+  ρ x
+_-ʳ_ {Γ ∷ A} {Γ'} ρ (suc τ) x =
+  _-ʳ_ {Γ} {Γ'} (ρ ∘ʳ wk-ren) (suc τ) x 
 _-ʳ_ {Γ ⟨ τ' ⟩} {Γ'} ρ (suc τ) x with suc τ ≤? τ'
-_-ʳ_ {Γ ⟨ τ' ⟩} {Γ'} ρ (suc τ) (Tl-⟨⟩ x) | yes p = {!!}
-_-ʳ_ {Γ ⟨ τ' ⟩} {Γ'} ρ (suc τ) x | no ¬p = {!!}
+_-ʳ_ {Γ ⟨ τ' ⟩} {Γ'} ρ (suc τ) (Tl-⟨⟩ x) | yes p with ρ (Tl-⟨⟩ x)
+... | τ' , q , y =
+  τ' ∸ suc τ ,
+  ≤-trans
+    (≤-reflexive (sym (+-∸-comm _ p)))
+    (∸-monoˡ-≤ (suc τ) q) ,
+  var-ᶜ {τ = suc τ} (≤-trans p (≤-trans (m≤m+n _ _) q)) y
+_-ʳ_ {Γ ⟨ τ' ⟩} {Γ'} ρ (suc τ) x | no ¬p with (_-ʳ_ {Γ} {Γ'} (ρ ∘ʳ wk-⟨⟩-ren) (suc τ ∸ τ')) x
+... | τ'' , q , y =
+  τ'' + τ' ,
+  ≤-trans q (m≤m+n _ _) ,
+  var-ᶜ-+ ¬p y
 
 
+
+
+
+
+
+
+{- ------------------------------------------------------- -}
 
 
 {-

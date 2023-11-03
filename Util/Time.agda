@@ -331,3 +331,7 @@ subst-left a b .a d p refl = p
                         (m≡n⇒m≤n (trans (sym q) (+-identityʳ τ)))))))) 
 τ≤τ'∧τ+τ''≡τ'+τ'''⇒τ''≤τ''' τ τ' (suc τ'') (suc τ''') p q = 
     s≤s (τ≤τ'∧τ+τ''≡τ'+τ'''⇒τ''≤τ''' τ τ' τ'' τ''' p (τ+sucτ''≡τ'+sucτ'''⇒τ+τ''≡τ'+τ''' τ τ' τ'' τ''' q))  
+
+sucτ∸τ≡1 : (τ : Time) → suc τ ∸ τ ≡ 1
+sucτ∸τ≡1 zero = refl
+sucτ∸τ≡1 (suc τ) = sucτ∸τ≡1 τ
