@@ -207,6 +207,14 @@ var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A}
 
 -- Temporal minus operation on contexts
 
+-- TODO: To properly fit with the view that -ᶜ is a 
+--       parametric right adjoint to ⟨ ⟩, then this
+--       operation should be restricted to times less
+--       than or equal to ctx-time of the given context.
+--
+--       Currently τ ≤ ctx-time Γ is required only in
+--       definitions and lemmas where it is necessary.
+
 _-ᶜ_ : Ctx → Time → Ctx
 Γ        -ᶜ zero  = Γ
 []       -ᶜ suc τ = []
@@ -216,6 +224,23 @@ _-ᶜ_ : Ctx → Time → Ctx
 ... | no ¬p = Γ -ᶜ (suc τ ∸ τ')
 
 infixl 30 _-ᶜ_
+
+-- Action of -ᶜ on extended contexts 
+
+-ᶜ-∷ : ∀ {Γ A τ}
+     → τ > 0
+     →  Γ ∷ A -ᶜ τ ≡ Γ -ᶜ τ
+-ᶜ-∷ {Γ} {A} {suc τ} p = refl
+
+-ᶜ-⟨⟩ : ∀ {Γ τ τ'}
+      → τ' ≤ τ
+      → τ' > 0
+      → Γ ⟨ τ ⟩ -ᶜ τ' ≡ Γ ⟨ τ ∸ τ' ⟩
+-ᶜ-⟨⟩ {Γ} {τ} {suc τ'} p q with suc τ' ≤? τ
+... | yes r = refl
+... | no ¬r = ⊥-elim (¬r p)
+
+-- Action laws for -ᶜ
 
 -ᶜ-[]-id : ∀ {τ} → [] -ᶜ τ ≡ []
 -ᶜ-[]-id {zero} =
@@ -275,10 +300,18 @@ infixl 30 _-ᶜ_
       (+-∸-comm {suc τ₁} (suc τ₂) {τ} (<⇒≤ (≰⇒> ¬p))))
     (++ᶜ-ᶜ-+ {Γ} {suc τ₁ ∸ τ} {suc τ₂})
 
--ᶜ-∷ : ∀ {Γ A τ} → τ > 0 →  Γ ∷ A -ᶜ τ ≡ Γ -ᶜ τ
--ᶜ-∷ {Γ} {A} {suc τ} p = refl
+-- Relating ctx-time and -ᶜ
 
--ᶜ-⟨⟩ : ∀ {Γ τ τ'} → τ' ≤ τ → τ' > 0 → Γ ⟨ τ ⟩ -ᶜ τ' ≡ Γ ⟨ τ ∸ τ' ⟩
--ᶜ-⟨⟩ {Γ} {τ} {suc τ'} p q with suc τ' ≤? τ
-... | yes r = refl
-... | no ¬r = ⊥-elim (¬r p)
+ctx-time-ᶜ-∸ : (Γ : Ctx) → (τ : Time)
+             → τ ≤ ctx-time Γ
+             → ctx-time (Γ -ᶜ τ) ≡ ctx-time Γ ∸ τ
+ctx-time-ᶜ-∸ Γ zero p = refl
+ctx-time-ᶜ-∸ [] (suc τ) p = refl
+ctx-time-ᶜ-∸ (Γ ∷ A) (suc τ) p = ctx-time-ᶜ-∸ Γ (suc τ) p
+ctx-time-ᶜ-∸ (Γ ⟨ τ' ⟩) (suc τ) p with suc τ ≤? τ'
+... | yes q =
+  sym (+-∸-assoc (ctx-time Γ) q)
+... | no ¬q =
+  trans
+    (ctx-time-ᶜ-∸ Γ (suc τ ∸ τ') (m≤n+k⇒m∸k≤n (suc τ) (ctx-time Γ) τ' p))
+    (sym (¬k≤m⇒k∸m≤n⇒n+m∸k≤n∸k∸m ¬q (m≤n+k⇒m∸k≤n (suc τ) (ctx-time Γ) τ' p)))
