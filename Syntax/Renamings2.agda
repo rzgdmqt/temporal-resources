@@ -152,19 +152,13 @@ var-ᶜ {Γ ⟨ τ'' ⟩} {A} {suc τ} {.(τ'' + τ')} p (Tl-⟨⟩ {τ' = τ'} 
   τ' , ≤-refl , x
 -ᶜ-wk-ren {Γ ∷ B} (suc τ) {A} {τ'} x with -ᶜ-wk-ren {Γ} (suc τ) x
 ... | τ'' , p , y =
-  τ'' ,
-  p ,
-  Tl-∷ y
+  τ'' , p , Tl-∷ y
 -ᶜ-wk-ren {Γ ⟨ τ'' ⟩} (suc τ) {A} {τ'} x with suc τ ≤? τ''
 -ᶜ-wk-ren {Γ ⟨ τ'' ⟩} (suc τ) {A} {.(τ'' ∸ suc τ + τ''')} (Tl-⟨⟩ {τ' = τ'''} x) | yes p =
-  τ'' + τ''' ,
-  +-monoˡ-≤ τ''' (m∸n≤m τ'' (suc τ)) ,
-  Tl-⟨⟩ x
+  τ'' + τ''' , +-monoˡ-≤ τ''' (m∸n≤m τ'' (suc τ)) , Tl-⟨⟩ x
 ... | no ¬p with -ᶜ-wk-ren {Γ} (suc τ ∸ τ'') x
 ... | τ''' , r , y =
-  τ'' + τ''' ,
-  ≤-stepsˡ τ'' r ,
-  Tl-⟨⟩ y
+  τ'' + τ''' , ≤-stepsˡ τ'' r , Tl-⟨⟩ y
 
 -- Parametric right adjoint situation (one direction of it)
 
@@ -174,6 +168,16 @@ pra-⟨⟩-ren {Γ} {Γ'} {τ} ρ {A} {τ'} x with ρ (Tl-⟨⟩ x)
   τ'' ∸ τ ,
   n+m≤k⇒m≤k∸n τ τ' τ'' p ,
   var-ᶜ {Γ'} {A} {τ} {τ''} (m+n≤o⇒m≤o τ p) y
+
+{-
+pra-⟨⟩-ren⁻¹ : ∀ {Γ Γ' τ} → Ren Γ (Γ' -ᶜ τ) → Ren (Γ ⟨ τ ⟩) Γ'
+pra-⟨⟩-ren⁻¹ {Γ} {Γ'} {τ} ρ {A} {.(τ + τ')} (Tl-⟨⟩ {τ' = τ'} x) with ρ x
+... | τ'' , q , y with -ᶜ-wk-ren τ y
+... | τ''' , r , z =
+  τ''' ,
+  {!!} ,
+  z
+-}
 
 -- Time-travelling operation on renamings
    
@@ -213,9 +217,113 @@ cong-ren {Γ'' = []} ρ        = ρ
 cong-ren {Γ'' = Γ'' ∷ A} ρ   = cong-∷-ren (cong-ren ρ)
 cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ = cong-⟨⟩-ren (cong-ren ρ)
 
+-- Weakening by a context renaming
+
+wk-ctx-ren : ∀ {Γ Γ'} → Ren Γ (Γ ++ᶜ Γ')
+wk-ctx-ren {Γ' = []}       = id-ren
+wk-ctx-ren {Γ' = Γ' ∷ A}   = wk-ren ∘ʳ wk-ctx-ren
+wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} = wk-⟨⟩-ren ∘ʳ wk-ctx-ren
+
+-- Exchange renamings
+
+exch-ren : ∀ {Γ A B} → Ren (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
+exch-ren = extend-ren (extend-ren wk-ctx-ren Hd) (Tl-∷ Hd)
+
+exch-⟨⟩-var-ren : ∀ {Γ A τ} → Ren (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
+exch-⟨⟩-var-ren {A = A} {τ = τ} =
+     var-ren (Tl-⟨⟩ Hd)
+  ∘ʳ cong-ren {Γ'' = [] ⟨ _ ⟩ ∷ _} wk-ren
+
+-- Contraction renaming
+
+contract-ren : ∀ {Γ A} → Ren (Γ ∷ A ∷ A) (Γ ∷ A)
+contract-ren = var-ren Hd
+
+-- Renaming from an equality of contexts
+
+eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
+eq-ren refl = id-ren
+
+-- Renaming from an empty context 
+
+empty-ren : ∀ {Γ} → Ren [] Γ 
+empty-ren {[]} = id-ren
+empty-ren {Γ ∷ A} = wk-ren ∘ʳ empty-ren
+empty-ren {Γ ⟨ τ ⟩} = wk-⟨⟩-ren ∘ʳ empty-ren
+
+-- Interaction of var-split and wk-ctx-ren
+
+var-split₁-wk-ctx-ren : ∀ {Γ Γ' A τ}
+                      → (x : A ∈[ τ ] Γ)
+                      → proj₁ (var-split x)
+                      ≡ proj₁ (var-split
+                          (proj₂ (proj₂ (wk-ctx-ren {Γ' = Γ'} x))))
+
+var-split₁-wk-ctx-ren {Γ' = []} x =
+  refl
+var-split₁-wk-ctx-ren {Γ' = Γ' ∷ A} x =
+  var-split₁-wk-ctx-ren {Γ' = Γ'} x
+var-split₁-wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} x =
+  var-split₁-wk-ctx-ren {Γ' = Γ'} x
+
+var-split₂-wk-ctx-ren : ∀ {Γ Γ' A τ}
+                      → (x : A ∈[ τ ] Γ)
+                      → proj₁ (proj₂ (var-split x)) ++ᶜ Γ'
+                      ≡ proj₁ (proj₂ (var-split
+                          (proj₂ (proj₂ (wk-ctx-ren {Γ' = Γ'} x)))))
+var-split₂-wk-ctx-ren {Γ' = []} x =
+  refl
+var-split₂-wk-ctx-ren {Γ' = Γ' ∷ A} x =
+  cong (_∷ A) (var-split₂-wk-ctx-ren x)
+var-split₂-wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} x =
+  cong (_⟨ τ ⟩) (var-split₂-wk-ctx-ren x)
+
+mutual
+
+  V-rename : ∀ {Γ Γ' A}
+           → Ren Γ Γ'
+           → Γ ⊢V⦂ A
+           ------------
+           → Γ' ⊢V⦂ A
+
+  V-rename ρ (var x)    = var (proj₂ (proj₂ (ρ x)))
+  V-rename ρ (const c)  = const c
+  V-rename ρ ⋆          = ⋆
+  V-rename ρ (⦉ V , W ⦊) = ⦉ V-rename ρ V , V-rename ρ W ⦊
+  V-rename ρ (lam M)    = lam (C-rename (cong-ren ρ) M)
+
+  C-rename : ∀ {Γ Γ' C}
+           → Ren Γ Γ'
+           → Γ ⊢C⦂ C
+           ------------
+           → Γ' ⊢C⦂ C
+
+  C-rename ρ (return V)       = return (V-rename ρ V)
+  C-rename ρ (M ; N)          = C-rename ρ M ; C-rename (cong-ren ρ) N
+  C-rename ρ (V · W)          = V-rename ρ V · V-rename ρ W
+  C-rename ρ (match V `in M)  = match V-rename ρ V `in C-rename (cong-ren ρ) M
+  C-rename ρ (absurd V)       = absurd (V-rename ρ V)
+  C-rename ρ (perform op V M) = perform op (V-rename ρ V) (C-rename (cong-ren ρ) M)
+  C-rename ρ (delay τ M)      = delay τ (C-rename (cong-ren ρ) M)
+  C-rename ρ (handle M `with H `in N) =
+    handle C-rename ρ M
+    `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'') )
+    `in (C-rename (cong-ren ρ) N)
+  C-rename ρ (unbox {τ = τ} p V M) =
+    unbox {!!} (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
+    --unbox (≤-trans p {!ren-≤-ctx-time ρ!}) (V-rename (ρ -ʳ τ) V) (C-rename (cong-ren ρ) M)
+  C-rename ρ (box V M)         = box (V-rename (cong-ren ρ) V) (C-rename (cong-ren ρ) M)
 
 
 
+
+
+
+
+
+
+{- ------------------------------------------------------- -}
+{- ------------------------------------------------------- -}
 {- ------------------------------------------------------- -}
 
 
