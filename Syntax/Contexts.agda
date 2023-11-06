@@ -107,6 +107,18 @@ data _∈[_]_ (A : VType) : Time → Ctx → Set where
 
 infix 27 _∈[_]_
 
+-- Every variable in a context is within time captured by that context
+
+∈-ctx-time : ∀ {Γ A τ} → A ∈[ τ ] Γ → τ ≤ ctx-time Γ
+∈-ctx-time {(Γ ∷ A)} {A} {.0} Hd =
+  z≤n
+∈-ctx-time {(Γ ∷ B)} {A} {τ} (Tl-∷ x) =
+  ∈-ctx-time x
+∈-ctx-time {(Γ ⟨ τ ⟩)} {A} {.(τ + τ')} (Tl-⟨⟩ {τ' = τ'} x) =
+  ≤-trans
+    (+-monoʳ-≤ τ (∈-ctx-time x))
+    (≤-reflexive (+-comm τ (ctx-time Γ)))
+
 -- Splitting a context according to a variable in it
 
 var-split : ∀ {Γ A τ}

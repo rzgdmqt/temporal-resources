@@ -106,16 +106,15 @@ sucn≤m⇒m+k≤n-contradiction {suc n} {suc m} {suc k} (s≤s p) (s≤s q) =
   ≤⇒≯ p (+-monoʳ-≤ 1 (m+n≤o⇒m≤o m q))
 
 
-n∸m≤zero⇒n∸m≡0 : ∀ {n m}
-               → n ∸ m ≤ zero
-               → n ∸ m ≡ 0
+n∸m≤zero⇒n∸m≡0 : ∀ {n m} → n ∸ m ≤ zero → n ∸ m ≡ 0
 n∸m≤zero⇒n∸m≡0 {.zero} {zero} z≤n = refl
 n∸m≤zero⇒n∸m≡0 {zero} {suc m} p = refl
 n∸m≤zero⇒n∸m≡0 {suc n} {suc m} p = n∸m≤zero⇒n∸m≡0 {n} {m} p
 
 
 ¬k≤m⇒k∸m≤n⇒n+m∸k≤n∸k∸m : ∀ {n m k}
-                       → ¬ (k ≤ m) → k ∸ m ≤ n
+                       → ¬ (k ≤ m)
+                       → k ∸ m ≤ n
                        → n + m ∸ k ≡ n ∸ (k ∸ m)
 ¬k≤m⇒k∸m≤n⇒n+m∸k≤n∸k∸m {zero} {zero} {zero} p q =
   refl
@@ -335,3 +334,4 @@ subst-left a b .a d p refl = p
 sucτ∸τ≡1 : (τ : Time) → suc τ ∸ τ ≡ 1
 sucτ∸τ≡1 zero = refl
 sucτ∸τ≡1 (suc τ) = sucτ∸τ≡1 τ
+

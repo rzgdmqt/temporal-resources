@@ -47,22 +47,73 @@ _∘ʳ_ ρ' ρ x with ρ x
 ... | τ' , p , y with ρ' y
 ... | τ'' , q , z = τ'' , ≤-trans p q , z
 
--- Weakening renamings
+-- Weakening renaming
 
 wk-ren : ∀ {Γ A} → Ren Γ (Γ ∷ A)
 wk-ren {Γ} {A} {B} {τ} x = τ , ≤-refl , Tl-∷ x
 
-wk-⟨⟩-ren : ∀ {Γ τ} → Ren Γ (Γ ⟨ τ ⟩)
-wk-⟨⟩-ren {Γ} {τ} {B} {τ'} x =
-  τ + τ' , m≤n+m τ' τ , Tl-⟨⟩ x
+-- Variable renaming
 
--- Monotonicity renamings
+var-ren : ∀ {Γ A τ} → A ∈[ τ ] Γ → Ren (Γ ∷ A) Γ
+var-ren {Γ} {A} {τ} x Hd =
+  τ , z≤n , x
+var-ren {Γ} {A} {τ} x (Tl-∷ {τ = τ'} y) =
+  τ' , ≤-refl , y
+
+-- Strong monoidal functor renamings
+
+⟨⟩-η-ren : ∀ {Γ} → Ren (Γ ⟨ 0 ⟩) Γ
+⟨⟩-η-ren {Γ} (Tl-⟨⟩ {τ' = τ} x) =
+  τ , ≤-refl , x
+
+⟨⟩-η⁻¹-ren : ∀ {Γ} → Ren Γ (Γ ⟨ 0 ⟩)
+⟨⟩-η⁻¹-ren {Γ} {A} {τ} x =
+  τ , ≤-refl , Tl-⟨⟩ x
+
+⟨⟩-μ-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ + τ' ⟩) (Γ ⟨ τ ⟩ ⟨ τ' ⟩)
+⟨⟩-μ-ren {Γ} {τ} {τ'} {A} {.(τ + τ' + τ'')} (Tl-⟨⟩ {τ' = τ''} x) =
+  τ' + (τ + τ'') ,
+  ≤-reflexive
+    (trans
+      (cong (_+ τ'') (+-comm τ τ'))
+      (+-assoc τ' τ τ'')) ,
+  Tl-⟨⟩ (Tl-⟨⟩ x)
+
+⟨⟩-μ⁻¹-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ + τ' ⟩)
+⟨⟩-μ⁻¹-ren {Γ} {τ} {τ'} {A} {.(τ' + (τ + _))} (Tl-⟨⟩ (Tl-⟨⟩ {τ' = τ''} x)) =
+  τ + τ' + τ'' ,
+  ≤-reflexive
+    (trans
+      (sym (+-assoc τ' τ τ''))
+      (cong (_+ τ'') (+-comm τ' τ))) ,
+  Tl-⟨⟩ x
 
 ⟨⟩-≤-ren : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
 ⟨⟩-≤-ren {Γ} {.zero} {τ'} z≤n {A} {τ''} (Tl-⟨⟩ x) =
   τ' + τ'' , m≤n+m τ'' τ' , Tl-⟨⟩ x
 ⟨⟩-≤-ren {Γ} {suc τ} {suc τ'} (s≤s p) {A} (Tl-⟨⟩ x) =
   suc (τ' + _) , +-monoʳ-≤ 1 (+-monoˡ-≤ _ p) , Tl-⟨⟩ x
+
+-- Derived modal weakening renaming
+
+wk-⟨⟩-ren : ∀ {Γ τ} → Ren Γ (Γ ⟨ τ ⟩)
+wk-⟨⟩-ren {Γ} {τ} =
+     ⟨⟩-≤-ren z≤n
+  ∘ʳ ⟨⟩-η⁻¹-ren
+
+-- Congruence renamings
+
+cong-∷-ren : ∀ {Γ Γ' A} → Ren Γ Γ' → Ren (Γ ∷ A) (Γ' ∷ A)
+cong-∷-ren {Γ} {Γ'} {A} ρ {.A} {.0} Hd =
+  0 , ≤-refl , Hd
+cong-∷-ren {Γ} {Γ'} {A} ρ {B} {τ} (Tl-∷ x) with ρ x
+... | τ' , p , y =
+  τ' , p , Tl-∷ y
+
+cong-⟨⟩-ren : ∀ {Γ Γ' τ} → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
+cong-⟨⟩-ren {Γ} {Γ'} {τ} ρ {A} {.(τ + τ')} (Tl-⟨⟩ {τ' = τ'} x) with ρ x
+... | τ'' , p , y =
+  τ + τ'' , +-monoʳ-≤ τ p , Tl-⟨⟩ y
 
 -- Interaction between time-indexes of variables and -ᶜ
 
@@ -94,6 +145,36 @@ var-ᶜ {Γ ⟨ τ'' ⟩} {A} {suc τ} {.(τ'' + τ')} p (Tl-⟨⟩ {τ' = τ'} 
           p
           (≤-reflexive (+-comm τ'' τ'))))) x)
 
+-- Weakening renaming for the time-travelling operation on contexts
+
+-ᶜ-wk-ren : ∀ {Γ} → (τ : Time) → Ren (Γ -ᶜ τ) Γ
+-ᶜ-wk-ren {Γ} zero {A} {τ'} x =
+  τ' , ≤-refl , x
+-ᶜ-wk-ren {Γ ∷ B} (suc τ) {A} {τ'} x with -ᶜ-wk-ren {Γ} (suc τ) x
+... | τ'' , p , y =
+  τ'' ,
+  p ,
+  Tl-∷ y
+-ᶜ-wk-ren {Γ ⟨ τ'' ⟩} (suc τ) {A} {τ'} x with suc τ ≤? τ''
+-ᶜ-wk-ren {Γ ⟨ τ'' ⟩} (suc τ) {A} {.(τ'' ∸ suc τ + τ''')} (Tl-⟨⟩ {τ' = τ'''} x) | yes p =
+  τ'' + τ''' ,
+  +-monoˡ-≤ τ''' (m∸n≤m τ'' (suc τ)) ,
+  Tl-⟨⟩ x
+... | no ¬p with -ᶜ-wk-ren {Γ} (suc τ ∸ τ'') x
+... | τ''' , r , y =
+  τ'' + τ''' ,
+  ≤-stepsˡ τ'' r ,
+  Tl-⟨⟩ y
+
+-- Parametric right adjoint situation (one direction of it)
+
+pra-⟨⟩-ren : ∀ {Γ Γ' τ} → Ren (Γ ⟨ τ ⟩) Γ' → Ren Γ (Γ' -ᶜ τ)
+pra-⟨⟩-ren {Γ} {Γ'} {τ} ρ {A} {τ'} x with ρ (Tl-⟨⟩ x)
+... | τ'' , p , y =
+  τ'' ∸ τ ,
+  n+m≤k⇒m≤k∸n τ τ' τ'' p ,
+  var-ᶜ {Γ'} {A} {τ} {τ''} (m+n≤o⇒m≤o τ p) y
+
 -- Time-travelling operation on renamings
    
 _-ʳ_ : ∀ {Γ Γ'} → Ren Γ Γ' → (τ : Time) → Ren (Γ -ᶜ τ) (Γ' -ᶜ τ)
@@ -109,15 +190,28 @@ _-ʳ_ {Γ ⟨ τ' ⟩} {Γ'} ρ (suc τ) (Tl-⟨⟩ x) | yes p with ρ (Tl-⟨�
     (≤-reflexive (sym (+-∸-comm _ p)))
     (∸-monoˡ-≤ (suc τ) q) ,
   var-ᶜ {τ = suc τ} (≤-trans p (≤-trans (m≤m+n _ _) q)) y
-_-ʳ_ {Γ ⟨ τ' ⟩} {Γ'} ρ (suc τ) x | no ¬p with (_-ʳ_ {Γ} {Γ'} (ρ ∘ʳ wk-⟨⟩-ren) (suc τ ∸ τ')) x
-... | τ'' , q , y =
-  τ'' ∸ τ' ,
-  {!!} ,
-  {!!}
+_-ʳ_ {Γ ⟨ τ' ⟩} {Γ'} ρ (suc τ) {A} {τ''} x | no ¬p with (_-ʳ_ {Γ} {Γ' -ᶜ τ'} (pra-⟨⟩-ren ρ) (suc τ ∸ τ')) x
+... | τ''' , q , y =
+  τ''' ,
+  q ,
+  subst (λ Γ → A ∈[ τ''' ] Γ)
+    (trans
+      (sym (++ᶜ-ᶜ-+ {Γ'} {τ'} {suc τ ∸ τ'}))
+      (cong (Γ' -ᶜ_) {x = τ' + (suc τ ∸ τ')} {y = suc τ} (m+[n∸m]≡n {τ'} {suc τ} (≰⇒≥ ¬p))))
+    y
 
+-- Extending a renaming with a variable
 
+extend-ren : ∀ {Γ Γ' A τ} → Ren Γ Γ' → A ∈[ τ ] Γ' → Ren (Γ ∷ A) Γ'
+extend-ren ρ x =
+  var-ren x ∘ʳ cong-∷-ren ρ
 
+-- Congruence of renamings
 
+cong-ren : ∀ {Γ Γ' Γ''} → Ren Γ Γ' → Ren (Γ ++ᶜ Γ'') (Γ' ++ᶜ Γ'')
+cong-ren {Γ'' = []} ρ        = ρ
+cong-ren {Γ'' = Γ'' ∷ A} ρ   = cong-∷-ren (cong-ren ρ)
+cong-ren {Γ'' = Γ'' ⟨ τ ⟩} ρ = cong-⟨⟩-ren (cong-ren ρ)
 
 
 
