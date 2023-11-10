@@ -152,6 +152,5 @@ mutual
       (≤-trans s (≤-reflexive (split-pres-ctx-time (proj₁ (proj₂ (proj₂ (var-split x)))))))
       (V-rename (eq-ren (var-not-in-ctx-after-ᶜ x (≰⇒> ¬p))) V)
       (M [ Tl-∷ x ↦ W ]c)
-  
   box V M [ x ↦ W ]c  = 
     box (V [ Tl-⟨⟩ x ↦ W ]v) (M [ Tl-∷ x ↦ W ]c)
