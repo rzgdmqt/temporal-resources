@@ -196,7 +196,7 @@ var-ᶜ-+ {Γ ⟨ τ'' ⟩} {A} {suc τ} {.(τ'' ∸ suc τ + τ')} (Tl-⟨⟩ {
 ... | τ''' , r , y =
   τ'' + τ''' , ≤-stepsˡ τ'' r , Tl-⟨⟩ y
 
--- Parametric right adjoint situation between (-) -ᶜ τ and ⟨ τ ⟩
+-- Parametric right adjoint (PRA) situation between (-) -ᶜ τ and ⟨ τ ⟩
 
 pra-⟨⟩-vren : ∀ {Γ Γ' τ} → VRen (Γ ⟨ τ ⟩) Γ' → VRen Γ (Γ' -ᶜ τ)
 pra-⟨⟩-vren {Γ} {Γ'} {τ} ρ {A} {τ'} x with ρ (Tl-⟨⟩ x)
@@ -325,27 +325,16 @@ var-split₂-wk-ctx-vren {Γ' = Γ' ∷ A} x =
 var-split₂-wk-ctx-vren {Γ' = Γ' ⟨ τ ⟩} x =
   cong (_⟨ τ ⟩) (var-split₂-wk-ctx-vren x)
 
--- rename time to context
+-- Rename a time modality to a context capturing at least the same amount of time
 
 vren⟨τ⟩-ctx : ∀ {Γ Γ' τ} → τ ≤ ctx-time Γ' → VRen (Γ ⟨ τ ⟩) (Γ ++ᶜ Γ')
-vren⟨τ⟩-ctx {Γ} {[]} {.zero} z≤n =
-  ⟨⟩-η-vren
-vren⟨τ⟩-ctx {Γ} {Γ' ∷ X} {τ} p =
-  wk-vren ∘ᵛʳ vren⟨τ⟩-ctx p
-vren⟨τ⟩-ctx {Γ} {Γ' ⟨ τ' ⟩} {τ} p with τ ≤? τ'
-... | yes q =
-  cong-⟨⟩-vren wk-ctx-vren ∘ᵛʳ (⟨⟩-≤-vren q) 
-... | no ¬q = 
-        (cong-⟨⟩-vren (vren⟨τ⟩-ctx (m≤n+k⇒m∸k≤n τ (ctx-time Γ') τ' p)) 
-            ∘ᵛʳ ⟨⟩-μ-vren {τ = τ ∸ τ'}) 
-        ∘ᵛʳ eq-vren (cong (Γ ⟨_⟩)
-              (trans
-                (trans
-                  (trans
-                    (sym (+-identityʳ τ))
-                    (cong (τ +_) (sym (n∸n≡0 τ'))))
-                  (sym (+-∸-assoc τ {τ'} {τ'} ≤-refl)))
-                (+-∸-comm {τ} τ' {τ'} (≰⇒≥ ¬q))))
+vren⟨τ⟩-ctx {Γ} {Γ'} {τ} p =
+  pra-⟨⟩-vren⁻¹ {Γ} {Γ ++ᶜ Γ'}
+    (≤-trans
+      (≤-stepsˡ (ctx-time Γ) p)
+      (≤-reflexive (sym (ctx-time-++ᶜ Γ Γ'))))
+    (    eq-vren (++ᶜ-ᶜ {Γ} {Γ'} p)
+     ∘ᵛʳ wk-ctx-vren)
 
 -- Variable renamings (with an extra conditionthat disallow discarding time captured by contexts)
 
