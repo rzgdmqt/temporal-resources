@@ -181,10 +181,10 @@ resource-pass-to-ctx : ∀ {Γ τ τ' A}
                      → Γ ++ᶜ toCtx S ⊢V⦂ A
 resource-pass-to-ctx {Γ} {τ} {τ'} {A} S x p V =
   V-rename
-    (eq-ren (cong (Γ ++ᶜ_) (split-state-++ᶜ S x)) 
-        ∘ʳ ((eq-ren (++ᶜ-assoc Γ (toCtx (split-state-fst S x) ∷ [ τ ] A) (toCtx (split-state-snd S x)))) 
-            ∘ʳ cong-ren wk-ren) 
-                ∘ʳ (ren⟨τ⟩-ctx {Γ' = toCtx (split-state-snd S x)} p))
+    (   eq-ren (cong (Γ ++ᶜ_) (split-state-++ᶜ S x)) 
+     ∘ʳ eq-ren (++ᶜ-assoc Γ (toCtx (split-state-fst S x) ∷ [ τ ] A) (toCtx (split-state-snd S x))) 
+     ∘ʳ cong-ren wk-ren
+     ∘ʳ ren⟨τ⟩-ctx {Γ' = toCtx (split-state-snd S x)} p)
     V
 
 -- Translating states to computation term contexts

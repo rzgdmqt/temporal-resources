@@ -47,6 +47,8 @@ _∘ᵛʳ_ ρ' ρ x with ρ x
 ... | τ' , p , y with ρ' y
 ... | τ'' , q , z = τ'' , ≤-trans p q , z
 
+infixr 20 _∘ᵛʳ_
+
 -- Weakening renaming
 
 wk-vren : ∀ {Γ A} → VRen Γ (Γ ∷ A)
@@ -237,6 +239,8 @@ _-ᵛʳ_ {Γ ⟨ τ' ⟩} {Γ'} ρ (suc τ) {A} {τ''} x | no ¬p with (_-ᵛʳ_
       (cong (Γ' -ᶜ_) {x = τ' + (suc τ ∸ τ')} {y = suc τ} (m+[n∸m]≡n {τ'} {suc τ} (≰⇒≥ ¬p))))
     y
 
+infixl 30 _-ᵛʳ_
+
 -- Extending a renaming with a variable
 
 extend-vren : ∀ {Γ Γ' A τ} → VRen Γ Γ' → A ∈[ τ ] Γ' → VRen (Γ ∷ A) Γ'
@@ -321,6 +325,28 @@ var-split₂-wk-ctx-vren {Γ' = Γ' ∷ A} x =
 var-split₂-wk-ctx-vren {Γ' = Γ' ⟨ τ ⟩} x =
   cong (_⟨ τ ⟩) (var-split₂-wk-ctx-vren x)
 
+-- rename time to context
+
+vren⟨τ⟩-ctx : ∀ {Γ Γ' τ} → τ ≤ ctx-time Γ' → VRen (Γ ⟨ τ ⟩) (Γ ++ᶜ Γ')
+vren⟨τ⟩-ctx {Γ} {[]} {.zero} z≤n =
+  ⟨⟩-η-vren
+vren⟨τ⟩-ctx {Γ} {Γ' ∷ X} {τ} p =
+  wk-vren ∘ᵛʳ vren⟨τ⟩-ctx p
+vren⟨τ⟩-ctx {Γ} {Γ' ⟨ τ' ⟩} {τ} p with τ ≤? τ'
+... | yes q =
+  cong-⟨⟩-vren wk-ctx-vren ∘ᵛʳ (⟨⟩-≤-vren q) 
+... | no ¬q = 
+        (cong-⟨⟩-vren (vren⟨τ⟩-ctx (m≤n+k⇒m∸k≤n τ (ctx-time Γ') τ' p)) 
+            ∘ᵛʳ ⟨⟩-μ-vren {τ = τ ∸ τ'}) 
+        ∘ᵛʳ eq-vren (cong (Γ ⟨_⟩)
+              (trans
+                (trans
+                  (trans
+                    (sym (+-identityʳ τ))
+                    (cong (τ +_) (sym (n∸n≡0 τ'))))
+                  (sym (+-∸-assoc τ {τ'} {τ'} ≤-refl)))
+                (+-∸-comm {τ} τ' {τ'} (≰⇒≥ ¬q))))
+
 -- Variable renamings (with an extra conditionthat disallow discarding time captured by contexts)
 
 record Ren (Γ Γ' : Ctx) : Set where
@@ -344,6 +370,8 @@ _∘ʳ_ : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
   ren
     (≤-trans (ctx-time-≤ ρ) (ctx-time-≤ ρ'))
     ((var-rename ρ') ∘ᵛʳ (var-rename ρ))
+
+infixr 20 _∘ʳ_
 
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren p =
@@ -386,6 +414,16 @@ _-ʳ_,_ {Γ} {Γ'} ρ τ p =
         (∸-monoˡ-≤ τ (ctx-time-≤ ρ))
         (≤-reflexive (sym (ctx-time-ᶜ-∸ Γ' τ (≤-trans p (ctx-time-≤ ρ)))))))
     ((var-rename ρ) -ᵛʳ τ)
+
+ren⟨τ⟩-ctx : ∀ {Γ Γ' τ} → τ ≤ ctx-time Γ' → Ren (Γ ⟨ τ ⟩) (Γ ++ᶜ Γ')
+ren⟨τ⟩-ctx {Γ} {Γ'} {τ} p =
+  ren
+    (≤-trans
+      (+-monoʳ-≤ (ctx-time Γ) p)
+      (≤-reflexive (sym (ctx-time-++ᶜ Γ Γ'))))
+    (vren⟨τ⟩-ctx p)
+
+infixl 30 _-ʳ_,_
 
 -- Action of renamings on well-typed values and computations
 
