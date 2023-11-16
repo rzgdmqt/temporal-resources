@@ -6,8 +6,7 @@ module EquationalTheory.EquationalTheory where
 
 open import Data.Product
 
-open import EquationalTheory.CompContext
-
+open import Syntax.CompContext
 open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Renamings
@@ -414,23 +413,22 @@ mutual
                               (H op τ''')) 
                         `in (C-rename (cong-∷-ren (cong-⟨⟩-ren wk-ren)) N))
 
+
     -- beta rule for unbox
 
     unbox-beta : ∀ {Δ A B C τ τ'}
                → (p : τ ≤ ctx-time (BCtx→Ctx Δ))
                → (V : Γ ⟨ τ ⟩ ⊢V⦂ A )
-               → (K : Γ ∷ [ τ ] A ⊢K[ Δ ⊢ C ]⦂ B ‼ τ')
+               → (K : Γ ∷ [ τ ] A ⊢K[ all ◁ Δ ⊢ C ]⦂ B ‼ τ')
                → (N : (Γ ∷ [ τ ] A ⋈ Δ) ∷ A ⊢C⦂ C)
                -----------------------------------------------
-               → Γ ⊢C⦂ box V 
-                      (K ₖ[ 
-                          unbox (τΔ≤τΓ⋈Δ {Γ = Γ ∷ [ τ ] A} {Δ = Δ} p) 
-                                (var (proj₂ (proj₂ (var-rename (Γ⋈Δ-ᶜτ {Δ = Δ} p) Hd)))) 
-                                N 
-                          ]) 
-                    == box V (K ₖ[ N [ Hd ↦ V-rename (renΓ⟨τ⟩-Γ⋈Δ {Δ = Δ} p) V ]c ])
+               → Γ ⊢C⦂ box V (K [ unbox (τΔ≤τΓ⋈Δ {Γ = Γ ∷ [ τ ] A} {Δ = Δ} p) 
+                                      (var (proj₂ (proj₂ (var-rename (Γ⋈Δ-ᶜτ {Δ = Δ} p) Hd)))) 
+                                      N ]) 
+                    == box V (K [ N [ Hd ↦ V-rename (renΓ⟨τ⟩-Γ⋈Δ {Δ = Δ} p) V ]c ])
 
     -- unboxing non-related values commute
+  
 
     unbox-comm : ∀ {A B C τ τ' τ''} →
                 (p : τ ≤ ctx-time Γ) → 
@@ -440,10 +438,10 @@ mutual
                 (M : Γ ∷ A ∷ B ⊢C⦂ C ‼ τ'') → 
                 ---------------------------------------------
                 Γ ⊢C⦂ unbox p V 
-                        (unbox q (V-rename (wk-ren -ʳ τ') W) M) 
+                        (unbox q (V-rename (wk-ren -ʳ τ' , q) W) M) 
                     ==  unbox q W 
                         (unbox p 
-                            (V-rename ((wk-ren -ʳ τ)) V) 
+                            (V-rename ((wk-ren -ʳ τ , p )) V) 
                             (C-rename exch-ren M))
 
     -- boxing resources commute 
@@ -491,7 +489,7 @@ mutual
                     -----------------------------------
                     Γ ⊢C⦂ box V 
                             (unbox p 
-                              (V-rename (wk-ren -ʳ τ') W) 
+                              (V-rename (wk-ren -ʳ τ' , p) W) 
                               M) 
                         == unbox p 
                             W 

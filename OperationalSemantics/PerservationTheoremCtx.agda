@@ -16,10 +16,9 @@ open import Util.Time
 -- record type for Configuratin that encapsulates time, state and computation
 
 record Config (C : CType) : Set where
-    constructor ⟨_,_⟩
-    field
-        { Δ }       : Ctx
-        state       : 𝕊 Δ
+  constructor ⟨_,_⟩
+  field
+        state       : 𝕊 []
         computation : toCtx state  ⊢C⦂ C
 
 mutual 
@@ -28,14 +27,14 @@ mutual
     data _↝_ :  {C D : CType} → Config C → Config D → Set where
 
         -- usual step for function aplication
-        APP :   ∀ {Δ A B τ'}
-                {S : 𝕊 Δ} → {M : ((toCtx S) ∷ A) ⊢C⦂ B ‼ τ'} → {V : (toCtx S) ⊢V⦂ A} →
+        APP :   ∀ {A B τ'}
+                {S : 𝕊 []} → {M : ((toCtx S) ∷ A) ⊢C⦂ B ‼ τ'} → {V : (toCtx S) ⊢V⦂ A} →
                 -------------------------------------------------------------
                 ⟨ S , lam M · V ⟩ ↝ ⟨ S , M [ Hd ↦ V ]c ⟩
 
         -- usual step for match on pair 
-        MATCH : ∀ {Δ A B C} →
-                {S : 𝕊 Δ} →  
+        MATCH : ∀ {A B C} →
+                {S : 𝕊 []} →  
                 {V : toCtx S ⊢V⦂ A } →
                 {W : toCtx S ⊢V⦂ B } → 
                 {M : toCtx S ∷ A ∷ B ⊢C⦂ C} → 
@@ -44,8 +43,8 @@ mutual
                 ⟨ S , (M [ Hd ↦ V-rename wk-ren W ]c) [ Hd ↦ V ]c ⟩
 
         -- step for sequencing (time and state must go on)
-        SEQ-FST : ∀ {Δ Δ₁ τ₂ τ₃ τ₄} → 
-                {A B : VType} → {S : 𝕊 Δ} → {S₁ : 𝕊 Δ₁} → 
+        SEQ-FST : ∀ {τ₂ τ₃ τ₄} → 
+                {A B : VType} → {S S₁ : 𝕊 []} → 
                 {M : toCtx S ⊢C⦂ A ‼ τ₂} → 
                 {N : ((toCtx S) ⟨ τ₂ ⟩ ∷ A) ⊢C⦂ B ‼ τ₃} → 
                 {M₁ : toCtx S₁ ⊢C⦂ A ‼ τ₄} →
@@ -56,19 +55,20 @@ mutual
                 ⟨ S₁ , M₁ ;  
                     C-rename 
                         (cong-∷-ren (suc-comp-ren (step-extends-state M↝M₁) (m≡n⇒m≤n Sτ+τ₂≡Sτ₁+τ₄))) 
-                        N ⟩
-
+                        N ⟩ 
+        
         -- usual step for return in sequencing
-        SEQ-RET : ∀ {Δ A B τ'} → 
-                {S : 𝕊 Δ} → 
+        SEQ-RET : ∀ {A B τ'} → 
+                {S : 𝕊 []} → 
                 {V : (toCtx S) ⊢V⦂ A} 
                 {N : ((toCtx S) ⟨ 0 ⟩ ∷ A) ⊢C⦂ B ‼ τ'} →  
                 -----------------------------------------------------------------------------------
                 ⟨ S , return V ; N ⟩ ↝ ⟨ S , C-rename (cong-∷-ren ⟨⟩-η-ren) N [ Hd ↦ V ]c ⟩
 
+
         -- usual performing operation in sequencing
-        SEQ-OP : ∀ {Δ A B τ τ' op} →  
-                {S : 𝕊 Δ} → 
+        SEQ-OP : ∀ {A B τ τ' op} →  
+                {S : 𝕊 []} → 
                 {V : (toCtx S) ⊢V⦂ type-of-gtype (param op)} 
                 {M : toCtx S ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ} →  
                 {N : toCtx S ⟨ op-time op + τ ⟩ ∷ A ⊢C⦂ B ‼ τ'} → 
@@ -79,15 +79,15 @@ mutual
                                  C-rename (cong-∷-ren (exch-⟨⟩-var-ren ∘ʳ wk-ren ∘ʳ ⟨⟩-μ-ren)) N))  ⟩
 
         -- delay just pass time further
-        DELAY : ∀ {Δ A τ' τ''} → 
-                {S : 𝕊 Δ} →
+        DELAY : ∀ {A τ' τ''} → 
+                {S : 𝕊 []} →
                 {M : toCtx S ⟨ τ' ⟩ ⊢C⦂ A ‼ τ''} → 
                 ---------------------------------------------------------------------
                 ⟨ S , (delay {τ' = τ''} τ' M) ⟩ ↝ ⟨ time-pass S τ' , M ⟩
 
         -- usual step for handle return
-        HANDLE-RET : ∀ {Δ A B τ'} →
-                {S : 𝕊 Δ} → 
+        HANDLE-RET : ∀ {A B τ'} →
+                {S : 𝕊 []} → 
                 {V : toCtx S ⊢V⦂ A} →
                 {H : (op : Op) → (τ'' : Time) →
                     toCtx S ∷ type-of-gtype (param op)
@@ -99,9 +99,8 @@ mutual
                 ⟨ S , (C-rename (cong-∷-ren ⟨⟩-η-ren) N) [ Hd ↦ V ]c ⟩ 
 
         -- step on computation in handle. time and state must go on
-        HANDLE-STEP : ∀ {Δ Δ₁ A B τ₁ τ₂ τ₃} → 
-                {S : 𝕊 Δ} → 
-                {S₁ : 𝕊 Δ₁} → 
+        HANDLE-STEP : ∀ {A B τ₁ τ₂ τ₃} → 
+                {S S₁ : 𝕊 []} → 
                 {M : toCtx S ⊢C⦂ A ‼ τ₂} → 
                 {H : (op : Op) → 
                      (τ₃ : Time) →
@@ -126,8 +125,8 @@ mutual
 
         -- operation handle where we box up result so that the resources
         -- in the result are not used before enough time has passed
-        HANDLE-OP : ∀ {Δ A B τ' τ'' op} →
-                {S : 𝕊 Δ} →  
+        HANDLE-OP : ∀ {A B τ' τ'' op} →
+                {S : 𝕊 []} →  
                 {V : toCtx S ⊢V⦂ type-of-gtype (param op)} →
                 {M : toCtx S ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ''} →
                 {H : (op : Op) → (τ₁ : Time) →
@@ -146,35 +145,38 @@ mutual
                             ((H op (τ'' + τ')) [ Tl-∷ Hd ↦ V ]c) ⟩
 
         -- step for box: we just extend our state with new resource
-        BOX :   ∀ {Δ A B τ' τ''} → {S : 𝕊 Δ} → 
+        BOX :   ∀ {A B τ' τ''} → {S : 𝕊 []} → 
                 {V : toCtx S ⟨ τ' ⟩ ⊢V⦂ A} →  
                 {M : toCtx S ∷ [ τ' ] A ⊢C⦂ B ‼ τ''} →
                 -------------------------------------------------------
-                ⟨ S , (box V M) ⟩ ↝ ⟨ extend-state S (V-rename (cong-⟨⟩-ren (eq-ren (sym (Γ≡toCtxS S)))) V) , M ⟩
+                ⟨ S , (box V M) ⟩ 
+                    ↝ ⟨ extend-state S (V-rename (cong-⟨⟩-ren wk-ctx-renₗ) V) , 
+                        M ⟩
 
         -- step for unbox: we just substitute in M with unboxed resource (finding the right one is tricky)
-        UNBOX : ∀ {Δ A C τ'} → {S : 𝕊 Δ} → 
+        UNBOX : ∀ {A C τ'} → 
+                {S : 𝕊 []} → 
                 (p : τ' ≤ ctx-time (toCtx S)) → 
                 {V : (toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A)} →
                 {M : toCtx S ∷ A ⊢C⦂ C } → 
                 ---------------------------------------------------------------------------------------------
-                let Σ[τ''∈Time][τ+τ'≤τ''×A∈[τ'']Γ] = (push-time-further p (proj₂ (var-in-ctx V))) in
-                let all-time-smaller = m+n≤o⇒m≤o τ' (proj₁ (proj₂ Σ[τ''∈Time][τ+τ'≤τ''×A∈[τ'']Γ])) in
-                let time-travel-to-past-smaller-than-ctx-time = τ-≤-substᵣ 
-                                (sym (ctx-time≡state-time S))
-                                (from-head-time-positive (proj₂ (proj₂ Σ[τ''∈Time][τ+τ'≤τ''×A∈[τ'']Γ]))) in
-                ⟨ S , unbox p V M ⟩ ↝ 
-                ⟨ S , 
-                    M [ Hd ↦ 
-                        resource-pass-to-ctx 
-                            S 
-                            all-time-smaller
-                            time-travel-to-past-smaller-than-ctx-time
-                            (resource-lookup S (proj₂ (proj₂ Σ[τ''∈Time][τ+τ'≤τ''×A∈[τ'']Γ]))) ]c ⟩ 
-            
+                let v-in-c = var-in-ctx V in 
+                let x = proj₂ v-in-c in 
+                let y = var-ᶜ-+ {τ = τ'} x in 
+                ⟨ S , unbox p V M ⟩ 
+                    ↝ ⟨ S , 
+                        M [ Hd ↦ V-rename (eq-ren ++ᶜ-identityˡ)
+                            (resource-pass-to-ctx
+                                S 
+                                y 
+                                (τ-≤-substᵣ 
+                                    (sym (time-≡ (split-state-snd S y))) 
+                                    (τ'≤snd-state V)) 
+                                (resource-lookup S y)) ]c ⟩
+ 
     -- Theorem that step only extends state
-    step-extends-state : ∀ {Δ Δ' τ'' τ'''} → 
-                {S : 𝕊 Δ} → {S' : 𝕊 Δ'} → 
+    step-extends-state : ∀ {τ'' τ'''} → 
+                {S : 𝕊 []} → {S' : 𝕊 []} → 
                 {A : VType} → 
                 {M : toCtx S ⊢C⦂ A ‼ τ''} → 
                 {M' : toCtx S' ⊢C⦂ A ‼ τ'''} → 
@@ -195,9 +197,8 @@ mutual
 
 -- perservation theorem
 
-perservation-theorem : ∀ {Δ Δ' A B τ'' τ'''}
-                → {S : 𝕊 Δ}
-                → {S' : 𝕊 Δ'}
+perservation-theorem : ∀ {A B τ'' τ'''}
+                → {S S' : 𝕊 []}
                 → {M : toCtx S ⊢C⦂ A ‼ τ''}
                 → {M' : toCtx S' ⊢C⦂ B ‼ τ'''}
                 → ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩

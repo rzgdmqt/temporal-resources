@@ -13,6 +13,7 @@ open import Data.Sum
 open import Relation.Binary.Definitions
 open import Relation.Nullary
 
+open import Syntax.CompContext
 open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Types
@@ -297,7 +298,7 @@ empty-vren {Γ ∷ A} =
 empty-vren {Γ ⟨ τ ⟩} =
   wk-⟨⟩-vren ∘ᵛʳ empty-vren
 
--- Interaction of var-split and wk-ctx-ren
+-- Interaction of var-split and wk-ctx-renᵣ
 
 var-split₁-wk-ctx-vren : ∀ {Γ Γ' A τ}
                        → (x : A ∈[ τ ] Γ)
@@ -376,6 +377,27 @@ wk-⟨⟩-ren : ∀ {Γ τ} → Ren Γ (Γ ⟨ τ ⟩)
 wk-⟨⟩-ren {Γ} {τ} =
   ren (m≤m+n (ctx-time Γ) τ) (wk-⟨⟩-vren {Γ} {τ})
 
+⟨⟩-η-ren : ∀ {Γ} → Ren (Γ ⟨ 0 ⟩) Γ
+⟨⟩-η-ren {Γ} = 
+  ren 
+    (τ-≤-substₗ (sym (+-identityʳ (ctx-time Γ))) ≤-refl) 
+    ⟨⟩-η-vren
+
+⟨⟩-η⁻¹-ren : ∀ {Γ} → Ren Γ (Γ ⟨ 0 ⟩)
+⟨⟩-η⁻¹-ren = wk-⟨⟩-ren
+
+⟨⟩-μ-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ + τ' ⟩) (Γ ⟨ τ ⟩ ⟨ τ' ⟩)
+⟨⟩-μ-ren {Γ} {τ} {τ'} = 
+  ren 
+    (τ-≤-substₗ (+-assoc (ctx-time Γ) τ τ') ≤-refl) 
+    ⟨⟩-μ-vren
+
+⟨⟩-μ⁻¹-ren : ∀ {Γ τ τ'} → Ren (Γ ⟨ τ ⟩ ⟨ τ' ⟩) (Γ ⟨ τ + τ' ⟩)
+⟨⟩-μ⁻¹-ren {Γ} {τ} {τ'} = 
+  ren 
+    (τ-≤-substₗ (sym (+-assoc (ctx-time Γ) τ τ')) ≤-refl)
+    ⟨⟩-μ⁻¹-vren
+
 cong-∷-ren : ∀ {Γ Γ' A} → Ren Γ Γ' → Ren (Γ ∷ A) (Γ' ∷ A)
 cong-∷-ren ρ =
   ren (ctx-time-≤ ρ) (cong-∷-vren (var-rename ρ))
@@ -393,6 +415,35 @@ cong-ren {Γ} {Γ'} {Γ''} ρ =
         (+-monoˡ-≤ (ctx-time Γ'') (ctx-time-≤ ρ))
         (≤-reflexive (sym (ctx-time-++ᶜ Γ' Γ'')))))
     (cong-vren (var-rename ρ))
+
+wk-ctx-renᵣ : ∀ {Γ Γ'} → Ren Γ (Γ ++ᶜ Γ')
+wk-ctx-renᵣ {Γ} {Γ'} = 
+  ren 
+    (τ-≤-substᵣ (ctx-time-++ᶜ Γ Γ') (≤-stepsʳ (ctx-time Γ') ≤-refl)) 
+    wk-ctx-vren
+
+wk-ctx-renₗ : ∀ {Γ Γ'} → Ren Γ (Γ' ++ᶜ Γ)
+wk-ctx-renₗ {Γ} {Γ'} = 
+  cong-ren {Γ' = Γ'} (eq-ren ++ᶜ-identityˡ ∘ʳ wk-ctx-renᵣ) 
+    ∘ʳ (eq-ren (sym ++ᶜ-identityˡ))
+
+⟨⟩-≤-ren : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
+⟨⟩-≤-ren {Γ} p = 
+  ren 
+    (+-monoʳ-≤ (ctx-time Γ) p) 
+    (⟨⟩-≤-vren p)
+
+exch-⟨⟩-var-ren : ∀ {Γ A τ} → Ren (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
+exch-⟨⟩-var-ren = 
+  ren 
+    ≤-refl 
+    exch-⟨⟩-var-vren 
+
+exch-ren : ∀ {Γ A B} → Ren (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
+exch-ren = 
+  ren 
+    ≤-refl 
+    exch-vren
 
 _-ʳ_,_ : ∀ {Γ Γ'} → Ren Γ Γ' → (τ : Time) → τ ≤ ctx-time Γ → Ren (Γ -ᶜ τ) (Γ' -ᶜ τ)
 _-ʳ_,_ {Γ} {Γ'} ρ τ p =
@@ -453,6 +504,33 @@ mutual
 
 
 
+-----------------------------------
+-- Renamings of binding contexts --
+-----------------------------------
+
+-- weakening lemma 
+
+-ᶜ-++ᶜ-wk-ren : ∀ {Γ Γ' τ} → τ ≤ ctx-time Γ' → Ren Γ (Γ ++ᶜ Γ' -ᶜ τ)
+-ᶜ-++ᶜ-wk-ren {Γ} {Γ'} {τ} p = (eq-ren (++ᶜ-ᶜ p)) ∘ʳ wk-ctx-renᵣ
+
+-- -ᶜ for joined contexts lemmas
+
+Γ⋈Δ-ᶜτ : ∀ {Γ Δ τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → Ren Γ (Γ ⋈ Δ -ᶜ τ)
+Γ⋈Δ-ᶜτ {Γ} {Δ} {τ} p = 
+  eq-ren (sym (Γ⋈Δ≡Γ++ᶜctxΔ Γ Δ)) -ʳ τ , τ-≤-substᵣ (ctx-time-++ᶜ Γ (BCtx→Ctx Δ)) (≤-stepsˡ (ctx-time Γ) p) 
+  ∘ʳ -ᶜ-++ᶜ-wk-ren p
+
+-- elim nonused variables from the joined contex 
+
+renΓ⟨τ⟩-Γ⋈Δ : ∀ {Γ Δ A τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → Ren (Γ ⟨ τ ⟩) (Γ ∷ A ⋈ Δ)
+renΓ⟨τ⟩-Γ⋈Δ {Γ} {Δ} {A} {τ} p =
+    ((eq-ren (sym (Γ⋈Δ≡Γ++ᶜctxΔ (Γ ∷ A) Δ))) 
+    ∘ʳ cong-ren wk-ren) 
+    ∘ʳ ren⟨τ⟩-ctx p 
+
+ren-++-⋈ : ∀ {Γ Δ Γ'} → BCtx→Ctx Δ ≡ Γ' → Ren (Γ ++ᶜ Γ') (Γ ⋈ Δ)
+ren-++-⋈ {Γ} {Δ} {Γ'} p = 
+  eq-ren (sym (trans (Γ⋈Δ≡Γ++ᶜctxΔ Γ Δ) (++ᶜ-inj Γ (BCtx→Ctx Δ) Γ' p)))
 
 
 
@@ -525,15 +603,15 @@ wk-⟨⟩-ren = ⟨⟩-≤-ren z≤n ∘ʳ ⟨⟩-η⁻¹-ren
 
 -- Weakening by a context renaming
 
-wk-ctx-ren : ∀ {Γ Γ'} → VRen Γ (Γ ++ᶜ Γ')
-wk-ctx-ren {Γ' = []}       = id-ren
-wk-ctx-ren {Γ' = Γ' ∷ A}   = wk-ren ∘ʳ wk-ctx-ren
-wk-ctx-ren {Γ' = Γ' ⟨ τ ⟩} = wk-⟨⟩-ren ∘ʳ wk-ctx-ren
+wk-ctx-renᵣ : ∀ {Γ Γ'} → VRen Γ (Γ ++ᶜ Γ')
+wk-ctx-renᵣ {Γ' = []}       = id-ren
+wk-ctx-renᵣ {Γ' = Γ' ∷ A}   = wk-ren ∘ʳ wk-ctx-renᵣ
+wk-ctx-renᵣ {Γ' = Γ' ⟨ τ ⟩} = wk-⟨⟩-ren ∘ʳ wk-ctx-renᵣ
 
 -- Exchange renamings
 
 exch-ren : ∀ {Γ A B} → VRen (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
-exch-ren = extend-ren (extend-ren wk-ctx-ren Hd) (Tl-∷ Hd)
+exch-ren = extend-ren (extend-ren wk-ctx-renᵣ Hd) (Tl-∷ Hd)
 
 exch-⟨⟩-var-ren : ∀ {Γ A τ} → VRen (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
 exch-⟨⟩-var-ren {A = A} {τ = τ} =
@@ -800,13 +878,13 @@ var-rename (cong-⟨⟩-ren ρ) (Tl-⟨⟩ x) with var-rename ρ x
 ... | τ , p , y =
   _ , +-monoʳ-≤ _ p , Tl-⟨⟩ y
 
--- Interaction of var-split, var-rename, and wk-ctx-ren
+-- Interaction of var-split, var-rename, and wk-ctx-renᵣ
 
 var-split₁-wk-ctx-ren : ∀ {Γ Γ' A τ}
                       → (x : A ∈[ τ ] Γ)
                       → proj₁ (var-split x)
                       ≡ proj₁ (var-split
-                          (proj₂ (proj₂ (var-rename (wk-ctx-ren {Γ' = Γ'}) x))))
+                          (proj₂ (proj₂ (var-rename (wk-ctx-renᵣ {Γ' = Γ'}) x))))
 
 var-split₁-wk-ctx-ren {Γ' = []} x =
   refl
@@ -819,7 +897,7 @@ var-split₂-wk-ctx-ren : ∀ {Γ Γ' A τ}
                       → (x : A ∈[ τ ] Γ)
                       → proj₁ (proj₂ (var-split x)) ++ᶜ Γ'
                       ≡ proj₁ (proj₂ (var-split
-                          (proj₂ (proj₂ (var-rename (wk-ctx-ren {Γ' = Γ'}) x)))))
+                          (proj₂ (proj₂ (var-rename (wk-ctx-renᵣ {Γ' = Γ'}) x)))))
 var-split₂-wk-ctx-ren {Γ' = []} x =
   refl
 var-split₂-wk-ctx-ren {Γ' = Γ' ∷ A} x =
@@ -1028,3 +1106,4 @@ ren-++-⋈ {Γ} {Δ} {Γ'} p = eq-ren (sym (trans (Γ⋈Δ≡Γ++ᶜctxΔ Γ Δ)
 
 
 -}
+ 

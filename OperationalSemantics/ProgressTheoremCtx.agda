@@ -17,20 +17,19 @@ open import Util.Time
 
 -- Progress theorem. A term is either returned value, operation or makes step
 
-data Progresses : ∀ {Δ τ'} → 
-                {S : 𝕊 Δ} → 
+data Progresses : ∀ {τ'} → 
+                {S : 𝕊 []} → 
                 {A : VType} → 
                 (M : toCtx S ⊢C⦂ A ‼ τ') →  Set where
                             
-    is-value : ∀ {Δ} → 
-            {S : 𝕊 Δ} → 
+    is-value : {S : 𝕊 []} → 
             {A : VType} → 
             {V : toCtx S ⊢V⦂ A} →
             ---------------------
             Progresses (return V) 
     
-    is-op : ∀ {Δ τ'} → 
-            {S : 𝕊 Δ} → 
+    is-op : ∀ {τ'} → 
+            {S : 𝕊 []} → 
             {A : VType} → 
             {op : Op} → 
             {V : toCtx S ⊢V⦂ type-of-gtype (param op) } → 
@@ -39,8 +38,8 @@ data Progresses : ∀ {Δ τ'} →
             Progresses (perform op V M) 
 
 
-    steps : ∀ {Δ Δ' τ'' τ'''} → 
-            {S : 𝕊 Δ} {S' : 𝕊 Δ'} {A : VType} → 
+    steps : ∀ {τ'' τ'''} → 
+            {S S' : 𝕊 []} {A : VType} → 
             {M : toCtx S ⊢C⦂ A ‼ τ''} →
             {M' : toCtx S' ⊢C⦂  A ‼ τ''' } → 
             (p : state-time S + τ'' ≡ state-time S' + τ''') → 
@@ -48,8 +47,8 @@ data Progresses : ∀ {Δ τ'} →
             ----------------------------------
             Progresses M 
 
-progress : ∀ {Δ A τ'} → 
-        {S : 𝕊 Δ} → 
+progress : ∀ {A τ'} → 
+        {S : 𝕊 []} → 
         (M : toCtx S ⊢C⦂ A ‼ τ') → 
         Progresses M 
 progress (return V) = is-value
@@ -78,9 +77,9 @@ progress (match var V `in M) = ⊥-elim (⦉⦊-not-in-toCtx V)
 
 -- Theorem: is-value is indeed final state (make no further steps)
 
-finality-value : ∀ {Δ Δ' A B τ₂}
-                → {S : 𝕊 Δ}
-                → {S₁ : 𝕊 Δ'}
+finality-value : ∀ {A B τ₂}
+                → {S : 𝕊 []}
+                → {S₁ : 𝕊 []}
                 → {V : toCtx S ⊢V⦂ A}
                 → {M₁ : toCtx S₁ ⊢C⦂ B ‼ τ₂}
                 → ⟨ S , return V ⟩ ↝ ⟨ S₁ , M₁ ⟩
@@ -90,9 +89,8 @@ finality-value ()
 
 -- Theorem: is-op is indeed final state (make no further steps)
 
-finality-op : ∀ {Δ Δ' A B op τ₂ τ₃}
-                → {S : 𝕊 Δ}
-                → {S₁ : 𝕊 Δ'}
+finality-op : ∀ {A B op τ₂ τ₃}
+                → {S S₁ : 𝕊 []}
                 → {V : toCtx S ⊢V⦂ type-of-gtype (param op) }
                 → {M : toCtx S ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢C⦂ A ‼ τ₂}
                 → {M₁ : toCtx S₁ ⊢C⦂ B ‼ τ₃}

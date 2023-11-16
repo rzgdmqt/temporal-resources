@@ -1,6 +1,7 @@
 module OperationalSemantics.TheoremsAboutStepsCtx where
 
 
+open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Types
 
@@ -15,8 +16,8 @@ open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)
 
 -- Theorem that step only increases time
 
-step-increases-time : ∀ {Δ Δ' A τ'' τ'''} → 
-                {S : 𝕊 Δ} → {S' : 𝕊 Δ'} → 
+step-increases-time : ∀ {A τ'' τ'''} → 
+                {S S' : 𝕊 []} 
                 {M : toCtx S ⊢C⦂ A ‼ τ''} → 
                 {M' : toCtx S' ⊢C⦂ A ‼ τ'''} → 
                 (M↝M' : ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩ ) → 
@@ -25,9 +26,8 @@ step-increases-time M↝M' = S≤ₛS'⇒τ≤τ' (step-extends-state M↝M')
 
 -- step perserves overall time
 
-conf-time+comp-time≡const : ∀ {Δ Δ' A τ'' τ'''}
-                → {S : 𝕊 Δ}
-                → {S' : 𝕊 Δ'}
+conf-time+comp-time≡const : ∀ {A τ'' τ'''}
+                → {S S' : 𝕊 []}
                 → {M : toCtx S ⊢C⦂ A ‼ τ''}
                 → {M' : toCtx S' ⊢C⦂ A ‼ τ'''}
                 → ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩

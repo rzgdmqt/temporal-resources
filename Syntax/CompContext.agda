@@ -216,6 +216,51 @@ ctx-time-bctx-time (⟨ τ ⟩ₗ Δ) =
     (ctx-time-++ᶜ ([] ⟨ τ ⟩) (BCtx→Ctx Δ)) 
     (cong (τ +_) (ctx-time-bctx-time Δ))
 
+-- lemma that states that joining contexts is context sumation under the hood
+
+Γ⋈Δ≡Γ++ᶜctxΔ : (Γ : Ctx) → (Δ : BCtx) → Γ ⋈ Δ ≡ Γ ++ᶜ (BCtx→Ctx Δ)
+Γ⋈Δ≡Γ++ᶜctxΔ Γ []ₗ = refl
+Γ⋈Δ≡Γ++ᶜctxΔ Γ (X ∷ₗ Δ) = 
+  begin 
+      Γ ⋈ (X ∷ₗ Δ) ≡⟨ refl ⟩  
+      (Γ ∷ X) ⋈ Δ ≡⟨ Γ⋈Δ≡Γ++ᶜctxΔ (Γ ∷ X) Δ ⟩ 
+      (Γ ∷ X) ++ᶜ (BCtx→Ctx Δ) ≡⟨ (++ᶜ-assoc Γ ([] ∷ X) (BCtx→Ctx Δ)) ⟩
+      Γ ++ᶜ (([] ∷ X) ++ᶜ (BCtx→Ctx Δ))
+    ∎
+Γ⋈Δ≡Γ++ᶜctxΔ Γ (⟨ τ ⟩ₗ Δ) = 
+    begin 
+      Γ ⋈ (⟨ τ ⟩ₗ Δ) ≡⟨ refl ⟩  
+      (Γ ⟨ τ ⟩) ⋈ Δ ≡⟨ Γ⋈Δ≡Γ++ᶜctxΔ (Γ ⟨ τ ⟩) Δ ⟩ 
+      (Γ ⟨ τ ⟩) ++ᶜ (BCtx→Ctx Δ) ≡⟨ (++ᶜ-assoc Γ ([] ⟨ τ ⟩) (BCtx→Ctx Δ)) ⟩
+      Γ ++ᶜ (([] ⟨ τ ⟩) ++ᶜ (BCtx→Ctx Δ))
+    ∎
+
+-- substitute context under the ctx-time
+
+subst-ctx-time : ∀ {Γ Δ} → Γ ≡ Δ → ctx-time Γ ≡ ctx-time Δ
+subst-ctx-time refl = refl
+
+-- time on ⋈ is homogenous
+
+time[Γ⋈Δ]≡time[Γ]+time[Δ] : (Γ : Ctx) → (Δ : BCtx) → ctx-time (Γ ⋈ Δ) ≡ ctx-time Γ + (ctx-time (BCtx→Ctx Δ))
+time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ = 
+  begin 
+      ctx-time (Γ ⋈ Δ) ≡⟨ subst-ctx-time (Γ⋈Δ≡Γ++ᶜctxΔ Γ Δ) ⟩  
+      ctx-time (Γ ++ᶜ (BCtx→Ctx Δ)) ≡⟨ ctx-time-++ᶜ Γ ((BCtx→Ctx Δ)) ⟩  
+      ctx-time Γ + ctx-time (BCtx→Ctx Δ)
+    ∎
+
+-- Lemma: ⋈ with binding context increase time on left
+
+τΓ≤τΓ⋈Δ : ∀ {Γ Δ τ} → τ ≤ ctx-time Γ → τ ≤ ctx-time (Γ ⋈ Δ)
+τΓ≤τΓ⋈Δ {Γ} {Δ} p = τ-≤-substᵣ (time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ) (≤-stepsʳ (ctx-time (BCtx→Ctx Δ)) p)
+
+-- Lemma: ⋈  with binding context increase time on right
+
+τΔ≤τΓ⋈Δ : ∀ {Γ Δ τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → τ ≤ ctx-time (Γ ⋈ Δ)
+τΔ≤τΓ⋈Δ {Γ} {Δ} p = τ-≤-substᵣ (time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ) (≤-stepsˡ (ctx-time Γ) p)
+
+
 -- Computation term context flags. They characterise whether
 -- it is an arbitrary term context, an evaluation context, or
 -- a state-induced context. Flags come together with a simple
