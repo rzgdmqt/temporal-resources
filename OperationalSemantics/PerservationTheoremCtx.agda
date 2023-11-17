@@ -197,25 +197,24 @@ mutual
 
 -- perservation theorem
 
-perservation-theorem : ∀ {A τ'' τ'''}
+perservation-theorem : ∀ {A B τ'' τ'''}
                 → {S S' : 𝕊 []}
                 → {M : toCtx S ⊢C⦂ A ‼ τ''}
-                → {M' : toCtx S' ⊢C⦂ A ‼ τ'''}
+                → {M' : toCtx S' ⊢C⦂ B ‼ τ'''}
                 → ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩
-                → state-time S + τ'' ≡ state-time S' + τ'''
-                
-perservation-theorem APP = refl
-perservation-theorem MATCH = refl
+                → A ≡ B × state-time S + τ'' ≡ state-time S' + τ'''
+perservation-theorem APP = refl , refl
+perservation-theorem MATCH = refl , refl
 perservation-theorem {S = S} {S' = S'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ M↝M') = 
-    τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] (state-time S) (state-time S') τ₂ τ₃ τ₄ τ+τ₂≡τ₁+τ₄
-perservation-theorem SEQ-RET = refl
-perservation-theorem SEQ-OP = refl
+    refl , τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] (state-time S) (state-time S') τ₂ τ₃ τ₄ τ+τ₂≡τ₁+τ₄
+perservation-theorem SEQ-RET = refl , refl
+perservation-theorem SEQ-OP = refl , refl
 perservation-theorem {τ''' = τ'''} {S = S} (DELAY {τ' = τ'}) = 
-    sym (+-assoc (state-time S) τ' τ''')
-perservation-theorem HANDLE-RET = refl
+    refl , sym (+-assoc (state-time S) τ' τ''')
+perservation-theorem HANDLE-RET = refl , refl
 perservation-theorem {S = S} {S' = S'} (HANDLE-STEP {τ₁ = τ₁} {τ₂} {τ₃} τ+τ₂≡τ₄+τ₃ M↝M') = 
-    τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] (state-time S) (state-time S') τ₂ τ₁ τ₃ τ+τ₂≡τ₄+τ₃
+    refl , τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] (state-time S) (state-time S') τ₂ τ₁ τ₃ τ+τ₂≡τ₄+τ₃
 perservation-theorem {S = S} (HANDLE-OP {τ' = τ'} {τ'' = τ''} {op = op}) = 
-    cong ((state-time S) +_) (+-assoc (op-time op) τ'' τ')
-perservation-theorem BOX = refl
-perservation-theorem (UNBOX p) = refl 
+    refl , cong ((state-time S) +_) (+-assoc (op-time op) τ'' τ')
+perservation-theorem BOX = refl , refl
+perservation-theorem (UNBOX p) = refl , refl 
