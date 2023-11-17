@@ -175,13 +175,14 @@ mutual
                                 (resource-lookup S y)) ]c ⟩
  
     -- Theorem that step only extends state
-    step-extends-state : ∀ {τ'' τ'''} → 
-                {S : 𝕊 []} → {S' : 𝕊 []} → 
-                {A : VType} → 
-                {M : toCtx S ⊢C⦂ A ‼ τ''} → 
-                {M' : toCtx S' ⊢C⦂ A ‼ τ'''} → 
-                (M↝M' : ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩ ) → 
-                S ≤ₛ S'
+    step-extends-state : ∀ {τ'' τ'''}
+                       → {S : 𝕊 []} → {S' : 𝕊 []}
+                       → {A : VType}
+                       → {M : toCtx S ⊢C⦂ A ‼ τ''}
+                       → {M' : toCtx S' ⊢C⦂ A ‼ τ'''}
+                       → (M↝M' : ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩ ) 
+                       → S ≤ₛ S'
+                       
     step-extends-state APP = id-suc
     step-extends-state MATCH = id-suc
     step-extends-state SEQ-RET = id-suc
@@ -195,27 +196,27 @@ mutual
     step-extends-state (HANDLE-STEP {M = M} {M₁ = M'} τ+τ₄≡τ₇+τ₆ M↝M') = step-extends-state M↝M'
 
 
--- perservation theorem
+-- Reduction steps preserve time
 
-perservation-theorem : ∀ {A τ'' τ'''}
-                → {S S' : 𝕊 []}
-                → {M : toCtx S ⊢C⦂ A ‼ τ''}
-                → {M' : toCtx S' ⊢C⦂ A ‼ τ'''}
-                → ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩
-                → state-time S + τ'' ≡ state-time S' + τ'''
+time-perservation-theorem : ∀ {A τ'' τ'''}
+                          → {S S' : 𝕊 []}
+                          → {M : toCtx S ⊢C⦂ A ‼ τ''}
+                          → {M' : toCtx S' ⊢C⦂ A ‼ τ'''}
+                          → ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩
+                          → state-time S + τ'' ≡ state-time S' + τ'''
                 
-perservation-theorem APP = refl
-perservation-theorem MATCH = refl
-perservation-theorem {S = S} {S' = S'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ M↝M') = 
+time-perservation-theorem APP = refl
+time-perservation-theorem MATCH = refl
+time-perservation-theorem {S = S} {S' = S'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ M↝M') = 
     τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] (state-time S) (state-time S') τ₂ τ₃ τ₄ τ+τ₂≡τ₁+τ₄
-perservation-theorem SEQ-RET = refl
-perservation-theorem SEQ-OP = refl
-perservation-theorem {τ''' = τ'''} {S = S} (DELAY {τ' = τ'}) = 
+time-perservation-theorem SEQ-RET = refl
+time-perservation-theorem SEQ-OP = refl
+time-perservation-theorem {τ''' = τ'''} {S = S} (DELAY {τ' = τ'}) = 
     sym (+-assoc (state-time S) τ' τ''')
-perservation-theorem HANDLE-RET = refl
-perservation-theorem {S = S} {S' = S'} (HANDLE-STEP {τ₁ = τ₁} {τ₂} {τ₃} τ+τ₂≡τ₄+τ₃ M↝M') = 
+time-perservation-theorem HANDLE-RET = refl
+time-perservation-theorem {S = S} {S' = S'} (HANDLE-STEP {τ₁ = τ₁} {τ₂} {τ₃} τ+τ₂≡τ₄+τ₃ M↝M') = 
     τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] (state-time S) (state-time S') τ₂ τ₁ τ₃ τ+τ₂≡τ₄+τ₃
-perservation-theorem {S = S} (HANDLE-OP {τ' = τ'} {τ'' = τ''} {op = op}) = 
+time-perservation-theorem {S = S} (HANDLE-OP {τ' = τ'} {τ'' = τ''} {op = op}) = 
     cong ((state-time S) +_) (+-assoc (op-time op) τ'' τ')
-perservation-theorem BOX = refl
-perservation-theorem (UNBOX p) = refl 
+time-perservation-theorem BOX = refl
+time-perservation-theorem (UNBOX p) = refl 
