@@ -1,6 +1,6 @@
-module OperationalSemantics.PerservationTheoremCtx where
+module OperationalSemantics.PerservationTheorem where
 
-open import OperationalSemantics.StateCtx
+open import OperationalSemantics.State
 
 open import Syntax.Contexts
 open import Syntax.Language

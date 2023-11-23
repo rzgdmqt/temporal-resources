@@ -1,9 +1,9 @@
-module OperationalSemantics.ProgressTheoremCtx where
+module OperationalSemantics.ProgressTheorem where
 
 
-open import OperationalSemantics.PerservationTheoremCtx
-open import OperationalSemantics.StateCtx
-open import OperationalSemantics.TheoremsAboutStepsCtx
+open import OperationalSemantics.PerservationTheorem
+open import OperationalSemantics.State
+open import OperationalSemantics.TheoremsAboutSteps
 
 open import Syntax.Contexts
 open import Syntax.Language

@@ -1,12 +1,12 @@
-module OperationalSemantics.TheoremsAboutStepsCtx where
+module OperationalSemantics.TheoremsAboutSteps where
 
 
 open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Types
 
-open import OperationalSemantics.PerservationTheoremCtx
-open import OperationalSemantics.StateCtx
+open import OperationalSemantics.PerservationTheorem
+open import OperationalSemantics.State
 
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
 open import Util.Operations

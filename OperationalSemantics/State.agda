@@ -1,4 +1,4 @@
-module OperationalSemantics.StateCtx where
+module OperationalSemantics.State where
 
 open import Syntax.Contexts
 open import Syntax.CompContext
