@@ -235,6 +235,17 @@ ctx-time-bctx-time (⟨ τ ⟩ₗ Δ) =
       Γ ++ᶜ (([] ⟨ τ ⟩) ++ᶜ (BCtx→Ctx Δ))
     ∎
 
+-- unitality of binding
+
+⋈-identityˡ : ∀ {Δ} → [] ⋈ Δ ≡ BCtx→Ctx Δ
+⋈-identityˡ {[]ₗ} = 
+  refl
+⋈-identityˡ {A ∷ₗ Δ} = 
+  trans (Γ⋈Δ≡Γ++ᶜctxΔ ([] ∷ A) Δ) refl
+⋈-identityˡ {⟨ τ ⟩ₗ Δ} = 
+  trans (Γ⋈Δ≡Γ++ᶜctxΔ ([] ⟨ τ ⟩) Δ) refl
+
+
 -- substitute context under the ctx-time
 
 subst-ctx-time : ∀ {Γ Δ} → Γ ≡ Δ → ctx-time Γ ≡ ctx-time Δ
@@ -415,6 +426,21 @@ data _⊢K[_◁_⊢_]⦂_ (Γ : Ctx) (f : Flag) : BCtx → CType → CType → S
 
 τ-substK refl K = K
 
+Γ-substK : ∀ {Γ Γ' Δ D C f}
+        → Γ ≡ Γ'
+        → Γ ⊢K[ f ◁ Δ ⊢ C ]⦂ D
+        ---------------------------
+        → Γ' ⊢K[ f ◁ Δ ⊢ C ]⦂ D
+
+Γ-substK refl K = K
+
+Δ-substK : ∀ {Γ Δ Δ' D C f}
+        → Δ ≡ Δ'
+        → Γ ⊢K[ f ◁ Δ ⊢ C ]⦂ D
+        ---------------------------
+        → Γ ⊢K[ f ◁ Δ' ⊢ C ]⦂ D
+Δ-substK refl K = K
+
 
 -- Monotonicity if computation term contexts with respect to flags
 
@@ -499,4 +525,3 @@ _[_] : ∀ {Γ Δ D C f}
   unbox q V (K [ M ])
 (box[ p ]ₖ V K [ M ]) =
   box V (K [ M ])
-

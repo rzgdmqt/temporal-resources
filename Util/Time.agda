@@ -335,3 +335,10 @@ sucτ∸τ≡1 : (τ : Time) → suc τ ∸ τ ≡ 1
 sucτ∸τ≡1 zero = refl
 sucτ∸τ≡1 (suc τ) = sucτ∸τ≡1 τ
 
+second-part-equality : ∀ (a b c d e : Time) → a ≡ b + c → b + d ≡ a + e → c + e ≡ d
+second-part-equality a b c d e p q = 
+  +-cancelˡ-≡ b 
+    (sym (trans q 
+      (sym (trans 
+        (sym (+-assoc b c e)) 
+        (cong (_+ e) (sym p)))))) 
