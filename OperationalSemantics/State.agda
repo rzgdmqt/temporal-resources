@@ -189,10 +189,13 @@ mutual
   split-state-++ᶜ (_∷ₛ_ {A = A} {τ = τ} S V) (Tl-∷ x) =
     cong (_∷ [ τ ] A) (split-state-++ᶜ S x)
 
+-- Relating the splitting of a state by the splitting of the corresponding context 
+
 fst-split-state≡split-ctx : ∀ {Γ A τ τ'}
                   → (S : 𝕊 Γ)
                   → (x : [ τ ] A ∈[ τ' ] (toCtx S))
                   → toCtx (split-state-fst S x) ≡ proj₁ (var-split x)
+                  
 fst-split-state≡split-ctx (S ⟨ τ ⟩ₛ) (Tl-⟨⟩ x) = fst-split-state≡split-ctx S x
 fst-split-state≡split-ctx (S ∷ₛ V) Hd = refl
 fst-split-state≡split-ctx (S ∷ₛ V) (Tl-∷ x) = fst-split-state≡split-ctx S x
@@ -203,6 +206,7 @@ split-state≡split-ctx : ∀ {Γ A τ τ'}
                   → toCtx (split-state-fst S x) ∷ [ τ ] A ++ᶜ (toCtx (split-state-snd S x))  
                   ≡ 
                   proj₁ (var-split x) ∷ [ τ ] A ++ᶜ (proj₁ (proj₂ (var-split x)))
+                  
 split-state≡split-ctx {S = S} {x = x} = 
         trans (split-state-++ᶜ S x) 
             (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x))))))
@@ -235,11 +239,11 @@ Ctx≡BCtx {Γ} {Γ'} p =
                (trans (cong Ctx→Bctx q) 
                    (sym (Ctx→Bctx-hom Γ₁ Γ₂')))))
 
-
 snd-split-state≡split-ctx : ∀ {Γ A τ τ'}
                   → (S : 𝕊 Γ)
                   → (x : [ τ ] A ∈[ τ' ] (toCtx S))
                   → toCtx (split-state-snd S x) ≡ proj₁ (proj₂ (var-split x))
+                  
 snd-split-state≡split-ctx {A = A} {τ = τ} S x = 
     Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' 
         (cong (_∷ [ τ ] A) (fst-split-state≡split-ctx S x)) 
@@ -249,6 +253,7 @@ snd-split-time≡time-from-head : ∀ {Γ A τ τ'}
                   → (S : 𝕊 Γ)
                   → (x : [ τ ] A ∈[ τ' ] (toCtx S))
                   → state-time (split-state-snd S x) ≡ τ'
+                  
 snd-split-time≡time-from-head S x = 
   trans (
     trans 
@@ -288,13 +293,6 @@ mutual
     cong (_⟨ τ'' ⟩) (S++suc-partS≡S' S S' S≤ₛS')
   S++suc-partS≡S' S .(S' ∷ₛ V) (∷-suc {τ = τ} {A = A} {S' = S'} V S≤ₛS') = 
     cong (_∷ [ τ ] A) (S++suc-partS≡S' S S' S≤ₛS')
-
-time-S++suc-partS≡S' : ∀ {Γ Γ'} 
-          → (S : 𝕊 Γ)
-          → (S' : 𝕊 Γ')
-          → (p : S ≤ₛ S') 
-          → ctx-time (toCtx S ++ᶜ toCtx (suc-part-state S S' p)) ≡ ctx-time (toCtx S')
-time-S++suc-partS≡S' S S' p = cong ctx-time (S++suc-partS≡S' S S' p)
 
 -- Lemmas about what can and what can't be in toCtx S (only var can be)
 
@@ -357,3 +355,22 @@ resource-pass-to-ctx {Γ} {τ} {τ'} {A} S x p V =
      ∘ʳ cong-ren wk-ren
      ∘ʳ ren⟨τ⟩-ctx {Γ' = toCtx (split-state-snd S x)} p)
     V
+
+-- Relating the splitting of a state to the whole state
+
+split-state-++ˢ : ∀ {Γ A τ τ'}
+                → (S : 𝕊 Γ)
+                → (x : [ τ ] A ∈[ τ' ] (toCtx S))
+                → split-state-fst S x ∷ₛ resource-lookup S x ++ˢ split-state-snd S x ≡ S
+                
+split-state-++ˢ (S ⟨ τ ⟩ₛ) (Tl-⟨⟩ x) =
+  cong _⟨ τ ⟩ₛ (split-state-++ˢ S x)
+split-state-++ˢ (S ∷ₛ V) Hd =
+  refl
+split-state-++ˢ {Γ} (_∷ₛ_ {A = A} {τ = τ} S V) (Tl-∷ x) =
+  dcong₂ (λ S V → S ∷ₛ V)
+    (split-state-++ˢ S x)
+    (trans
+      (cong (subst (λ z → (Γ ++ᶜ toCtx z) ⟨ τ ⟩ ⊢V⦂ A)
+      (split-state-++ˢ S x)) {!!})
+      {!!})

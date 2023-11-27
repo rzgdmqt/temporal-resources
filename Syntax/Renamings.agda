@@ -13,7 +13,6 @@ open import Data.Sum
 open import Relation.Binary.Definitions
 open import Relation.Nullary
 
-open import Syntax.CompContext
 open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Types
@@ -337,7 +336,70 @@ vren⟨τ⟩-ctx {Γ} {Γ'} {τ} p =
     (    eq-vren (++ᶜ-ᶜ {Γ} {Γ'} p)
      ∘ᵛʳ wk-ctx-vren)
 
--- Variable renamings (with an extra conditionthat disallow discarding time captured by contexts)
+-- Relating congruence renamings with composition of renamings (functoriality)
+
+cong-∷-vren-fun : ∀ {Γ Γ' Γ'' A B τ}
+                → (ρ : VRen Γ Γ')
+                → (ρ' : VRen Γ' Γ'')
+                → (x : A ∈[ τ ] (Γ ∷ B))
+                → cong-∷-vren {A = B} (ρ' ∘ᵛʳ ρ) x
+                ≡ (cong-∷-vren ρ' ∘ᵛʳ cong-∷-vren ρ) x
+               
+cong-∷-vren-fun ρ ρ' Hd =
+  refl
+cong-∷-vren-fun ρ ρ' (Tl-∷ x) =
+  refl
+
+cong-⟨⟩-vren-fun : ∀ {Γ Γ' Γ'' A τ τ'}
+                → (ρ : VRen Γ Γ')
+                → (ρ' : VRen Γ' Γ'')
+                → (x : A ∈[ τ ] (Γ ⟨ τ' ⟩))
+                → cong-⟨⟩-vren (ρ' ∘ᵛʳ ρ) x
+                ≡ (cong-⟨⟩-vren ρ' ∘ᵛʳ cong-⟨⟩-vren ρ) x
+                
+cong-⟨⟩-vren-fun ρ ρ' (Tl-⟨⟩ x) with ρ x
+... | τ'' , p , y =
+  cong (_ ,_) (cong (_, Tl-⟨⟩ (proj₂ (proj₂ (ρ' y)))) (≤-irrelevant _ _))
+
+cong-vren-fun : ∀ {Γ Γ' Γ'' Γ''' A τ}
+            → (ρ : VRen Γ Γ')
+            → (ρ' : VRen Γ' Γ'')
+            → (x : A ∈[ τ ] (Γ ++ᶜ Γ'''))
+            → cong-vren (ρ' ∘ᵛʳ ρ) x
+            ≡ (cong-vren ρ' ∘ᵛʳ cong-vren ρ) x
+
+cong-vren-fun {Γ} {Γ'} {Γ''} {Γ''' = []} ρ ρ' x =
+  refl
+cong-vren-fun {Γ} {Γ'} {Γ''} {Γ''' ∷ A} ρ ρ' x =
+  trans
+    (cong
+      (λ (ρ : VRen (Γ ++ᶜ Γ''') (Γ'' ++ᶜ Γ''')) → cong-∷-vren ρ x)
+      (ifun-ext λ {A} → ifun-ext (λ {τ} → fun-ext (λ x → cong-vren-fun ρ ρ' x))))
+    (cong-∷-vren-fun (cong-vren ρ) (cong-vren ρ') x)
+cong-vren-fun {Γ} {Γ'} {Γ''} {Γ''' ⟨ τ ⟩} ρ ρ' x =
+  trans
+    (cong
+      (λ (ρ : VRen (Γ ++ᶜ Γ''') (Γ'' ++ᶜ Γ''')) → cong-⟨⟩-vren ρ x)
+      (ifun-ext λ {A} → ifun-ext (λ {τ} → fun-ext (λ x → cong-vren-fun ρ ρ' x))))
+    (cong-⟨⟩-vren-fun (cong-vren ρ) (cong-vren ρ') x)
+
+-- Relating -ʳ with composition of renamings (functoriality)
+
+-ᵛʳ-fun : ∀ {Γ Γ' Γ'' A τ'}
+        → (ρ : VRen Γ Γ')
+        → (ρ' : VRen Γ' Γ'')
+        → (τ : Time)                   -- TODO: might need condition relating Γ and τ (and Γ Γ' Γ'') (like built into Rens below)
+        → (x : A ∈[ τ' ] (Γ -ᶜ τ))
+        → ((ρ' ∘ᵛʳ ρ) -ᵛʳ τ) x
+        ≡ ((ρ' -ᵛʳ τ) ∘ᵛʳ (ρ -ᵛʳ τ)) x
+
+-ᵛʳ-fun {Γ} {Γ'} {Γ''} {A} {τ'} ρ ρ' zero x =
+  refl
+-ᵛʳ-fun {Γ ∷ B} {Γ'} {Γ''} {A} {τ'} ρ ρ' (suc τ) x =
+  {!!}
+-ᵛʳ-fun {Γ ⟨ τ'' ⟩} {Γ'} {Γ''} {A} {τ'} ρ ρ' (suc τ) x = {!!}
+
+-- Variable renamings (with an extra condition that disallow discarding time captured by contexts)
 
 record Ren (Γ Γ' : Ctx) : Set where
   constructor ren
@@ -465,6 +527,19 @@ ren⟨τ⟩-ctx {Γ} {Γ'} {τ} p =
 
 infixl 30 _-ʳ_,_
 
+-- Congruence renamings' interaction with composition (functoriality)
+
+cong-ren-fun : ∀ {Γ Γ' Γ'' Γ'''}
+             → (ρ : Ren Γ Γ')
+             → (ρ' : Ren Γ' Γ'')
+             → cong-ren {Γ'' = Γ'''} (ρ' ∘ʳ ρ)
+             ≡ cong-ren ρ' ∘ʳ cong-ren ρ
+
+cong-ren-fun {Γ} {Γ'} {Γ''} {Γ'''} ρ ρ' =
+  cong₂ ren
+    (≤-irrelevant _ _)
+    (ifun-ext (λ {A} → ifun-ext (λ {τ} → fun-ext (λ x → cong-vren-fun (var-rename ρ) (var-rename ρ') x))))
+
 -- Action of renamings on well-typed values and computations
 
 mutual
@@ -502,35 +577,100 @@ mutual
     unbox (≤-trans p (ctx-time-≤ ρ)) (V-rename (ρ -ʳ τ , p) V) (C-rename (cong-ren ρ) M)
   C-rename ρ (box V M)        = box (V-rename (cong-ren ρ) V) (C-rename (cong-ren ρ) M)
 
+-- Transitivity of the action of renamings
 
+mutual
 
------------------------------------
--- Renamings of binding contexts --
------------------------------------
+  V-rename-trans : ∀ {Γ Γ' Γ'' A}
+                 → (ρ : Ren Γ Γ')
+                 → (ρ' : Ren Γ' Γ'')
+                 → (V : Γ ⊢V⦂ A)
+                 → V-rename (ρ' ∘ʳ ρ) V
+                 ≡ V-rename ρ' (V-rename ρ V)
 
--- weakening lemma 
+  V-rename-trans ρ ρ' (var x) =
+    refl
+  V-rename-trans ρ ρ' (const c) =
+    refl 
+  V-rename-trans ρ ρ' ⋆ =
+    refl
+  V-rename-trans ρ ρ' ⦉ V , W ⦊ =
+    cong₂ ⦉_,_⦊
+      (V-rename-trans ρ ρ' V)
+      (V-rename-trans ρ ρ' W)
+  V-rename-trans ρ ρ' (lam M) =
+    cong lam
+      (trans
+        (cong (λ ρ → C-rename ρ M) (cong-ren-fun ρ ρ'))
+        (C-rename-trans (cong-ren ρ) (cong-ren ρ') M))
 
--ᶜ-++ᶜ-wk-ren : ∀ {Γ Γ' τ} → τ ≤ ctx-time Γ' → Ren Γ (Γ ++ᶜ Γ' -ᶜ τ)
--ᶜ-++ᶜ-wk-ren {Γ} {Γ'} {τ} p = (eq-ren (++ᶜ-ᶜ p)) ∘ʳ wk-ctx-renᵣ
+  C-rename-trans : ∀ {Γ Γ' Γ'' C}
+                 → (ρ : Ren Γ Γ')
+                 → (ρ' : Ren Γ' Γ'')
+                 → (M : Γ ⊢C⦂ C)
+                 → C-rename (ρ' ∘ʳ ρ) M
+                 ≡ C-rename ρ' (C-rename ρ M)
 
--- -ᶜ for joined contexts lemmas
-
-Γ⋈Δ-ᶜτ : ∀ {Γ Δ τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → Ren Γ (Γ ⋈ Δ -ᶜ τ)
-Γ⋈Δ-ᶜτ {Γ} {Δ} {τ} p = 
-  eq-ren (sym (Γ⋈Δ≡Γ++ᶜctxΔ Γ Δ)) -ʳ τ , τ-≤-substᵣ (ctx-time-++ᶜ Γ (BCtx→Ctx Δ)) (≤-stepsˡ (ctx-time Γ) p) 
-  ∘ʳ -ᶜ-++ᶜ-wk-ren p
-
--- elim nonused variables from the joined contex 
-
-renΓ⟨τ⟩-Γ⋈Δ : ∀ {Γ Δ A τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → Ren (Γ ⟨ τ ⟩) (Γ ∷ A ⋈ Δ)
-renΓ⟨τ⟩-Γ⋈Δ {Γ} {Δ} {A} {τ} p =
-    ((eq-ren (sym (Γ⋈Δ≡Γ++ᶜctxΔ (Γ ∷ A) Δ))) 
-    ∘ʳ cong-ren wk-ren) 
-    ∘ʳ ren⟨τ⟩-ctx p 
-
-ren-++-⋈ : ∀ {Γ Δ Γ'} → BCtx→Ctx Δ ≡ Γ' → Ren (Γ ++ᶜ Γ') (Γ ⋈ Δ)
-ren-++-⋈ {Γ} {Δ} {Γ'} p = 
-  eq-ren (sym (trans (Γ⋈Δ≡Γ++ᶜctxΔ Γ Δ) (++ᶜ-inj Γ (BCtx→Ctx Δ) Γ' p)))
+  C-rename-trans ρ ρ' (return V) =
+    cong return
+      (V-rename-trans ρ ρ' V)
+  C-rename-trans ρ ρ' (M ; N) =
+    cong₂ _;_
+      (C-rename-trans ρ ρ' M)
+      (trans
+         (cong (λ ρ → C-rename ρ N) (cong-ren-fun ρ ρ'))
+         (C-rename-trans (cong-ren ρ) (cong-ren ρ') N))
+  C-rename-trans ρ ρ' (V · W) =
+    cong₂ _·_
+      (V-rename-trans ρ ρ' V)
+      (V-rename-trans ρ ρ' W)
+  C-rename-trans ρ ρ' (match V `in N) =
+    cong₂ (match_`in_)
+      (V-rename-trans ρ ρ' V)
+      (trans
+         (cong (λ ρ → C-rename ρ N) (cong-ren-fun ρ ρ'))
+         (C-rename-trans (cong-ren ρ) (cong-ren ρ') N))
+  C-rename-trans ρ ρ' (absurd V) =
+    cong absurd
+      (V-rename-trans ρ ρ' V)
+  C-rename-trans ρ ρ' (perform op V M) =
+    cong₂ (perform op)
+      (V-rename-trans ρ ρ' V)
+      (trans
+         (cong (λ ρ → C-rename ρ M) (cong-ren-fun ρ ρ'))
+         (C-rename-trans (cong-ren ρ) (cong-ren ρ') M))
+  C-rename-trans ρ ρ' (delay τ M) =
+    cong (delay τ)
+      (trans
+         (cong (λ ρ → C-rename ρ M) (cong-ren-fun ρ ρ'))
+         (C-rename-trans (cong-ren ρ) (cong-ren ρ') M))
+  C-rename-trans ρ ρ' (handle M `with H `in N) =
+    cong₃ (handle_`with_`in)
+      (C-rename-trans ρ ρ' M)
+      (fun-ext (λ op → fun-ext (λ τ'' →
+        trans
+          (cong (λ ρ → C-rename ρ (H op τ'')) (cong-ren-fun ρ ρ'))
+          (C-rename-trans (cong-ren ρ) (cong-ren ρ') (H op τ'')))))
+      (trans
+         (cong (λ ρ → C-rename ρ N) (cong-ren-fun ρ ρ'))
+         (C-rename-trans (cong-ren ρ) (cong-ren ρ') N))
+  C-rename-trans ρ ρ' (unbox {τ = τ} p V M) =
+    cong₃ unbox
+      (≤-irrelevant _ _)
+      (trans
+        (cong (λ ρ → V-rename ρ V) {!!}) -- TODO: need lemmas relating renaming with ∘ʳ and -ʳ
+        (V-rename-trans _ _ V))
+      (trans
+         (cong (λ ρ → C-rename ρ M) (cong-ren-fun ρ ρ'))
+         (C-rename-trans (cong-ren ρ) (cong-ren ρ') M))
+  C-rename-trans ρ ρ' (box V M) =
+    cong₂ box
+      (trans
+         (cong (λ ρ → V-rename ρ V) (cong-ren-fun ρ ρ'))
+         (V-rename-trans (cong-ren ρ) (cong-ren ρ') V))
+      (trans
+         (cong (λ ρ → C-rename ρ M) (cong-ren-fun ρ ρ'))
+         (C-rename-trans (cong-ren ρ) (cong-ren ρ') M))
 
 
 

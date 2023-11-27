@@ -53,7 +53,7 @@ soundness : ∀ {A B τ₁ τ₂ τ₃}
                   τ₁ τ₂ 
                   (sym (trans 
                     (sym (ctx-time-++ᶜ (toCtx S) (toCtx suc-part-state))) 
-                    (time-S++suc-partS≡S' S S' S≤ₛS')))
+                    (cong ctx-time (S++suc-partS≡S' S S' S≤ₛS'))))
                   (trans 
                     (cong (_+ τ₁) (sym (time-≡ S))) 
                     (trans 

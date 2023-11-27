@@ -7,7 +7,7 @@ module Util.Equality where
 open import Level renaming (zero to lzero; suc to lsuc)
 
 import Relation.Binary.PropositionalEquality as Eq
-open Eq public hiding (Extensionality) renaming ([_] to [|_|])
+open Eq public hiding (Extensionality) renaming ([_] to [|_|]) hiding (subst₂)
 open Eq.≡-Reasoning public using (begin_; _≡⟨⟩_; step-≡; _∎)
 
 open import Axiom.Extensionality.Propositional
@@ -37,6 +37,18 @@ subst-const : ∀ {l₁ l₂} {A : Set l₁} (P : Set l₂) {x₁ x₂ : A}
             → (y : P)
             → subst (λ _ → P) p y ≡ y
 subst-const P refl y = refl
+
+-- Double substitution
+
+subst₂ : ∀ {l₁ l₂ l₃}
+         {A : Set l₁} {B : Set l₂}
+         (P : A → B → Set l₃)
+         {x₁ x₂ y₁ y₂}
+       → x₁ ≡ x₂
+       → y₁ ≡ y₂
+       → P x₁ y₁
+       → P x₂ y₂
+subst₂ P refl refl z = z
 
 -- Dependent double substitution
 

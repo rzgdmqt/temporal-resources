@@ -2,6 +2,7 @@ module Syntax.CompContext where
 
 open import Syntax.Contexts
 open import Syntax.Language
+open import Syntax.Renamings
 open import Syntax.Types
 
 open import Util.Equality
@@ -271,7 +272,6 @@ time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ =
 τΔ≤τΓ⋈Δ : ∀ {Γ Δ τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → τ ≤ ctx-time (Γ ⋈ Δ)
 τΔ≤τΓ⋈Δ {Γ} {Δ} p = τ-≤-substᵣ (time[Γ⋈Δ]≡time[Γ]+time[Δ] Γ Δ) (≤-stepsˡ (ctx-time Γ) p)
 
-
 -- Computation term context flags. They characterise whether
 -- it is an arbitrary term context, an evaluation context, or
 -- a state-induced context. Flags come together with a simple
@@ -470,6 +470,35 @@ data _⊢K[_◁_⊢_]⦂_ (Γ : Ctx) (f : Flag) : BCtx → CType → CType → S
 ◁-mon {f = f} {f' = f'} p (box[ q ]ₖ V K) =
   box[ ≤ᶠ-trans q p ]ₖ V (◁-mon p K)
 
+-- Renaming for computation term contexts
+
+K-rename : ∀ {Γ Γ' Δ f C D}
+         → Ren Γ Γ'
+         → Γ ⊢K[ f ◁ Δ ⊢ C ]⦂ D
+         ------------
+         → Γ' ⊢K[ f ◁ Δ ⊢ C ]⦂ D
+
+K-rename ρ []ₖ =
+  []ₖ
+K-rename ρ (K ₖ[ p ]; N) =
+  (K-rename ρ K) ₖ[ p ]; (C-rename (cong-ren ρ) N)
+K-rename ρ (M ;[ p ]ₖ K) =
+  (C-rename ρ M) ;[ p ]ₖ (K-rename (cong-ren ρ) K)
+K-rename ρ (match V `in[ p ]ₖ K) =
+  match (V-rename ρ V) `in[ p ]ₖ (K-rename (cong-ren ρ) K)
+K-rename ρ (perform[ p ]ₖ op V K) =
+  perform[ p ]ₖ op (V-rename ρ V) (K-rename (cong-ren ρ) K)
+K-rename ρ (handle[ p ]ₖ K `with H `in N) =
+  handle[ p ]ₖ K-rename ρ K `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'')) `in (C-rename (cong-ren ρ) N)
+K-rename ρ (handle M `with H `in[ p ]ₖ K) =
+  handle (C-rename ρ M) `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'')) `in[ p ]ₖ (K-rename (cong-ren ρ) K)
+K-rename ρ (delay[ p ]ₖ τ K) =
+  delay[ p ]ₖ τ (K-rename (cong-ren ρ) K)
+K-rename ρ (unbox[ p ]ₖ q V K) =
+  unbox[ p ]ₖ (≤-trans q (ctx-time-≤ ρ)) (V-rename (ρ -ʳ _ , q) V) (K-rename (cong-ren ρ) K)
+K-rename ρ (box[ p ]ₖ V K) =
+  box[ p ]ₖ (V-rename (cong-ren ρ) V) (K-rename (cong-ren ρ) K)
+
 -- Composition of computation term contexts
 
 _[_]ₖ : ∀ {Γ Δ Δ' D C E f f'}
@@ -525,3 +554,33 @@ _[_] : ∀ {Γ Δ D C f}
   unbox q V (K [ M ])
 (box[ p ]ₖ V K [ M ]) =
   box V (K [ M ])
+
+{-
+-----------------------------------
+-- Renamings of binding contexts --
+-----------------------------------
+
+-- weakening lemma 
+
+-ᶜ-++ᶜ-wk-ren : ∀ {Γ Γ' τ} → τ ≤ ctx-time Γ' → Ren Γ (Γ ++ᶜ Γ' -ᶜ τ)
+-ᶜ-++ᶜ-wk-ren {Γ} {Γ'} {τ} p = (eq-ren (++ᶜ-ᶜ p)) ∘ʳ wk-ctx-renᵣ
+
+-- -ᶜ for joined contexts lemmas
+
+Γ⋈Δ-ᶜτ : ∀ {Γ Δ τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → Ren Γ (Γ ⋈ Δ -ᶜ τ)
+Γ⋈Δ-ᶜτ {Γ} {Δ} {τ} p = 
+  eq-ren (sym (Γ⋈Δ≡Γ++ᶜctxΔ Γ Δ)) -ʳ τ , τ-≤-substᵣ (ctx-time-++ᶜ Γ (BCtx→Ctx Δ)) (≤-stepsˡ (ctx-time Γ) p) 
+  ∘ʳ -ᶜ-++ᶜ-wk-ren p
+
+-- elim nonused variables from the joined contex 
+
+renΓ⟨τ⟩-Γ⋈Δ : ∀ {Γ Δ A τ} → τ ≤ ctx-time (BCtx→Ctx Δ) → Ren (Γ ⟨ τ ⟩) (Γ ∷ A ⋈ Δ)
+renΓ⟨τ⟩-Γ⋈Δ {Γ} {Δ} {A} {τ} p =
+    ((eq-ren (sym (Γ⋈Δ≡Γ++ᶜctxΔ (Γ ∷ A) Δ))) 
+    ∘ʳ cong-ren wk-ren) 
+    ∘ʳ ren⟨τ⟩-ctx p 
+
+ren-++-⋈ : ∀ {Γ Δ Γ'} → BCtx→Ctx Δ ≡ Γ' → Ren (Γ ++ᶜ Γ') (Γ ⋈ Δ)
+ren-++-⋈ {Γ} {Δ} {Γ'} p = 
+  eq-ren (sym (trans (Γ⋈Δ≡Γ++ᶜctxΔ Γ Δ) (++ᶜ-inj Γ (BCtx→Ctx Δ) Γ' p)))
+-}
