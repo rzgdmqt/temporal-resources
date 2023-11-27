@@ -400,5 +400,12 @@ cong-vren-fun {Γ} {Γ'} {Γ''} {Γ''' ⟨ τ ⟩} ρ ρ' x =
 -ᵛʳ-fun {Γ} {Γ'} {Γ''} {A} {τ'} ρ ρ' zero x =
   refl
 -ᵛʳ-fun {Γ ∷ B} {Γ'} {Γ''} {A} {τ'} ρ ρ' (suc τ) x =
-  {!!}
--ᵛʳ-fun {Γ ⟨ τ'' ⟩} {Γ'} {Γ''} {A} {τ'} ρ ρ' (suc τ) x = {!!}
+  trans
+    (cong
+      (λ (ρ : VRen Γ Γ'') → (ρ -ᵛʳ suc τ) x)
+      (ifun-ext (λ {A} → ifun-ext (λ {τ''} → fun-ext (λ y →
+        cong (proj₁ (ρ' (proj₂ (proj₂ (ρ (Tl-∷ y))))) ,_) (cong₂ _,_ (≤-irrelevant _ _) refl))))))
+    (-ᵛʳ-fun {Γ} {Γ'} {Γ''} (ρ ∘ᵛʳ wk-vren) ρ' (suc τ) x)
+-ᵛʳ-fun {Γ ⟨ τ'' ⟩} {Γ'} {Γ''} {A} {τ'} ρ ρ' (suc τ) x with suc τ ≤? τ''
+-ᵛʳ-fun {Γ ⟨ τ'' ⟩} {Γ'} {Γ''} {A} {.(τ'' ∸ suc τ + _)} ρ ρ' (suc τ) (Tl-⟨⟩ x) | yes p = {!!}
+-ᵛʳ-fun {Γ ⟨ τ'' ⟩} {Γ'} {Γ''} {A} {τ'} ρ ρ' (suc τ) x | no ¬p = {!!}
