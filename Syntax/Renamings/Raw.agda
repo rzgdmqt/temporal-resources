@@ -389,6 +389,7 @@ cong-vren-fun {Γ} {Γ'} {Γ''} {Γ''' ⟨ τ ⟩} ρ ρ' x =
 
 -- Relating -ʳ with composition of renamings (functoriality)
 
+{-
 -ᵛʳ-fun : ∀ {Γ Γ' Γ'' A τ'}
         → (ρ : VRen Γ Γ')
         → (ρ' : VRen Γ' Γ'')
@@ -409,3 +410,4 @@ cong-vren-fun {Γ} {Γ'} {Γ''} {Γ''' ⟨ τ ⟩} ρ ρ' x =
 -ᵛʳ-fun {Γ ⟨ τ'' ⟩} {Γ'} {Γ''} {A} {τ'} ρ ρ' (suc τ) x with suc τ ≤? τ''
 -ᵛʳ-fun {Γ ⟨ τ'' ⟩} {Γ'} {Γ''} {A} {.(τ'' ∸ suc τ + _)} ρ ρ' (suc τ) (Tl-⟨⟩ x) | yes p = {!!}
 -ᵛʳ-fun {Γ ⟨ τ'' ⟩} {Γ'} {Γ''} {A} {τ'} ρ ρ' (suc τ) x | no ¬p = {!!}
+-}

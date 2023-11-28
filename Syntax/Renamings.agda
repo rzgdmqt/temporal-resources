@@ -205,8 +205,12 @@ mutual
     unbox (≤-trans p (ctx-time-≤ ρ)) (V-rename (ρ -ʳ τ , p) V) (C-rename (cong-ren ρ) M)
   C-rename ρ (box V M)        = box (V-rename (cong-ren ρ) V) (C-rename (cong-ren ρ) M)
 
+
 -- Transitivity of the action of renamings
 
+-- TODO: temporarily commented out
+
+{-
 mutual
 
   V-rename-trans : ∀ {Γ Γ' Γ'' A}
@@ -299,6 +303,8 @@ mutual
       (trans
          (cong (λ ρ → C-rename ρ M) (cong-ren-fun ρ ρ'))
          (C-rename-trans (cong-ren ρ) (cong-ren ρ') M))
+-}
+
 
 
 
