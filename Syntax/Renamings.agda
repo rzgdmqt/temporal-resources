@@ -16,7 +16,7 @@ open import Relation.Nullary
 
 open import Syntax.Contexts
 open import Syntax.Language
-open import Syntax.Renamings.Raw
+open import Syntax.Renamings.Raw public
 open import Syntax.Types
 
 open import Data.Nat public
@@ -304,7 +304,6 @@ mutual
          (cong (λ ρ → C-rename ρ M) (cong-ren-fun ρ ρ'))
          (C-rename-trans (cong-ren ρ) (cong-ren ρ') M))
 -}
-
 
 
 

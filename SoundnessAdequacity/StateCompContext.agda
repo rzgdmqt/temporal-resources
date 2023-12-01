@@ -32,6 +32,7 @@ toK (_∷ₛ_ {τ = τ} S V) =
 
 -- Spliting computation term context at resource 
 
+{-
 split-state-K : ∀ {Γ A B τ τ' τ''}
               → (S : 𝕊 Γ)
               → (x : [ τ ] A ∈[ τ' ] toCtx S)
@@ -53,3 +54,4 @@ split-state-K : ∀ {Γ A B τ τ' τ''}
                 K ≡ K' [ box[ f≤ᶠf ]ₖ V K'' ]ₖ
 
 split-state-K S x = {!!}
+-}

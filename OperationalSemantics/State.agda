@@ -316,7 +316,6 @@ var-in-ctx : ∀ { Γ τ' A} →
             Σ[ τ'' ∈ Time ] ([ τ' ] A ∈[ τ'' ] Γ )
 var-in-ctx (var {τ = τ} x) = τ , x
 
-
 τ'≤snd-state : ∀ {A τ'} 
         → {S : 𝕊 []}
         → (V : toCtx S -ᶜ τ' ⊢V⦂ [ τ' ] A)
@@ -358,6 +357,7 @@ resource-pass-to-ctx {Γ} {τ} {τ'} {A} S x p V =
 
 -- Relating the splitting of a state to the whole state
 
+{-
 split-state-++ˢ : ∀ {Γ A τ τ'}
                 → (S : 𝕊 Γ)
                 → (x : [ τ ] A ∈[ τ' ] (toCtx S))
@@ -374,3 +374,4 @@ split-state-++ˢ {Γ} (_∷ₛ_ {A = A} {τ = τ} S V) (Tl-∷ x) =
       (cong (subst (λ z → (Γ ++ᶜ toCtx z) ⟨ τ ⟩ ⊢V⦂ A)
       (split-state-++ˢ S x)) {!!})
       {!!})
+-}
