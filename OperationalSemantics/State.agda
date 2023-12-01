@@ -208,36 +208,9 @@ split-state≡split-ctx : ∀ {Γ A τ τ'}
                   proj₁ (var-split x) ∷ [ τ ] A ++ᶜ (proj₁ (proj₂ (var-split x)))
                   
 split-state≡split-ctx {S = S} {x = x} = 
-        trans (split-state-++ᶜ S x) 
-            (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x))))))
-
-cons-inj : ∀ {Γ Γ' A} → A ∷ₗ Γ ≡ A ∷ₗ Γ' → Γ ≡ Γ' 
-cons-inj refl = refl
-
-time-pass-inj : ∀ {Γ Γ' τ} → ⟨ τ ⟩ₗ Γ ≡ ⟨ τ ⟩ₗ Γ' → Γ ≡ Γ' 
-time-pass-inj refl = refl
-
-Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' : ∀ {Δ₁ Δ₁' Δ₂ Δ₂'} → Δ₁ ≡ Δ₂ → Δ₁ ++ₗ Δ₁' ≡ Δ₂ ++ₗ Δ₂' → Δ₁' ≡ Δ₂'
-Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {[]ₗ} refl q = q
-Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {x ∷ₗ Δ₁} refl q = Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {Δ₁ = Δ₁} refl (cons-inj q)
-Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {⟨ τ ⟩ₗ Δ₁} refl q = Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' {Δ₁ = Δ₁} refl (time-pass-inj q)
-
-Ctx≡BCtx : ∀ {Γ Γ'} → Ctx→Bctx Γ ≡ Ctx→Bctx Γ' → Γ ≡ Γ'
-Ctx≡BCtx {Γ} {Γ'} p =
   trans
-    (sym (Ctx→Bctx→Ctx-iso Γ))
-    (trans
-      (cong BCtx→Ctx p)
-      (Ctx→Bctx→Ctx-iso Γ'))
-
-Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' : ∀ {Γ₁ Γ₁' Γ₂ Γ₂'} → Γ₁ ≡ Γ₂ → Γ₁ ++ᶜ Γ₁' ≡ Γ₂ ++ᶜ Γ₂' → Γ₁' ≡ Γ₂'
-Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' {Γ₁} {Γ₁'} {.Γ₁} {Γ₂'} refl q =
-   Ctx≡BCtx (Δ₁≡Δ₂⇒Δ₁++Δ₁'≡Δ₂++Δ₂'⇒Δ₁'≡Δ₂' 
-       {Δ₁ = Ctx→Bctx Γ₁} 
-           refl 
-           (trans (Ctx→Bctx-hom Γ₁ Γ₁') 
-               (trans (cong Ctx→Bctx q) 
-                   (sym (Ctx→Bctx-hom Γ₁ Γ₂')))))
+    (split-state-++ᶜ S x) 
+    (sym (split-≡ (proj₁ (proj₂ (proj₂ (var-split x))))))
 
 snd-split-state≡split-ctx : ∀ {Γ A τ τ'}
                   → (S : 𝕊 Γ)
@@ -245,9 +218,11 @@ snd-split-state≡split-ctx : ∀ {Γ A τ τ'}
                   → toCtx (split-state-snd S x) ≡ proj₁ (proj₂ (var-split x))
                   
 snd-split-state≡split-ctx {A = A} {τ = τ} S x = 
-    Γ₁≡Γ₂⇒Γ₁++Γ₁'≡Γ₂++Γ₂'⇒Γ₁'≡Γ₂' 
-        (cong (_∷ [ τ ] A) (fst-split-state≡split-ctx S x)) 
-        split-state≡split-ctx
+  ++ᶜ-inj₂ {Γ = toCtx (split-state-fst S x) ∷ [ τ ] A}
+    (trans
+      split-state≡split-ctx
+      (cong (_++ᶜ proj₁ (proj₂ (var-split x)))
+        (cong (_∷ [ τ ] A) (sym (fst-split-state≡split-ctx S x)))))
 
 snd-split-time≡time-from-head : ∀ {Γ A τ τ'}
                   → (S : 𝕊 Γ)
@@ -324,7 +299,6 @@ var-in-ctx (var {τ = τ} x) = τ , x
 τ'≤snd-state {τ' = τ'} {S = S} (var {τ = τ} x) = 
   let y = var-ᶜ-+ {τ = τ'} x in 
   τ-≤-substᵣ (snd-split-time≡time-from-head S y) (≤-stepsˡ τ ≤-refl)
-
 
 -- Looking up a resource in the state
 

@@ -26,11 +26,17 @@ data Ctx : Set where
 infixl 31 _∷_
 infix  32 _⟨_⟩
 
-∷ᶜ-injective : ∀ {Γ Γ' A} → Γ ∷ A ≡ Γ' ∷ A → Γ ≡ Γ'
-∷ᶜ-injective refl = refl
+∷ᶜ-injective-ctx : ∀ {Γ Γ' A B} → Γ ∷ A ≡ Γ' ∷ B → Γ ≡ Γ'
+∷ᶜ-injective-ctx refl = refl
 
-⟨⟩-injective : ∀ {Γ Γ' τ} → Γ ⟨ τ ⟩ ≡ Γ' ⟨ τ ⟩ → Γ ≡ Γ'
-⟨⟩-injective refl = refl
+∷ᶜ-injective-ty : ∀ {Γ Γ' A B} → Γ ∷ A ≡ Γ' ∷ B → A ≡ B
+∷ᶜ-injective-ty refl = refl
+
+⟨⟩-injective-ctx : ∀ {Γ Γ' τ τ'} → Γ ⟨ τ ⟩ ≡ Γ' ⟨ τ' ⟩ → Γ ≡ Γ'
+⟨⟩-injective-ctx refl = refl
+
+⟨⟩-injective-time : ∀ {Γ Γ' τ τ'} → Γ ⟨ τ ⟩ ≡ Γ' ⟨ τ' ⟩ → τ ≡ τ'
+⟨⟩-injective-time refl = refl
 
 -- Concatenation of contexts
 
@@ -41,7 +47,7 @@ _++ᶜ_ : Ctx → Ctx → Ctx
 
 infixl 30 _++ᶜ_
 
--- Identity, associativity, and injectivity of ++ᶜ
+-- Identity, associativity, congruence, and injectivity of ++ᶜ
 
 ++ᶜ-identityˡ : ∀ {Γ} → [] ++ᶜ Γ ≡ Γ
 ++ᶜ-identityˡ {[]}      = refl
@@ -56,8 +62,30 @@ infixl 30 _++ᶜ_
 ++ᶜ-assoc Γ Γ' (Γ'' ∷ A)   = cong (_∷ A) (++ᶜ-assoc Γ Γ' Γ'')
 ++ᶜ-assoc Γ Γ' (Γ'' ⟨ τ ⟩) = cong (_⟨ τ ⟩) (++ᶜ-assoc Γ Γ' Γ'')
 
-++ᶜ-inj : (Γ Γ' Γ'' : Ctx) → Γ' ≡ Γ'' → (Γ ++ᶜ Γ') ≡ (Γ ++ᶜ Γ'')
-++ᶜ-inj Γ Γ' Γ'' p = cong (Γ ++ᶜ_) p
+++ᶜ-cong : (Γ Γ' Γ'' : Ctx) → Γ' ≡ Γ'' → (Γ ++ᶜ Γ') ≡ (Γ ++ᶜ Γ'')
+++ᶜ-cong Γ Γ' Γ'' p = cong (Γ ++ᶜ_) p
+
+++ᶜ-inj₁ : ∀ {Γ₁ Γ₂ Γ} → Γ₁ ++ᶜ Γ ≡ Γ₂ ++ᶜ Γ → Γ₁ ≡ Γ₂
+++ᶜ-inj₁ {Γ₁} {Γ₂} {[]} p =
+  p
+++ᶜ-inj₁ {Γ₁} {Γ₂} {Γ ∷ A} p =
+  ++ᶜ-inj₁ (∷ᶜ-injective-ctx p)
+++ᶜ-inj₁ {Γ₁} {Γ₂} {Γ ⟨ τ ⟩} p =
+  ++ᶜ-inj₁ (⟨⟩-injective-ctx p)
+
+postulate
+  ++ᶜ-inj₂ : ∀ {Γ Γ₁ Γ₂} → Γ ++ᶜ Γ₁ ≡ Γ ++ᶜ Γ₂ → Γ₁ ≡ Γ₂
+{- -- TODO: finish the off-diagonal cases
+++ᶜ-inj₂ {Γ} {[]} {[]} q = refl
+++ᶜ-inj₂ {Γ} {[]} {Γ₂ ∷ B} q = {!!}
+++ᶜ-inj₂ {Γ} {[]} {Γ₂ ⟨ τ' ⟩} q = {!!}
+++ᶜ-inj₂ {Γ} {Γ₁ ∷ A} {[]} q = {!!}
+++ᶜ-inj₂ {Γ} {Γ₁ ∷ A} {Γ₂ ∷ B} q =
+  cong₂ _∷_ (++ᶜ-inj₂ (∷ᶜ-injective-ctx q)) (∷ᶜ-injective-ty q)
+++ᶜ-inj₂ {Γ} {Γ₁ ⟨ τ ⟩} {[]} q = {!!}
+++ᶜ-inj₂ {Γ} {Γ₁ ⟨ τ ⟩} {Γ₂ ⟨ τ' ⟩} q =
+  cong₂ _⟨_⟩ (++ᶜ-inj₂ (⟨⟩-injective-ctx q)) (⟨⟩-injective-time q)
+-}
 
 -- Amount of time-passage modelled by a context 
 
