@@ -110,6 +110,7 @@ infix 27 _∈[_]_
 -- Every variable in a context is within time captured by that context
 
 ∈-ctx-time : ∀ {Γ A τ} → A ∈[ τ ] Γ → τ ≤ ctx-time Γ
+
 ∈-ctx-time {(Γ ∷ A)} {A} {.0} Hd =
   z≤n
 ∈-ctx-time {(Γ ∷ B)} {A} {τ} (Tl-∷ x) =
@@ -118,6 +119,25 @@ infix 27 _∈[_]_
   ≤-trans
     (+-monoʳ-≤ τ (∈-ctx-time x))
     (≤-reflexive (+-comm τ (ctx-time Γ)))
+
+-- Context extension does not decrease variable's time annotation
+
+var-τ-++ᶜ : ∀ {Γ Γ' A τ} → A ∈[ τ ] Γ → A ∈[ τ + ctx-time Γ' ] Γ ++ᶜ Γ'
+
+var-τ-++ᶜ {Γ} {[]} {A} {τ} x =
+  subst (A ∈[_] Γ) (sym (+-identityʳ _)) x
+var-τ-++ᶜ {Γ} {Γ' ∷ B} {A} {τ} x =
+  Tl-∷ (var-τ-++ᶜ {Γ} {Γ'} x)
+var-τ-++ᶜ {Γ} {Γ' ⟨ τ' ⟩} {A} {τ} x =
+  subst (A ∈[_] (Γ ++ᶜ Γ') ⟨ τ' ⟩)
+    (trans
+      (sym (+-assoc τ' τ (ctx-time Γ')))
+      (trans
+        (cong (_+ ctx-time Γ') (+-comm τ' τ))
+        (trans
+          (+-assoc τ τ' (ctx-time Γ'))
+          (cong (τ +_) (+-comm τ' (ctx-time Γ'))))))
+    (Tl-⟨⟩ (var-τ-++ᶜ {Γ} {Γ'} x))
 
 -- Splitting a context according to a variable in it
 
