@@ -62,8 +62,32 @@ infixl 30 _++ᶜ_
 ++ᶜ-assoc Γ Γ' (Γ'' ∷ A)   = cong (_∷ A) (++ᶜ-assoc Γ Γ' Γ'')
 ++ᶜ-assoc Γ Γ' (Γ'' ⟨ τ ⟩) = cong (_⟨ τ ⟩) (++ᶜ-assoc Γ Γ' Γ'')
 
-++ᶜ-cong : (Γ Γ' Γ'' : Ctx) → Γ' ≡ Γ'' → (Γ ++ᶜ Γ') ≡ (Γ ++ᶜ Γ'')
-++ᶜ-cong Γ Γ' Γ'' p = cong (Γ ++ᶜ_) p
+++ᶜ-congʳ : (Γ Γ' Γ'' : Ctx) → Γ' ≡ Γ'' → (Γ ++ᶜ Γ') ≡ (Γ ++ᶜ Γ'')
+++ᶜ-congʳ Γ Γ' Γ'' p = cong (Γ ++ᶜ_) p
+
+++ᶜ-identityˡ-unique : ∀ {Γ Γ'} → Γ ≡ Γ' ++ᶜ Γ → Γ' ≡ []
+++ᶜ-identityˡ-unique {[]} {Γ'} p =
+  sym p
+++ᶜ-identityˡ-unique {Γ ∷ A} {Γ'} p =
+  ++ᶜ-identityˡ-unique (∷ᶜ-injective-ctx p)
+++ᶜ-identityˡ-unique {Γ ⟨ τ ⟩} {Γ'} p =
+  ++ᶜ-identityˡ-unique (⟨⟩-injective-ctx p)
+
+++ᶜ-identityʳ-unique : ∀ {Γ Γ'} → Γ ≡ Γ ++ᶜ Γ' → Γ' ≡ []
+++ᶜ-identityʳ-unique {Γ} {[]} p =
+  refl
+++ᶜ-identityʳ-unique {Γ ∷ A} {Γ' ∷ B} p
+  with ++ᶜ-identityʳ-unique {Γ} {[] ∷ A ++ᶜ Γ'}
+         (trans (∷ᶜ-injective-ctx p) (++ᶜ-assoc Γ ([] ∷ A) Γ'))
+++ᶜ-identityʳ-unique {Γ ∷ A} {[] ∷ B} p | ()
+++ᶜ-identityʳ-unique {Γ ∷ A} {Γ' ∷ _ ∷ B} p | ()
+++ᶜ-identityʳ-unique {Γ ∷ A} {Γ' ⟨ _ ⟩ ∷ B} p | ()
+++ᶜ-identityʳ-unique {Γ ⟨ τ ⟩} {Γ' ⟨ τ' ⟩} p
+  with ++ᶜ-identityʳ-unique {Γ} {[] ⟨ τ ⟩ ++ᶜ Γ'}
+         (trans (⟨⟩-injective-ctx p) (++ᶜ-assoc Γ ([] ⟨ τ ⟩) Γ'))
+++ᶜ-identityʳ-unique {Γ ⟨ τ ⟩} {[] ⟨ τ' ⟩} p | ()
+++ᶜ-identityʳ-unique {Γ ⟨ τ ⟩} {(Γ' ∷ _) ⟨ τ' ⟩} p | ()
+++ᶜ-identityʳ-unique {Γ ⟨ τ ⟩} {(Γ' ⟨ _ ⟩) ⟨ τ' ⟩} p | ()
 
 ++ᶜ-inj₁ : ∀ {Γ₁ Γ₂ Γ} → Γ₁ ++ᶜ Γ ≡ Γ₂ ++ᶜ Γ → Γ₁ ≡ Γ₂
 ++ᶜ-inj₁ {Γ₁} {Γ₂} {[]} p =
@@ -73,19 +97,20 @@ infixl 30 _++ᶜ_
 ++ᶜ-inj₁ {Γ₁} {Γ₂} {Γ ⟨ τ ⟩} p =
   ++ᶜ-inj₁ (⟨⟩-injective-ctx p)
 
-postulate
-  ++ᶜ-inj₂ : ∀ {Γ Γ₁ Γ₂} → Γ ++ᶜ Γ₁ ≡ Γ ++ᶜ Γ₂ → Γ₁ ≡ Γ₂
-{- -- TODO: finish the off-diagonal cases
+++ᶜ-inj₂ : ∀ {Γ Γ₁ Γ₂} → Γ ++ᶜ Γ₁ ≡ Γ ++ᶜ Γ₂ → Γ₁ ≡ Γ₂
 ++ᶜ-inj₂ {Γ} {[]} {[]} q = refl
-++ᶜ-inj₂ {Γ} {[]} {Γ₂ ∷ B} q = {!!}
-++ᶜ-inj₂ {Γ} {[]} {Γ₂ ⟨ τ' ⟩} q = {!!}
-++ᶜ-inj₂ {Γ} {Γ₁ ∷ A} {[]} q = {!!}
+++ᶜ-inj₂ {Γ} {[]} {Γ₂ ∷ B} q =
+  sym (++ᶜ-identityʳ-unique q)
+++ᶜ-inj₂ {Γ} {[]} {Γ₂ ⟨ τ' ⟩} q =
+  sym (++ᶜ-identityʳ-unique q)
+++ᶜ-inj₂ {Γ} {Γ₁ ∷ A} {[]} q =
+  ++ᶜ-identityʳ-unique (sym q)
 ++ᶜ-inj₂ {Γ} {Γ₁ ∷ A} {Γ₂ ∷ B} q =
   cong₂ _∷_ (++ᶜ-inj₂ (∷ᶜ-injective-ctx q)) (∷ᶜ-injective-ty q)
-++ᶜ-inj₂ {Γ} {Γ₁ ⟨ τ ⟩} {[]} q = {!!}
+++ᶜ-inj₂ {Γ} {Γ₁ ⟨ τ ⟩} {[]} q =
+  ++ᶜ-identityʳ-unique (sym q)
 ++ᶜ-inj₂ {Γ} {Γ₁ ⟨ τ ⟩} {Γ₂ ⟨ τ' ⟩} q =
   cong₂ _⟨_⟩ (++ᶜ-inj₂ (⟨⟩-injective-ctx q)) (⟨⟩-injective-time q)
--}
 
 -- Amount of time-passage modelled by a context 
 
