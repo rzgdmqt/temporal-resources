@@ -24,7 +24,14 @@ open import Util.Time
 
 -- Soundness theorem
 
-soundness : ∀ {A B τ₁ τ₂ τ₃}
+-- TODO: define K-rename, replace with K-rename eq-ren
+
+--(((toK S) [ (Γ-substK p E) [ Γ-substK s {!!} ]ₖ ]ₖ) [ (C-rename r M') ])
+
+-- Γ-substK s ((τ-substK t (toK suc-part-state)))
+
+
+soundness' : ∀ {A B τ₁ τ₂ τ₃}
         → {S S' : 𝕊 []} 
         → {M : toCtx S ⊢C⦂ A ‼ τ₁}
         → {M' : toCtx S' ⊢C⦂ A ‼ τ₂}
@@ -53,7 +60,7 @@ soundness : ∀ {A B τ₁ τ₂ τ₃}
                   τ₁ τ₂ 
                   (sym (trans 
                     (sym (ctx-time-++ᶜ (toCtx S) (toCtx suc-part-state))) 
-                    (cong ctx-time (S++suc-partS≡S' S S' S≤ₛS'))))
+                    (time-S++suc-partS≡S' S S' S≤ₛS')))
                   (trans 
                     (cong (_+ τ₁) (sym (time-≡ S))) 
                     (trans 
@@ -63,5 +70,4 @@ soundness : ∀ {A B τ₁ τ₂ τ₃}
             (toK S [ Γ-substK p E ]ₖ) [ C-rename q M ]
           == 
             (((toK S) [ (Γ-substK p E) [ Γ-substK s (τ-substK t (toK suc-part-state)) ]ₖ ]ₖ) [ (C-rename r M') ])
-soundness M↝M' E = {!   !}
- 
+soundness' M↝M' E = {!   !}
