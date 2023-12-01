@@ -31,7 +31,7 @@ toK (_∷ₛ_ {τ = τ} S V) =
   (toK S) [ box[ f≤ᶠf ]ₖ (V-rename (eq-ren (cong (_⟨ τ ⟩) (sym (⋈-++ₗ-[] _ (toCtx S))))) V) []ₖ ]ₖ 
 
 -- Spliting computation term context at resource 
-
+{-
 split-K : ∀ {Γ A B C D τ τ' τ'' τ''' τ''''}
         → (S : 𝕊 Γ)
         → (x : [ τ ] A ∈[ τ' ] toCtx S)
@@ -51,3 +51,4 @@ split-K : ∀ {Γ A B C D τ τ' τ'' τ''' τ''''}
                        (sym (fst-split-state≡split-ctx S x)))))))))
                 (resource-lookup S x)) K₂ ]ₖ ≡  K )
 split-K S x K = {!   !}
+-}

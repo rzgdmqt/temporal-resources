@@ -19,11 +19,13 @@ open import Util.Time
 
 -- Equations between well-typed values and computations
 
+-- TODO: prove that Γ ⊢V⦂ V == V' implies that V and V' have the same type
+
 mutual
 
   -- value equations
 
-  data _⊢V⦂_==_ (Γ : Ctx) : {A : VType} → Γ ⊢V⦂ A → Γ ⊢V⦂ A → Set where
+  data _⊢V⦂_==_ (Γ : Ctx) : {A B : VType} → Γ ⊢V⦂ A → Γ ⊢V⦂ B → Set where
 
     -- reflexivity, symmetry, transitivity
   
@@ -90,7 +92,7 @@ mutual
 
   -- computation equations
 
-  data _⊢C⦂_==_ (Γ : Ctx) : {C : CType} → Γ ⊢C⦂ C → Γ ⊢C⦂ C → Set where
+  data _⊢C⦂_==_ (Γ : Ctx) : {C D : CType} → Γ ⊢C⦂ C → Γ ⊢C⦂ D → Set where
 
     -- reflexivity, symmetry, transitivity
   
@@ -160,7 +162,7 @@ mutual
                 → {V W : Γ ⊢V⦂ Empty}
                 → Γ ⊢V⦂ V == W
                 ------------------------------------
-                → Γ ⊢C⦂ absurd {C = C} V == absurd W
+                → Γ ⊢C⦂ absurd {C = C} V == absurd {C = C} W
 
     perform-cong : ∀ {A τ op}
                  → {V W : Γ ⊢V⦂ type-of-gtype (param op)}
@@ -316,7 +318,7 @@ mutual
                → (V : Γ ⊢V⦂ Empty)
                → (M : Γ ∷ Empty ⊢C⦂ C)
                -----------------------
-               → Γ ⊢C⦂ absurd V
+               → Γ ⊢C⦂ absurd {C = C} V
                    == M [ Hd ↦ V ]c
 
     -- computational/beta-equations for effect handling
