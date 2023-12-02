@@ -340,6 +340,24 @@ vren⟨τ⟩-ctx {Γ} {Γ'} {τ} p =
     (    eq-vren (++ᶜ-ᶜ {Γ} {Γ'} p)
      ∘ᵛʳ wk-ctx-vren)
 
+-- Identity laws
+
+∘ᵛʳ-identityˡ : ∀ {Γ Γ' A τ}
+              → (ρ : VRen Γ Γ')
+              → (x : A ∈[ τ ] Γ)
+              → (id-vren ∘ᵛʳ ρ) x ≡ ρ x
+
+∘ᵛʳ-identityˡ {Γ} {Γ'} {A} {τ} ρ x =
+  dcong₂ _,_ refl (cong₂ _,_ (≤-irrelevant _ _) refl)
+
+∘ᵛʳ-identityʳ : ∀ {Γ Γ' A τ}
+              → (ρ : VRen Γ Γ')
+              → (x : A ∈[ τ ] Γ)
+              → (ρ ∘ᵛʳ id-vren) x ≡ ρ x
+
+∘ᵛʳ-identityʳ {Γ} {Γ'} {A} {τ} ρ x =
+  dcong₂ _,_ refl (cong₂ _,_ (≤-irrelevant _ _) refl)
+
 -- Relating congruence renamings with identity renamings (functoriality)
 
 cong-∷-vren-id : ∀ {Γ A B τ}
@@ -424,24 +442,9 @@ cong-vren-fun {Γ} {Γ'} {Γ''} {Γ''' ⟨ τ ⟩} ρ ρ' x =
       (ifun-ext λ {A} → ifun-ext (λ {τ} → fun-ext (λ x → cong-vren-fun ρ ρ' x))))
     (cong-⟨⟩-vren-fun (cong-vren ρ) (cong-vren ρ') x)
 
--- Relating -ʳ with identity renamings (functoriality)
-
 {-
--ᵛʳ-id : ∀ {Γ A τ τ'}
-       → (x : A ∈[ τ ] (Γ -ᶜ τ'))
-       → (id-vren -ᵛʳ τ') x ≡ id-vren x
-
--ᵛʳ-id {Γ} {A} {τ} {zero} x = refl
--ᵛʳ-id {Γ ∷ B} {A} {τ} {suc τ'} x =
-  trans
-    {!!} 
-    (-ᵛʳ-id {Γ} {A} {_} {suc τ'} x)
--ᵛʳ-id {Γ ⟨ τ'' ⟩} {A} {τ} {suc τ'} x = {!!}
--}
-
 -- Relating -ʳ with composition of renamings (functoriality)
 
-{-
 -ᵛʳ-fun : ∀ {Γ Γ' Γ'' A τ'}
         → (ρ : VRen Γ Γ')
         → (ρ' : VRen Γ' Γ'')
@@ -462,4 +465,24 @@ cong-vren-fun {Γ} {Γ'} {Γ''} {Γ''' ⟨ τ ⟩} ρ ρ' x =
 -ᵛʳ-fun {Γ ⟨ τ'' ⟩} {Γ'} {Γ''} {A} {τ'} ρ ρ' (suc τ) x with suc τ ≤? τ''
 -ᵛʳ-fun {Γ ⟨ τ'' ⟩} {Γ'} {Γ''} {A} {.(τ'' ∸ suc τ + _)} ρ ρ' (suc τ) (Tl-⟨⟩ x) | yes p = {!!}
 -ᵛʳ-fun {Γ ⟨ τ'' ⟩} {Γ'} {Γ''} {A} {τ'} ρ ρ' (suc τ) x | no ¬p = {!!}
+
+-- Relating -ʳ with identity renamings (functoriality)
+
+-ᵛʳ-id : ∀ {Γ A τ τ'}
+       → (x : A ∈[ τ ] (Γ -ᶜ τ'))
+       → (id-vren -ᵛʳ τ') x ≡ id-vren x
+
+-ᵛʳ-id {Γ} {A} {τ} {zero} x = refl
+-ᵛʳ-id {Γ ∷ B} {A} {τ} {suc τ'} x =
+  trans
+    (trans
+      (-ᵛʳ-fun id-vren (wk-vren {Γ} {B}) (suc τ') x)
+      (trans
+        (cong (λ (ρ : VRen (Γ -ᶜ suc τ') (Γ -ᶜ suc τ')) → (wk-vren {Γ} {B} -ᵛʳ suc τ' ∘ᵛʳ ρ) x)
+          (ifun-ext (λ {A} → ifun-ext (λ {τ''} → fun-ext (λ y → -ᵛʳ-id {Γ} {A} {τ''} {suc τ'} y)))))
+        (trans
+          (∘ᵛʳ-identityʳ (wk-vren {Γ} {B} -ᵛʳ suc τ') x)
+          {!!}))) 
+    (-ᵛʳ-id {Γ} {A} {_} {suc τ'} x)
+-ᵛʳ-id {Γ ⟨ τ'' ⟩} {A} {τ} {suc τ'} x = {!!}
 -}
