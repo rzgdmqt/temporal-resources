@@ -422,13 +422,12 @@ box[ p ]ₖ V K [ N ] =
 
 τ-substK refl K = K
 
-{-
 τ-substK-hole-ctx : ∀ {Γ Γ' CH A τ τ' f}
                   → (p : τ ≡ τ')
                   → (K : Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ)
                   → rel-hole-ctx K Γ' ≡ rel-hole-ctx (τ-substK p K) Γ'
                   
-τ-substK-hole-ctx p K = {!!} -- TODO: for this need lemmas relating τ-substK to all computation term context formers
+τ-substK-hole-ctx refl K = refl
 
 τ-substK-[·]ₖ : ∀ {Γ CH CH' A τ τ' f f'}
               → (p : τ ≡ τ')
@@ -437,5 +436,7 @@ box[ p ]ₖ V K [ N ] =
               → τ-substK p (K [ L ]ₖ)
               ≡ τ-substK p K [ K-rename (eq-ren (cong (Γ ++ᶜ_) (τ-substK-hole-ctx p K))) L ]ₖ
               
-τ-substK-[·]ₖ p K L = {!!} -- TODO: for this need lemmas relating τ-substK to all computation term context formers
--}
+τ-substK-[·]ₖ refl K L =
+  trans
+    {!!}                             -- TODO: need to prove *-rename idʳ x ≡ x for * ∈ {V,C,K}
+    (cong (λ ρ → K [ K-rename ρ L ]ₖ) (sym eq-ren-refl-id))

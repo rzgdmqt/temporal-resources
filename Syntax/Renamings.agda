@@ -53,19 +53,27 @@ _∘ʳ_ : ∀ {Γ Γ' Γ''} → Ren Γ' Γ'' → Ren Γ Γ' → Ren Γ Γ''
 
 infixr 20 _∘ʳ_
 
+-- Equality renaming
+
 eq-ren : ∀ {Γ Γ'} → Γ ≡ Γ' → Ren Γ Γ'
 eq-ren p =
   ren
     (≤-reflexive (cong ctx-time p))
     (eq-vren p)
 
+-- Variable weakening renaming
+
 wk-ren : ∀ {Γ A} → Ren Γ (Γ ∷ A)
 wk-ren {Γ} {A} =
   ren ≤-refl (wk-vren {Γ} {A})
 
+-- Time weakening renaming
+
 wk-⟨⟩-ren : ∀ {Γ τ} → Ren Γ (Γ ⟨ τ ⟩)
 wk-⟨⟩-ren {Γ} {τ} =
   ren (m≤m+n (ctx-time Γ) τ) (wk-⟨⟩-vren {Γ} {τ})
+
+-- Strong monoidal structure of ⟨_⟩
 
 ⟨⟩-η-ren : ∀ {Γ} → Ren (Γ ⟨ 0 ⟩) Γ
 ⟨⟩-η-ren {Γ} = 
@@ -88,13 +96,19 @@ wk-⟨⟩-ren {Γ} {τ} =
     (τ-≤-substₗ (sym (+-assoc (ctx-time Γ) τ τ')) ≤-refl)
     ⟨⟩-μ⁻¹-vren
 
+-- Variable congruence renaming
+
 cong-∷-ren : ∀ {Γ Γ' A} → Ren Γ Γ' → Ren (Γ ∷ A) (Γ' ∷ A)
 cong-∷-ren ρ =
   ren (ctx-time-≤ ρ) (cong-∷-vren (var-rename ρ))
 
+-- Time congruence renaming
+
 cong-⟨⟩-ren : ∀ {Γ Γ' τ} → Ren Γ Γ' → Ren (Γ ⟨ τ ⟩) (Γ' ⟨ τ ⟩)
 cong-⟨⟩-ren {τ = τ} ρ =
   ren (+-monoˡ-≤ τ (ctx-time-≤ ρ)) (cong-⟨⟩-vren (var-rename ρ))
+
+-- General congruence renaming
 
 cong-ren : ∀ {Γ Γ' Γ''} → Ren Γ Γ' → Ren (Γ ++ᶜ Γ'') (Γ' ++ᶜ Γ'')
 cong-ren {Γ} {Γ'} {Γ''} ρ =
@@ -105,6 +119,8 @@ cong-ren {Γ} {Γ'} {Γ''} ρ =
         (+-monoˡ-≤ (ctx-time Γ'') (ctx-time-≤ ρ))
         (≤-reflexive (sym (ctx-time-++ᶜ Γ' Γ'')))))
     (cong-vren (var-rename ρ))
+
+-- General weakening renamings
 
 wk-ctx-renᵣ : ∀ {Γ Γ'} → Ren Γ (Γ ++ᶜ Γ')
 wk-ctx-renᵣ {Γ} {Γ'} = 
@@ -117,23 +133,31 @@ wk-ctx-renₗ {Γ} {Γ'} =
   cong-ren {Γ' = Γ'} (eq-ren ++ᶜ-identityˡ ∘ʳ wk-ctx-renᵣ) 
     ∘ʳ (eq-ren (sym ++ᶜ-identityˡ))
 
+-- Monotonicity renaming for ⟨_⟩
+
 ⟨⟩-≤-ren : ∀ {Γ τ τ'} → τ ≤ τ' → Ren (Γ ⟨ τ ⟩) (Γ ⟨ τ' ⟩)
 ⟨⟩-≤-ren {Γ} p = 
   ren 
     (+-monoʳ-≤ (ctx-time Γ) p) 
     (⟨⟩-≤-vren p)
 
+-- Time and variable exchange renaming
+
 exch-⟨⟩-var-ren : ∀ {Γ A τ} → Ren (Γ ⟨ τ ⟩ ∷ A) ((Γ ∷ A) ⟨ τ ⟩)
 exch-⟨⟩-var-ren = 
   ren 
     ≤-refl 
-    exch-⟨⟩-var-vren 
+    exch-⟨⟩-var-vren
+
+-- Variable exchange renaming
 
 exch-ren : ∀ {Γ A B} → Ren (Γ ∷ A ∷ B) (Γ ∷ B ∷ A)
 exch-ren = 
   ren 
     ≤-refl 
     exch-vren
+
+-- Time travelling operation on contexts
 
 _-ʳ_,_ : ∀ {Γ Γ'} → Ren Γ Γ' → (τ : Time) → τ ≤ ctx-time Γ → Ren (Γ -ᶜ τ) (Γ' -ᶜ τ)
 _-ʳ_,_ {Γ} {Γ'} ρ τ p =
@@ -145,6 +169,8 @@ _-ʳ_,_ {Γ} {Γ'} ρ τ p =
         (≤-reflexive (sym (ctx-time-ᶜ-∸ Γ' τ (≤-trans p (ctx-time-≤ ρ)))))))
     ((var-rename ρ) -ᵛʳ τ)
 
+-- Weakening a time to a context renaming
+
 ren⟨τ⟩-ctx : ∀ {Γ Γ' τ} → τ ≤ ctx-time Γ' → Ren (Γ ⟨ τ ⟩) (Γ ++ᶜ Γ')
 ren⟨τ⟩-ctx {Γ} {Γ'} {τ} p =
   ren
@@ -154,6 +180,14 @@ ren⟨τ⟩-ctx {Γ} {Γ'} {τ} p =
     (vren⟨τ⟩-ctx p)
 
 infixl 30 _-ʳ_,_
+
+-- Reflexivity equality renamings' interaction with identity renamings
+
+eq-ren-refl-id : ∀ {Γ}
+               → eq-ren refl ≡ id-ren {Γ}
+                
+eq-ren-refl-id {Γ} =
+  cong₂ ren refl refl
 
 -- Congruence renamings' interaction with composition (functoriality)
 
@@ -205,8 +239,37 @@ mutual
     unbox (≤-trans p (ctx-time-≤ ρ)) (V-rename (ρ -ʳ τ , p) V) (C-rename (cong-ren ρ) M)
   C-rename ρ (box V M)        = box (V-rename (cong-ren ρ) V) (C-rename (cong-ren ρ) M)
 
+{-
+-- Identity law of the action of renamings
 
--- Transitivity of the action of renamings
+mutual
+
+  V-rename-id : ∀ {Γ A}
+              → (V : Γ ⊢V⦂ A)
+              → V-rename id-ren V
+              ≡ V
+
+  V-rename-id (var x) =
+    refl
+  V-rename-id (const c) =
+    refl
+  V-rename-id ⋆ =
+    refl
+  V-rename-id ⦉ V , W ⦊ =
+    cong₂ ⦉_,_⦊ (V-rename-id V) (V-rename-id W)
+  V-rename-id (lam M) =
+    cong lam {!C-rename-id M!}
+
+  C-rename-id : ∀ {Γ C}
+              → (M : Γ ⊢C⦂ C)
+              → C-rename id-ren M
+              ≡ M
+
+  C-rename-id M = {!!}
+-}
+
+
+-- Transitivity law of the action of renamings
 
 -- TODO: temporarily commented out
 
