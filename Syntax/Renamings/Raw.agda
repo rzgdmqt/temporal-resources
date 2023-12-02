@@ -340,6 +340,43 @@ vren⟨τ⟩-ctx {Γ} {Γ'} {τ} p =
     (    eq-vren (++ᶜ-ᶜ {Γ} {Γ'} p)
      ∘ᵛʳ wk-ctx-vren)
 
+-- Relating congruence renamings with identity renamings (functoriality)
+
+cong-∷-vren-id : ∀ {Γ A B τ}
+               → (x : A ∈[ τ ] Γ ∷ B)
+               → cong-∷-vren id-vren x ≡ id-vren x
+
+cong-∷-vren-id {Γ} {A} {.A} {.0} Hd = refl
+cong-∷-vren-id {Γ} {A} {B} {τ} (Tl-∷ x) with id-vren x
+... | τ' , p , y = refl
+
+cong-⟨⟩-vren-id : ∀ {Γ A τ τ'}
+                → (x : A ∈[ τ ] Γ ⟨ τ' ⟩)
+                → cong-⟨⟩-vren id-vren x ≡ id-vren x
+
+cong-⟨⟩-vren-id {Γ} {A} {.(τ' + _)} {τ'} (Tl-⟨⟩ x) with id-vren x
+... | τ'' , p , y =
+  dcong₂ _,_ refl (cong₂ _,_ (≤-irrelevant _ _) refl)
+
+cong-vren-id : ∀ {Γ Γ' A τ}
+             → (x : A ∈[ τ ] Γ ++ᶜ Γ')
+             → cong-vren {Γ'' = Γ'} id-vren x ≡ id-vren x
+
+cong-vren-id {Γ} {[]} {A} {τ} x = refl
+cong-vren-id {Γ} {Γ' ∷ B} {A} {τ} x =
+  trans
+    (cong
+      (λ (ρ : VRen (Γ ++ᶜ Γ') (Γ ++ᶜ Γ')) → cong-∷-vren ρ x)
+      (ifun-ext (λ {A} → ifun-ext (λ {τ} → fun-ext (λ y →
+        cong-vren-id {Γ = Γ} {Γ' = Γ'} y)))))
+    (cong-∷-vren-id x)
+cong-vren-id {Γ} {Γ' ⟨ τ' ⟩} {A} {τ} x =
+  trans
+    (cong (λ (ρ : VRen (Γ ++ᶜ Γ') (Γ ++ᶜ Γ')) → cong-⟨⟩-vren ρ x)
+      (ifun-ext (λ {A} → ifun-ext (λ {τ} → fun-ext (λ y →
+        cong-vren-id {Γ = Γ} {Γ' = Γ'} y)))))
+    (cong-⟨⟩-vren-id x)
+
 -- Relating congruence renamings with composition of renamings (functoriality)
 
 cong-∷-vren-fun : ∀ {Γ Γ' Γ'' A B τ}
@@ -386,6 +423,21 @@ cong-vren-fun {Γ} {Γ'} {Γ''} {Γ''' ⟨ τ ⟩} ρ ρ' x =
       (λ (ρ : VRen (Γ ++ᶜ Γ''') (Γ'' ++ᶜ Γ''')) → cong-⟨⟩-vren ρ x)
       (ifun-ext λ {A} → ifun-ext (λ {τ} → fun-ext (λ x → cong-vren-fun ρ ρ' x))))
     (cong-⟨⟩-vren-fun (cong-vren ρ) (cong-vren ρ') x)
+
+-- Relating -ʳ with identity renamings (functoriality)
+
+{-
+-ᵛʳ-id : ∀ {Γ A τ τ'}
+       → (x : A ∈[ τ ] (Γ -ᶜ τ'))
+       → (id-vren -ᵛʳ τ') x ≡ id-vren x
+
+-ᵛʳ-id {Γ} {A} {τ} {zero} x = refl
+-ᵛʳ-id {Γ ∷ B} {A} {τ} {suc τ'} x =
+  trans
+    {!!} 
+    (-ᵛʳ-id {Γ} {A} {_} {suc τ'} x)
+-ᵛʳ-id {Γ ⟨ τ'' ⟩} {A} {τ} {suc τ'} x = {!!}
+-}
 
 -- Relating -ʳ with composition of renamings (functoriality)
 

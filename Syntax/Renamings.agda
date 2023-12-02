@@ -189,6 +189,17 @@ eq-ren-refl-id : ∀ {Γ}
 eq-ren-refl-id {Γ} =
   cong₂ ren refl refl
 
+-- Congruence renamings' interaction with identities (functoriality)
+
+cong-ren-id : ∀ {Γ Γ'}
+            → cong-ren {Γ'' = Γ'} (id-ren {Γ}) ≡ id-ren
+
+cong-ren-id {Γ} {Γ'} =
+  cong₂ ren
+    (≤-irrelevant _ _)
+    (ifun-ext (λ {A} → ifun-ext (λ {τ} → fun-ext (λ x →
+      cong-vren-id {Γ} {Γ'} x))))
+
 -- Congruence renamings' interaction with composition (functoriality)
 
 cong-ren-fun : ∀ {Γ Γ' Γ'' Γ'''}
@@ -239,9 +250,8 @@ mutual
     unbox (≤-trans p (ctx-time-≤ ρ)) (V-rename (ρ -ʳ τ , p) V) (C-rename (cong-ren ρ) M)
   C-rename ρ (box V M)        = box (V-rename (cong-ren ρ) V) (C-rename (cong-ren ρ) M)
 
-{-
 -- Identity law of the action of renamings
-
+{-
 mutual
 
   V-rename-id : ∀ {Γ A}
@@ -257,17 +267,72 @@ mutual
     refl
   V-rename-id ⦉ V , W ⦊ =
     cong₂ ⦉_,_⦊ (V-rename-id V) (V-rename-id W)
-  V-rename-id (lam M) =
-    cong lam {!C-rename-id M!}
+  V-rename-id {Γ} (lam M) =
+    cong lam
+      (trans
+        (cong (λ ρ → C-rename ρ M) (cong-ren-id {Γ}))
+        (C-rename-id M))
 
   C-rename-id : ∀ {Γ C}
               → (M : Γ ⊢C⦂ C)
               → C-rename id-ren M
               ≡ M
 
-  C-rename-id M = {!!}
+  C-rename-id (return V) =
+    cong return (V-rename-id V)
+  C-rename-id {Γ} (M ; N) =
+    cong₂ _;_
+      (C-rename-id M)
+      (trans
+        (cong (λ ρ → C-rename ρ N) (cong-ren-id {Γ}))
+        (C-rename-id N))
+  C-rename-id {Γ} (V · W) =
+    cong₂ _·_ (V-rename-id V) (V-rename-id W)
+  C-rename-id {Γ} (match V `in M) =
+    cong₂ match_`in_
+      (V-rename-id V)
+      (trans
+        (cong (λ ρ → C-rename ρ M) (cong-ren-id {Γ}))
+        (C-rename-id M))
+  C-rename-id {Γ} (absurd V) =
+    cong absurd (V-rename-id V)
+  C-rename-id {Γ} (perform op V M) =
+    cong₂ (perform op)
+      (V-rename-id V)
+      (trans
+        (cong (λ ρ → C-rename ρ M) (cong-ren-id {Γ}))
+        (C-rename-id M))
+  C-rename-id {Γ} (delay τ M) =
+    cong (delay τ)
+    (trans
+        (cong (λ ρ → C-rename ρ M) (cong-ren-id {Γ}))
+        (C-rename-id M))
+  C-rename-id {Γ} (handle M `with H `in N) =
+    cong₃ (handle_`with_`in)
+      (C-rename-id M)
+      (fun-ext (λ op → fun-ext (λ τ'' →
+        trans
+          (cong (λ ρ → C-rename ρ (H op τ'')) (cong-ren-id {Γ}))
+          (C-rename-id (H op τ'')))))
+      (trans
+        (cong (λ ρ → C-rename ρ N) (cong-ren-id {Γ}))
+        (C-rename-id N))
+  C-rename-id {Γ} (unbox p V M) =
+    cong₃ unbox
+      (≤-irrelevant _ _)
+      {!!}
+      (trans
+        (cong (λ ρ → C-rename ρ M) (cong-ren-id {Γ}))
+        (C-rename-id M))
+  C-rename-id {Γ} (box V M) =
+    cong₂ box
+      (trans
+        (cong (λ ρ → V-rename ρ V) (cong-ren-id {Γ}))
+        (V-rename-id V))
+      (trans
+        (cong (λ ρ → C-rename ρ M) (cong-ren-id {Γ}))
+        (C-rename-id M))
 -}
-
 
 -- Transitivity law of the action of renamings
 
