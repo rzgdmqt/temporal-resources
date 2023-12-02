@@ -74,52 +74,52 @@ infixl 32 _∨ᶠ_
 -- Computation term contexts. The allowed cases depend on the
 -- given flag.
 
-data _⊢K[_]⦂_ (Γ : Ctx) (f : Flag) : CType → Set where
+data _⊢K[_◁_]⦂_ (Γ : Ctx) (f : Flag) (CH : CType) : CType → Set where
 
-    []ₖ : ∀ {C} 
-        ------------------
-        → Γ ⊢K[ f ]⦂ C
+    []ₖ :  
+        --------------------
+          Γ ⊢K[ f ◁ CH ]⦂ CH
 
     _ₖ[_];_ : ∀ {Aₖ A τₖ τ}
-        → Γ ⊢K[ f ]⦂ Aₖ ‼ τₖ
+        → Γ ⊢K[ f ◁ CH ]⦂ Aₖ ‼ τₖ
         → eval ≤ᶠ f
         → Γ ⟨ τₖ ⟩ ∷ Aₖ ⊢C⦂ A ‼ τ
         -----------------------------
-        → Γ ⊢K[ f ]⦂ A ‼ (τₖ + τ)
+        → Γ ⊢K[ f ◁ CH ]⦂ A ‼ (τₖ + τ)
 
     _;[_]ₖ_ : ∀ {Aₖ A τₖ τ} 
         → Γ ⊢C⦂ A ‼ τ
         → all ≤ᶠ f
-        → Γ ⟨ τ ⟩ ∷ A ⊢K[ f ]⦂ Aₖ ‼ τₖ 
+        → Γ ⟨ τ ⟩ ∷ A ⊢K[ f ◁ CH ]⦂ Aₖ ‼ τₖ 
         ----------------------------------
-        → Γ ⊢K[ f ]⦂ Aₖ ‼ (τ + τₖ)
+        → Γ ⊢K[ f ◁ CH ]⦂ Aₖ ‼ (τ + τₖ)
 
     match_`in[_]ₖ_ : ∀ {Aₖ A B τₖ}
         → Γ ⊢V⦂ A |×| B
         → all ≤ᶠ f
-        → Γ ∷ A ∷ B ⊢K[ f ]⦂ Aₖ ‼ τₖ
+        → Γ ∷ A ∷ B ⊢K[ f ◁ CH ]⦂ Aₖ ‼ τₖ
         -------------------------------
-        → Γ ⊢K[ f ]⦂ Aₖ ‼ τₖ
+        → Γ ⊢K[ f ◁ CH ]⦂ Aₖ ‼ τₖ
 
     perform[_]ₖ : ∀ {A τ}
         → all ≤ᶠ f
         → (op : Op)
         → Γ ⊢V⦂ type-of-gtype (param op)
-        → Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢K[ f ]⦂ A ‼ τ
+        → Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢K[ f ◁ CH ]⦂ A ‼ τ
         ----------------------------------------------------------------
-        → Γ ⊢K[ f ]⦂ A ‼ (op-time op + τ)
+        → Γ ⊢K[ f ◁ CH ]⦂ A ‼ (op-time op + τ)
 
     handle[_]ₖ_`with_`in
         : ∀ {A B τ τ'}
         → eval ≤ᶠ f
-        → Γ ⊢K[ f ]⦂ A ‼ τ
+        → Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ
         → ((op : Op) → (τ'' : Time) →
              Γ ∷ type-of-gtype (param op)
                ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
              ⊢C⦂ B ‼ (op-time op + τ''))
         → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
         ------------------------------------------------------------
-        → Γ ⊢K[ f ]⦂ B ‼ (τ + τ')
+        → Γ ⊢K[ f ◁ CH ]⦂ B ‼ (τ + τ')
 
     handle_`with_`in[_]ₖ
         : ∀ {A B τ τ'}
@@ -129,37 +129,38 @@ data _⊢K[_]⦂_ (Γ : Ctx) (f : Flag) : CType → Set where
                ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
              ⊢C⦂ B ‼ (op-time op + τ''))
         → all ≤ᶠ f
-        → Γ ⟨ τ ⟩ ∷ A ⊢K[ f ]⦂ B ‼ τ'
+        → Γ ⟨ τ ⟩ ∷ A ⊢K[ f ◁ CH ]⦂ B ‼ τ'
         ------------------------------------------------------------
-        → Γ ⊢K[ f ]⦂ B ‼ (τ + τ')
+        → Γ ⊢K[ f ◁ CH ]⦂ B ‼ (τ + τ')
 
     delay[_]ₖ : ∀ {A τ'}
         → state ≤ᶠ f
         → (τ : Time)
-        → Γ ⟨ τ ⟩ ⊢K[ f ]⦂ A ‼ τ'
+        → Γ ⟨ τ ⟩ ⊢K[ f ◁ CH ]⦂ A ‼ τ'
         -----------------------------
-        → Γ ⊢K[ f ]⦂ A ‼ (τ + τ')
+        → Γ ⊢K[ f ◁ CH ]⦂ A ‼ (τ + τ')
 
     unbox[_]ₖ : ∀ {A C τ}
         → all ≤ᶠ f
         → τ ≤ ctx-time Γ
         → Γ -ᶜ τ ⊢V⦂ [ τ ] A
-        → Γ ∷ A  ⊢K[ f ]⦂ C
+        → Γ ∷ A  ⊢K[ f ◁ CH ]⦂ C
         -----------------------
-        → Γ ⊢K[ f ]⦂ C
+        → Γ ⊢K[ f ◁ CH ]⦂ C
     
     box[_]ₖ : ∀ {A C τ}
         → state ≤ᶠ f
         → Γ ⟨ τ ⟩ ⊢V⦂ A
-        → Γ ∷ [ τ ] A ⊢K[ f ]⦂ C
+        → Γ ∷ [ τ ] A ⊢K[ f ◁ CH ]⦂ C
         ----------------------------
-        → Γ ⊢K[ f ]⦂ C
+        → Γ ⊢K[ f ◁ CH ]⦂ C
 
+{-
 -- Type of the hole in a computation term context
 
-hole-ty : ∀ {Γ f C} → Γ ⊢K[ f ]⦂ C → CType
+hole-ty : ∀ {Γ f CH C} → Γ ⊢K[ f ◁ CH ]⦂ C → CType
 
-hole-ty ([]ₖ {C = C}) = C
+hole-ty ([]ₖ ) = C
 hole-ty (K ₖ[ p ]; N) = hole-ty K
 hole-ty (M ;[ p ]ₖ K) = hole-ty K
 hole-ty (match V `in[ p ]ₖ K) = hole-ty K
@@ -169,12 +170,13 @@ hole-ty (handle M `with H `in[ p ]ₖ K) = hole-ty K
 hole-ty (delay[ p ]ₖ τ K) = hole-ty K
 hole-ty (unbox[ p ]ₖ q V K) = hole-ty K
 hole-ty (box[ p ]ₖ V K) = hole-ty K
+-}
 
 -- Contexts of the hole in a computation term context
 -- (the relative version, against arbitrary ctx Γ')
 -- (turns a computation term contexts into a Hughes list)
 
-rel-hole-ctx : ∀ {Γ f C} → Γ ⊢K[ f ]⦂ C → Ctx → Ctx
+rel-hole-ctx : ∀ {Γ f CH C} → Γ ⊢K[ f ◁ CH ]⦂ C → Ctx → Ctx
 
 rel-hole-ctx []ₖ Γ' =
   Γ'
@@ -200,19 +202,19 @@ rel-hole-ctx (box[_]ₖ {A = A} {τ = τ} p V K) Γ' =
 -- Contexts of the hole in a computation term context
 -- (the relative version, with only the vars bound in K)
 
-hole-ctx : ∀ {Γ f C} → Γ ⊢K[ f ]⦂ C → Ctx
+hole-ctx : ∀ {Γ f CH C} → Γ ⊢K[ f ◁ CH ]⦂ C → Ctx
 hole-ctx K = rel-hole-ctx K []
 
 -- Contexts of the hole in a computation term context
 -- (the absolute version, it includes Γ as its prefix)
 
-abs-hole-ctx : ∀ {Γ f C} → Γ ⊢K[ f ]⦂ C → Ctx
+abs-hole-ctx : ∀ {Γ f CH C} → Γ ⊢K[ f ◁ CH ]⦂ C → Ctx
 abs-hole-ctx {Γ} K = rel-hole-ctx K Γ
 
 -- Relating the absolute and relative versions of hole-ctx
 
-rel-hole-ctx-++ᶜ : ∀ {Γ Γ' Γ'' f C}
-                 → (K : Γ ⊢K[ f ]⦂ C)
+rel-hole-ctx-++ᶜ : ∀ {Γ Γ' Γ'' f CH C}
+                 → (K : Γ ⊢K[ f ◁ CH ]⦂ C)
                  → rel-hole-ctx K (Γ' ++ᶜ Γ'') ≡ Γ' ++ᶜ rel-hole-ctx K Γ''
 
 rel-hole-ctx-++ᶜ {Γ} {Γ'} {Γ''} []ₖ =
@@ -236,18 +238,18 @@ rel-hole-ctx-++ᶜ {Γ} {Γ'} {Γ''} (unbox[ p ]ₖ q V K) =
 rel-hole-ctx-++ᶜ {Γ} {Γ'} {Γ''} (box[ p ]ₖ V K) =
   rel-hole-ctx-++ᶜ K
 
-hole-ctx-++ᶜ : ∀ {Γ f C}
-             → (K : Γ ⊢K[ f ]⦂ C)
+hole-ctx-++ᶜ : ∀ {Γ f CH C}
+             → (K : Γ ⊢K[ f ◁ CH ]⦂ C)
              → abs-hole-ctx K ≡ Γ ++ᶜ hole-ctx K
 
 hole-ctx-++ᶜ {Γ} K = rel-hole-ctx-++ᶜ {Γ} {Γ} {[]} K
 
 -- Monotonicity if computation term contexts with respect to flags
 
-◁-mon : ∀ {Γ C f f'}
+◁-mon : ∀ {Γ CH C f f'}
       → f ≤ᶠ f'
-      → Γ ⊢K[ f ]⦂ C
-      → Γ ⊢K[ f' ]⦂ C
+      → Γ ⊢K[ f ◁ CH ]⦂ C
+      → Γ ⊢K[ f' ◁ CH ]⦂ C
       
 ◁-mon {f = f} {f' = f'} p []ₖ =
   []ₖ
@@ -272,11 +274,11 @@ hole-ctx-++ᶜ {Γ} K = rel-hole-ctx-++ᶜ {Γ} {Γ} {[]} K
 
 -- Renaming of computation term contexts
 
-K-rename : ∀ {Γ Γ' C f}
+K-rename : ∀ {Γ Γ' CH C f}
          → Ren Γ Γ'
-         → Γ ⊢K[ f ]⦂ C
+         → Γ ⊢K[ f ◁ CH ]⦂ C
          ---------------
-         → Γ' ⊢K[ f ]⦂ C
+         → Γ' ⊢K[ f ◁ CH ]⦂ C
 
 K-rename ρ []ₖ =
   []ₖ
@@ -301,10 +303,10 @@ K-rename ρ (box[ p ]ₖ V K) =
 
 -- Composition of computation term contexts
 
-_[_]ₖ : ∀ {Γ C f f'}
-      → (K : Γ ⊢K[ f ]⦂ C)
-      → (L : Γ ++ᶜ hole-ctx K ⊢K[ f' ]⦂ (hole-ty K))
-      → Γ ⊢K[ f ∨ᶠ f' ]⦂ C
+_[_]ₖ : ∀ {Γ CH CH' C f f'}
+      → (K : Γ ⊢K[ f ◁ CH ]⦂ C)
+      → (L : Γ ++ᶜ hole-ctx K ⊢K[ f' ◁ CH' ]⦂ CH)
+      → Γ ⊢K[ f ∨ᶠ f' ◁ CH' ]⦂ C
 
 []ₖ [ L ]ₖ =
   ◁-mon ∨ᶠ-inr L
@@ -355,41 +357,11 @@ box[ p ]ₖ V K [ L ]ₖ =
              (cong (_ ++ᶜ_) (rel-hole-ctx-++ᶜ K))
              (sym (++ᶜ-assoc _ ([] ∷ _) (hole-ctx K))))) L ]ₖ)
 
-{-
--- Composition of computation term context with absolute binding contexts (leaving it here just in case)
-
-_[_]ₖ : ∀ {Γ C f f'}
-      → (K : Γ ⊢K[ f ]⦂ C)
-      → (L : abs-hole-ctx K ⊢K[ f' ]⦂ (hole-ty K))
-      → Γ ⊢K[ f ∨ᶠ f' ]⦂ C
-
-[]ₖ [ L ]ₖ =
-  ◁-mon ∨ᶠ-inr L
-(K ₖ[ p ]; N) [ L ]ₖ =
-  (K [ L ]ₖ) ₖ[ ≤ᶠ-trans p ∨ᶠ-inl ]; N
-(M ;[ p ]ₖ K) [ L ]ₖ =
-  M ;[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ (K [ L ]ₖ)
-(match V `in[ p ]ₖ K) [ L ]ₖ =
-  match V `in[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ (K [ L ]ₖ)
-perform[ p ]ₖ op V K [ L ]ₖ =
-  perform[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ op V (K [ L ]ₖ)
-handle[ p ]ₖ K `with H `in N [ L ]ₖ =
-  handle[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ (K [ L ]ₖ) `with H `in N
-handle M `with H `in[ p ]ₖ K [ L ]ₖ =
-  handle M `with H `in[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ (K [ L ]ₖ)
-delay[ p ]ₖ τ K [ L ]ₖ =
-  delay[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ τ (K [ L ]ₖ)
-unbox[ p ]ₖ q V K [ L ]ₖ =
-  unbox[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ q V (K [ L ]ₖ)
-box[ p ]ₖ V K [ L ]ₖ =
-  box[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ V (K [ L ]ₖ)
--}
-
 -- Filling a computation term context hole with a computation
 
-_[_] : ∀ {Γ C f} 
-     → (K : Γ ⊢K[ f ]⦂ C) 
-     → (M : Γ ++ᶜ hole-ctx K ⊢C⦂ (hole-ty K)) 
+_[_] : ∀ {Γ CH C f} 
+     → (K : Γ ⊢K[ f ◁ CH ]⦂ C) 
+     → (M : Γ ++ᶜ hole-ctx K ⊢C⦂ CH) 
      → Γ ⊢C⦂ C
 
 []ₖ [ N ] =
@@ -441,34 +413,29 @@ box[ p ]ₖ V K [ N ] =
              (cong (_ ++ᶜ_) (rel-hole-ctx-++ᶜ K))
              (sym (++ᶜ-assoc _ ([] ∷ _) (hole-ctx K))))) N ])
 
+-- Equality-subeffecting for computation term contexts
+
+τ-substK : ∀ {Γ CH A τ τ' f}
+         → τ ≡ τ'
+         → Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ
+         → Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ'
+
+τ-substK refl K = K
 
 {-
--- Filling a computation term context hole with a computation with absolute binding context (leaving it here just in case)
+τ-substK-hole-ctx : ∀ {Γ Γ' CH A τ τ' f}
+                  → (p : τ ≡ τ')
+                  → (K : Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ)
+                  → rel-hole-ctx K Γ' ≡ rel-hole-ctx (τ-substK p K) Γ'
+                  
+τ-substK-hole-ctx p K = {!!} -- TODO: for this need lemmas relating τ-substK to all computation term context formers
 
-_[_] : ∀ {Γ C f} 
-     → (K : Γ ⊢K[ f ]⦂ C) 
-     → (M : abs-hole-ctx K ⊢C⦂ (hole-ty K)) 
-     → Γ ⊢C⦂ C
-
-[]ₖ [ M ] =
-  M
-(K ₖ[ p ]; N) [ M ] =
-  (K [ M ]) ; N
-(N ;[ p ]ₖ K) [ M ] =
-  N ; (K [ M ])
-(match V `in[ P ]ₖ K) [ M ] =
-  match V `in (K [ M ])
-(perform[ p ]ₖ op V K) [ M ] =
-  perform op V (K [ M ])
-(handle[ p ]ₖ K `with H `in N) [ M ] =
-  handle (K [ M ]) `with H `in N
-(handle N `with H `in[ p ]ₖ K) [ M ] =
-  handle N `with H `in (K [ M ])
-(delay[ p ]ₖ τ K) [ M ] =
-  delay τ (K [ M ])
-(unbox[ p ]ₖ q V K) [ M ] =
-  unbox q V (K [ M ])
-(box[ p ]ₖ V K [ M ]) =
-  box V (K [ M ])
+τ-substK-[·]ₖ : ∀ {Γ CH CH' A τ τ' f f'}
+              → (p : τ ≡ τ')
+              → (K : Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ)
+              → (L : Γ ++ᶜ hole-ctx K ⊢K[ f' ◁ CH' ]⦂ CH)
+              → τ-substK p (K [ L ]ₖ)
+              ≡ τ-substK p K [ K-rename (eq-ren (cong (Γ ++ᶜ_) (τ-substK-hole-ctx p K))) L ]ₖ
+              
+τ-substK-[·]ₖ p K L = {!!} -- TODO: for this need lemmas relating τ-substK to all computation term context formers
 -}
-

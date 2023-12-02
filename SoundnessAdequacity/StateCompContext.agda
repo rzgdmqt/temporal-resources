@@ -19,16 +19,31 @@ open import Data.Sum
 
 -- Translating states to computation term contexts
 
-toK : ∀ {Γ A τ}
-    → (S : 𝕊 Γ)
-    → Γ ⊢K[ state ◁ Ctx→Bctx (toCtx S) ⊢ A ‼ τ ]⦂ (A ‼ (state-time S + τ))
-    
-toK ∅ =
-  []ₖ
-toK {A = A} {τ = τ'} (S ⟨ τ ⟩ₛ) =
-  (τ-substK (sym (+-assoc _ τ τ')) (toK {A = A} {τ = τ + τ' } S)) [ delay[ f≤ᶠf ]ₖ τ []ₖ ]ₖ
-toK (_∷ₛ_ {τ = τ} S V) =
-  (toK S) [ box[ f≤ᶠf ]ₖ (V-rename (eq-ren (cong (_⟨ τ ⟩) (sym (⋈-++ₗ-[] _ (toCtx S))))) V) []ₖ ]ₖ
+mutual
+
+  toK : ∀ {Γ A τ}
+      → (S : 𝕊 Γ)
+      → Γ ⊢K[ state ◁ A ‼ τ ]⦂ (A ‼ (state-time S + τ))
+      
+  toK ∅ =
+    []ₖ
+  toK {A = A} {τ = τ'} (S ⟨ τ ⟩ₛ) =
+    τ-substK (sym (+-assoc _ τ τ')) ((toK S) [ delay[ f≤ᶠf ]ₖ τ []ₖ ]ₖ)
+  toK {Γ} (_∷ₛ_ {A = A} {τ = τ} S V) =
+    (toK S) [ box[ f≤ᶠf ]ₖ (V-rename (eq-ren (cong (λ Γ' → (Γ ++ᶜ Γ') ⟨ τ ⟩) {!!})) V) []ₖ ]ₖ
+
+  toCtx-rel-hole-ctx : ∀ {Γ Γ' A τ}
+                       → (S : 𝕊 Γ)
+                       → Γ' ++ᶜ toCtx S ≡ rel-hole-ctx (toK {A = A} {τ = τ} S) Γ'
+  
+  toCtx-rel-hole-ctx {Γ} {Γ'} {A} {τ} ∅ = refl
+  toCtx-rel-hole-ctx {Γ} {Γ'} {A} {τ} (S ⟨ τ' ⟩ₛ) =
+    trans
+      (cong (_⟨ τ' ⟩) (toCtx-rel-hole-ctx {A = A} {τ = τ} S))
+      {!!}
+  toCtx-rel-hole-ctx {Γ} {Γ'} {A} {τ} (S ∷ₛ V) = {!!}
+
+--(toK S) [ box[ f≤ᶠf ]ₖ (V-rename (eq-ren (cong (_⟨ τ ⟩) (sym (⋈-++ₗ-[] _ (toCtx S))))) V) []ₖ ]ₖ
 
 -- Spliting computation term context at resource 
 
