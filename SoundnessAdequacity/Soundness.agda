@@ -21,53 +21,52 @@ open import Util.Operations
 open import Data.Product
 open import Util.Time
 
+{-
+-- Compatibility relation between evaluation contexts
+
+data _~[_]~_ : ∀ {Γ Γ' CH CH' C C'} → Γ ⊢K[ eval ◁ CH ]⦂ C → Ren Γ Γ' → Γ' ⊢K[ eval ◁ CH' ]⦂ C' → Set where
+
+  ~[]ₖ : ∀ {Γ Γ' CH CH' ρ}
+       → []ₖ {Γ} {eval} {CH} ~[ ρ ]~ []ₖ {Γ'} {eval} {CH'}
+
+  ~let : ∀ {Γ Γ' CH CH' A B C τ τ' τ''}
+       → {E : Γ ⊢K[ eval ◁ CH ]⦂ (A ‼ τ)}
+       → {E' : Γ' ⊢K[ eval ◁ CH' ]⦂ (B ‼ τ')}
+       → {N : Γ ⟨ τ ⟩ ∷ A ⊢C⦂ C ‼ τ''}
+       → {ρ : Ren Γ Γ'}
+       → E ~[ ρ ]~ E'
+       → (E ₖ[ f≤ᶠf ]; N) ~[ ρ ]~ (E' ₖ[ f≤ᶠf ]; C-rename {!!} N)
+-}
+
 
 -- Soundness theorem
 
--- TODO: define K-rename, replace with K-rename eq-ren
-
---(((toK S) [ (Γ-substK p E) [ Γ-substK s {!!} ]ₖ ]ₖ) [ (C-rename r M') ])
-
--- Γ-substK s ((τ-substK t (toK suc-part-state)))
-
-
-soundness' : ∀ {A B τ₁ τ₂ τ₃}
+soundness : ∀ {A B τ₁ τ₂ τ₃}
         → {S S' : 𝕊 []} 
         → {M : toCtx S ⊢C⦂ A ‼ τ₁}
         → {M' : toCtx S' ⊢C⦂ A ‼ τ₂}
         → (M↝M' : ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩)
-        → let S≤ₛS' = step-extends-state M↝M' in 
-        let suc-part-state = (suc-part-state S S' S≤ₛS') in 
-        (E : toCtx S ⊢K[ eval ◁ []ₗ ⊢ A ‼ τ₁ ]⦂ B ‼ τ₃)
-        → let p = sym (trans (⋈-identityˡ {Δ = Ctx→Bctx (toCtx S)}) (Ctx→Bctx→Ctx-iso (toCtx S))) in
-        let q = eq-ren (sym (trans 
-                (⋈-identityˡ {Δ = Ctx→Bctx (toCtx S) ++ₗ []ₗ}) 
-                (trans {j = BCtx→Ctx (Ctx→Bctx (toCtx S))} 
-                  (cong BCtx→Ctx (Ctx→Bctx-hom (toCtx S) [])) 
-                  (Ctx→Bctx→Ctx-iso (toCtx S))))) in 
-        let r = eq-ren (sym (trans 
-                (⋈-identityˡ {Δ = Ctx→Bctx (toCtx S) ++ₗ Ctx→Bctx (toCtx suc-part-state)}) 
-                (trans 
-                  (cong BCtx→Ctx (Ctx→Bctx-hom (toCtx S) (toCtx suc-part-state))) 
-                  (trans 
-                    (Ctx→Bctx→Ctx-iso ((toCtx S) ++ᶜ (toCtx suc-part-state))) 
-                    (S++suc-partS≡S' S S' S≤ₛS'))))) in
-        let s = trans ++ᶜ-identityˡ p in
-        let t = second-part-equality 
-                  (ctx-time (toCtx S')) 
-                  (ctx-time (toCtx S)) 
-                  (ctx-time (toCtx suc-part-state)) 
-                  τ₁ τ₂ 
-                  (sym (trans 
-                    (sym (ctx-time-++ᶜ (toCtx S) (toCtx suc-part-state))) 
-                    (time-S++suc-partS≡S' S S' S≤ₛS')))
-                  (trans 
-                    (cong (_+ τ₁) (sym (time-≡ S))) 
-                    (trans 
-                      (proj₂ (perservation-theorem M↝M')) 
-                      (cong (_+ τ₂) (time-≡ S')))) in
-        [] ⊢C⦂ 
-            (toK S [ Γ-substK p E ]ₖ) [ C-rename q M ]
-          == 
-            (((toK S) [ (Γ-substK p E) [ Γ-substK s (τ-substK t (toK suc-part-state)) ]ₖ ]ₖ) [ (C-rename r M') ])
-soundness' M↝M' E = {!   !}
+        → (E : hole-ctx (toK S) ⊢K[ eval ◁ A ‼ τ₁ ]⦂ B ‼ (τ₁ + τ₃))
+        → (E' : hole-ctx (toK S') ⊢K[ eval ◁ A ‼ τ₂ ]⦂ B ‼ (τ₂ + τ₃))
+        → {!!} -- TODO: this variant would ne some kind of compatibility relation between E and E' (that modulo weakening renamings they have the same structure)
+        → let ρ = eq-ren
+                    (trans
+                      (sym ++ᶜ-identityˡ)
+                      (trans
+                        (toCtx-rel-hole-ctx S)
+                        (cong (rel-hole-ctx (toK S) [] ++ᶜ_) (sym (eval-hole-ctx E)))))
+                     in
+          let ρ' = eq-ren
+                     (trans
+                       (sym ++ᶜ-identityˡ)
+                       (trans
+                         (toCtx-rel-hole-ctx S')
+                         (cong (rel-hole-ctx (toK S') [] ++ᶜ_) (sym (eval-hole-ctx E')))))
+                     in
+          [] ⊢C⦂
+             toK S [ C-rename (eq-ren (sym ++ᶜ-identityˡ)) (E [ C-rename ρ M ]) ]
+             ==
+             toK S' [ C-rename (eq-ren (sym ++ᶜ-identityˡ)) (E' [ C-rename ρ' M' ]) ]
+
+soundness M↝M' E = {!!}
+

@@ -244,7 +244,20 @@ hole-ctx-++ᶜ : ∀ {Γ f CH C}
 
 hole-ctx-++ᶜ {Γ} K = rel-hole-ctx-++ᶜ {Γ} {Γ} {[]} K
 
--- Monotonicity if computation term contexts with respect to flags
+-- For evaluation contexts, holes do not bind any variables
+
+eval-hole-ctx : ∀ {Γ CH C}
+              → (K : Γ ⊢K[ eval ◁ CH ]⦂ C)
+              → hole-ctx K ≡ []
+
+eval-hole-ctx []ₖ =
+  refl
+eval-hole-ctx (K ₖ[ p ]; N) =
+  eval-hole-ctx K
+eval-hole-ctx (handle[ p ]ₖ K `with H `in N) =
+  eval-hole-ctx K
+
+-- Monotonicity of computation term contexts with respect to flags
 
 ◁-mon : ∀ {Γ CH C f f'}
       → f ≤ᶠ f'
@@ -300,6 +313,14 @@ K-rename ρ (unbox[ p ]ₖ q V K) =
   unbox[ p ]ₖ (≤-trans q (ctx-time-≤ ρ)) (V-rename (ρ -ʳ _ , q) V) (K-rename (cong-ren ρ) K)
 K-rename ρ (box[ p ]ₖ V K) =
   box[ p ]ₖ (V-rename (cong-ren ρ) V) (K-rename (cong-ren ρ) K)
+
+-- Lemmas about the action of renaming (TODO: postulated for time being; complete later)
+
+postulate
+
+  K-rename-id : ∀ {Γ CH C f}
+              → (K : Γ ⊢K[ f ◁ CH ]⦂ C)
+              → K-rename id-ren K ≡ K
 
 -- Composition of computation term contexts
 
@@ -438,5 +459,6 @@ box[ p ]ₖ V K [ N ] =
               
 τ-substK-[·]ₖ refl K L =
   trans
-    {!!}                             -- TODO: need to prove *-rename idʳ x ≡ x for * ∈ {V,C,K}
+    (cong (λ L → K [ L ]ₖ) (sym (K-rename-id L)))
     (cong (λ ρ → K [ K-rename ρ L ]ₖ) (sym eq-ren-refl-id))
+

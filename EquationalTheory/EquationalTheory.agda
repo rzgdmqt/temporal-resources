@@ -436,11 +436,11 @@ mutual
 
     -- beta rule for unbox
 
-    unbox-beta : ∀ {A C τ}
+    unbox-beta : ∀ {A C D τ}
                → (V : Γ ⟨ τ ⟩ ⊢V⦂ A )
-               → (K : Γ ∷ [ τ ] A ⊢K[ all ]⦂ C)
+               → (K : Γ ∷ [ τ ] A ⊢K[ all ◁ D ]⦂ C)
                → (p : τ ≤ ctx-time (hole-ctx K))
-               → (N : (Γ ∷ [ τ ] A ++ᶜ hole-ctx K) ∷ A ⊢C⦂ hole-ty K)
+               → (N : (Γ ∷ [ τ ] A ++ᶜ hole-ctx K) ∷ A ⊢C⦂ D)
                ------------------------------------------------------------------------------------------------------------------------
                → Γ ⊢C⦂ box V (K [ unbox
                                    (≤-trans (≤-stepsˡ _ p) (≤-reflexive (sym (ctx-time-++ᶜ (Γ ∷ [ τ ] A)  (hole-ctx K)))))
