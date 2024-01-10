@@ -443,7 +443,7 @@ mutual
                → (N : (Γ ∷ [ τ ] A ++ᶜ hole-ctx K) ∷ A ⊢C⦂ D)
                ------------------------------------------------------------------------------------------------------------------------
                → Γ ⊢C⦂ box V (K [ unbox
-                                   (≤-trans (≤-stepsˡ _ p) (≤-reflexive (sym (ctx-time-++ᶜ (Γ ∷ [ τ ] A)  (hole-ctx K)))))
+                                   (≤-trans (m≤n⇒m≤o+n _ p) (≤-reflexive (sym (ctx-time-++ᶜ (Γ ∷ [ τ ] A)  (hole-ctx K)))))
                                    (var (var-ᶜ {Γ = Γ ∷ [ τ ] A ++ᶜ hole-ctx K} {τ = τ} {τ' = ctx-time (hole-ctx K)} p (var-τ-++ᶜ Hd)))
                                    N ])
                    == box V (K [ N [ Hd ↦ V-rename (ren⟨τ⟩-ctx p ∘ʳ cong-⟨⟩-ren (wk-ren {A = [ τ ] A})) V ]c ])

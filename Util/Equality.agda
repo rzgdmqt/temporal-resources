@@ -7,8 +7,8 @@ module Util.Equality where
 open import Level renaming (zero to lzero; suc to lsuc)
 
 import Relation.Binary.PropositionalEquality as Eq
-open Eq public hiding (Extensionality) renaming ([_] to [|_|]) hiding (subst₂)
-open Eq.≡-Reasoning public using (begin_; _≡⟨⟩_; step-≡; _∎)
+open Eq public renaming ([_] to [|_|]) hiding (subst₂)
+open Eq.≡-Reasoning public
 
 open import Axiom.Extensionality.Propositional
 
@@ -20,6 +20,7 @@ postulate
 
 -- Congruence rules for dependent functions
 
+{-
 dcong : ∀ {l₁ l₂} {A : Set l₁} {B : A → Set l₂} (f : (x : A) → B x) {x y}
       → (p : x ≡ y) → subst B p (f x) ≡ f y
 dcong f refl = refl
@@ -29,6 +30,7 @@ dcong₂ : ∀ {l₁ l₂ l₃} {A : Set l₁} {B : A → Set l₂} {C : Set l�
        → (p : x₁ ≡ x₂) → subst B p y₁ ≡ y₂
        → f x₁ y₁ ≡ f x₂ y₂
 dcong₂ f refl refl = refl
+-}
 
 -- Constant subst is identity
 
@@ -52,6 +54,7 @@ subst₂ P refl refl z = z
 
 -- Dependent double substitution
 
+{-
 dsubst₂ : ∀ {l₁ l₂ l₃}
           {A : Set l₁} {B : A → Set l₂}
           (P : (x : A) → B x → Set l₃)
@@ -61,6 +64,7 @@ dsubst₂ : ∀ {l₁ l₂ l₃}
         → P x₁ y₁
         → P x₂ y₂
 dsubst₂ P refl refl z = z
+-}
 
 -- Tertiary congruence
 

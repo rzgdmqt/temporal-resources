@@ -86,7 +86,7 @@ data _≤ₛ_ : ∀ {Γ Γ'} → 𝕊 Γ → 𝕊 Γ' → Set where
 S≤ₛS'⇒τ≤τ' : ∀ {Γ Γ'} → {S : 𝕊 Γ} → {S' : 𝕊 Γ'} → S ≤ₛ S' → (state-time S) ≤ (state-time S')
 S≤ₛS'⇒τ≤τ' {S = S} {S' = .S} id-suc = ≤-refl
 S≤ₛS'⇒τ≤τ' {S = S} {S' = .(S' ⟨ τ'' ⟩ₛ)} (⟨⟩-suc {S' = S'} τ'' S≤ₛS') = 
-    ≤-stepsʳ τ'' 
+    m≤n⇒m≤n+o τ'' 
         (τ-≤-substᵣ (time-≡ S')
         (τ-≤-substₗ (sym (time-≡ S)) 
     (Ren.ctx-time-≤ (≤ₛ⇒Ren S≤ₛS'))))
@@ -107,7 +107,7 @@ suc-comp-ren : ∀ {Γ Γ'}
         → (q : state-time S + τ'' ≤ state-time S' + τ''') 
         → Ren (toCtx S ⟨ τ'' ⟩) (toCtx S' ⟨ τ''' ⟩)
 suc-comp-ren {S = S} id-suc q = 
-  ⟨⟩-≤-ren (+-cancelˡ-≤ (state-time S) q)
+  ⟨⟩-≤-ren (+-cancelˡ-≤ _ _ _ q)
 suc-comp-ren {τ'' = τ} {τ'''} (⟨⟩-suc {S' = S'} τ'' S≤ₛS') q = 
   ⟨⟩-μ-ren 
     ∘ʳ suc-comp-ren S≤ₛS' (τ-≤-substᵣ (sym (+-assoc (state-time S') τ'' τ''')) q)
@@ -298,7 +298,7 @@ var-in-ctx (var {τ = τ} x) = τ , x
     state-time (split-state-snd S (var-ᶜ-+ {τ = τ'} (proj₂ (var-in-ctx V))))
 τ'≤snd-state {τ' = τ'} {S = S} (var {τ = τ} x) = 
   let y = var-ᶜ-+ {τ = τ'} x in 
-  τ-≤-substᵣ (snd-split-time≡time-from-head S y) (≤-stepsˡ τ ≤-refl)
+  τ-≤-substᵣ (snd-split-time≡time-from-head S y) (m≤n⇒m≤o+n τ ≤-refl)
 
 -- Looking up a resource in the state
 

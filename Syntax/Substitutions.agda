@@ -70,7 +70,7 @@ var-not-in-ctx-after-ᶜ {Γ ⟨ τ'' ⟩} {A} {.(τ'' + _)} {suc τ'} (Tl-⟨�
     (≤-trans
       (≤-trans
         (+-monoʳ-≤ 1 (≤-reflexive (sym (m+n∸m≡n τ'' τ'''))))
-        (≤-reflexive (sym (+-∸-assoc 1 {τ'' + τ'''} {τ''} (≤-stepsʳ τ''' ≤-refl)))))
+        (≤-reflexive (sym (+-∸-assoc 1 {τ'' + τ'''} {τ''} (m≤n⇒m≤n+o τ''' ≤-refl)))))
       (∸-monoˡ-≤ τ'' (+-monoʳ-≤ 1 p)))
 
 -- Substituting a value for a variable in context

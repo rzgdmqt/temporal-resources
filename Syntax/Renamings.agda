@@ -25,7 +25,7 @@ open import Util.Equality
 open import Util.Time
 
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
-open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)
+open Eq.≡-Reasoning
 
 -- Variable renamings (with an extra condition that disallow discarding time captured by contexts)
 
@@ -125,7 +125,7 @@ cong-ren {Γ} {Γ'} {Γ''} ρ =
 wk-ctx-renᵣ : ∀ {Γ Γ'} → Ren Γ (Γ ++ᶜ Γ')
 wk-ctx-renᵣ {Γ} {Γ'} = 
   ren 
-    (τ-≤-substᵣ (ctx-time-++ᶜ Γ Γ') (≤-stepsʳ (ctx-time Γ') ≤-refl)) 
+    (τ-≤-substᵣ (ctx-time-++ᶜ Γ Γ') (m≤n⇒m≤n+o (ctx-time Γ') ≤-refl)) 
     wk-ctx-vren
 
 wk-ctx-renₗ : ∀ {Γ Γ'} → Ren Γ (Γ' ++ᶜ Γ)

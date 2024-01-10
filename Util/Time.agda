@@ -28,7 +28,7 @@ n≤k⇒m≤k∸n⇒n+m≤k (suc n) m (suc k) (s≤s p) q =
 
 
 n≤n∸m+m : (n m : Time) → n ≤ n ∸ m + m
-n≤n∸m+m n       zero    = ≤-stepsʳ 0 ≤-refl
+n≤n∸m+m n       zero    = m≤n⇒m≤n+o 0 ≤-refl
 n≤n∸m+m zero    (suc m) = z≤n
 n≤n∸m+m (suc n) (suc m) =
   ≤-trans
@@ -96,7 +96,7 @@ n≤k⇒¬n≤m+k-contradiction {n} {zero} {k} p q = q p
 n≤k⇒¬n≤m+k-contradiction {.zero} {suc m} {k} z≤n q = q z≤n
 n≤k⇒¬n≤m+k-contradiction {.(suc _)} {suc m} {.(suc _)} (s≤s p) q =
   n≤k⇒¬n≤m+k-contradiction {_} {m} {_} p
-    (λ r → q (+-monoʳ-≤ 1 (≤-trans (≤-step r) (≤-reflexive (sym (+-suc m _))))))
+    (λ r → q (+-monoʳ-≤ 1 (≤-trans (m≤n⇒m≤1+n r) (≤-reflexive (sym (+-suc m _))))))
 
 
 sucn≤m⇒m+k≤n-contradiction : ∀ {n m k} → suc n ≤ m → m + k ≤ n → ⊥
@@ -317,6 +317,7 @@ a≤b⇒b≤a⇒a≡b (s≤s a≤b) (s≤s b≤a) = cong suc (a≤b⇒b≤a⇒a�
 subst-left : ∀ a b c d → a + b ≡ c + d → a ≡ c → a + b ≡ a + d
 subst-left a b .a d p refl = p
 
+{-
 τ≤τ'∧τ+τ''≡τ'+τ'''⇒τ''≤τ''' : ∀ τ τ' τ'' τ''' → τ ≤ τ' → τ + τ'' ≡ τ' + τ''' → τ''' ≤ τ''
 τ≤τ'∧τ+τ''≡τ'+τ'''⇒τ''≤τ''' τ τ' τ'' zero p q = z≤n
 τ≤τ'∧τ+τ''≡τ'+τ'''⇒τ''≤τ''' τ τ' zero (suc τ''') p q = 
@@ -342,3 +343,4 @@ second-part-equality a b c d e p q =
       (sym (trans 
         (sym (+-assoc b c e)) 
         (cong (_+ e) (sym p)))))) 
+-}

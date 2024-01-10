@@ -27,7 +27,7 @@ open import Util.Equality
 open import Util.Time
 
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
-open Eq.≡-Reasoning using (begin_; _≡⟨⟩_; step-≡; step-≡˘; _∎)
+open Eq.≡-Reasoning
 
 -- Subst for time annotations of variables (for convenience)
 
@@ -198,7 +198,7 @@ var-ᶜ-+ {Γ ⟨ τ'' ⟩} {A} {suc τ} {.(τ'' ∸ suc τ + τ')} (Tl-⟨⟩ {
   τ'' + τ''' , +-monoˡ-≤ τ''' (m∸n≤m τ'' (suc τ)) , Tl-⟨⟩ x
 ... | no ¬p with -ᶜ-wk-vren {Γ} (suc τ ∸ τ'') x
 ... | τ''' , r , y =
-  τ'' + τ''' , ≤-stepsˡ τ'' r , Tl-⟨⟩ y
+  τ'' + τ''' , m≤n⇒m≤o+n τ'' r , Tl-⟨⟩ y
 
 -- Parametric right adjoint (PRA) situation between (-) -ᶜ τ and ⟨ τ ⟩
 
@@ -335,7 +335,7 @@ vren⟨τ⟩-ctx : ∀ {Γ Γ' τ} → τ ≤ ctx-time Γ' → VRen (Γ ⟨ τ �
 vren⟨τ⟩-ctx {Γ} {Γ'} {τ} p =
   pra-⟨⟩-vren⁻¹ {Γ} {Γ ++ᶜ Γ'}
     (≤-trans
-      (≤-stepsˡ (ctx-time Γ) p)
+      (m≤n⇒m≤o+n (ctx-time Γ) p)
       (≤-reflexive (sym (ctx-time-++ᶜ Γ Γ'))))
     (    eq-vren (++ᶜ-ᶜ {Γ} {Γ'} p)
      ∘ᵛʳ wk-ctx-vren)
