@@ -280,14 +280,6 @@ var-in-split {Γ₁ = Γ₁} {Γ₂ = Γ₂ ⟨ τ ⟩} {A = A}
 
 -- Temporal minus operation on contexts
 
--- TODO: To properly fit with the view that -ᶜ is a 
---       parametric right adjoint to ⟨ ⟩, then this
---       operation should be restricted to times less
---       than or equal to ctx-time of the given context.
---
---       Currently τ ≤ ctx-time Γ is required only in
---       definitions and lemmas where it is necessary.
-
 _-ᶜ_ : Ctx → Time → Ctx
 Γ        -ᶜ zero  = Γ
 []       -ᶜ suc τ = []

@@ -4,11 +4,8 @@
 
 module Syntax.Substitutions where
 
-open import Function hiding (const)
-
 open import Data.Empty
 open import Data.Product
-open import Data.Sum
 
 open import Relation.Nullary
 

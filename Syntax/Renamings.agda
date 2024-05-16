@@ -4,28 +4,17 @@
 
 module Syntax.Renamings where
 
-open import Function hiding (const)
-
-open import Data.Bool hiding (_≤_;_≤?_)
-open import Data.Empty
 open import Data.Product
-open import Data.Sum
-
-open import Relation.Binary.Definitions
-open import Relation.Nullary
 
 open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Renamings.Raw public
 open import Syntax.Types
 
-open import Data.Nat public
-open import Data.Nat.Properties public
 open import Util.Equality
 open import Util.Time
 
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 
-open Eq.≡-Reasoning
 
 -- Variable renamings (with an extra condition that disallow discarding time captured by contexts)
 

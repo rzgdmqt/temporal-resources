@@ -1,7 +1,6 @@
 module OperationalSemantics.State where
 
 open import Syntax.Contexts
-open import Syntax.CompContext
 open import Syntax.Language
 open import Syntax.Renamings
 open import Syntax.Types
