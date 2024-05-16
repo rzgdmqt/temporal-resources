@@ -19,7 +19,6 @@ open import Util.Time
 
 -- Equations between well-typed values and computations
 
--- TODO: prove that Γ ⊢V⦂ V == V' implies that V and V' have the same type
 
 mutual
 

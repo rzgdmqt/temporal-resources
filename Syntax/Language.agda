@@ -156,15 +156,7 @@ mutual
             → Γ ⊢C⦂ C
 
 
--- some usefull Substitutions
-
-τ-subst⟨⟩ : ∀ {Γ A B τ τ' τ''}
-        → τ ≡ τ'
-        → Γ ⟨ τ ⟩ ∷ B ⊢C⦂ A ‼ τ''
-        --------------------------
-        → Γ ⟨ τ' ⟩ ∷ B ⊢C⦂ A ‼ τ''
-
-τ-subst⟨⟩ refl M = M
+-- Usefull Substitution
 
 τ-subst : ∀ {Γ A τ τ'}
         → τ ≡ τ'

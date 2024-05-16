@@ -153,7 +153,7 @@ mutual
                     ↝ ⟨ extend-state S (V-rename (cong-⟨⟩-ren wk-ctx-renₗ) V) , 
                         M ⟩
 
-        -- step for unbox: we just substitute in M with unboxed resource (finding the right one is tricky)
+        -- step for unbox: we just substitute in M with unboxed resource
         UNBOX : ∀ {A C τ'} → 
                 {S : 𝕊 []} → 
                 (p : τ' ≤ ctx-time (toCtx S)) → 
@@ -174,7 +174,7 @@ mutual
                                     (τ'≤snd-state V)) 
                                 (resource-lookup S y)) ]c ⟩
  
-    -- Theorem that step only extends state
+    -- Theorem: Step only extends state
     step-extends-state : ∀ {τ'' τ'''} → 
                 {S : 𝕊 []} → {S' : 𝕊 []} → 
                 {A : VType} → 

@@ -28,7 +28,7 @@ mutual
   infix  32 _⟨_⟩ₛ
 
 
--- operations on state - just for better readability in perservation theorem
+-- Operations on state - for better readability in perservation theorem
 
 time-pass : ∀ {Γ} → (S : 𝕊 Γ) → (τ' : Time) → 𝕊 Γ
 time-pass S τ = S ⟨ τ ⟩ₛ 
@@ -36,14 +36,14 @@ time-pass S τ = S ⟨ τ ⟩ₛ
 extend-state : ∀ {Γ A τ} → (S : 𝕊 Γ) → ((Γ ++ᶜ (toCtx S) ⟨ τ ⟩) ⊢V⦂ A) → 𝕊 Γ
 extend-state S V = S ∷ₛ V 
 
--- Sum of time passing in the state
+-- Sum of the time passings in the state
 
 state-time : ∀ {Γ} → (S : 𝕊 Γ) → Time
 state-time ∅ = 0
 state-time (S ⟨ τ ⟩ₛ) = state-time S + τ
 state-time (S ∷ₛ A) = state-time S
 
--- State time is the same as context time of toCtx S 
+-- State time is the same as the context time of toCtx S 
 
 time-≡ : ∀ {Γ} → (S : 𝕊 Γ) → state-time S ≡ ctx-time (toCtx S)
 time-≡ ∅ = refl
@@ -74,14 +74,14 @@ data _≤ₛ_ : ∀ {Γ Γ'} → 𝕊 Γ → 𝕊 Γ' → Set where
             ----------------
             → S ≤ₛ (S' ∷ₛ V)
 
--- if two states are successors they can be renamed contexts
+-- If a state is a successor of another state they can be renamed as contexts
 
 ≤ₛ⇒Ren : ∀ {Γ Γ'} → {S : 𝕊 Γ} → {S' : 𝕊 Γ'} → S ≤ₛ S' → Ren (toCtx S) (toCtx S')
 ≤ₛ⇒Ren id-suc = id-ren
-≤ₛ⇒Ren (⟨⟩-suc τ'' y) = wk-⟨⟩-ren ∘ʳ (≤ₛ⇒Ren y)
-≤ₛ⇒Ren (∷-suc V y) = wk-ren ∘ʳ (≤ₛ⇒Ren y)
+≤ₛ⇒Ren (⟨⟩-suc τ'' S≤ₛS') = wk-⟨⟩-ren ∘ʳ (≤ₛ⇒Ren S≤ₛS')
+≤ₛ⇒Ren (∷-suc V S≤ₛS') = wk-ren ∘ʳ (≤ₛ⇒Ren S≤ₛS')
 
--- ≤ₛ increase time
+-- ≤ₛ increases time
 
 S≤ₛS'⇒τ≤τ' : ∀ {Γ Γ'} → {S : 𝕊 Γ} → {S' : 𝕊 Γ'} → S ≤ₛ S' → (state-time S) ≤ (state-time S')
 S≤ₛS'⇒τ≤τ' {S = S} {S' = .S} id-suc = ≤-refl
@@ -96,7 +96,7 @@ S≤ₛS'⇒τ≤τ' {S = S} {S' = .(S' ∷ₛ V)} (∷-suc {S' = S'} V S≤ₛS
     (Ren.ctx-time-≤ (≤ₛ⇒Ren S≤ₛS')))
 
 
--- Lemma if one state is successor of another and overall time inreases we 
+-- Lemma: If one state is a successor of another and overall time inreases we 
 -- can rename it
 
 suc-comp-ren : ∀ {Γ Γ'} 
@@ -104,7 +104,7 @@ suc-comp-ren : ∀ {Γ Γ'}
         → {S : 𝕊 Γ} 
         → {S' : 𝕊 Γ'} 
         → S ≤ₛ S' 
-        → (q : state-time S + τ'' ≤ state-time S' + τ''') 
+        → state-time S + τ'' ≤ state-time S' + τ'''
         → Ren (toCtx S ⟨ τ'' ⟩) (toCtx S' ⟨ τ''' ⟩)
 suc-comp-ren {S = S} id-suc q = 
   ⟨⟩-≤-ren (+-cancelˡ-≤ _ _ _ q)
@@ -189,7 +189,7 @@ mutual
   split-state-++ᶜ (_∷ₛ_ {A = A} {τ = τ} S V) (Tl-∷ x) =
     cong (_∷ [ τ ] A) (split-state-++ᶜ S x)
 
--- Relating the splitting of a state by the splitting of the corresponding context 
+-- Relating the splitting of the state to the splitting of the corresponding context 
 
 fst-split-state≡split-ctx : ∀ {Γ A τ τ'}
                   → (S : 𝕊 Γ)
@@ -269,7 +269,7 @@ mutual
   S++suc-partS≡S' S .(S' ∷ₛ V) (∷-suc {τ = τ} {A = A} {S' = S'} V S≤ₛS') = 
     cong (_∷ [ τ ] A) (S++suc-partS≡S' S S' S≤ₛS')
 
--- Lemmas about what can and what can't be in toCtx S (only var can be)
+-- Lemmas about which values can and which can't be in toCtx S (only var can be)
 
 ⇒-not-in-toCtx : ∀ {Γ τ} {S : 𝕊 Γ} {A : VType} {C : CType} → A ⇒ C ∈[ τ ] toCtx S → ⊥
 ⇒-not-in-toCtx {S = S ⟨ τ ⟩ₛ} (Tl-⟨⟩ x) = ⇒-not-in-toCtx x
@@ -290,6 +290,8 @@ var-in-ctx : ∀ { Γ τ' A} →
             (V : Γ ⊢V⦂ [ τ' ] A) → 
             Σ[ τ'' ∈ Time ] ([ τ' ] A ∈[ τ'' ] Γ )
 var-in-ctx (var {τ = τ} x) = τ , x
+
+-- The time of state can't be negative
 
 τ'≤snd-state : ∀ {A τ'} 
         → {S : 𝕊 []}
@@ -328,24 +330,3 @@ resource-pass-to-ctx {Γ} {τ} {τ'} {A} S x p V =
      ∘ʳ cong-ren wk-ren
      ∘ʳ ren⟨τ⟩-ctx {Γ' = toCtx (split-state-snd S x)} p)
     V
-
--- Relating the splitting of a state to the whole state
-
-{-
-split-state-++ˢ : ∀ {Γ A τ τ'}
-                → (S : 𝕊 Γ)
-                → (x : [ τ ] A ∈[ τ' ] (toCtx S))
-                → split-state-fst S x ∷ₛ resource-lookup S x ++ˢ split-state-snd S x ≡ S
-                
-split-state-++ˢ (S ⟨ τ ⟩ₛ) (Tl-⟨⟩ x) =
-  cong _⟨ τ ⟩ₛ (split-state-++ˢ S x)
-split-state-++ˢ (S ∷ₛ V) Hd =
-  refl
-split-state-++ˢ {Γ} (_∷ₛ_ {A = A} {τ = τ} S V) (Tl-∷ x) =
-  dcong₂ (λ S V → S ∷ₛ V)
-    (split-state-++ˢ S x)
-    (trans
-      (cong (subst (λ z → (Γ ++ᶜ toCtx z) ⟨ τ ⟩ ⊢V⦂ A)
-      (split-state-++ˢ S x)) {!!})
-      {!!})
--}

@@ -155,23 +155,6 @@ data _⊢K[_◁_]⦂_ (Γ : Ctx) (f : Flag) (CH : CType) : CType → Set where
         ----------------------------
         → Γ ⊢K[ f ◁ CH ]⦂ C
 
-{-
--- Type of the hole in a computation term context
-
-hole-ty : ∀ {Γ f CH C} → Γ ⊢K[ f ◁ CH ]⦂ C → CType
-
-hole-ty ([]ₖ ) = C
-hole-ty (K ₖ[ p ]; N) = hole-ty K
-hole-ty (M ;[ p ]ₖ K) = hole-ty K
-hole-ty (match V `in[ p ]ₖ K) = hole-ty K
-hole-ty (perform[ p ]ₖ op V K) = hole-ty K
-hole-ty (handle[ p ]ₖ K `with H `in N) = hole-ty K
-hole-ty (handle M `with H `in[ p ]ₖ K) = hole-ty K
-hole-ty (delay[ p ]ₖ τ K) = hole-ty K
-hole-ty (unbox[ p ]ₖ q V K) = hole-ty K
-hole-ty (box[ p ]ₖ V K) = hole-ty K
--}
-
 -- Contexts of the hole in a computation term context
 -- (the relative version, against arbitrary ctx Γ')
 -- (turns a computation term contexts into a Hughes list)
@@ -314,14 +297,6 @@ K-rename ρ (unbox[ p ]ₖ q V K) =
 K-rename ρ (box[ p ]ₖ V K) =
   box[ p ]ₖ (V-rename (cong-ren ρ) V) (K-rename (cong-ren ρ) K)
 
--- Lemmas about the action of renaming (TODO: postulated for time being; complete later)
-
-postulate
-
-  K-rename-id : ∀ {Γ CH C f}
-              → (K : Γ ⊢K[ f ◁ CH ]⦂ C)
-              → K-rename id-ren K ≡ K
-
 -- Composition of computation term contexts
 
 _[_]ₖ : ∀ {Γ CH CH' C f f'}
@@ -433,32 +408,4 @@ box[ p ]ₖ V K [ N ] =
            (trans
              (cong (_ ++ᶜ_) (rel-hole-ctx-++ᶜ K))
              (sym (++ᶜ-assoc _ ([] ∷ _) (hole-ctx K))))) N ])
-
--- Equality-subeffecting for computation term contexts
-
-τ-substK : ∀ {Γ CH A τ τ' f}
-         → τ ≡ τ'
-         → Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ
-         → Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ'
-
-τ-substK refl K = K
-
-τ-substK-hole-ctx : ∀ {Γ Γ' CH A τ τ' f}
-                  → (p : τ ≡ τ')
-                  → (K : Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ)
-                  → rel-hole-ctx K Γ' ≡ rel-hole-ctx (τ-substK p K) Γ'
-                  
-τ-substK-hole-ctx refl K = refl
-
-τ-substK-[·]ₖ : ∀ {Γ CH CH' A τ τ' f f'}
-              → (p : τ ≡ τ')
-              → (K : Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ)
-              → (L : Γ ++ᶜ hole-ctx K ⊢K[ f' ◁ CH' ]⦂ CH)
-              → τ-substK p (K [ L ]ₖ)
-              ≡ τ-substK p K [ K-rename (eq-ren (cong (Γ ++ᶜ_) (τ-substK-hole-ctx p K))) L ]ₖ
-              
-τ-substK-[·]ₖ refl K L =
-  trans
-    (cong (λ L → K [ L ]ₖ) (sym (K-rename-id L)))
-    (cong (λ ρ → K [ K-rename ρ L ]ₖ) (sym eq-ren-refl-id))
 
