@@ -87,20 +87,6 @@ data _⊢K[_◁_]⦂_ (Γ : Ctx) (f : Flag) (CH : CType) : CType → Set where
         -----------------------------
         → Γ ⊢K[ f ◁ CH ]⦂ A ‼ (τₖ + τ)
 
-    _;[_]ₖ_ : ∀ {Aₖ A τₖ τ} 
-        → Γ ⊢C⦂ A ‼ τ
-        → all ≤ᶠ f
-        → Γ ⟨ τ ⟩ ∷ A ⊢K[ f ◁ CH ]⦂ Aₖ ‼ τₖ 
-        ----------------------------------
-        → Γ ⊢K[ f ◁ CH ]⦂ Aₖ ‼ (τ + τₖ)
-
-    match_`in[_]ₖ_ : ∀ {Aₖ A B τₖ}
-        → Γ ⊢V⦂ A |×| B
-        → all ≤ᶠ f
-        → Γ ∷ A ∷ B ⊢K[ f ◁ CH ]⦂ Aₖ ‼ τₖ
-        -------------------------------
-        → Γ ⊢K[ f ◁ CH ]⦂ Aₖ ‼ τₖ
-
     perform[_]ₖ : ∀ {A τ}
         → all ≤ᶠ f
         → (op : Op)
@@ -118,18 +104,6 @@ data _⊢K[_◁_]⦂_ (Γ : Ctx) (f : Flag) (CH : CType) : CType → Set where
                ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
              ⊢C⦂ B ‼ (op-time op + τ''))
         → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
-        ------------------------------------------------------------
-        → Γ ⊢K[ f ◁ CH ]⦂ B ‼ (τ + τ')
-
-    handle_`with_`in[_]ₖ
-        : ∀ {A B τ τ'}
-        → Γ ⊢C⦂ A ‼ τ
-        → ((op : Op) → (τ'' : Time) →
-             Γ ∷ type-of-gtype (param op)
-               ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
-             ⊢C⦂ B ‼ (op-time op + τ''))
-        → all ≤ᶠ f
-        → Γ ⟨ τ ⟩ ∷ A ⊢K[ f ◁ CH ]⦂ B ‼ τ'
         ------------------------------------------------------------
         → Γ ⊢K[ f ◁ CH ]⦂ B ‼ (τ + τ')
 
@@ -165,16 +139,10 @@ rel-hole-ctx []ₖ Γ' =
   Γ'
 rel-hole-ctx (K ₖ[ p ]; N) Γ' =
   rel-hole-ctx K Γ'
-rel-hole-ctx (_;[_]ₖ_ {A = A} {τ = τ} M p K) Γ' =
-  rel-hole-ctx K (Γ' ⟨ τ ⟩ ∷ A)
-rel-hole-ctx (match_`in[_]ₖ_ {A = A} {B = B} V p K) Γ' =
-  rel-hole-ctx K (Γ' ∷ A ∷ B)
 rel-hole-ctx (perform[_]ₖ p op V K) Γ' =
   rel-hole-ctx K (Γ' ⟨ op-time op ⟩ ∷ type-of-gtype (arity op))
 rel-hole-ctx (handle[ p ]ₖ K `with H `in N) Γ' =
   rel-hole-ctx K Γ'
-rel-hole-ctx (handle_`with_`in[_]ₖ {A = A} {τ = τ} M H p K) Γ' =
-  rel-hole-ctx K (Γ' ⟨ τ ⟩ ∷ A)
 rel-hole-ctx (delay[ p ]ₖ τ K) Γ' =
   rel-hole-ctx K (Γ' ⟨ τ ⟩)
 rel-hole-ctx (unbox[_]ₖ {A = A} p q V K) Γ' =
@@ -204,15 +172,9 @@ rel-hole-ctx-++ᶜ {Γ} {Γ'} {Γ''} []ₖ =
   refl
 rel-hole-ctx-++ᶜ {Γ} {Γ'} {Γ''} (K ₖ[ p ]; N) =
   rel-hole-ctx-++ᶜ K
-rel-hole-ctx-++ᶜ {Γ} {Γ'} {Γ''} (M ;[ p ]ₖ K) =
-  rel-hole-ctx-++ᶜ K 
-rel-hole-ctx-++ᶜ {Γ} {Γ'} {Γ''} (match V `in[ p ]ₖ K) =
-  rel-hole-ctx-++ᶜ K
 rel-hole-ctx-++ᶜ {Γ} {Γ'} {Γ''} (perform[ p ]ₖ op V K) =
   rel-hole-ctx-++ᶜ K
 rel-hole-ctx-++ᶜ {Γ} {Γ'} {Γ''} (handle[ p ]ₖ K `with H `in N) =
-  rel-hole-ctx-++ᶜ K
-rel-hole-ctx-++ᶜ {Γ} {Γ'} {Γ''} (handle M `with H `in[ p ]ₖ K) =
   rel-hole-ctx-++ᶜ K
 rel-hole-ctx-++ᶜ {Γ} {Γ'} {Γ''} (delay[ p ]ₖ τ K) =
   rel-hole-ctx-++ᶜ K
@@ -232,7 +194,6 @@ hole-ctx-++ᶜ {Γ} K = rel-hole-ctx-++ᶜ {Γ} {Γ} {[]} K
 eval-hole-ctx : ∀ {Γ CH C}
               → (K : Γ ⊢K[ eval ◁ CH ]⦂ C)
               → hole-ctx K ≡ []
-
 eval-hole-ctx []ₖ =
   refl
 eval-hole-ctx (K ₖ[ p ]; N) =
@@ -251,16 +212,10 @@ eval-hole-ctx (handle[ p ]ₖ K `with H `in N) =
   []ₖ
 ◁-mon {f = f} {f' = f'} p (K ₖ[ q ]; N) =
   (◁-mon p K) ₖ[ ≤ᶠ-trans q p ]; N
-◁-mon {f = f} {f' = f'} p (M ;[ q ]ₖ K) =
-  M ;[ ≤ᶠ-trans q p ]ₖ (◁-mon p K)
-◁-mon {f = f} {f' = f'} p (match V `in[ q ]ₖ K) =
-  match V `in[ ≤ᶠ-trans q p ]ₖ (◁-mon p K)
 ◁-mon {f = f} {f' = f'} p (perform[ q ]ₖ op V K) =
   perform[ ≤ᶠ-trans q p ]ₖ op V (◁-mon p K)
 ◁-mon {f = f} {f' = f'} p (handle[ q ]ₖ K `with H `in N) =
   handle[ ≤ᶠ-trans q p ]ₖ (◁-mon p K) `with H `in N
-◁-mon {f = f} {f' = f'} p (handle M `with H `in[ q ]ₖ K) =
-  handle M `with H `in[ ≤ᶠ-trans q p ]ₖ (◁-mon p K)
 ◁-mon {f = f} {f' = f'} p (delay[ q ]ₖ τ K) =
   delay[ ≤ᶠ-trans q p ]ₖ τ (◁-mon p K)
 ◁-mon {f = f} {f' = f'} p (unbox[ q ]ₖ r V K) =
@@ -280,16 +235,10 @@ K-rename ρ []ₖ =
   []ₖ
 K-rename ρ (K ₖ[ p ]; N) =
   (K-rename ρ K) ₖ[ p ]; (C-rename (cong-ren ρ) N)
-K-rename ρ (M ;[ p ]ₖ K) =
-  (C-rename ρ M) ;[ p ]ₖ (K-rename (cong-ren ρ) K)
-K-rename ρ (match V `in[ p ]ₖ K) =
-  match (V-rename ρ V) `in[ p ]ₖ (K-rename (cong-ren ρ) K)
 K-rename ρ (perform[ p ]ₖ op V K) =
   perform[ p ]ₖ op (V-rename ρ V) (K-rename (cong-ren ρ) K)
 K-rename ρ (handle[ p ]ₖ K `with H `in N) =
   handle[ p ]ₖ K-rename ρ K `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'')) `in (C-rename (cong-ren ρ) N)
-K-rename ρ (handle M `with H `in[ p ]ₖ K) =
-  handle (C-rename ρ M) `with (λ op τ'' → C-rename (cong-ren ρ) (H op τ'')) `in[ p ]ₖ (K-rename (cong-ren ρ) K)
 K-rename ρ (delay[ p ]ₖ τ K) =
   delay[ p ]ₖ τ (K-rename (cong-ren ρ) K)
 K-rename ρ (unbox[ p ]ₖ q V K) =
@@ -308,18 +257,6 @@ _[_]ₖ : ∀ {Γ CH CH' C f f'}
   ◁-mon ∨ᶠ-inr L
 (K ₖ[ p ]; N) [ L ]ₖ =
   (K [ L ]ₖ) ₖ[ ≤ᶠ-trans p ∨ᶠ-inl ]; N
-(M ;[ p ]ₖ K) [ L ]ₖ =
-  M ;[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ
-  (K [ K-rename (eq-ren
-         (trans
-           (cong (_ ++ᶜ_) (rel-hole-ctx-++ᶜ K))
-           (sym (++ᶜ-assoc _ ([] ⟨ _ ⟩ ∷ _) (hole-ctx K))))) L ]ₖ)
-(match V `in[ p ]ₖ K) [ L ]ₖ =
-  match V `in[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ
-    (K [ K-rename (eq-ren
-           (trans
-             (cong (_ ++ᶜ_) (rel-hole-ctx-++ᶜ K))
-             (sym (++ᶜ-assoc _ ([] ∷ _ ∷ _) (hole-ctx K))))) L ]ₖ)
 perform[ p ]ₖ op V K [ L ]ₖ =
   perform[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ op V
     (K [ K-rename (eq-ren
@@ -328,12 +265,6 @@ perform[ p ]ₖ op V K [ L ]ₖ =
              (sym (++ᶜ-assoc _ ([] ⟨ _ ⟩ ∷ _) (hole-ctx K))))) L ]ₖ)
 handle[ p ]ₖ K `with H `in N [ L ]ₖ =
   handle[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ (K [ L ]ₖ) `with H `in N
-handle M `with H `in[ p ]ₖ K [ L ]ₖ =
-  handle M `with H `in[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ
-    (K [ K-rename (eq-ren
-           (trans
-             (cong (_ ++ᶜ_) (rel-hole-ctx-++ᶜ K))
-             (sym (++ᶜ-assoc _ ([] ⟨ _ ⟩ ∷ _) (hole-ctx K))))) L ]ₖ)
 delay[ p ]ₖ τ K [ L ]ₖ =
   delay[ ≤ᶠ-trans p ∨ᶠ-inl ]ₖ τ
     (K [ K-rename (eq-ren
@@ -364,18 +295,6 @@ _[_] : ∀ {Γ CH C f}
   N
 (K ₖ[ p ]; M) [ N ] =
   (K [ N ]) ; M
-(M ;[ p ]ₖ K) [ N ] =
-  M ;
-  (K [ C-rename (eq-ren
-         (trans
-           (cong (_ ++ᶜ_) (rel-hole-ctx-++ᶜ K))
-           (sym (++ᶜ-assoc _ ([] ⟨ _ ⟩ ∷ _) (hole-ctx K))))) N ])
-(match V `in[ p ]ₖ K) [ N ] =
-  match V `in
-    (K [ C-rename (eq-ren
-           (trans
-             (cong (_ ++ᶜ_) (rel-hole-ctx-++ᶜ K))
-             (sym (++ᶜ-assoc _ ([] ∷ _ ∷ _) (hole-ctx K))))) N ])
 perform[ p ]ₖ op V K [ N ] =
   perform op V
     (K [ C-rename (eq-ren
@@ -384,12 +303,6 @@ perform[ p ]ₖ op V K [ N ] =
              (sym (++ᶜ-assoc _ ([] ⟨ _ ⟩ ∷ _) (hole-ctx K))))) N ])
 handle[ p ]ₖ K `with H `in M [ N ] =
   handle (K [ N ]) `with H `in M
-handle M `with H `in[ p ]ₖ K [ N ] =
-  handle M `with H `in
-    (K [ C-rename (eq-ren
-           (trans
-             (cong (_ ++ᶜ_) (rel-hole-ctx-++ᶜ K))
-             (sym (++ᶜ-assoc _ ([] ⟨ _ ⟩ ∷ _) (hole-ctx K))))) N ])
 delay[ p ]ₖ τ K [ N ] =
   delay τ
     (K [ C-rename (eq-ren
