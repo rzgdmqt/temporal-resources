@@ -1,4 +1,4 @@
-module OperationalSemantics.PerservationTheorem where
+module OperationalSemantics.PreservationTheorem where
 
 open import OperationalSemantics.State
 
@@ -195,26 +195,26 @@ mutual
     step-extends-state (HANDLE-STEP {M = M} {M₁ = M'} τ+τ₄≡τ₇+τ₆ M↝M') = step-extends-state M↝M'
 
 
--- perservation theorem
+-- preservation theorem
 
-perservation-theorem : ∀ {A B τ'' τ'''}
+preservation-theorem : ∀ {A B τ'' τ'''}
                 → {S S' : 𝕊 []}
                 → {M : toCtx S ⊢C⦂ A ‼ τ''}
                 → {M' : toCtx S' ⊢C⦂ B ‼ τ'''}
                 → ⟨ S , M ⟩ ↝ ⟨ S' , M' ⟩
                 → A ≡ B × state-time S + τ'' ≡ state-time S' + τ'''
-perservation-theorem APP = refl , refl
-perservation-theorem MATCH = refl , refl
-perservation-theorem {S = S} {S' = S'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ M↝M') = 
+preservation-theorem APP = refl , refl
+preservation-theorem MATCH = refl , refl
+preservation-theorem {S = S} {S' = S'} (SEQ-FST {τ₂ = τ₂} {τ₃} {τ₄} τ+τ₂≡τ₁+τ₄ M↝M') = 
     refl , τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] (state-time S) (state-time S') τ₂ τ₃ τ₄ τ+τ₂≡τ₁+τ₄
-perservation-theorem SEQ-RET = refl , refl
-perservation-theorem SEQ-OP = refl , refl
-perservation-theorem {τ''' = τ'''} {S = S} (DELAY {τ' = τ'}) = 
+preservation-theorem SEQ-RET = refl , refl
+preservation-theorem SEQ-OP = refl , refl
+preservation-theorem {τ''' = τ'''} {S = S} (DELAY {τ' = τ'}) = 
     refl , sym (+-assoc (state-time S) τ' τ''')
-perservation-theorem HANDLE-RET = refl , refl
-perservation-theorem {S = S} {S' = S'} (HANDLE-STEP {τ₁ = τ₁} {τ₂} {τ₃} τ+τ₂≡τ₄+τ₃ M↝M') = 
+preservation-theorem HANDLE-RET = refl , refl
+preservation-theorem {S = S} {S' = S'} (HANDLE-STEP {τ₁ = τ₁} {τ₂} {τ₃} τ+τ₂≡τ₄+τ₃ M↝M') = 
     refl , τ+τ₂≡τ₁+τ₄⇒τ+[τ₂+τ₃]≡τ₁+[τ₄+τ₃] (state-time S) (state-time S') τ₂ τ₁ τ₃ τ+τ₂≡τ₄+τ₃
-perservation-theorem {S = S} (HANDLE-OP {τ' = τ'} {τ'' = τ''} {op = op}) = 
+preservation-theorem {S = S} (HANDLE-OP {τ' = τ'} {τ'' = τ''} {op = op}) = 
     refl , cong ((state-time S) +_) (+-assoc (op-time op) τ'' τ')
-perservation-theorem BOX = refl , refl
-perservation-theorem (UNBOX p) = refl , refl 
+preservation-theorem BOX = refl , refl
+preservation-theorem (UNBOX p) = refl , refl 

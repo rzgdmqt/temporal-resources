@@ -51,7 +51,7 @@ The main modules presenting the core language are:
 
 - `OperationalSemantics/State.agda` defines state for stateful operational semantics, and proves some state properties.
 
-- `OperationalSemantics/PerservationTheorem.agda` defines steps for stateful operational semantics, and proves perservation theorem.
+- `OperationalSemantics/PreservationTheorem.agda` defines steps for stateful operational semantics, and proves preservation theorem.
 
 - `OperationalSemantics/TheoremsAboutSteps.agda` proves some basic theorems about steps.
 

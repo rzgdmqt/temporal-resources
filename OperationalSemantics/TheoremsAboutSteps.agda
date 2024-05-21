@@ -5,7 +5,7 @@ open import Syntax.Contexts
 open import Syntax.Language
 open import Syntax.Types
 
-open import OperationalSemantics.PerservationTheorem
+open import OperationalSemantics.PreservationTheorem
 open import OperationalSemantics.State
 
 open import Relation.Binary.PropositionalEquality  as Eq hiding ( [_] ) 

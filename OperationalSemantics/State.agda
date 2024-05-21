@@ -27,7 +27,7 @@ mutual
   infix  32 _⟨_⟩ₛ
 
 
--- Operations on state - for better readability in perservation theorem
+-- Operations on state - for better readability in preservation theorem
 
 time-pass : ∀ {Γ} → (S : 𝕊 Γ) → (τ' : Time) → 𝕊 Γ
 time-pass S τ = S ⟨ τ ⟩ₛ 

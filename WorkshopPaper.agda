@@ -21,7 +21,7 @@
 --                                                                    --
 --   - small-step operational semantic                                --
 --                                                                    --
---   - progress and perservation theorem                              --
+--   - progress and preservation theorem                              --
 --                                                                    --
 --   - equational theory                                              --
 ------------------------------------------------------------------------
@@ -68,9 +68,9 @@ open import Syntax.CompContext
 
 open import OperationalSemantics.State
 
----- Small-steps operational semantics and perservation theorem 
+---- Small-steps operational semantics and preservation theorem 
 
-open import OperationalSemantics.PerservationTheorem
+open import OperationalSemantics.PreservationTheorem
 
 ---- Some theorems about step relation 
 

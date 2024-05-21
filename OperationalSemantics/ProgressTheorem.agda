@@ -1,7 +1,7 @@
 module OperationalSemantics.ProgressTheorem where
 
 
-open import OperationalSemantics.PerservationTheorem
+open import OperationalSemantics.PreservationTheorem
 open import OperationalSemantics.State
 
 open import Syntax.Contexts
