@@ -80,33 +80,16 @@ data _⊢K[_◁_]⦂_ (Γ : Ctx) (f : Flag) (CH : CType) : CType → Set where
         --------------------
           Γ ⊢K[ f ◁ CH ]⦂ CH
 
-    _ₖ[_];_ : ∀ {Aₖ A τₖ τ}
-        → Γ ⊢K[ f ◁ CH ]⦂ Aₖ ‼ τₖ
-        → eval ≤ᶠ f
-        → Γ ⟨ τₖ ⟩ ∷ Aₖ ⊢C⦂ A ‼ τ
-        -----------------------------
-        → Γ ⊢K[ f ◁ CH ]⦂ A ‼ (τₖ + τ)
+    -- state specific computation term contexts
 
     perform[_]ₖ : ∀ {A τ}
-        → all ≤ᶠ f
+        → state ≤ᶠ f
         → (op : Op)
         → Γ ⊢V⦂ type-of-gtype (param op)
         → Γ ⟨ op-time op ⟩ ∷ type-of-gtype (arity op) ⊢K[ f ◁ CH ]⦂ A ‼ τ
         ----------------------------------------------------------------
         → Γ ⊢K[ f ◁ CH ]⦂ A ‼ (op-time op + τ)
-
-    handle[_]ₖ_`with_`in
-        : ∀ {A B τ τ'}
-        → eval ≤ᶠ f
-        → Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ
-        → ((op : Op) → (τ'' : Time) →
-             Γ ∷ type-of-gtype (param op)
-               ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
-             ⊢C⦂ B ‼ (op-time op + τ''))
-        → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
-        ------------------------------------------------------------
-        → Γ ⊢K[ f ◁ CH ]⦂ B ‼ (τ + τ')
-
+    
     delay[_]ₖ : ∀ {A τ'}
         → state ≤ᶠ f
         → (τ : Time)
@@ -115,7 +98,7 @@ data _⊢K[_◁_]⦂_ (Γ : Ctx) (f : Flag) (CH : CType) : CType → Set where
         → Γ ⊢K[ f ◁ CH ]⦂ A ‼ (τ + τ')
 
     unbox[_]ₖ : ∀ {A C τ}
-        → all ≤ᶠ f
+        → state ≤ᶠ f
         → τ ≤ ctx-time Γ
         → Γ -ᶜ τ ⊢V⦂ [ τ ] A
         → Γ ∷ A  ⊢K[ f ◁ CH ]⦂ C
@@ -128,6 +111,28 @@ data _⊢K[_◁_]⦂_ (Γ : Ctx) (f : Flag) (CH : CType) : CType → Set where
         → Γ ∷ [ τ ] A ⊢K[ f ◁ CH ]⦂ C
         ----------------------------
         → Γ ⊢K[ f ◁ CH ]⦂ C
+
+    -- evaluation specific computation term contexts
+
+    _ₖ[_];_ : ∀ {Aₖ A τₖ τ}
+        → Γ ⊢K[ f ◁ CH ]⦂ Aₖ ‼ τₖ
+        → eval ≤ᶠ f
+        → Γ ⟨ τₖ ⟩ ∷ Aₖ ⊢C⦂ A ‼ τ
+        -----------------------------
+        → Γ ⊢K[ f ◁ CH ]⦂ A ‼ (τₖ + τ)
+    
+    handle[_]ₖ_`with_`in
+        : ∀ {A B τ τ'}
+        → eval ≤ᶠ f
+        → Γ ⊢K[ f ◁ CH ]⦂ A ‼ τ
+        → ((op : Op) → (τ'' : Time) →
+             Γ ∷ type-of-gtype (param op)
+               ∷ [ op-time op ] (type-of-gtype (arity op) ⇒ B ‼ τ'')
+             ⊢C⦂ B ‼ (op-time op + τ''))
+        → Γ ⟨ τ ⟩ ∷ A ⊢C⦂ B ‼ τ'
+        ------------------------------------------------------------
+        → Γ ⊢K[ f ◁ CH ]⦂ B ‼ (τ + τ')
+
 
 -- Contexts of the hole in a computation term context
 -- (the relative version, against arbitrary ctx Γ')
